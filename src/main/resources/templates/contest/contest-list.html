@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1440" />
+    <title>공모전 목록</title>
+    <link rel="stylesheet" href="../../static/css/common/reset.css" />
+    <link rel="stylesheet" href="../../static/css/common/font.css" />
+    <link rel="stylesheet" href="../../static/css/common/global.css" />
+    <link rel="stylesheet" href="../../static/css/common/util.css" />
+    <link rel="stylesheet" href="../../static/css/common/common.css" />
+    <link rel="stylesheet" href="../../static/css/contest/contest-list-page.css" />
+</head>
+<body>
+
+<div id="section" class="Page-Content">
+<div class="Contest-Page">
+
+    <!-- ===== 공모전 리스트 영역 ===== -->
+    <div class="Contest-List-Section">
+
+        <!-- 필터 바 -->
+        <div class="Contest-Filter-Bar">
+            <div class="Contest-Filter-Group">
+                <button class="Contest-Filter-Btn Contest-Filter-Btn--active" data-sort="latest">최신순</button>
+                <button class="Contest-Filter-Btn" data-sort="popular">인기순</button>
+                <button class="Contest-Filter-Btn" data-sort="deadline">마감순</button>
+            </div>
+            <div class="Contest-Filter-Divider"></div>
+            <div class="Contest-Filter-Group">
+                <button class="Contest-Filter-Btn Contest-Filter-Btn--toggle" data-scope="joined">내가 참여한 공모전</button>
+                <button class="Contest-Filter-Btn Contest-Filter-Btn--toggle" data-scope="mine">내가 올린 공모전</button>
+            </div>
+        </div>
+
+        <!-- 리스트 아이템들 (JS에서 동적 렌더링) -->
+        <div class="Contest-List" id="contestList"></div>
+
+        <!-- 무한스크롤 로딩 표시 -->
+        <div class="Contest-List-Loader" id="contestLoader">
+            <div class="Contest-List-Spinner"></div>
+        </div>
+
+    </div>
+
+    <!-- ===== 상세 패널 (오른쪽, 클릭 시 표시) ===== -->
+    <div class="Contest-Detail-Panel" id="contestDetailPanel">
+        <div class="Contest-Detail-Inner">
+
+            <!-- 배너 이미지 -->
+            <div class="Contest-Detail-Banner">
+                <img class="Contest-Detail-BannerImage" id="detailBanner" alt="" src="" />
+            </div>
+
+            <!-- 대표 이미지 + 제목 -->
+            <div class="Contest-Detail-Header">
+                <div class="Contest-Detail-Avatar">
+                    <img class="Contest-Detail-AvatarImage" id="detailAvatar" alt="" src="" />
+                </div>
+                <div class="Contest-Detail-HeaderInfo">
+                    <h2 class="Contest-Detail-Title" id="detailTitle"></h2>
+                    <div class="Contest-Detail-Host" id="detailHost"></div>
+                </div>
+            </div>
+
+            <div class="Contest-Detail-Divider"></div>
+
+            <!-- 공모전 정보 -->
+            <div class="Contest-Detail-InfoGroup">
+                <div class="Contest-Detail-InfoRow">
+                    <span class="Contest-Detail-InfoLabel">상태</span>
+                    <span class="Contest-Detail-InfoValue Contest-Detail-Status" id="detailStatus">모집중</span>
+                </div>
+                <div class="Contest-Detail-InfoRow">
+                    <span class="Contest-Detail-InfoLabel">접수 기간</span>
+                    <span class="Contest-Detail-InfoValue" id="detailPeriod"></span>
+                </div>
+                <div class="Contest-Detail-InfoRow">
+                    <span class="Contest-Detail-InfoLabel">참가 작품</span>
+                    <span class="Contest-Detail-InfoValue" id="detailEntries"></span>
+                </div>
+                <div class="Contest-Detail-InfoRow">
+                    <span class="Contest-Detail-InfoLabel">조회수</span>
+                    <span class="Contest-Detail-InfoValue" id="detailViews"></span>
+                </div>
+                <div class="Contest-Detail-InfoRow">
+                    <span class="Contest-Detail-InfoLabel">상금</span>
+                    <span class="Contest-Detail-InfoValue Contest-Detail-Prize" id="detailPrize"></span>
+                </div>
+                <div class="Contest-Detail-InfoRow">
+                    <span class="Contest-Detail-InfoLabel">결과 발표</span>
+                    <span class="Contest-Detail-InfoValue" id="detailAnnounce"></span>
+                </div>
+            </div>
+
+            <div class="Contest-Detail-Divider"></div>
+
+            <!-- 설명 -->
+            <div class="Contest-Detail-DescSection">
+                <h3 class="Contest-Detail-DescTitle">설명</h3>
+                <p class="Contest-Detail-DescText" id="detailDesc"></p>
+            </div>
+
+            <div class="Contest-Detail-Divider"></div>
+
+            <!-- 태그 -->
+            <div class="Contest-Detail-TagSection">
+                <h3 class="Contest-Detail-TagTitle">태그</h3>
+                <div class="Contest-Detail-Tags" id="detailTags"></div>
+            </div>
+
+            <div class="Contest-Detail-Divider"></div>
+
+            <!-- 액션 버튼 -->
+            <div class="Contest-Detail-ButtonGroup">
+                <button class="Contest-Detail-ApplyBtn">참가 신청</button>
+                <button class="Contest-Detail-ShareBtn">공유</button>
+                <button class="Contest-Detail-ReportBtn">신고</button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+</div>
+
+<script src="../../static/js/contest/contest-list.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+/* 폰트 영역 */
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap");
+
+html,
+body {
+  font-family: "Roboto", "Noto Sans KR", sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}

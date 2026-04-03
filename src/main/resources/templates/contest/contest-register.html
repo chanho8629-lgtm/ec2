@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1440" />
+    <title>공모전 등록</title>
+    <link rel="stylesheet" href="../../static/css/common/reset.css" />
+    <link rel="stylesheet" href="../../static/css/common/font.css" />
+    <link rel="stylesheet" href="../../static/css/common/global.css" />
+    <link rel="stylesheet" href="../../static/css/common/util.css" />
+    <link rel="stylesheet" href="../../static/css/common/common.css" />
+    <link rel="stylesheet" href="../../static/css/contest/contest-register-page.css" />
+    
+</head>
+<body>
+
+<div id="section" class="Page-Content">
+<div class="Register-Page">
+
+    <!-- ===== 페이지 타이틀 + 액션 버튼 ===== -->
+    <div class="Register-Page-Header">
+        <h1 class="Register-Page-Title">공모전 등록</h1>
+        <div class="Register-ActionBar-Buttons">
+            <button class="Register-Button-Outline">수정</button>
+            <button class="Register-Button-Filled">등록</button>
+        </div>
+    </div>
+
+    <!-- ===== 구분선 ===== -->
+    <div class="Register-Divider"></div>
+
+    <!-- ===== 폼 콘텐츠 ===== -->
+    <div class="Register-Form">
+
+        <!-- 배너 이미지 -->
+        <section class="Register-Section">
+            <h2 class="Register-Section-Title">배너 이미지</h2>
+            <p class="Register-Section-Desc">이 이미지가 공모전 상세 페이지 상단에 표시됩니다.</p>
+            <div class="Register-Upload-Row">
+                <div class="Register-Banner-Preview" id="bannerPreview">
+                    <div class="Register-Banner-Placeholder" id="bannerPlaceholder">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 0 24 24" width="48"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" fill="#606060"/></svg>
+                    </div>
+                    <img class="Register-Banner-Image" id="bannerImage" alt="" src="" style="display:none;" />
+                </div>
+                <div class="Register-Upload-Info">
+                    <p class="Register-Upload-Guide">모든 기기에 최적화된 이미지가 표시되도록 2048x1152픽셀 이상, 6MB 이하의 이미지를 사용하세요.</p>
+                    <input type="file" id="bannerFileInput" accept="image/*" hidden />
+                    <div class="Register-Button-Group">
+                        <button class="Register-Button-Outline" id="bannerUploadBtn">업로드</button>
+                        <button class="Register-Button-Outline" id="bannerChangeBtn" style="display:none;">변경</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 공모전 제목 -->
+        <section class="Register-Section">
+            <h2 class="Register-Section-Title">공모전 제목</h2>
+            <p class="Register-Section-Desc">공모전을 잘 나타내는 제목을 입력하세요. 변경된 제목은 공모전 목록과 상세 페이지에 표시됩니다. 제목은 14일 내에 2회 변경할 수 있습니다.</p>
+            <div class="Register-Input-Wrap">
+                <input class="Register-Input" type="text" placeholder="공모전 제목을 입력하세요" />
+            </div>
+        </section>
+
+        <!-- 접수 기간 -->
+        <section class="Register-Section">
+            <h2 class="Register-Section-Title">접수 기간</h2>
+            <p class="Register-Section-Desc">공모전 참가 접수 시작일과 마감일을 설정하세요. 설정된 기간 동안만 참가 신청이 가능합니다.</p>
+            <div class="Register-Date-Row">
+                <div class="Register-Input-Wrap Register-Input-Wrap--labeled">
+                    <label class="Register-Input-Label">시작일</label>
+                    <input class="Register-Input" type="date" id="startDate" />
+                </div>
+                <span class="Register-Date-Separator">~</span>
+                <div class="Register-Input-Wrap Register-Input-Wrap--labeled">
+                    <label class="Register-Input-Label">마감일</label>
+                    <input class="Register-Input" type="date" id="endDate" />
+                </div>
+            </div>
+        </section>
+
+        <!-- 결과 발표일 -->
+        <section class="Register-Section">
+            <h2 class="Register-Section-Title">결과 발표일</h2>
+            <p class="Register-Section-Desc">심사 완료 후 수상자를 발표할 날짜를 설정하세요. 발표일은 공모전 상세 페이지에 표시됩니다.</p>
+            <div class="Register-Input-Wrap Register-Input-Wrap--labeled">
+                <label class="Register-Input-Label">발표일</label>
+                <input class="Register-Input" type="date" id="announceDate" />
+            </div>
+        </section>
+
+        <!-- 상금 -->
+        <section class="Register-Section">
+            <h2 class="Register-Section-Title">상금</h2>
+            <p class="Register-Section-Desc">공모전 총 상금을 입력하세요. 상금은 공모전 목록과 상세 페이지에 표시됩니다.</p>
+            <div class="Register-Input-Wrap">
+                <input class="Register-Input" type="text" placeholder="예: 총 500만원" />
+            </div>
+        </section>
+
+        <!-- 공모전 설명 -->
+        <section class="Register-Section">
+            <h2 class="Register-Section-Title">설명</h2>
+            <div class="Register-Textarea-Wrap">
+                <textarea class="Register-Textarea" rows="6" placeholder="참가자에게 공모전에 대해 설명해 주세요. 이 설명은 공모전의 정보 섹션 및 검색결과 등에 표시됩니다."></textarea>
+            </div>
+        </section>
+
+        <!-- 태그 -->
+        <section class="Register-Section">
+            <h2 class="Register-Section-Title">태그</h2>
+            <p class="Register-Section-Desc">#을 붙여 입력한 뒤 Enter를 누르면 태그가 생성됩니다.</p>
+            <div class="Register-Tag-Wrap" id="tagWrap">
+                <input class="Register-Tag-Input" type="text" id="tagInput" placeholder="#태그 입력 후 Enter" />
+            </div>
+        </section>
+
+
+    </div>
+
+    <!-- 삭제 버튼 (하단) -->
+    <div class="Register-Delete-Section">
+        <button class="Register-Button-Delete">삭제</button>
+    </div>
+
+</div>
+</div>
+
+<script src="../../static/js/contest/contest-register.js"></script>
+</body>
+</html>

@@ -1,0 +1,559 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
+    color: inherit;
+}
+
+/* ===== 페이지 레이아웃 ===== */
+.Contest-Page {
+    display: flex;
+    width: 100%;
+    min-height: calc(100vh - 56px - 48px);
+    gap: 0;
+}
+
+/* ===== 리스트 영역 (왼쪽) ===== */
+.Contest-List-Section {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ===== 필터 바 ===== */
+.Contest-Filter-Bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0;
+}
+
+.Contest-Filter-Group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.Contest-Filter-Divider {
+    width: 1px;
+    height: 20px;
+    background-color: var(--color-border);
+    margin: 0 4px;
+}
+
+.Contest-Filter-Btn {
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-sub);
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.Contest-Filter-Btn:hover {
+    background-color: var(--color-bg-muted);
+    color: var(--color-text);
+}
+
+.Contest-Filter-Btn--active {
+    background-color: var(--color-primary);
+    color: #ffffff;
+    border-color: var(--color-primary);
+    font-weight: 600;
+}
+
+.Contest-Filter-Btn--active:hover {
+    background-color: var(--color-primary-hover);
+    color: #ffffff;
+}
+
+.Contest-Filter-Btn--toggle.Contest-Filter-Btn--selected {
+    background-color: var(--color-primary-light);
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+    font-weight: 600;
+}
+
+.Contest-Filter-Btn--toggle.Contest-Filter-Btn--selected:hover {
+    background-color: #e8d5ff;
+}
+
+/* ===== 로딩 스피너 ===== */
+.Contest-List-Loader {
+    display: flex;
+    justify-content: center;
+    padding: 24px 0;
+}
+
+.Contest-List-Spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spinLoader 0.7s linear infinite;
+}
+
+@keyframes spinLoader {
+    to { transform: rotate(360deg); }
+}
+
+.Contest-List {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== 리스트 아이템 ===== */
+.Contest-List-Item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.Contest-List-Item:hover {
+    background-color: var(--color-bg-muted);
+}
+
+.Contest-List-Item--active {
+    background-color: var(--color-bg-muted);
+}
+
+/* 드래그 핸들 */
+.Contest-Item-DragHandle {
+    width: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    cursor: grab;
+}
+
+.Contest-Item-DragHandle svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--color-text-muted);
+}
+
+/* 인덱스 번호 */
+.Contest-Item-Index {
+    width: 36px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--color-text-sub);
+    flex-shrink: 0;
+}
+
+/* 썸네일 */
+.Contest-Item-Thumbnail {
+    width: 160px;
+    flex-shrink: 0;
+    margin-right: 16px;
+}
+
+.Contest-Thumbnail-Link {
+    display: block;
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.Contest-Thumbnail-Image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+}
+
+
+/* 아이템 정보 */
+.Contest-Item-Info {
+    flex: 1;
+    min-width: 0;
+    padding-right: 8px;
+}
+
+.Contest-Item-Title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text);
+    line-height: 20px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+}
+
+.Contest-Item-Meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.Contest-Item-Channel,
+.Contest-Item-Views,
+.Contest-Item-Date {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--color-text-sub);
+    line-height: 18px;
+}
+
+.Contest-Item-Separator {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 0 4px;
+}
+
+.Contest-Item-Channel:hover {
+    color: var(--color-text);
+}
+
+/* 액션 (점 3개 메뉴) */
+.Contest-Item-Actions {
+    flex-shrink: 0;
+    padding-right: 8px;
+}
+
+.Contest-Item-MenuBtn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--color-text);
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.Contest-List-Item:hover .Contest-Item-MenuBtn {
+    opacity: 1;
+}
+
+.Contest-Item-MenuBtn:hover {
+    background-color: var(--color-bg-muted);
+}
+
+.Contest-Item-MenuBtn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+/* ===== 상세 패널 (오른쪽) ===== */
+.Contest-Detail-Panel {
+    flex-shrink: 0;
+    position: sticky;
+    top: calc(var(--content-top, var(--layout-header-height)) + var(--content-padding));
+    align-self: flex-start;
+    overflow: hidden;
+    width: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.Contest-Detail-Panel--visible {
+    width: 720px;
+    opacity: 1;
+    pointer-events: auto;
+    animation: panelSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.Contest-Detail-Panel--closing {
+    animation: panelSlideOut 0.25s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes panelSlideIn {
+    0% {
+        width: 720px;
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    100% {
+        width: 720px;
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.Contest-Detail-Panel--closing .Contest-Detail-Inner {
+    min-width: 720px;
+}
+
+@keyframes panelSlideOut {
+    0% {
+        width: 720px;
+        opacity: 1;
+        transform: translateX(0);
+    }
+    100% {
+        width: 0;
+        opacity: 0;
+        transform: translateX(60px);
+    }
+}
+
+.Contest-Detail-Inner {
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    overflow: hidden;
+    background-color: var(--color-bg);
+}
+
+/* 배너 */
+.Contest-Detail-Banner {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    background-color: var(--color-bg-muted);
+}
+
+.Contest-Detail-BannerImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* 헤더: 아바타 + 제목 */
+.Contest-Detail-Header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px 16px;
+}
+
+.Contest-Detail-Avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: var(--color-bg-muted);
+    flex-shrink: 0;
+}
+
+.Contest-Detail-AvatarImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.Contest-Detail-HeaderInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.Contest-Detail-Title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 28px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.Contest-Detail-Host {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--color-text-sub);
+    line-height: 18px;
+}
+
+/* 구분선 */
+.Contest-Detail-Divider {
+    height: 1px;
+    background-color: var(--color-border);
+    margin: 0 24px;
+}
+
+/* 정보 그룹 */
+.Contest-Detail-InfoGroup {
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.Contest-Detail-InfoRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.Contest-Detail-InfoLabel {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--color-text-sub);
+}
+
+.Contest-Detail-InfoValue {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.Contest-Detail-Status {
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.Contest-Detail-Status--open {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.Contest-Detail-Status--closing {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.Contest-Detail-Status--closed {
+    background-color: var(--color-bg-muted);
+    color: var(--color-text-muted);
+}
+
+.Contest-Detail-Prize {
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+/* 설명 */
+.Contest-Detail-DescSection {
+    padding: 16px 24px;
+}
+
+.Contest-Detail-DescTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 8px;
+}
+
+.Contest-Detail-DescText {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--color-text-sub);
+    line-height: 20px;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* 태그 */
+.Contest-Detail-TagSection {
+    padding: 16px 24px;
+}
+
+.Contest-Detail-TagTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 8px;
+}
+
+.Contest-Detail-Tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.Contest-Detail-Tag {
+    display: inline-flex;
+    padding: 4px 12px;
+    border-radius: 14px;
+    background-color: var(--color-primary-light);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-primary);
+}
+
+/* 액션 버튼 */
+.Contest-Detail-ButtonGroup {
+    display: flex;
+    gap: 8px;
+    padding: 20px 24px;
+}
+
+.Contest-Detail-ApplyBtn {
+    flex: 1;
+    height: 40px;
+    border-radius: 20px;
+    background-color: var(--color-primary);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.Contest-Detail-ApplyBtn:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.Contest-Detail-ShareBtn {
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.Contest-Detail-ShareBtn:hover {
+    background-color: var(--color-bg-muted);
+    border-color: var(--color-border-strong);
+}
+
+.Contest-Detail-ReportBtn {
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-danger);
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.Contest-Detail-ReportBtn:hover {
+    background-color: #fef2f2;
+    border-color: var(--color-danger);
+}
+
+[hidden] {
+    display: none !important;
+}

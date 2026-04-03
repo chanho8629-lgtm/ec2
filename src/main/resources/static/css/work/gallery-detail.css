@@ -1,0 +1,418 @@
+:root {
+    --main-bg: #ffffff;
+    --txt-black: #0f0f0f;
+    --txt-gray: #606060;
+    --yt-white: #ffffff;
+    --line: rgba(0, 0, 0, 0.1);
+    --yt-font: "Roboto", "Arial", sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--yt-font);
+    background-color: var(--main-bg);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Base Layout */
+.yt-shell__page-content.gallery-page {
+    position: relative;
+    min-height: calc(100vh - 56px);
+    margin-top: 56px;
+    margin-left: 240px;
+    background: #ffffff;
+}
+
+.gallery-container {
+    max-width: 100%;
+}
+
+/* [핵심] 50/50 무한 페이드 배너 스타일 */
+ytd-carousel-header-renderer {
+    display: block;
+    width: 100%;
+    background-color: #000; /* 전체 배경을 짙은 검은색으로 고정 */
+}
+
+#header.ytd-browse {
+    position: relative;
+}
+
+.gallery-top-actions {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+}
+
+.gallery-top-action-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 999px;
+    background: inherit;
+    color: #ffffff;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+}
+
+.gallery-top-action-button:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.gallery-top-action-button svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+
+ytd-default-promo-panel-renderer {
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 420px;
+    background-color: #000;
+    overflow: hidden;
+}
+
+/* 우측 사진 영역: 마스크 기법을 사용하여 왼쪽으로 갈수록 투명하게 소멸 */
+#hero {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 70%; /* 페이드 구간 확보를 위해 50%보다 넓게 설정 */
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: 1;
+    /* 사진이 더 넓게 보이도록 페이드 구간을 줄임 */
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.18) 18%, rgba(0,0,0,0.72) 34%, black 48%);
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.18) 18%, rgba(0,0,0,0.72) 34%, black 48%);
+}
+
+/* 텍스트 가독성을 위한 전체적인 어두운 톤 유지 */
+#scrim {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.1); /* 사진이 더 잘 보이도록 어둡기 완화 */
+    z-index: 2;
+}
+
+/* 좌측 콘텐츠 영역: 검은색 배경 위에 배치 */
+#content.ytd-default-promo-panel-renderer {
+    position: relative;
+    z-index: 3;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 80px;
+    box-sizing: border-box;
+    color: #fff;
+    background-color: transparent; /* 배경은 부모의 #000을 따름 */
+}
+
+.promo-text-wrapper {
+    width: 100%;
+}
+
+#description.style-scope {
+    display: block;
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+#hero-title.ytd-default-promo-panel-renderer {
+    font-size: 35px;
+    font-weight: 800;
+    margin: 0 0 32px 0;
+    line-height: 1.1;
+    letter-spacing: -1px;
+}
+
+.hero-meta {
+    margin: 0 0 24px;
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.72);
+    letter-spacing: -0.01em;
+}
+
+.btn-play-all-main {
+    background-color: var(--yt-white);
+    color: #000;
+    border: none;
+    border-radius: 24px;
+    padding: 0 32px;
+    height: 48px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 60px;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.btn-play-all-main:hover {
+    background-color: #f2f2f2;
+    transform: scale(1.05);
+}
+
+/* 하단 썸네일 내비게이션 */
+#pagination-thumbnails {
+    display: flex;
+    gap: 12px;
+}
+
+#pagination-thumbnails button {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    width: 90px;
+    opacity: 0.4;
+    transition: opacity 0.3s, transform 0.2s;
+}
+
+#pagination-thumbnails button.selected {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.thumb-img-wrapper {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.thumb-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 3px;
+    background-color: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+button.selected .progress-bar::after {
+    content: '';
+    display: block;
+    height: 100%;
+    width: 100%;
+    background-color: #fff;
+    animation: yt-progress 7500ms linear forwards;
+}
+
+@keyframes yt-progress {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+/* Navigation Tabs */
+.gallery-nav {
+    border-bottom: 1px solid var(--line);
+    background: var(--main-bg);
+}
+
+.gallery-nav ul {
+    list-style: none;
+    padding: 0 80px;
+    margin: 0;
+    display: flex;
+    height: 56px;
+    align-items: center;
+    gap: 40px;
+}
+
+.gallery-nav li {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--txt-gray);
+    cursor: pointer;
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.gallery-nav li.active {
+    color: var(--txt-black);
+}
+
+.gallery-nav li.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #0f0f0f;
+}
+
+/* Contents Section */
+.gallery-content {
+    padding: 40px 80px;
+}
+
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+}
+
+.shorts-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.video-item .thumb {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #eee;
+    margin-bottom: 12px;
+}
+
+.shorts-thumb {
+    aspect-ratio: 9 / 16 !important;
+}
+
+.video-item .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.item-meta {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+    margin-top: 12px;
+}
+
+.item-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #d9d9d9;
+}
+
+.item-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.item-copy {
+    min-width: 0;
+}
+
+.item-meta h3 {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 0 0 2px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+.item-meta p {
+    margin: 0;
+}
+
+.item-channel,
+.item-stats {
+    font-size: 14px;
+    color: var(--txt-gray);
+    line-height: 1.35;
+}
+
+.item-channel {
+    margin-bottom: 1px;
+}
+
+ytd-rich-shelf-renderer h2, .content-row-section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    #content.ytd-default-promo-panel-renderer { padding: 0 40px; }
+    .gallery-nav ul, .gallery-content { padding-left: 40px; padding-right: 40px; }
+    .video-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 768px) {
+    .yt-shell__page-content.gallery-page { margin-left: 72px; }
+    ytd-default-promo-panel-renderer { height: 320px; }
+    #hero { width: 100%; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 50%); }
+    #content.ytd-default-promo-panel-renderer { width: 100%; align-items: center; text-align: center; }
+    .video-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.work-action-sheet {
+    position: absolute;
+    left: 1651px;
+    top: 106px;
+    z-index: 3;
+    width: 180px;
+    border: 1px solid #e6e6e6;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.98);
+    color: #111111;
+    box-shadow: none;
+}
+
+.work-action-sheet button.danger {
+    color: #ed4956;
+    font-weight: 600;
+}
+.work-action-sheet button {
+    width: 100%;
+    border: none;
+    background: transparent;
+    text-align: center;
+    padding: 14px 0;
+    font-size: 14px;
+    color: #262626;
+    cursor: pointer;
+    line-height: 1.5;
+}
+.work-action-sheet button + button {
+    border-top: 1px solid #efefef;
+}
+.work-action-sheet button.cancel{
+    color: #262626;
+}
+
+.work-action-sheet button + button {
+    border-top: 1px solid #efefef;
+}

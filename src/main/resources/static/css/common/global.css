@@ -1,0 +1,163 @@
+/* 토큰 영역 */
+:root {
+  /* 공통 */
+  --color-primary: #6800ea;
+  --color-primary-hover: #5300bb;
+  --color-primary-light: #f3e8ff;
+  --color-accent-cyan: #00d5ff;
+  --color-accent-cyan-soft: #e6fbff;
+  --color-accent-pink: #ff4fd8;
+  --color-accent-pink-soft: #fff0fb;
+  --color-accent-indigo: #7c3aed;
+  --color-accent-indigo-soft: #f5f0ff;
+  --color-accent-mint: #19c37d;
+  --color-accent-mint-soft: #e9fbf3;
+  --color-accent-amber: #ffb020;
+  --color-accent-amber-soft: #fff7e8;
+  --color-accent-coral: #ff5f6d;
+  --color-accent-coral-soft: #fff1f3;
+  --color-secondary: #5f6368;
+  --color-success: #20a464;
+  --color-warning: #f59e0b;
+  --color-danger: #e5484d;
+  --color-text: #0f172a;
+  --color-text-sub: #6b7280;
+  --color-text-muted: #9ca3af;
+  --color-border: #e5e7eb;
+  --color-border-strong: #d1d5db;
+  --color-bg: #ffffff;
+  --color-bg-sub: #f8fafc;
+  --color-bg-muted: #f3f4f6;
+  --color-bg-disabled: #eef2f7;
+  --color-surface: rgba(255, 255, 255, 0.88);
+  --color-overlay: rgba(15, 23, 42, 0.58);
+  --focus-ring: 0 0 0 4px rgba(255, 0, 51, 0.12);
+  --shadow-sm: 0 10px 30px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 20px 60px rgba(15, 23, 42, 0.12);
+  --shadow-lg: 0 30px 80px rgba(15, 23, 42, 0.18);
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 40px;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
+  --height-sm: 32px;
+  --height-md: 40px;
+  --height-lg: 48px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --z-dropdown: 40;
+  --z-modal: 80;
+  --z-toast: 120;
+
+  /* 레이아웃 변수 (layout.html 기준) */
+  --layout-header-height: 56px;
+  --layout-guide-width: 240px;
+  --layout-guide-collapsed-width: 72px;
+
+  /* 콘텐츠 영역 */
+  --content-top: var(--layout-header-height);
+  --content-left: var(--layout-guide-width);
+  --content-width: calc(100& - var(--layout-guide-width));
+  --content-padding: 24px;
+
+  /* 다크 테마 색상 */
+  --dark-bg-primary: #0f0f0f;
+  --dark-bg-secondary: #272727;
+  --dark-bg-hover: rgba(255, 255, 255, 0.1);
+  --dark-border-color: #3a3a3a;
+  --dark-text-primary: #f1f1f1;
+  --dark-text-secondary: #aaaaaa;
+  --dark-text-muted: #717171;
+  --dark-accent-blue: #3ea6ff;
+
+  /* 대시보드 공통 */
+  --dashboard-primary: #1e2a38;
+  --dashboard-secondary: #8b7cff;
+  --dashboard-tertiary: #5bd4ff;
+  --dashboard-sub: #eef4ff;
+  --dashboard-accent: var(--dashboard-secondary);
+  --dashboard-accent-hover: #7465ef;
+  --dashboard-accent-soft: var(--dashboard-sub);
+  --dashboard-accent-tint-strong: rgba(139, 124, 255, 0.18);
+  --dashboard-chart-grid: rgba(30, 42, 56, 0.1);
+  --dashboard-chart-label: #66707c;
+  --dashboard-chart-tooltip-bg: var(--dashboard-primary);
+  --dashboard-chart-tooltip-text: #ffffff;
+  --dashboard-chart-point-border: #d7dee7;
+  --dashboard-chart-fill-primary: rgba(30, 42, 56, 0.12);
+  --dashboard-chart-fill-secondary: rgba(139, 124, 255, 0.16);
+  --dashboard-chart-fill-tertiary: rgba(91, 212, 255, 0.18);
+  --dashboard-chart-fill-quaternary: rgba(139, 124, 255, 0.1);
+  --dashboard-status-pending-bg: rgba(255, 176, 32, 0.18);
+  --dashboard-status-pending-text: #a96500;
+
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+html[data-theme="dark"] {
+  --color-text: var(--dark-text-primary);
+  --color-text-sub: var(--dark-text-secondary);
+  --color-text-muted: var(--dark-text-muted);
+  --color-border: var(--dark-border-color);
+  --color-border-strong: #4a4a4a;
+  --color-bg: var(--dark-bg-primary);
+  --color-bg-sub: #181818;
+  --color-bg-muted: var(--dark-bg-secondary);
+  --color-bg-disabled: #202020;
+  --color-surface: rgba(39, 39, 39, 0.92);
+  --color-overlay: rgba(0, 0, 0, 0.68);
+  --shadow-sm: 0 10px 30px rgba(0, 0, 0, 0.22);
+  --shadow-md: 0 20px 60px rgba(0, 0, 0, 0.28);
+  --shadow-lg: 0 30px 80px rgba(0, 0, 0, 0.34);
+  --dashboard-status-pending-bg: rgba(255, 176, 32, 0.22);
+  --dashboard-status-pending-text: #ffd27a;
+}
+
+.QuickThemeToggle {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  z-index: 200;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 76px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+html[data-theme="dark"] .QuickThemeToggle {
+  border-color: #454545;
+  background: rgba(39, 39, 39, 0.92);
+  color: var(--dark-text-primary);
+}

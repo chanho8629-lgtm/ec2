@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1440" />
+    <title>오프라인 저장 동영상</title>
+    <link rel="stylesheet" href="../../static/css/common/reset.css" />
+    <link rel="stylesheet" href="../../static/css/common/font.css" />
+    <link rel="stylesheet" href="../../static/css/common/global.css" />
+    <link rel="stylesheet" href="../../static/css/common/util.css" />
+    <link rel="stylesheet" href="../../static/css/common/common.css" />
+    <link rel="stylesheet" href="../../static/css/downloads/downloads.css" />
+</head>
+<body>
+
+<div id="section" class="Page-Content">
+<div class="Downloads-Page-Contents">
+
+    <!-- ===== 필터 ===== -->
+    <div class="Downloads-Section">
+        <div class="Downloads-Section-Content">
+            <div class="Downloads-Filter-Bar">
+                <button class="Downloads-Filter-Btn Downloads-Filter-Btn--active" data-filter="all">전체</button>
+                <button class="Downloads-Filter-Btn" data-filter="video">동영상</button>
+                <button class="Downloads-Filter-Btn" data-filter="contest">공모전</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 콘텐츠 목록 ===== -->
+    <div class="Downloads-Section">
+        <div class="Downloads-Section-Content">
+            <div class="Downloads-Shelf">
+                <div class="Downloads-Shelf-Body">
+
+                    <!-- 셸프 헤더 -->
+                    <div class="Downloads-Shelf-Header">
+                        <h2 class="Downloads-Shelf-Heading">
+                            <div class="Downloads-Shelf-TitleWrap">
+                                <div class="Downloads-Shelf-Title">My bideo</div>
+                                <div class="Downloads-Shelf-Subtitle" id="shelfSubtitle">동영상 1개</div>
+                            </div>
+                        </h2>
+                    </div>
+
+                    <!-- 동영상 목록 -->
+                    <div class="Downloads-VideoList-Container">
+                        <div class="Downloads-VideoList" id="downloadsList">
+
+                            <!-- 동영상 카드 -->
+                            <div class="Downloads-Video-Item" data-type="video">
+                                <div class="Downloads-Video-Card">
+                                    <div class="Downloads-Video-Thumbnail">
+                                        <a class="Downloads-Thumbnail-Link" href="#">
+                                            <img class="Downloads-Thumbnail-Image" alt="" src="https://i.ytimg.com/vi/32yiFNiSoj8/hqdefault.jpg" />
+                                            <div class="Downloads-Thumbnail-Overlay">
+                                                <div class="Downloads-Time-Badge">
+                                                    <span class="Downloads-Time-Badge-Text">2:12</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="Downloads-Video-Details">
+                                        <div class="Downloads-Video-Meta">
+                                            <h3 class="Downloads-Video-TitleWrap">
+                                                <a class="Downloads-Video-TitleLink" href="#">
+                                                    <span class="Downloads-Video-Title">[자막뉴스] 미군 정예부대가 알린 소식...12번 말 바꾼 트럼프에 '대혼란' / YTN</span>
+                                                </a>
+                                            </h3>
+                                            <button class="Downloads-Menu-Button" aria-label="작업 메뉴">
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
+                                                    <path d="M12 4a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Z"></path>
+                                                </svg>
+                                            </button>
+                                            <div class="Downloads-Video-Metadata">
+                                                <div class="Downloads-Channel-Name">YTN</div>
+                                                <div class="Downloads-Meta-Line">
+                                                    <span class="Downloads-Meta-Item">조회수 2.3만회</span>
+                                                    <span class="Downloads-Meta-Item">1시간 전</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 공모전 카드 (샘플) -->
+                            <div class="Downloads-Video-Item" data-type="contest">
+                                <div class="Downloads-Video-Card">
+                                    <div class="Downloads-Video-Thumbnail">
+                                        <a class="Downloads-Thumbnail-Link" href="#">
+                                            <img class="Downloads-Thumbnail-Image" alt="" src="https://i.ytimg.com/vi/nLD84OB7rO0/hqdefault.jpg" />
+                                        </a>
+                                    </div>
+                                    <div class="Downloads-Video-Details">
+                                        <div class="Downloads-Video-Meta">
+                                            <h3 class="Downloads-Video-TitleWrap">
+                                                <a class="Downloads-Video-TitleLink" href="#">
+                                                    <span class="Downloads-Video-Title">2026 신인 영상 크리에이터 공모전</span>
+                                                </a>
+                                            </h3>
+                                            <button class="Downloads-Menu-Button" aria-label="작업 메뉴">
+                                                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
+                                                    <path d="M12 4a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Z"></path>
+                                                </svg>
+                                            </button>
+                                            <div class="Downloads-Video-Metadata">
+                                                <div class="Downloads-Channel-Name">BIDEO 공식</div>
+                                                <div class="Downloads-Meta-Line">
+                                                    <span class="Downloads-Meta-Item">~2026.04.30</span>
+                                                    <span class="Downloads-Meta-Item">총 500만원</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 하단 안내 메시지 ===== -->
+    <div class="Downloads-Section">
+        <div class="Downloads-Section-Content">
+            <div class="Downloads-Message">
+                <span class="Downloads-Message-Text">찜한 동영상과 공모전을 한곳에서 확인할 수 있습니다.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 동영상 없을 때: 빈 상태 프로모 섹션 ===== -->
+    <div class="Downloads-Section">
+        <div class="Downloads-Section-Content">
+            <div class="Downloads-Empty-State">
+                <div class="Downloads-Empty-Image">
+                    <img draggable="false" alt="" src="https://www.gstatic.com/youtube/img/useredu/downloads_empty_state.png" />
+                </div>
+                <div class="Downloads-Empty-Message">
+                    <span class="Downloads-Empty-Text">찜한 콘텐츠가 여기에 표시됩니다.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+
+<script src="../../static/js/downloads/downloads.js"></script>
+</body>
+</html>

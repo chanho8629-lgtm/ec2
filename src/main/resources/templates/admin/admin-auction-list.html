@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin-layout}"
+      th:with="activeMenu='auctions'">
+<head>
+    <meta charset="UTF-8">
+    <title>경매관리 - BIDEO Admin</title>
+    <link rel="stylesheet" href="../../static/css/admin/admin-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="page-header"><h1 class="page-title">경매관리</h1></div>
+    <div class="filter-bar">
+        <div class="filter-search">
+            <svg class="filter-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="searchInput" placeholder="경매 번호 또는 작품 검색...">
+        </div>
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-status="all">전체</button>
+            <button class="filter-tab" data-status="ONGOING">진행중</button>
+            <button class="filter-tab" data-status="FINISHED">종료</button>
+            <button class="filter-tab" data-status="SCHEDULED">예정</button>
+        </div>
+    </div>
+    <table class="data-table">
+        <thead><tr>
+            <th style="width:100px">경매번호</th><th>작품명</th><th style="width:120px">아티스트</th>
+            <th style="width:130px">시작가</th><th style="width:130px">낙찰가</th>
+            <th style="width:80px">입찰수</th><th style="width:160px">종료일시</th><th style="width:80px">상태</th>
+        </tr></thead>
+        <tbody>
+        <tr th:each="auction, iter : ${auctionList}"
+            th:onclick="|location.href='@{/admin/auctions/{id}(id=${auction.id})}'|"
+            style="cursor:pointer">
+            <td th:text="'#AUC-' + ${auction.id}">AUC-202</td>
+            <td th:text="${auction.artworkTitle}">작품명</td>
+            <td th:text="${auction.artistNickname}">아티스트</td>
+            <td th:text="${#numbers.formatInteger(auction.startPrice, 0, 'COMMA')} + ' 원'">₩500,000</td>
+            <td th:text="${auction.winningPrice != null} ? ${#numbers.formatInteger(auction.winningPrice, 0, 'COMMA')} + ' 원' : '-'">₩1,000,000</td>
+            <td th:text="${auction.bidCount}">5</td>
+            <td th:text="${auction.endAt}">2024-01-07 18:00</td>
+            <td>
+                <span th:if="${auction.status == 'ONGOING'}" class="status-badge status-active">진행중</span>
+                <span th:if="${auction.status == 'FINISHED' and auction.winnerId != null}" class="status-badge status-pending">낙찰</span>
+                <span th:if="${auction.status == 'FINISHED' and auction.winnerId == null}" class="status-badge status-muted">유찰</span>
+                <span th:if="${auction.status == 'SCHEDULED'}" class="status-badge status-muted">예정</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="table-footer">
+        <div class="page-size-group"><span>페이지당 행 수:</span><div class="page-size-trigger" onclick="this.classList.toggle('open'); this.querySelector('.page-size-menu').classList.toggle('open')"><span class="trigger-text">30</span><svg class="trigger-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.707 8.793a1 1 0 00-1.414 0L12 14.086 6.707 8.793a1 1 0 10-1.414 1.414L12 16.914l6.707-6.707a1 1 0 000-1.414Z"/></svg><div class="page-size-menu"><div class="page-size-menu-item selected" data-value="30">30</div><div class="page-size-menu-item" data-value="50">50</div><div class="page-size-menu-item" data-value="100">100</div></div></div></div>
+        <span class="page-description" th:text="${totalCount} ? |${totalCount}개 중 1~${totalCount > 30 ? 30 : totalCount}| : '0개'">0개</span>
+        <div class="page-nav">
+            <button class="page-nav-btn" disabled title="첫 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.293 4.293 10.586 12l7.707 7.707a1 1 0 101.414-1.414L13.414 12l6.293-6.293a1 1 0 10-1.414-1.414ZM6 4a1 1 0 00-1 1v14a1 1 0 102 0V5a1 1 0 00-1-1Z"/></svg></button>
+            <button class="page-nav-btn" disabled title="이전 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.793 5.293 7.086 12l6.707 6.707a1 1 0 101.414-1.414L9.914 12l5.293-5.293a1 1 0 10-1.414-1.414Z"/></svg></button>
+            <!-- 페이지 번호 버튼 (active = 현재 페이지) -->
+            <!--<button class="page-num-btn active">1</button>-->
+            <!--<button class="page-num-btn">2</button>-->
+            <!--<button class="page-num-btn">3</button>-->
+            <button class="page-nav-btn" title="다음 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.793 5.293a1 1 0 000 1.414L14.086 12l-5.293 5.293a1 1 0 101.414 1.414L16.914 12l-6.707-6.707a1 1 0 00-1.414 0Z"/></svg></button>
+        </div>
+    </div>
+    <div class="empty-state" id="emptyState" style="display:none">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2.27 6.34 7.93c-3.12 3.12-3.12 8.19 0 11.31C7.9 20.8 9.95 21.58 12 21.58c2.05 0 4.1-.78 5.66-2.34 3.12-3.12 3.12-8.19 0-11.31z"/></svg>
+        <p class="empty-state-text">등록된 경매가 없습니다</p>
+    </div>
+</div>
+</body>
+</html>

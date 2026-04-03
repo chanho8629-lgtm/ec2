@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin-layout}"
+      th:with="activeMenu='members'">
+<head>
+    <meta charset="UTF-8">
+    <title>회원 상세 - BIDEO Admin</title>
+    <link rel="stylesheet" href="../../static/css/admin/admin-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="content">
+    <a th:href="@{/admin/members}" class="back-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+        목록으로 돌아가기
+    </a>
+
+    <div class="detail-header">
+        <h1 class="page-title">
+            회원 상세
+            <span th:if="${member.status == 'ACTIVE'}" class="status-badge status-active">활동</span>
+            <span th:if="${member.status == 'SUSPENDED'}" class="status-badge status-urgent">정지</span>
+        </h1>
+        <div>
+            <button th:if="${member.status == 'ACTIVE'}"
+                    class="btn-action-sm btn-danger"
+                    onclick="openModal('suspendModal')">정지</button>
+            <button th:if="${member.status == 'SUSPENDED'}"
+                    class="btn-action-sm btn-primary"
+                    onclick="openModal('unsuspendModal')">해제</button>
+        </div>
+    </div>
+
+    <div class="detail-columns">
+        <div class="detail-col">
+            <div class="detail-section">
+                <h3 class="detail-section-title">기본 정보</h3>
+                <div class="detail-field">
+                    <span class="detail-field-label">이메일</span>
+                    <span class="detail-field-value" th:text="${member.email}">user@email.com</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">닉네임</span>
+                    <span class="detail-field-value" th:text="${member.nickname}">닉네임</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">연락처</span>
+                    <span class="detail-field-value" th:text="${member.phone}">010-0000-0000</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">가입일</span>
+                    <span class="detail-field-value" th:text="${member.createdAt}">2024-01-01</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">회원 유형</span>
+                    <span class="detail-field-value" th:text="${member.memberType} ?: '-'">-</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">소셜로그인</span>
+                    <span class="detail-field-value text-info" th:text="${member.socialProvider} ?: '일반'">일반</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">이메일 인증</span>
+                    <span class="detail-field-value"
+                          th:text="${member.emailVerified != null and member.emailVerified} ? '완료' : '미완료'"
+                          th:class="'detail-field-value ' + (${member.emailVerified != null and member.emailVerified} ? 'text-success' : 'text-muted')">-</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">휴대폰 인증</span>
+                    <span class="detail-field-value"
+                          th:text="${member.phoneVerified != null and member.phoneVerified} ? '완료' : '미완료'"
+                          th:class="'detail-field-value ' + (${member.phoneVerified != null and member.phoneVerified} ? 'text-success' : 'text-muted')">-</span>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3 class="detail-section-title">계정 상태</h3>
+                <div class="detail-field">
+                    <span class="detail-field-label">회원 상태</span>
+                    <span class="detail-field-value"
+                          th:text="${member.status == 'ACTIVE'} ? '활동' : '정지'">활동</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">최종 로그인</span>
+                    <span class="detail-field-value" th:text="${member.lastLoginAt}">2024-01-01 12:00</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">최종 활동</span>
+                    <span class="detail-field-value" th:text="${member.lastActivityAt} ?: '-'">-</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">신고 횟수</span>
+                    <span class="detail-field-value"
+                          th:text="${member.reportCount} ?: '0건'"
+                          th:class="'detail-field-value ' + (${member.reportCount != null and member.reportCount > 0} ? 'text-warn' : '')">0건</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">결제 실패</span>
+                    <span class="detail-field-value"
+                          th:text="${member.failedPaymentCount} ?: '0회'"
+                          th:class="'detail-field-value ' + (${member.failedPaymentCount != null and member.failedPaymentCount > 0} ? 'text-warn' : '')">0회</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">환불</span>
+                    <span class="detail-field-value" th:text="${member.refundCount} ?: '0건'">0건</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">정지 이력</span>
+                    <span class="detail-field-value" th:text="${member.suspensionCount} ?: '0회'">0회</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-col">
+            <div class="detail-section">
+                <h3 class="detail-section-title">활동 요약</h3>
+                <div class="detail-field">
+                    <span class="detail-field-label">예술관 수</span>
+                    <span class="detail-field-value"><span th:text="${member.galleryCount}">0</span> 건</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">팔로워 수</span>
+                    <span class="detail-field-value"><span th:text="${member.followerCount}">0</span> 명</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">팔로잉 수</span>
+                    <span class="detail-field-value"><span th:text="${member.followingCount}">0</span> 명</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">판매 작품</span>
+                    <span class="detail-field-value" th:text="${member.soldCount} ?: '0건'">0건</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">경매 낙찰</span>
+                    <span class="detail-field-value" th:text="${member.auctionWinCount} ?: '0건'">0건</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">총 거래액</span>
+                    <span class="detail-field-value text-info"
+                          th:text="${member.totalTransactionAmount != null} ? ${#numbers.formatInteger(member.totalTransactionAmount, 1, 'COMMA')} + '원' : '0원'">0원</span>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3 class="detail-section-title">출금 현황</h3>
+                <div class="detail-field">
+                    <span class="detail-field-label">출금 대기</span>
+                    <span class="detail-field-value"
+                          th:text="${member.pendingWithdrawalCount} ?: '0건'"
+                          th:class="'detail-field-value ' + (${member.pendingWithdrawalCount != null and member.pendingWithdrawalCount > 0} ? 'text-warn' : '')">0건</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">최근거래 일시</span>
+                    <span class="detail-field-value" th:text="${member.lastTransactionDate} ?: '-'">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div layout:fragment="modals">
+    <div class="modal-overlay" id="suspendModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-header-title">회원 정지 처리</div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body-scroll">
+                    <label>대상자</label>
+                    <input type="text" th:value="${member.nickname}" readonly>
+                    <label>제한 종료일</label>
+                    <input type="date" id="suspendEndDate" placeholder="연도-월-일">
+                    <label>제한 사유 수정</label>
+                    <textarea id="suspendReason" placeholder="정지 사유를 입력하세요"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('suspendModal')">취소</button>
+                <button class="btn btn-primary">확인</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="unsuspendModal">
+        <div class="modal">
+            <div class="modal-header">정말 처리하시겠습니까?</div>
+            <div class="modal-body">계정 정지를 해제합니다.</div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('unsuspendModal')">취소</button>
+                <button class="btn btn-primary">확인</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

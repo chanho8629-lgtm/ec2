@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin-layout}"
+      th:with="activeMenu='payments'">
+<head>
+    <meta charset="UTF-8">
+    <title>결제 상세 - BIDEO Admin</title>
+    <link rel="stylesheet" href="../../static/css/admin/admin-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="content">
+    <a th:href="@{/admin/payments}" class="back-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+        목록으로 돌아가기
+    </a>
+    <div class="detail-header">
+        <h1 class="page-title">결제 상세
+            <span th:if="${payment.status == 'COMPLETED'}" class="status-badge status-active">결제완료</span>
+            <span th:if="${payment.status == 'CANCELLED'}" class="status-badge status-urgent">결제취소</span>
+            <span th:if="${payment.status == 'PENDING'}" class="status-badge status-pending">결제대기</span>
+        </h1>
+    </div>
+    <div class="detail-columns">
+        <div class="detail-col">
+            <div class="detail-section">
+                <h3 class="detail-section-title">주문 및 작품 정보</h3>
+                <div class="detail-field">
+                    <span class="detail-field-label">작품명</span>
+                    <span class="detail-field-value" th:text="${payment.artworkTitle}">작품명</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">아티스트</span>
+                    <span class="detail-field-value" th:text="${payment.artistNickname}">아티스트</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">판매가</span>
+                    <span class="detail-field-value" th:text="${#numbers.formatInteger(payment.price, 0, 'COMMA')} + ' 원'">1,200,000 원</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">수수료</span>
+                    <span class="detail-field-value" th:text="${#numbers.formatInteger(payment.commissionAmount, 0, 'COMMA')} + ' 원'">120,000 원</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">정산금액</span>
+                    <span class="detail-field-value" th:text="${#numbers.formatInteger(payment.settlementAmount, 0, 'COMMA')} + ' 원'">1,080,000 원</span>
+                </div>
+            </div>
+            <div class="detail-section">
+                <h3 class="detail-section-title">구매자 정보</h3>
+                <div class="detail-field">
+                    <span class="detail-field-label">성함</span>
+                    <span class="detail-field-value" th:text="${payment.buyerName}">구매자</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">연락처</span>
+                    <span class="detail-field-value" th:text="${payment.buyerPhone}">010-0000-0000</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">이메일</span>
+                    <span class="detail-field-value" th:text="${payment.buyerEmail}">buyer@example.com</span>
+                </div>
+            </div>
+        </div>
+        <div class="detail-col">
+            <div class="detail-section">
+                <h3 class="detail-section-title">결제 수단</h3>
+                <div class="detail-field">
+                    <span class="detail-field-label">결제방식</span>
+                    <span class="detail-field-value" th:text="${payment.paymentMethod}">신용카드</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">카드번호</span>
+                    <span class="detail-field-value" th:text="${payment.cardNumber}">****-****-****-1234</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">결제일시</span>
+                    <span class="detail-field-value" th:text="${#temporals.format(payment.paidAt, 'yyyy.MM.dd HH:mm')}">2024.03.09 14:30</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">승인번호</span>
+                    <span class="detail-field-value" th:text="${payment.approvalNumber}">12345678</span>
+                </div>
+            </div>
+            <div class="detail-amount-card">
+                <div class="detail-field-label">최종 결제 금액</div>
+                <div class="text-info" th:text="${#numbers.formatInteger(payment.totalAmount, 0, 'COMMA')} + ' 원'">1,200,000 원</div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

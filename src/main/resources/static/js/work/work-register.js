@@ -1,0 +1,756 @@
+document.addEventListener("DOMContentLoaded", function () {
+    var modal = document.getElementById("work-register-modal");
+    var dialogContent = document.getElementById("dialog-content");
+    var uploadScreen = document.getElementById("upload-screen");
+    var detailsScreen = document.getElementById("details-screen");
+    var uploadPanel = document.getElementById("drop-zone");
+    var fileInput = document.getElementById("video-file-input");
+    var selectFileButton = document.getElementById("select-file-button");
+    var uploadAiButton = document.getElementById("upload-ai-button");
+    var closeButton = document.getElementById("close-modal-button");
+    var uploadCloseButton = document.getElementById("upload-close-button");
+    var detailsCloseButton = document.getElementById("details-close-button");
+    var detailsBackButton = document.getElementById("details-back-button");
+    var fileNameText = document.getElementById("selected-file-name");
+    var detailsVideoTitle = document.getElementById("details-video-title");
+    var videoFileLabel = document.getElementById("video-file-label");
+    var videoPreviewShell = document.getElementById("video-preview-shell");
+    var videoPreviewPlayer = document.getElementById("video-preview-player");
+    var imagePreviewPlayer = document.getElementById("image-preview-player");
+    var videoTitleInput = document.getElementById("video-title-input");
+    var videoTitleCount = document.getElementById("video-title-count");
+    var videoDescriptionInput = document.getElementById("video-description-input");
+    var videoDescriptionCount = document.getElementById("video-description-count");
+    var videoTagsInput = document.getElementById("video-tags-input");
+    var videoTagsCount = document.getElementById("video-tags-count");
+    var tradeToggle = document.getElementById("tradeToggle");
+    var tradeConfig = document.getElementById("tradeConfig");
+    var tradePriceInput = document.getElementById("tradePriceInput");
+    var auctionExpandButton = document.querySelector(".auction-expand-button");
+    var auctionExpandIcon = document.querySelector(".auction-expand-button .auction-expand-icon:not(.auction-expand-icon-collapse)");
+    var auctionCollapseIcon = document.querySelector(".auction-expand-icon-collapse");
+    var auctionConfig = document.getElementById("auctionConfig");
+    var auctionBidPriceInput = document.getElementById("auctionBidPriceInput");
+    var auctionDeadlineSelected = document.getElementById("auctionDeadlineSelected");
+    var auctionDeadlineReset = document.getElementById("auctionDeadlineReset");
+    var auctionDeadlineHoursInput = document.getElementById("auctionDeadlineHoursInput");
+    var auctionDeadlineButtons = document.querySelectorAll("#auctionConfig .work-auction-config__deadline-btn");
+    var videoLinkUrl = document.getElementById("video-link-url");
+    var videoLinkCopyButton = document.getElementById("video-link-copy-button");
+    var playlistDropdownButton = document.getElementById("playlist-dropdown-button");
+    var playlistDropdownMenu = document.getElementById("playlist-dropdown-menu");
+    var playlistDropdownText = document.getElementById("playlist-dropdown-text");
+    var playlistOptions = document.querySelectorAll(".playlist-option");
+    var thumbnailUploadButtons = document.querySelectorAll(".thumbnail-upload-button");
+    var thumbnailFileInputs = document.querySelectorAll('input[id^="thumbnail-file-input-"]');
+    var aiPromptModal = document.getElementById("ai-prompt-modal");
+    var aiPromptCloseButton = document.getElementById("ai-prompt-close-button");
+    var aiPromptInput = document.getElementById("ai-prompt-input");
+    var aiPromptBubble = document.getElementById("ai-prompt-bubble");
+    var aiPromptSendButton = document.getElementById("ai-prompt-send-button");
+    var aiPromptToolButton = document.getElementById("ai-prompt-tool-button");
+    var aiPromptComposeMenu = document.getElementById("ai-prompt-compose-menu");
+    var aiPromptAttachButton = document.getElementById("ai-prompt-attach-button");
+    var aiPromptFileInput = document.getElementById("ai-prompt-file-input");
+    var aiPromptAttachments = document.getElementById("ai-prompt-attachments");
+    var aiPromptImageAttachment = document.getElementById("ai-prompt-image-attachment");
+    var aiPromptImagePreview = document.getElementById("ai-prompt-image-preview");
+    var aiPromptRemoveAttachment = document.getElementById("ai-prompt-remove-attachment");
+    var aiPromptFileAttachment = document.getElementById("ai-prompt-file-attachment");
+    var aiPromptFileName = document.getElementById("ai-prompt-file-name");
+    var aiPromptRemoveFileAttachment = document.getElementById("ai-prompt-remove-file-attachment");
+    var aiPromptCloseTargets = document.querySelectorAll('[data-role="ai-prompt-close"]');
+    var currentPreviewUrl = "";
+    var currentAiPromptAttachmentUrl = "";
+    var thumbnailPreviewUrls = {};
+
+    if (!modal || !dialogContent || !uploadScreen || !detailsScreen || !uploadPanel || !fileInput || !selectFileButton || !closeButton || !fileNameText) {
+        return;
+    }
+
+    function closeModal() {
+        modal.style.display = "none";
+    }
+
+    function openAiPromptModal() {
+        if (!aiPromptModal) {
+            return;
+        }
+
+        aiPromptModal.hidden = false;
+
+        if (aiPromptInput) {
+            aiPromptInput.focus();
+        }
+    }
+
+    function closeAiPromptModal() {
+        if (!aiPromptModal) {
+            return;
+        }
+
+        aiPromptModal.hidden = true;
+        closeAiPromptComposeMenu();
+    }
+
+    function closeAiPromptComposeMenu() {
+        if (!aiPromptComposeMenu || !aiPromptToolButton) {
+            return;
+        }
+
+        aiPromptComposeMenu.hidden = true;
+        aiPromptToolButton.setAttribute("aria-expanded", "false");
+    }
+
+    function toggleAiPromptComposeMenu() {
+        var willOpen;
+
+        if (!aiPromptComposeMenu || !aiPromptToolButton) {
+            return;
+        }
+
+        willOpen = aiPromptComposeMenu.hidden;
+        aiPromptComposeMenu.hidden = !willOpen;
+        aiPromptToolButton.setAttribute("aria-expanded", willOpen ? "true" : "false");
+    }
+
+    function clearAiPromptAttachment() {
+        if (currentAiPromptAttachmentUrl) {
+            URL.revokeObjectURL(currentAiPromptAttachmentUrl);
+            currentAiPromptAttachmentUrl = "";
+        }
+
+        if (aiPromptFileInput) {
+            aiPromptFileInput.value = "";
+        }
+
+        if (aiPromptImagePreview) {
+            aiPromptImagePreview.removeAttribute("src");
+        }
+
+        if (aiPromptFileName) {
+            aiPromptFileName.textContent = "";
+        }
+
+        if (aiPromptImageAttachment) {
+            aiPromptImageAttachment.hidden = true;
+        }
+
+        if (aiPromptFileAttachment) {
+            aiPromptFileAttachment.hidden = true;
+        }
+
+        if (aiPromptAttachments) {
+            aiPromptAttachments.hidden = true;
+        }
+    }
+
+    function renderAiPromptAttachment(file) {
+        if (!file || !aiPromptAttachments || !aiPromptImageAttachment || !aiPromptFileAttachment) {
+            return;
+        }
+
+        clearAiPromptAttachment();
+        aiPromptAttachments.hidden = false;
+
+        if (file.type && file.type.indexOf("image/") === 0) {
+            currentAiPromptAttachmentUrl = URL.createObjectURL(file);
+
+            if (aiPromptImagePreview) {
+                aiPromptImagePreview.src = currentAiPromptAttachmentUrl;
+            }
+
+            aiPromptImageAttachment.hidden = false;
+            return;
+        }
+
+        if (aiPromptFileName) {
+            aiPromptFileName.textContent = file.name;
+        }
+
+        aiPromptFileAttachment.hidden = false;
+    }
+
+    function renderThumbnailPreview(input, file) {
+        var placeholder;
+        var previewImage;
+        var oldUrl;
+
+        if (!input) {
+            return;
+        }
+
+        placeholder = input.closest(".thumbnail-placeholder");
+        if (!placeholder) {
+            return;
+        }
+
+        previewImage = placeholder.querySelector(".thumbnail-preview-image");
+        if (!previewImage) {
+            previewImage = document.createElement("img");
+            previewImage.className = "thumbnail-preview-image";
+            previewImage.alt = "썸네일 미리보기";
+            placeholder.appendChild(previewImage);
+        }
+
+        oldUrl = thumbnailPreviewUrls[input.id];
+        if (oldUrl) {
+            URL.revokeObjectURL(oldUrl);
+            delete thumbnailPreviewUrls[input.id];
+        }
+
+        if (!file || !file.type || file.type.indexOf("image/") !== 0) {
+            previewImage.removeAttribute("src");
+            placeholder.classList.remove("has-thumbnail-preview");
+            return;
+        }
+
+        thumbnailPreviewUrls[input.id] = URL.createObjectURL(file);
+        previewImage.src = thumbnailPreviewUrls[input.id];
+        placeholder.classList.add("has-thumbnail-preview");
+    }
+
+    function submitAiPrompt() {
+        var promptText;
+
+        if (!aiPromptInput || !aiPromptBubble) {
+            return;
+        }
+
+        promptText = aiPromptInput.value.trim();
+
+        if (!promptText) {
+            aiPromptInput.focus();
+            return;
+        }
+
+        aiPromptBubble.textContent = promptText;
+    }
+
+    function updateMediaPreview(file) {
+        if (!videoPreviewShell || !videoPreviewPlayer || !imagePreviewPlayer) {
+            return;
+        }
+
+        if (currentPreviewUrl) {
+            URL.revokeObjectURL(currentPreviewUrl);
+            currentPreviewUrl = "";
+        }
+
+        if (!file) {
+            videoPreviewPlayer.removeAttribute("src");
+            videoPreviewPlayer.load();
+            imagePreviewPlayer.removeAttribute("src");
+            videoPreviewShell.classList.remove("has-video");
+            videoPreviewShell.classList.remove("has-image");
+            return;
+        }
+
+        currentPreviewUrl = URL.createObjectURL(file);
+
+        if (file.type.indexOf("image/") === 0) {
+            videoPreviewPlayer.removeAttribute("src");
+            videoPreviewPlayer.load();
+            imagePreviewPlayer.src = currentPreviewUrl;
+            videoPreviewShell.classList.remove("has-video");
+            videoPreviewShell.classList.add("has-image");
+            return;
+        }
+
+        imagePreviewPlayer.removeAttribute("src");
+        videoPreviewPlayer.src = currentPreviewUrl;
+        videoPreviewPlayer.load();
+        videoPreviewShell.classList.remove("has-image");
+        videoPreviewShell.classList.add("has-video");
+    }
+
+    function updateSelectedFile(file) {
+        if (!file) {
+            fileNameText.textContent = "";
+            fileNameText.hidden = true;
+            return;
+        }
+
+        fileNameText.textContent = file.name;
+        fileNameText.hidden = false;
+    }
+
+    function isSupportedMediaFile(file) {
+        return !!file && !!file.type && (file.type.indexOf("video/") === 0 || file.type.indexOf("image/") === 0);
+    }
+
+    function updateTextCount(input, output, maxLength) {
+        if (!input || !output) {
+            return;
+        }
+
+        if (input.value.length > maxLength) {
+            input.value = input.value.slice(0, maxLength);
+        }
+
+        output.textContent = input.value.length + "/" + maxLength;
+    }
+
+    function autoResizeTextarea(textarea) {
+        if (!textarea) {
+            return;
+        }
+
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight + "px";
+    }
+
+    function bindFieldCountVisibility(input) {
+        var control;
+
+        if (!input) {
+            return;
+        }
+
+        control = input.parentElement;
+
+        if (!control) {
+            return;
+        }
+
+        input.addEventListener("focus", function () {
+            control.classList.add("is-active");
+        });
+
+        input.addEventListener("blur", function () {
+            control.classList.remove("is-active");
+        });
+    }
+
+    function toDisplayTitle(fileName) {
+        if (!fileName) {
+            return "업로드한 동영상";
+        }
+
+        return fileName.replace(/\.[^/.]+$/, "");
+    }
+
+    function syncDialogSizeToDetailsScreen() {
+        var clone;
+        var measuredHeight;
+        var maxAllowedHeight;
+        var finalHeight;
+
+        if (!dialogContent || !detailsScreen) {
+            return;
+        }
+
+        clone = detailsScreen.cloneNode(true);
+        clone.hidden = false;
+        clone.removeAttribute("hidden");
+        clone.classList.add("is-active");
+        clone.style.position = "absolute";
+        clone.style.visibility = "hidden";
+        clone.style.pointerEvents = "none";
+        clone.style.left = "-99999px";
+        clone.style.top = "0";
+        clone.style.width = window.getComputedStyle(dialogContent).width;
+        clone.style.height = "auto";
+        clone.style.maxHeight = "none";
+
+        document.body.appendChild(clone);
+        measuredHeight = clone.scrollHeight;
+        document.body.removeChild(clone);
+
+        if (measuredHeight > 0) {
+            maxAllowedHeight = Math.max(window.innerHeight - 40, 520);
+            finalHeight = Math.round(Math.min(measuredHeight, maxAllowedHeight) * 0.9);
+            finalHeight = Math.max(finalHeight, 540);
+
+            dialogContent.style.height = finalHeight + "px";
+            dialogContent.style.minHeight = finalHeight + "px";
+            dialogContent.style.maxHeight = finalHeight + "px";
+        }
+    }
+
+    function formatAuctionDeadline(hours) {
+        if (hours <= 0) {
+            return "0시간";
+        }
+
+        if (hours >= 24) {
+            if (hours % 24 === 0) {
+                return String(hours / 24) + "일";
+            }
+
+            return String(Math.floor(hours / 24)) + "일 " + String(hours % 24) + "시간";
+        }
+
+        return String(hours) + "시간";
+    }
+
+    function formatAuctionPrice(value) {
+        var numbersOnly = value.replace(/,/g, "").replace(/\D/g, "");
+
+        return numbersOnly ? Number(numbersOnly).toLocaleString("ko-KR") : "";
+    }
+
+    function copyVideoLink() {
+        if (!videoLinkUrl || !navigator.clipboard || !navigator.clipboard.writeText) {
+            return;
+        }
+
+        navigator.clipboard.writeText(videoLinkUrl.textContent.trim()).catch(function () {
+        });
+    }
+
+    function showDetailsScreen(file) {
+        var title = toDisplayTitle(file.name);
+
+        uploadScreen.hidden = true;
+        uploadScreen.classList.remove("is-active");
+        detailsScreen.hidden = false;
+        detailsScreen.classList.add("is-active");
+        dialogContent.classList.add("is-details");
+
+        if (detailsVideoTitle) {
+            detailsVideoTitle.textContent = title;
+        }
+
+        if (videoFileLabel) {
+            videoFileLabel.textContent = file.name;
+        }
+
+        if (videoTitleInput) {
+            videoTitleInput.value = title;
+            autoResizeTextarea(videoTitleInput);
+            updateTextCount(videoTitleInput, videoTitleCount, 100);
+        }
+    }
+
+    function showUploadScreen() {
+        detailsScreen.hidden = true;
+        detailsScreen.classList.remove("is-active");
+        uploadScreen.hidden = false;
+        uploadScreen.classList.add("is-active");
+        dialogContent.classList.remove("is-details");
+    }
+
+    function handleFiles(files) {
+        var file = files && files[0];
+
+        if (!file) {
+            updateSelectedFile(null);
+            updateMediaPreview(null);
+            return;
+        }
+
+        if (!isSupportedMediaFile(file)) {
+            return;
+        }
+
+        updateSelectedFile(file);
+        updateMediaPreview(file);
+        showDetailsScreen(file);
+    }
+
+    selectFileButton.addEventListener("click", function () {
+        fileInput.click();
+    });
+
+    if (uploadAiButton) {
+        uploadAiButton.addEventListener("click", openAiPromptModal);
+    }
+
+    fileInput.addEventListener("change", function () {
+        handleFiles(fileInput.files);
+    });
+
+    ["dragenter", "dragover"].forEach(function (eventName) {
+        uploadPanel.addEventListener(eventName, function (event) {
+            event.preventDefault();
+            uploadPanel.classList.add("is-dragover");
+        });
+    });
+
+    ["dragleave", "drop"].forEach(function (eventName) {
+        uploadPanel.addEventListener(eventName, function (event) {
+            event.preventDefault();
+            uploadPanel.classList.remove("is-dragover");
+        });
+    });
+
+    uploadPanel.addEventListener("drop", function (event) {
+        handleFiles(event.dataTransfer.files);
+    });
+
+    closeButton.addEventListener("click", closeModal);
+
+    if (uploadCloseButton) {
+        uploadCloseButton.addEventListener("click", closeModal);
+    }
+
+    if (detailsCloseButton) {
+        detailsCloseButton.addEventListener("click", closeModal);
+    }
+
+    if (detailsBackButton) {
+        detailsBackButton.addEventListener("click", showUploadScreen);
+    }
+
+    aiPromptCloseTargets.forEach(function (target) {
+        target.addEventListener("click", closeAiPromptModal);
+    });
+
+    if (aiPromptCloseButton) {
+        aiPromptCloseButton.addEventListener("click", closeAiPromptModal);
+    }
+
+    if (aiPromptSendButton) {
+        aiPromptSendButton.addEventListener("click", submitAiPrompt);
+    }
+
+    if (aiPromptToolButton) {
+        aiPromptToolButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+            toggleAiPromptComposeMenu();
+        });
+    }
+
+    if (aiPromptAttachButton && aiPromptFileInput) {
+        aiPromptAttachButton.addEventListener("click", function () {
+            closeAiPromptComposeMenu();
+            aiPromptFileInput.click();
+        });
+    }
+
+    if (aiPromptComposeMenu) {
+        aiPromptComposeMenu.addEventListener("click", function (event) {
+            event.stopPropagation();
+        });
+    }
+
+    if (aiPromptFileInput) {
+        aiPromptFileInput.addEventListener("change", function () {
+            if (!aiPromptFileInput.files || !aiPromptFileInput.files[0]) {
+                return;
+            }
+
+            renderAiPromptAttachment(aiPromptFileInput.files[0]);
+        });
+    }
+
+    if (aiPromptRemoveAttachment) {
+        aiPromptRemoveAttachment.addEventListener("click", clearAiPromptAttachment);
+    }
+
+    if (aiPromptRemoveFileAttachment) {
+        aiPromptRemoveFileAttachment.addEventListener("click", clearAiPromptAttachment);
+    }
+
+    if (aiPromptInput) {
+        aiPromptInput.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                submitAiPrompt();
+            }
+        });
+    }
+
+    thumbnailUploadButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            var inputId = button.getAttribute("data-target-input");
+            var targetInput = inputId ? document.getElementById(inputId) : null;
+
+            if (targetInput) {
+                targetInput.click();
+            }
+        });
+    });
+
+    thumbnailFileInputs.forEach(function (input) {
+        input.addEventListener("change", function () {
+            var file = input.files && input.files[0];
+            renderThumbnailPreview(input, file);
+        });
+    });
+
+    if (videoLinkUrl) {
+        videoLinkUrl.addEventListener("click", function (event) {
+            event.preventDefault();
+            copyVideoLink();
+        });
+    }
+
+    if (videoLinkCopyButton) {
+        videoLinkCopyButton.addEventListener("click", function (event) {
+            event.preventDefault();
+            copyVideoLink();
+        });
+    }
+
+    if (playlistDropdownButton && playlistDropdownMenu && playlistDropdownText) {
+        playlistDropdownButton.addEventListener("click", function () {
+            var isOpen = !playlistDropdownMenu.hidden;
+
+            playlistDropdownMenu.hidden = isOpen;
+            playlistDropdownButton.setAttribute("aria-expanded", String(!isOpen));
+        });
+
+        playlistOptions.forEach(function (option) {
+            option.addEventListener("click", function () {
+                playlistDropdownText.textContent = option.getAttribute("data-playlist-name") || option.textContent.trim();
+                playlistDropdownMenu.hidden = true;
+                playlistDropdownButton.setAttribute("aria-expanded", "false");
+            });
+        });
+
+        document.addEventListener("click", function (event) {
+            if (!playlistDropdownButton.contains(event.target) && !playlistDropdownMenu.contains(event.target)) {
+                playlistDropdownMenu.hidden = true;
+                playlistDropdownButton.setAttribute("aria-expanded", "false");
+            }
+        });
+    }
+
+    if (videoTitleInput && videoTitleCount) {
+        videoTitleInput.addEventListener("input", function () {
+            autoResizeTextarea(videoTitleInput);
+            updateTextCount(videoTitleInput, videoTitleCount, 100);
+
+            if (detailsVideoTitle) {
+                detailsVideoTitle.textContent = videoTitleInput.value || "업로드한 동영상";
+            }
+        });
+    }
+
+    if (videoDescriptionInput && videoDescriptionCount) {
+        videoDescriptionInput.addEventListener("input", function () {
+            updateTextCount(videoDescriptionInput, videoDescriptionCount, 5000);
+        });
+    }
+
+    if (videoTagsInput && videoTagsCount) {
+        videoTagsInput.addEventListener("input", function () {
+            updateTextCount(videoTagsInput, videoTagsCount, 500);
+        });
+    }
+
+    if (tradeToggle && tradeConfig) {
+        tradeToggle.addEventListener("change", function () {
+            if (tradeToggle.checked) {
+                if (auctionConfig) {
+                    auctionConfig.hidden = true;
+                }
+
+                if (auctionExpandIcon) {
+                    auctionExpandIcon.hidden = false;
+                }
+
+                if (auctionCollapseIcon) {
+                    auctionCollapseIcon.hidden = true;
+                }
+            }
+
+            tradeConfig.hidden = !tradeToggle.checked;
+
+            if (!tradeToggle.checked && tradePriceInput) {
+                tradePriceInput.value = "";
+            }
+        });
+    }
+
+    if (tradePriceInput) {
+        tradePriceInput.addEventListener("input", function (event) {
+            event.target.value = formatAuctionPrice(event.target.value);
+        });
+    }
+
+    if (auctionExpandButton && auctionConfig) {
+        auctionExpandButton.addEventListener("click", function () {
+            var isHidden = auctionConfig.hidden;
+
+            if (isHidden && tradeToggle) {
+                tradeToggle.checked = false;
+
+                if (tradeConfig) {
+                    tradeConfig.hidden = true;
+                }
+
+                if (tradePriceInput) {
+                    tradePriceInput.value = "";
+                }
+            }
+
+            auctionConfig.hidden = !isHidden;
+
+            if (auctionExpandIcon) {
+                auctionExpandIcon.hidden = !isHidden;
+            }
+
+            if (auctionCollapseIcon) {
+                auctionCollapseIcon.hidden = isHidden;
+            }
+        });
+    }
+
+    if (auctionBidPriceInput) {
+        auctionBidPriceInput.addEventListener("input", function (event) {
+            event.target.value = formatAuctionPrice(event.target.value);
+        });
+    }
+
+    if (auctionDeadlineButtons.length && auctionDeadlineSelected && auctionDeadlineHoursInput) {
+        auctionDeadlineButtons.forEach(function (button) {
+            button.addEventListener("click", function () {
+                var hours = Number(button.getAttribute("data-hours") || "0");
+                var currentHours = Number(auctionDeadlineHoursInput.value || "0");
+                var nextHours = currentHours + hours;
+
+                auctionDeadlineSelected.textContent = formatAuctionDeadline(nextHours);
+                auctionDeadlineHoursInput.value = String(nextHours);
+
+                auctionDeadlineButtons.forEach(function (item) {
+                    item.classList.remove("work-auction-config__deadline-btn--active");
+                });
+
+                button.classList.add("work-auction-config__deadline-btn--active");
+            });
+        });
+    }
+
+    if (auctionDeadlineReset && auctionDeadlineSelected && auctionDeadlineHoursInput) {
+        auctionDeadlineReset.addEventListener("click", function () {
+            auctionDeadlineSelected.textContent = "0시간";
+            auctionDeadlineHoursInput.value = "0";
+
+            auctionDeadlineButtons.forEach(function (item) {
+                item.classList.remove("work-auction-config__deadline-btn--active");
+            });
+        });
+    }
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && aiPromptModal && !aiPromptModal.hidden) {
+            closeAiPromptModal();
+        }
+    });
+
+    document.addEventListener("click", function (event) {
+        if (!aiPromptComposeMenu || !aiPromptToolButton || aiPromptComposeMenu.hidden) {
+            return;
+        }
+
+        if (!aiPromptComposeMenu.contains(event.target) && !aiPromptToolButton.contains(event.target)) {
+            closeAiPromptComposeMenu();
+        }
+    });
+
+    bindFieldCountVisibility(videoTitleInput);
+    bindFieldCountVisibility(videoDescriptionInput);
+
+    updateSelectedFile(null);
+    updateMediaPreview(null);
+    syncDialogSizeToDetailsScreen();
+    autoResizeTextarea(videoTitleInput);
+    updateTextCount(videoTitleInput, videoTitleCount, 100);
+    updateTextCount(videoDescriptionInput, videoDescriptionCount, 5000);
+    updateTextCount(videoTagsInput, videoTagsCount, 500);
+
+    window.addEventListener("resize", syncDialogSizeToDetailsScreen);
+});

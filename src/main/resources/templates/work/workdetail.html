@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Detail</title>
+    <meta name="shell-head" th:replace="templates/layout/youtube-shell :: ytShellHead('Work Detail - Bideo')">
+    <link rel="stylesheet" href="../../static/css/common/font.css" th:href="@{/css/common/font.css}">
+    <link rel="stylesheet" href="../../static/css/work/workdetail.css" th:href="@{/css/work/workdetail.css}">
+    <link rel="stylesheet" href="../../static/css/auction/auction.css" th:href="@{/css/auction/auction.css}">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+ </head>
+<body class="workdetail-page" id="section">
+    <div th:replace="templates/layout/youtube-shell :: ytShellChrome('workdetail')"></div>
+
+    <main class="yt-shell__page-content workdetail-shell" aria-label="작품 상세">
+        <section class="workdetail-stage">
+            <main class="page-stack" id="page-stack"></main>
+            <nav class="shorts-navigation" aria-label="쇼츠 탐색">
+                <button class="navigation-button navigation-button-up" id="navigation-button-up" type="button" aria-label="이전 동영상">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 21a1 1 0 0 1-1-1V6.414L5.707 11.707a1 1 0 1 1-1.414-1.414L12 2.586l7.707 7.707a1 1 0 1 1-1.414 1.414L13 6.414V20a1 1 0 0 1-1 1Z"></path>
+                    </svg>
+                </button>
+                <button class="navigation-button navigation-button-down" id="navigation-button-down" type="button" aria-label="다음 동영상">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 3a1 1 0 0 0-1 1v13.586l-5.293-5.293a1 1 0 1 0-1.414 1.414L12 21.414l7.707-7.707a1 1 0 1 0-1.414-1.414L13 17.586V4a1 1 0 0 0-1-1Z"></path>
+                    </svg>
+                </button>
+            </nav>
+        </section>
+    </main>
+
+    <template id="work-page-template">
+        <section class="page">
+            <section class="view">
+                <section class="info">
+                    <section class="channel-box">
+                        <div class="channel">
+                            <span class="avatar" data-field="avatarText"></span>
+                            <strong class="name" data-field="channel"></strong>
+                            <button class="sub" type="button" data-field="subscribe"></button>
+                        </div>
+                    </section>
+
+                    <section class="left-meta">
+                        <p class="desc" data-field="desc"></p>
+                        <h2 class="headline" data-field="headline"></h2>
+                    </section>
+                </section>
+
+                <section class="media-cluster">
+                    <section class="media">
+                        <article class="card">
+                            <div class="thumb">
+                                <div class="thumb-controls" aria-label="플레이어 컨트롤">
+                                    <div class="thumb-controls-group thumb-controls-group-left">
+                                        <button class="thumb-control-button thumb-control-button-dark" type="button" aria-label="재생" data-role="play-toggle">
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                <path data-role="play-toggle-path" d="M7 5.2v13.6c0 .73.8 1.18 1.43.8L19.98 13a.92.92 0 0 0 0-1.6L8.43 4.4A.92.92 0 0 0 7 5.2Z"></path>
+                                            </svg>
+                                        </button>
+                                        <button class="thumb-control-button thumb-control-button-dark" type="button" aria-label="음소거">
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                <path d="M11.485 2.143 3.913 6.687A6 6 0 001 11.832v.338a6 6 0 002.913 5.144l7.572 4.543A1 1 0 0013 21V3a1.001 1.001 0 00-1.515-.857Zm6.88 2.079a1 1 0 00-.001 1.414 9 9 0 010 12.728 1 1 0 001.414 1.414 11 11 0 000-15.556 1 1 0 00-1.413 0Zm-2.83 2.828a1 1 0 000 1.415 5 5 0 010 7.07 1 1 0 001.415 1.415 6.999 6.999 0 000-9.9 1 1 0 00-1.415 0Z"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div class="thumb-controls-group thumb-controls-group-right">
+                                        <button class="thumb-control-button thumb-control-button-bookmark" type="button" aria-label="찜하기" aria-pressed="false" data-role="bookmark-button">
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                <path data-role="bookmark-icon-path" d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z"></path>
+                                            </svg>
+                                        </button>
+                                        <button class="thumb-control-button" type="button" aria-label="추가 작업" data-role="more-button" aria-expanded="false">
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                <path d="M12 4a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Z"></path>
+                                            </svg>
+                                        </button>
+                                        <button class="thumb-control-button" type="button" aria-label="전체 화면" data-role="fullscreen-button">
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                                <path d="M10 3H3v7c0 .265.105.52.293.707.187.188.442.293.707.293.265 0 .52-.105.707-.293C4.895 10.52 5 10.265 5 10V6.414l4.293 4.293.076.068c.192.155.435.233.68.22.247-.014.48-.118.654-.292.174-.174.278-.407.291-.653.014-.246-.064-.489-.219-.681l-.068-.076L6.414 5H10c.265 0 .52-.105.707-.293C10.895 4.52 11 4.265 11 4c0-.265-.105-.52-.293-.707C10.52 3.105 10.265 3 10 3Zm10 10c-.265 0-.52.105-.707.293-.188.187-.293.442-.293.707v3.586l-4.293-4.293-.076-.068c-.192-.155-.435-.233-.68-.22-.247.014-.48.118-.654.292-.174.174-.278.407-.291.653-.014.246.064.489.219.681l.068.076L17.586 19H14c-.265 0-.52.105-.707.293-.188.187-.293.442-.293.707 0 .265.105.52.293.707.187.188.442.293.707.293h7v-7c0-.265-.105-.52-.293-.707C20.52 13.105 20.265 13 20 13Z"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <video class="thumb-video" data-role="thumb-video" muted loop playsinline preload="metadata" hidden></video>
+                                <img data-field="thumb" src="" alt="">
+                                <p class="caption" data-field="caption"></p>
+                            </div>
+                            <div class="thumb-more-menu" hidden data-role="more-menu">
+                                <button class="thumb-more-menu-item" type="button" data-role="edit-button" hidden>
+                                    <span class="thumb-more-menu-icon">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Zm2.92 1.83H5v-.92l9.06-9.06.92.92-9.06 9.06ZM20.71 7.04a.996.996 0 0 0 0-1.41L18.37 3.29a.996.996 0 1 0-1.41 1.41L19.3 7.04a.996.996 0 0 0 1.41 0Z"></path>
+                                        </svg>
+                                    </span>
+                                    <span>수정하기</span>
+                                </button>
+                                <button class="thumb-more-menu-item thumb-more-menu-item-danger" type="button" data-role="delete-button" hidden>
+                                    <span class="thumb-more-menu-icon">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M9 3V4H4v2h1v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1V4h-5V3H9Zm8 3v13H7V6h10ZM9 8v9h2V8H9Zm4 0v9h2V8h-2Z"></path>
+                                        </svg>
+                                    </span>
+                                    <span>삭제하기</span>
+                                </button>
+                                <button class="thumb-more-menu-item" type="button" data-role="description-button">
+                                    <span class="thumb-more-menu-icon">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M4 5a1 1 0 000 2h16a1 1 0 100-2H4Zm-1 5a1 1 0 001 1h10a1 1 0 000-2H4a1 1 0 00-1 1Zm1 3a1 1 0 000 2h16a1 1 0 000-2H4Zm0 4a1 1 0 000 2h10a1 1 0 000-2H4Z"></path>
+                                        </svg>
+                                    </span>
+                                    <span>설명</span>
+                                </button>
+                                <button class="thumb-more-menu-item" type="button" data-role="not-recommend-button">
+                                    <span class="thumb-more-menu-icon">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1Zm0 2a9 9 0 110 18.001A9 9 0 0112 3Zm4 8H8a1 1 0 000 2h8a1 1 0 000-2Z"></path>
+                                        </svg>
+                                    </span>
+                                    <span>작품 추천 안함</span>
+                                </button>
+                                <button class="thumb-more-menu-item" type="button" data-role="report-button">
+                                    <span class="thumb-more-menu-icon">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="m4 2.999-.146.073A1.55 1.55 0 003 4.454v16.545a1 1 0 102 0v-6.491a7.26 7.26 0 016.248.115l.752.376a8.94 8.94 0 008 0l.145-.073c.524-.262.855-.797.855-1.382V4.458a1.21 1.21 0 00-1.752-1.083 7.26 7.26 0 01-6.496 0L12 2.999a8.94 8.94 0 00-8 0Zm7.105 1.79v-.002l.752.376A9.26 9.26 0 0019 5.641v7.62a6.95 6.95 0 01-6.105-.052l-.752-.376A9.261 9.261 0 005 12.355v-7.62a6.94 6.94 0 016.105.054Z"></path>
+                                        </svg>
+                                    </span>
+                                    <span>신고</span>
+                                </button>
+                            </div>
+                        </article>
+                    </section>
+
+                <aside class="actions" aria-label="동영상 액션">
+                    <button class="action" type="button" data-action-label data-role="market-button">
+                        <span class="bubble">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path data-role="market-icon-path" d="M6 3h12l1 4v2.5a2.5 2.5 0 0 1-1 2V19a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-7.5a2.5 2.5 0 0 1-1-2V7l1-4Zm1.56 2L7 7.25V9.5a.5.5 0 0 0 .5.5h1A1.5 1.5 0 0 0 10 8.5V5H7.56Zm4.44 0v3.5A1.5 1.5 0 0 0 13.5 10h1a.5.5 0 0 0 .5-.5V5H12Zm5 0v3.5a1.5 1.5 0 0 0 1.5 1.5h.5a.5.5 0 0 0 .5-.5V7.25L18.44 5H17ZM8 12v7h8v-7h-8Z"></path>
+                            </svg>
+                        </span>
+                        <span data-field="remixLabel"></span>
+                    </button>
+                    <button class="action" type="button" data-action-label data-role="primary-like-button" aria-pressed="false">
+                        <span class="bubble">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M9.221 1.795a1 1 0 011.109-.656l1.04.173a4 4 0 013.252 4.784L14 9h4.061a3.664 3.664 0 013.576 2.868A3.68 3.68 0 0121 14.85l.02.087A3.815 3.815 0 0120 18.5v.043l-.01.227a2.82 2.82 0 01-.135.663l-.106.282A3.754 3.754 0 0116.295 22h-3.606l-.392-.007a12.002 12.002 0 01-5.223-1.388l-.343-.189-.27-.154a2.005 2.005 0 00-.863-.26l-.13-.004H3.5a1.5 1.5 0 01-1.5-1.5V12.5A1.5 1.5 0 013.5 11h1.79l.157-.013a1 1 0 00.724-.512l.063-.145 2.987-8.535Zm-1.1 9.196A3 3 0 015.29 13H4v4.998h1.468a4 4 0 011.986.528l.27.155.285.157A10 10 0 0012.69 20h3.606c.754 0 1.424-.483 1.663-1.2l.03-.126a.819.819 0 00.012-.131v-.872l.587-.586c.388-.388.577-.927.523-1.465l-.038-.23-.02-.087-.21-.9.55-.744A1.663 1.663 0 0018.061 11H14a2.002 2.002 0 01-1.956-2.418l.623-2.904a2 2 0 00-1.626-2.392l-.21-.035-2.71 7.741Z"></path>
+                            </svg>
+                        </span>
+                        <span data-field="likeCount"></span>
+                    </button>
+                    <button class="action" type="button" data-action-label data-role="comments-button">
+                        <span class="bubble">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M1 6a4 4 0 014-4h14a4 4 0 014 4v10a4 4 0 01-4 4h-4.8l-5.105 2.836A1.41 1.41 0 017 21.604V20H5a4 4 0 01-4-4V6Zm8 12v2.601l4.229-2.35.453-.251H19a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h4ZM7 8a1 1 0 000 2h10a1 1 0 100-2H7Zm-1 5a1 1 0 001 1h6a1 1 0 000-2H7a1 1 0 00-1 1Z"></path>
+                            </svg>
+                        </span>
+                        <span data-field="commentCount"></span>
+                    </button>
+                    <button class="action" type="button" data-action-label data-role="share-button">
+                        <span class="bubble">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M10 3.158V7.51c-5.428.223-8.27 3.75-8.875 11.199-.04.487-.07.975-.09 1.464l-.014.395c-.014.473.578.684.88.32.302-.368.61-.73.925-1.086l.244-.273c1.79-1.967 3-2.677 4.93-2.917a18.011 18.011 0 012-.112v4.346a1 1 0 001.646.763l9.805-8.297 1.55-1.31-1.55-1.31-9.805-8.297A1 1 0 0010 3.158Zm2 6.27v.002-4.116l7.904 6.688L12 18.689v-4.212l-2.023.024c-1.935.022-3.587.17-5.197 1.024a9 9 0 00-1.348.893c.355-1.947.916-3.39 1.63-4.425 1.062-1.541 2.607-2.385 5.02-2.485L12 9.428Z"></path>
+                            </svg>
+                        </span>
+                        <span data-field="shareLabel"></span>
+                    </button>
+
+                        <a class="pivot" href="about:invalid#zClosurez" aria-label="관련 작품 더보기" data-role="pivot-button">
+                            <img data-field="pivotThumb" src="" alt="">
+                        </a>
+                    </aside>
+                </section>
+            </section>
+
+            <aside class="anchored-panel" hidden data-role="anchored-panel" aria-label="설명 패널">
+                <div class="anchored-panel-header">
+                    <div class="anchored-panel-title-wrap">
+                        <h3 class="anchored-panel-title">설명</h3>
+                    </div>
+                    <button class="anchored-panel-close" type="button" aria-label="닫기" data-role="anchored-panel-close">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 10-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 001.414 1.414L12 13.414l5.293 5.293a1 1 0 001.414-1.414L13.414 12l5.293-5.293a1 1 0 10-1.414-1.414Z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="anchored-panel-body">
+                    <div class="desc-head">
+                        <p class="anchored-panel-headline" data-field="headline"></p>
+                    </div>
+                    <div class="facts" aria-label="영상 정보">
+                        <div class="fact">
+                            <span class="fact-v" data-field="likeCount"></span>
+                            <span class="fact-l">좋아요</span>
+                        </div>
+                        <div class="fact">
+                            <span class="fact-v" data-field="viewCount"></span>
+                            <span class="fact-l">조회수</span>
+                        </div>
+                        <div class="fact">
+                            <span class="fact-v" data-field="publishedDate"></span>
+                            <span class="fact-l" data-field="publishedYear"></span>
+                        </div>
+                    </div>
+                    <div class="desc-box">
+                        <p class="anchored-panel-description" data-field="desc"></p>
+                    </div>
+                    <section class="made">
+                        <p class="made-title">콘텐츠 생성 방식</p>
+                        <p class="made-head">변경되었거나 합성된 콘텐츠</p>
+                        <p class="made-text">
+                            상당히 수정되었거나 디지털 방식으로 생성된 사운드 또는 영상입니다.
+                            <a class="made-link" href="#" tabindex="-1">자세히 알아보기</a>
+                        </p>
+                    </section>
+                </div>
+            </aside>
+
+            <aside class="comments-panel" hidden data-role="comments-panel" aria-label="댓글 패널">
+                <div class="comments-panel-header">
+                    <div class="comments-panel-title-wrap">
+                        <h3 class="comments-panel-title">댓글 <span class="comments-panel-count" data-field="commentCount"></span></h3>
+                    </div>
+                    <button class="comments-panel-close" type="button" aria-label="닫기" data-role="comments-panel-close">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 10-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 001.414 1.414L12 13.414l5.293 5.293a1 1 0 001.414-1.414L13.414 12l5.293-5.293a1 1 0 10-1.414-1.414Z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="comments-panel-body">
+                    <div class="comments-list" data-role="comments-list"></div>
+                    <div class="cp-box">
+                        <div class="cp-av">@</div>
+                        <div class="cp-ph">댓글 추가...</div>
+                    </div>
+                </div>
+            </aside>
+
+            <aside class="pivot-panel" hidden data-role="pivot-panel" aria-label="예술관 작품 패널">
+                <div class="pivot-panel-header">
+                    <div class="pivot-panel-title-wrap">
+                        <h3 class="pivot-panel-title">예술관 작품</h3>
+                    </div>
+                    <button class="pivot-panel-close" type="button" aria-label="닫기" data-role="pivot-panel-close">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 10-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 001.414 1.414L12 13.414l5.293 5.293a1 1 0 001.414-1.414L13.414 12l5.293-5.293a1 1 0 10-1.414-1.414Z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="pivot-panel-body">
+                    <section class="pivot-gallery-header">
+                        <img class="pivot-gallery-cover" data-role="pivot-gallery-cover" src="" alt="">
+                        <div class="pivot-gallery-copy">
+                            <h4 class="pivot-gallery-title" data-role="pivot-gallery-title"></h4>
+                            <div class="pivot-gallery-meta-row">
+                                <img class="pivot-gallery-avatar" data-role="pivot-gallery-avatar" src="" alt="">
+                                <span class="pivot-gallery-artist" data-role="pivot-gallery-artist"></span>
+                            </div>
+                            <p class="pivot-gallery-count" data-role="pivot-gallery-count"></p>
+                        </div>
+                    </section>
+                    <div class="pivot-gallery-divider"></div>
+                    <div class="pivot-grid" data-role="pivot-grid"></div>
+                </div>
+            </aside>
+
+            <div class="work-share-modal-backdrop" hidden data-role="share-modal-backdrop">
+                <div class="work-share-modal" role="dialog" aria-modal="true" aria-labelledby="work-share-modal-title" style="left: 800px; top: 300px;">
+                    <div class="work-share-modal__header">
+                        <div class="work-share-modal__spacer"></div>
+                        <h2 class="work-share-modal__title" id="work-share-modal-title">공유</h2>
+                        <button class="work-share-modal__close" type="button" aria-label="닫기" data-role="share-modal-close">
+                            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                <polyline fill="none" points="20.643 3.357 12 12 3.353 20.647" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></polyline>
+                                <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" x1="20.649" x2="3.354" y1="20.649" y2="3.354"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="work-share-modal__link-row">
+                        <input class="work-share-modal__link-input" type="text" readonly value="https://localhost:10000/profile/ttt?galleryId=9" data-role="share-link-input">
+                        <button class="work-share-modal__link-copy" type="button" data-role="share-link-copy">복사</button>
+                    </div>
+                    <div class="work-share-modal__receiver">
+                        <label class="work-share-modal__label">받는 사람:</label>
+                        <div class="work-share-modal__receiver-body">
+                            <div class="work-share-modal__chips"></div>
+                            <input class="work-share-modal__search" type="text" placeholder="검색..." autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="work-share-modal__list"></div>
+                    <div class="work-share-modal__footer">
+                        <input class="work-share-modal__message" type="text" placeholder="메시지 쓰기..." autocomplete="off">
+                        <button class="work-share-modal__send" type="button">보내기</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="work-snackbar" hidden data-role="work-snackbar" aria-live="polite">
+                <span class="work-snackbar__message">이제 이 작품 관련 추천되지 않습니다.</span>
+                <button class="work-snackbar__action" type="button" data-role="work-snackbar-undo">실행취소</button>
+            </div>
+
+            <div hidden class="report-modal-backdrop" data-role="report-modal-backdrop">
+                <tp-yt-paper-dialog class="report-modal-dialog" role="dialog" tabindex="-1" prevent-autonav="true" modern="">
+                    <div class="report-modal-header">
+                        <div class="report-modal-header-spacer"></div>
+                        <yt-formatted-string tabindex="-1" class="report-modal-title">신고</yt-formatted-string>
+                        <button type="button" class="report-modal-close" aria-label="닫기" data-role="report-modal-close">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
+                                <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 10-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 001.414 1.414L12 13.414l5.293 5.293a1 1 0 001.414-1.414L13.414 12l5.293-5.293a1 1 0 10-1.414-1.414Z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="report-modal-step" data-role="report-step-reasons">
+                        <div class="report-modal-body">
+                            <h1 class="report-modal-heading">어떤 문제인가요?</h1>
+                            <div class="report-modal-copy">YouTube에서 모든 커뮤니티 가이드에 대해 확인하므로 완벽히 들어맞지 않아도 괜찮습니다.</div>
+                            <div class="report-modal-reasons">
+                                <label class="report-modal-reason"><input type="radio" name="report-form-reason-select-page" aria-label="성적인 콘텐츠"><span>성적인 콘텐츠</span></label>
+                                <label class="report-modal-reason"><input type="radio" name="report-form-reason-select-page" aria-label="폭력적 또는 혐오스러운 콘텐츠"><span>폭력적 또는 혐오스러운 콘텐츠</span></label>
+                                <label class="report-modal-reason"><input type="radio" name="report-form-reason-select-page" aria-label="괴롭힘 또는 폭력"><span>괴롭힘 또는 폭력</span></label>
+                                <label class="report-modal-reason"><input type="radio" name="report-form-reason-select-page" aria-label="유해하거나 위험한 행위"><span>유해하거나 위험한 행위</span></label>
+                            </div>
+                        </div>
+                        <div class="report-modal-footer">
+                            <button type="button" disabled aria-disabled="true" class="report-modal-button report-modal-button-next" data-role="report-next-button">다음</button>
+                        </div>
+                    </div>
+                </tp-yt-paper-dialog>
+            </div>
+
+            <div hidden class="report-modal-backdrop" data-role="report-confirmation-backdrop">
+                <tp-yt-paper-dialog class="report-modal-dialog" role="dialog" tabindex="-1" prevent-autonav="true" modern="">
+                    <div class="report-modal-header">
+                        <div class="report-modal-header-spacer"></div>
+                        <yt-formatted-string tabindex="-1" class="report-modal-title">신고</yt-formatted-string>
+                        <button type="button" class="report-modal-close" aria-label="닫기" data-role="report-confirmation-close">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
+                                <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 10-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 001.414 1.414L12 13.414l5.293 5.293a1 1 0 001.414-1.414L13.414 12l5.293-5.293a1 1 0 10-1.414-1.414Z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="report-modal-step report-modal-step-confirmation">
+                        <div class="report-modal-body report-modal-body-confirmation">
+                            <img alt="" width="178" height="115" src="https://www.youtube.com/img/flagging/confirm-light.png" class="report-modal-image">
+                            <h1 class="report-modal-heading">커뮤니티에 도움을 주셔서 감사합니다</h1>
+                            <div class="report-modal-copy report-modal-copy-centered">신고해 주신 내용은 유해한 콘텐츠로부터 커뮤니티를 보호하는 데 도움이 됩니다.</div>
+                            <div class="report-modal-copy report-modal-copy-centered">누군가 위급한 상황에 처했다고 생각한다면 현지 법 집행 기관에 연락하세요.</div>
+                        </div>
+                        <div class="report-modal-footer">
+                            <button type="button" class="report-modal-button report-modal-button-confirm" data-role="report-confirm-button">확인</button>
+                        </div>
+                    </div>
+                </tp-yt-paper-dialog>
+            </div>
+        </section>
+    </template>
+
+<div class="Auction-Page-Wrapper">
+    <div class="Auction-Content-Layout">
+        <main class="Auction-Watch-Main">
+            <!--! 입찰 채팅 패널 -->
+            <aside class="Auction-Bid-Panel">
+
+                <!-- 채팅 헤더 -->
+                <div class="Auction-Bid-Header">
+                    <div class="Auction-Bid-Title">
+                        <span class="Auction-Live-Dot"></span>
+                        <span class="Auction-Bid-TitleText">AUCTION</span>
+                    </div>
+                </div>
+
+                <!-- 입찰 메시지 목록 -->
+                <div class="Auction-Bid-Messages">
+
+                    <!-- 입찰 남은 시간 -->
+                    <div class="Auction-Countdown-Wrap">
+                        <div class="Auction-Countdown-Label">경매 마감까지</div>
+                        <div class="Auction-Countdown-Timer">
+                            <div class="Auction-Cd-Unit">
+                                <div class="Auction-Cd-Num" id="cdDay">00</div>
+                                <div class="Auction-Cd-Lbl">일</div>
+                            </div>
+                            <div class="Auction-Cd-Sep">:</div>
+                            <div class="Auction-Cd-Unit">
+                                <div class="Auction-Cd-Num" id="cdHour">00</div>
+                                <div class="Auction-Cd-Lbl">시간</div>
+                            </div>
+                            <div class="Auction-Cd-Sep">:</div>
+                            <div class="Auction-Cd-Unit">
+                                <div class="Auction-Cd-Num" id="cdMin">00</div>
+                                <div class="Auction-Cd-Lbl">분</div>
+                            </div>
+                            <div class="Auction-Cd-Sep">:</div>
+                            <div class="Auction-Cd-Unit">
+                                <div class="Auction-Cd-Num" id="cdSec">00</div>
+                                <div class="Auction-Cd-Lbl">초</div>
+                            </div>
+                        </div>
+                        <div class="Auction-Countdown-Deadline" id="auctionDeadlineDate">마감 일정</div>
+                    </div>
+
+                    <!-- 입찰 현황 제목 -->
+                    <div class="Auction-BidHistory-Header">
+                        <span class="Auction-BidHistory-Title">입찰 현황</span>
+                        <span class="Auction-BidHistory-Count" id="bidHistoryCount">0건</span>
+                    </div>
+
+                    <!-- 입찰 채팅 스크롤 영역 -->
+                    <div class="Auction-BidHistory-List" id="bidHistoryList">
+
+                        <div class="Auction-Bid-Item">
+                            <div class="Auction-Bid-Avatar">
+                                <div class="Auction-Bid-AvatarCircle"></div>
+                            </div>
+                            <div class="Auction-Bid-Content">
+                                <span class="Auction-Bid-Username">@mezzo369</span>
+                                <span class="Auction-Bid-Text">10,000원 입찰했습니다.</span>
+                            </div>
+                        </div>
+
+                        <div class="Auction-Bid-Item">
+                            <div class="Auction-Bid-Avatar">
+                                <div class="Auction-Bid-AvatarCircle">A</div>
+                            </div>
+                            <div class="Auction-Bid-Content">
+                                <span class="Auction-Bid-Username">@ajaa8277</span>
+                                <span class="Auction-Bid-Text">15,000원 입찰했습니다.</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 입찰 입력창 -->
+                <div class="Auction-Bid-InputArea">
+
+                    <!-- 현재 최고 입찰가 -->
+                    <div class="Auction-Bid-CurrentPrice">
+                        <span class="Auction-Bid-CurrentPrice-Label">현재 최고 입찰가</span>
+                        <span class="Auction-Bid-CurrentPrice-Value" id="currentHighestPrice">15,000원</span>
+                    </div>
+
+                    <!-- 즉시 입찰 체크박스 -->
+                    <div class="Auction-Bid-Instant">
+                        <label class="Auction-Bid-Instant-Label">
+                            <input class="Auction-Bid-Instant-Checkbox" type="checkbox" id="instantBidCheck" />
+                            <span class="Auction-Bid-Instant-Text">확인 없이 바로 입찰</span>
+                        </label>
+
+                        <!-- 입찰 가이드 i -->
+                        <div class="Auction-Bid-Info">
+                            <button class="Auction-Bid-Info-Btn" id="bidInfoBtn" aria-label="입찰 안내">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="8" x2="12" y2="8"/>
+                                    <line x1="12" y1="12" x2="12" y2="16"/>
+                                </svg>
+                            </button>
+                            <div class="Auction-Bid-Info-Tooltip" id="bidInfoTooltip">
+                                <p>· 입력값이 없으면 최소 입찰가로 자동 입찰됩니다.</p>
+                                <p>· 최소 입찰가는 현재 최고가의 10% 인상된 금액입니다.</p>
+                                <p>· 체크 시 확인 없이 즉시 입찰이 진행됩니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 직접 금액 입력 -->
+                    <div class="Auction-Bid-InputWrapper">
+                        <input
+                                class="Auction-Bid-Input"
+                                id="bidCustomInput"
+                                type="text"
+                                inputmode="numeric"
+                                placeholder="직접 입력 (최소 입찰가 이상)"
+                                autocomplete="off"
+                                autocapitalize="off"
+                        />
+                        <span class="Auction-Bid-Input-Unit">원</span>
+                    </div>
+                    <!-- 입찰 버튼 -->
+                    <button class="Auction-Bid-SubmitBtn" id="bidSubmitBtn" aria-label="입찰 제출">
+                        <span class="Auction-Bid-SubmitBtn-Amount" id="bidNextAmount" data-amount="16500">16,500원으로 입찰하기</span>
+                        <svg class="Auction-Bid-SubmitIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                            <path d="M201.6 217.4L182.9 198.7C170.4 186.2 170.4 165.9 182.9 153.4L297.6 38.6C310.1 26.1 330.4 26.1 342.9 38.6L361.6 57.4C374.1 69.9 374.1 90.2 361.6 102.7L246.9 217.4C234.4 229.9 214.1 229.9 201.6 217.4zM308 275.7L276.6 244.3L388.6 132.3L508 251.7L396 363.7L364.6 332.3L132.6 564.3C117 579.9 91.7 579.9 76 564.3C60.3 548.7 60.4 523.4 76 507.7L308 275.7zM422.9 438.6C410.4 426.1 410.4 405.8 422.9 393.3L537.6 278.6C550.1 266.1 570.4 266.1 582.9 278.6L601.6 297.3C614.1 309.8 614.1 330.1 601.6 342.6L486.9 457.4C474.4 469.9 454.1 469.9 441.6 457.4L422.9 438.7z"/>
+                        </svg>
+                    </button>
+                </div>
+            </aside>
+        </main>
+
+    </div>
+</div>
+    <script src="../../static/js/work/workdetail.js" th:src="@{/js/work/workdetail.js}"></script>
+    <script src="../../static/js/auction/service.js" th:src="@{/js/auction/service.js}"></script>
+    <script src="../../static/js/auction/layout.js" th:src="@{/js/auction/layout.js}"></script>
+    <script src="../../static/js/auction/event.js" th:src="@{/js/auction/event.js}"></script>
+    <th:block th:replace="templates/layout/youtube-shell :: ytShellScripts()"></th:block>
+</body>
+</html>

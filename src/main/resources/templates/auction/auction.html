@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1440" />
+    <title>경매</title>
+    <link rel="stylesheet" href="../../static/css/auction/auction.css" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <script src="../../static/js/auction/event.js"></script>
+    <script src="../../static/js/auction/service.js"></script>
+    <script src="../../static/js/auction/layout.js"></script>
+</head>
+<body>
+
+<div class="Auction-Page-Wrapper">
+    <div class="Auction-Content-Layout">
+        <main class="Auction-Watch-Main">
+            <!--! 입찰 채팅 패널 -->
+            <aside class="Auction-Bid-Panel">
+
+                <!-- 채팅 헤더 -->
+                <div class="Auction-Bid-Header">
+                    <div class="Auction-Bid-Title">
+                        <span class="Auction-Live-Dot"></span>
+                        <span class="Auction-Bid-TitleText">AUCTION</span>
+                    </div>
+                </div>
+
+                <!-- 입찰 메시지 목록 -->
+                <div class="Auction-Bid-Messages">
+
+                    <!-- 입찰 남은 시간 -->
+                    <div class="Auction-Countdown-Wrap">
+                        <div class="Auction-Countdown-Label">경매 마감까지</div>
+                        <div class="Auction-Countdown-Timer">
+                            <div class="Auction-Cd-Unit">
+                                <div class="Auction-Cd-Num" id="cdDay">00</div>
+                                <div class="Auction-Cd-Lbl">일</div>
+                            </div>
+                            <div class="Auction-Cd-Sep">:</div>
+                            <div class="Auction-Cd-Unit">
+                                <div class="Auction-Cd-Num" id="cdHour">00</div>
+                                <div class="Auction-Cd-Lbl">시간</div>
+                            </div>
+                            <div class="Auction-Cd-Sep">:</div>
+                            <div class="Auction-Cd-Unit">
+                                <div class="Auction-Cd-Num" id="cdMin">00</div>
+                                <div class="Auction-Cd-Lbl">분</div>
+                            </div>
+                            <div class="Auction-Cd-Sep">:</div>
+                            <div class="Auction-Cd-Unit">
+                                <div class="Auction-Cd-Num" id="cdSec">00</div>
+                                <div class="Auction-Cd-Lbl">초</div>
+                            </div>
+                        </div>
+                        <div class="Auction-Countdown-Deadline" id="auctionDeadlineDate">마감 일정</div>
+                    </div>
+
+                    <!-- 입찰 현황 제목 -->
+                    <div class="Auction-BidHistory-Header">
+                        <span class="Auction-BidHistory-Title">입찰 현황</span>
+                        <span class="Auction-BidHistory-Count" id="bidHistoryCount">0건</span>
+                    </div>
+
+                    <!-- 입찰 채팅 스크롤 영역 -->
+                    <div class="Auction-BidHistory-List" id="bidHistoryList">
+
+                        <div class="Auction-Bid-Item">
+                            <div class="Auction-Bid-Avatar">
+                                <div class="Auction-Bid-AvatarCircle"></div>
+                            </div>
+                            <div class="Auction-Bid-Content">
+                                <span class="Auction-Bid-Username">@mezzo369</span>
+                                <span class="Auction-Bid-Text">10,000원 입찰했습니다.</span>
+                            </div>
+                        </div>
+
+                        <div class="Auction-Bid-Item">
+                            <div class="Auction-Bid-Avatar">
+                                <div class="Auction-Bid-AvatarCircle">A</div>
+                            </div>
+                            <div class="Auction-Bid-Content">
+                                <span class="Auction-Bid-Username">@ajaa8277</span>
+                                <span class="Auction-Bid-Text">15,000원 입찰했습니다.</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 입찰 입력창 -->
+                <div class="Auction-Bid-InputArea">
+
+                    <!-- 현재 최고 입찰가 -->
+                    <div class="Auction-Bid-CurrentPrice">
+                        <span class="Auction-Bid-CurrentPrice-Label">현재 최고 입찰가</span>
+                        <span class="Auction-Bid-CurrentPrice-Value" id="currentHighestPrice">15,000원</span>
+                    </div>
+
+                    <!-- 즉시 입찰 체크박스 -->
+                    <div class="Auction-Bid-Instant">
+                        <label class="Auction-Bid-Instant-Label">
+                            <input class="Auction-Bid-Instant-Checkbox" type="checkbox" id="instantBidCheck" />
+                            <span class="Auction-Bid-Instant-Text">확인 없이 바로 입찰</span>
+                        </label>
+
+                        <!-- 입찰 가이드 i -->
+                        <div class="Auction-Bid-Info">
+                            <button class="Auction-Bid-Info-Btn" id="bidInfoBtn" aria-label="입찰 안내">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <line x1="12" y1="8" x2="12" y2="8"/>
+                                    <line x1="12" y1="12" x2="12" y2="16"/>
+                                </svg>
+                            </button>
+                            <div class="Auction-Bid-Info-Tooltip" id="bidInfoTooltip">
+                                <p>· 입력값이 없으면 최소 입찰가로 자동 입찰됩니다.</p>
+                                <p>· 최소 입찰가는 현재 최고가의 10% 인상된 금액입니다.</p>
+                                <p>· 체크 시 확인 없이 즉시 입찰이 진행됩니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 직접 금액 입력 -->
+                    <div class="Auction-Bid-InputWrapper">
+                        <input
+                                class="Auction-Bid-Input"
+                                id="bidCustomInput"
+                                type="text"
+                                inputmode="numeric"
+                                placeholder="직접 입력 (최소 입찰가 이상)"
+                                autocomplete="off"
+                                autocapitalize="off"
+                        />
+                        <span class="Auction-Bid-Input-Unit">원</span>
+                    </div>
+                    <!-- 입찰 버튼 -->
+                    <button class="Auction-Bid-SubmitBtn" id="bidSubmitBtn" aria-label="입찰 제출">
+                        <span class="Auction-Bid-SubmitBtn-Amount" id="bidNextAmount" data-amount="16500">16,500원으로 입찰하기</span>
+                        <svg class="Auction-Bid-SubmitIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                            <path d="M201.6 217.4L182.9 198.7C170.4 186.2 170.4 165.9 182.9 153.4L297.6 38.6C310.1 26.1 330.4 26.1 342.9 38.6L361.6 57.4C374.1 69.9 374.1 90.2 361.6 102.7L246.9 217.4C234.4 229.9 214.1 229.9 201.6 217.4zM308 275.7L276.6 244.3L388.6 132.3L508 251.7L396 363.7L364.6 332.3L132.6 564.3C117 579.9 91.7 579.9 76 564.3C60.3 548.7 60.4 523.4 76 507.7L308 275.7zM422.9 438.6C410.4 426.1 410.4 405.8 422.9 393.3L537.6 278.6C550.1 266.1 570.4 266.1 582.9 278.6L601.6 297.3C614.1 309.8 614.1 330.1 601.6 342.6L486.9 457.4C474.4 469.9 454.1 469.9 441.6 457.4L422.9 438.7z"/>
+                        </svg>
+                    </button>
+                </div>
+            </aside>
+        </main>
+
+        <!-- 입찰 확인 모달 -->
+        <div class="Auction-Modal-Backdrop off" id="bidConfirmBackdrop">
+            <div class="Auction-Modal">
+                <div class="Auction-Modal-Body">
+                    <p class="Auction-Modal-Message">입찰을 진행하시겠습니까?</p>
+                </div>
+                <div class="Auction-Modal-Footer">
+                    <button class="Auction-Modal-Btn Auction-Modal-Btn--cancel" id="bidConfirmCancel">취소</button>
+                    <button class="Auction-Modal-Btn Auction-Modal-Btn--confirm" id="bidConfirmOk">확인</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 토스트 -->
+        <div class="Auction-Toast off" id="auctionToast">
+            <span class="Auction-Toast-Message" id="auctionToastMessage"></span>
+        </div>
+    </div>
+</div>
+</body>
+</html>

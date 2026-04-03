@@ -1,0 +1,8 @@
+#section, .section{
+    margin-top: var(--layout-header-height) !important;
+    margin-left: var(--layout-guide-width) !important;
+    min-width: var(--content-width) !important;
+    min-height: calc(100% - var(--layout-header-height)) !important;
+    padding: var(--content-padding) !important;
+    background-color: var(--bg-primary) !important;
+}

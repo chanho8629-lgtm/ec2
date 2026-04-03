@@ -1,0 +1,501 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
+    color: inherit;
+}
+
+/* ===== 페이지 ===== */
+.Register-Page {
+    width: 100%;
+}
+
+/* ===== 페이지 헤더 ===== */
+.Register-Page-Header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.Register-Page-Title {
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--color-text);
+    line-height: 32px;
+}
+
+/* ===== 탭바 + 액션 버튼 ===== */
+.Register-ActionBar {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+.Register-ActionBar-Primary {
+    flex: 1;
+}
+
+.Register-Tabs {
+    display: flex;
+    gap: 0;
+}
+
+.Register-Tab {
+    position: relative;
+    padding: 12px 16px;
+    cursor: pointer;
+}
+
+.Register-Tab-Text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-sub);
+    line-height: 20px;
+}
+
+.Register-Tab--selected .Register-Tab-Text {
+    color: var(--color-text);
+}
+
+.Register-Tab-Indicator {
+    position: absolute;
+    bottom: 0;
+    left: 16px;
+    right: 16px;
+    height: 2px;
+    background-color: var(--color-primary);
+    border-radius: 1px;
+}
+
+.Register-Tab:hover .Register-Tab-Text {
+    color: var(--color-text);
+}
+
+/* 액션 버튼 그룹 */
+.Register-ActionBar-Buttons {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* ===== 공통 버튼 ===== */
+.Register-Button-Tonal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 18px;
+    background-color: var(--color-bg-muted);
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.Register-Button-Tonal:hover {
+    background-color: var(--color-border);
+}
+
+.Register-Button-Outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 18px;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.Register-Button-Outline:hover {
+    background-color: var(--color-bg-muted);
+    border-color: var(--color-border-strong);
+}
+
+.Register-Button-Filled {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 18px;
+    background-color: var(--color-primary);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.Register-Button-Filled:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.Register-Button-WithIcon {
+    gap: 6px;
+}
+
+.Register-Button-WithIcon svg {
+    flex-shrink: 0;
+}
+
+.Register-Button-Group {
+    display: flex;
+    gap: 8px;
+}
+
+/* ===== 구분선 ===== */
+.Register-Divider {
+    height: 1px;
+    background-color: var(--color-border);
+}
+
+/* ===== 폼 영역 ===== */
+.Register-Form {
+    padding-top: 24px;
+}
+
+/* ===== 섹션 ===== */
+.Register-Section {
+    margin-bottom: 32px;
+}
+
+.Register-Section-Title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 20px;
+    margin-bottom: 4px;
+}
+
+.Register-Section-Desc {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--color-text-sub);
+    line-height: 18px;
+    margin-bottom: 16px;
+}
+
+/* ===== 업로드 행 (이미지 + 안내) ===== */
+.Register-Upload-Row {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.Register-Upload-Info {
+    flex: 1;
+}
+
+.Register-Upload-Guide {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--color-text-sub);
+    line-height: 18px;
+    margin-bottom: 12px;
+}
+
+/* 배너 프리뷰 */
+.Register-Banner-Preview {
+    width: 290px;
+    height: 160px;
+    border-radius: 8px;
+    background-color: var(--color-bg-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.Register-Banner-Image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.Register-Banner-Placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.4;
+}
+
+/* 대표 이미지 프리뷰 */
+.Register-Photo-Preview {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background-color: var(--color-bg-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.Register-Photo-Placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.4;
+}
+
+/* 샘플 영상 프리뷰 */
+.Register-Video-Preview {
+    width: 200px;
+    height: 120px;
+    border-radius: 8px;
+    background-color: var(--color-bg-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.Register-Video-Placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.4;
+}
+
+/* ===== 인풋 ===== */
+.Register-Input-Wrap {
+    position: relative;
+    margin-bottom: 8px;
+}
+
+.Register-Input {
+    width: 100%;
+    height: 44px;
+    padding: 0 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background-color: transparent;
+    color: var(--color-text);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+}
+
+.Register-Input::placeholder {
+    color: var(--color-text-muted);
+}
+
+.Register-Input:focus {
+    border-color: var(--color-primary);
+}
+
+.Register-Input[readonly] {
+    color: var(--color-text-sub);
+    cursor: default;
+}
+
+/* 라벨 있는 인풋 */
+.Register-Input-Wrap--labeled {
+    max-width: 320px;
+}
+
+.Register-Input-Wrap--labeled .Register-Input {
+    max-width: 100%;
+    padding-top: 18px;
+    height: 56px;
+}
+
+.Register-Input-Label {
+    position: absolute;
+    top: 6px;
+    left: 16px;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--color-text-muted);
+    line-height: 16px;
+    pointer-events: none;
+}
+
+/* readonly + 복사 버튼 */
+.Register-Input-Wrap--readonly {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.Register-Input-Wrap--readonly .Register-Input {
+    flex: 1;
+}
+
+.Register-Input-CopyBtn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--color-text-sub);
+}
+
+.Register-Input-CopyBtn:hover {
+    background-color: var(--color-bg-muted);
+    color: var(--color-text);
+}
+
+/* ===== 날짜 입력 행 ===== */
+.Register-Date-Row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.Register-Date-Row .Register-Input-Wrap--labeled {
+    flex: 1;
+    max-width: 280px;
+}
+
+.Register-Date-Separator {
+    font-size: 16px;
+    color: var(--color-text-sub);
+    padding-top: 8px;
+}
+
+/* ===== 텍스트에어리어 ===== */
+.Register-Textarea-Wrap {
+    margin-bottom: 12px;
+}
+
+.Register-Textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background-color: transparent;
+    color: var(--color-text);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    resize: vertical;
+    min-height: 120px;
+}
+
+.Register-Textarea::placeholder {
+    color: var(--color-text-muted);
+}
+
+.Register-Textarea:focus {
+    border-color: var(--color-primary);
+}
+
+/* ===== 태그 입력 영역 ===== */
+.Register-Tag-Wrap {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background-color: transparent;
+    cursor: text;
+    min-height: 44px;
+}
+
+.Register-Tag-Wrap:focus-within {
+    border-color: var(--color-primary);
+}
+
+.Register-Tag-Input {
+    flex: 1;
+    min-width: 120px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--color-text);
+    font-size: 14px;
+    font-family: inherit;
+    padding: 4px 0;
+}
+
+.Register-Tag-Input::placeholder {
+    color: var(--color-text-muted);
+}
+
+.Register-Tag-Chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 14px;
+    background-color: var(--color-primary-light);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-primary);
+    white-space: nowrap;
+}
+
+.Register-Tag-Remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border: none;
+    background: none;
+    color: var(--color-text-sub);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+    border-radius: 50%;
+}
+
+.Register-Tag-Remove:hover {
+    color: var(--color-text);
+    background-color: var(--color-bg-muted);
+}
+
+/* ===== 삭제 버튼 (하단) ===== */
+.Register-Delete-Section {
+    padding: 32px 0;
+    border-top: 1px solid var(--color-border);
+    margin-top: 24px;
+}
+
+.Register-Button-Delete {
+    padding: 10px 24px;
+    border-radius: 20px;
+    border: 1px solid var(--color-danger);
+    background: transparent;
+    color: var(--color-danger);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.Register-Button-Delete:hover {
+    background-color: #fef2f2;
+}
+
+[hidden] {
+    display: none !important;
+}

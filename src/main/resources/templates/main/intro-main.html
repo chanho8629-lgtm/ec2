@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ko" dir="ltr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta name="viewport" content="initial-scale=1, minimum-scale=1, width=device-width">
+  <title>BIDEO - 영상 크리에이터를 위한 프리미엄 마켓플레이스</title>
+  <meta name="description" content="BIDEO에서 영상 콘텐츠를 경매하고, 거래하고, 소장하세요. 크리에이터와 컬렉터가 만나는 프리미엄 영상 마켓플레이스.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="BIDEO - 영상 크리에이터를 위한 프리미엄 마켓플레이스">
+  <meta property="og:description" content="크리에이터와 컬렉터가 만나는 프리미엄 영상 마켓플레이스.">
+  <meta property="og:site_name" content="BIDEO">
+
+  <link rel="icon" href="../../static/images/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap">
+  <link rel="stylesheet" href="../../static/css/main/intro-main.css">
+  <link rel="stylesheet" href="../../static/css/main/modal-shared.css">
+  <link rel="stylesheet" href="../../static/css/main/auth-modal.css">
+  <link rel="stylesheet" href="../../static/css/main/signup-modal.css">
+
+  <script>
+    (function () {
+      var de = document.documentElement;
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        de.setAttribute('data-theme', 'dark');
+      } else {
+        de.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- SVG 아이콘 정의 -->
+  <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="display:none">
+    <defs>
+      <path d="M15.71 15.03L4.69 4.01h9.71v-1H2.98v11.42h1V4.72L15 15.74l.71-.71z" id="arrow-diagonal"/>
+      <path d="M3.01 12v-1h15.36l-6.72-6.72.71-.71 7.92 7.92-7.92 7.92-.71-.71 6.71-6.7H3.01z" id="arrow-right"/>
+      <path d="M18.35 8.94L12 15.29 5.65 8.94l.71-.71L12 13.88l5.65-5.65.7.71z" id="chevron-down"/>
+      <path d="M21.58 7.19c-.23-.86-.91-1.54-1.77-1.77C18.25 5 12 5 12 5s-6.25 0-7.81.42c-.86.23-1.54.91-1.77 1.77C2 8.75 2 12 2 12s0 3.25.42 4.81c.23.86.91 1.54 1.77 1.77C5.75 19 12 19 12 19s6.25 0 7.81-.42c.86-.23 1.54-.91 1.77-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81zM10 15V9l5.2 3-5.2 3z" id="bideo-logo-icon"/>
+      <path d="M17.5 11.93c0 2.14-1.5 3.92-3.5 4.38v-1.04c1.44-.43 2.5-1.76 2.5-3.34 0-1.58-1.06-2.9-2.5-3.34V7.55c2 .46 3.5 2.24 3.5 4.38zM12 4v15.86l-5.84-4.93H3v-6h3.16L12 4zm-1 2.15L6.52 9.93H4v4h2.52L11 17.71V6.15zm10 5.78c0 4.08-3.05 7.44-7 7.93v-1.01c3.39-.49 6-3.4 6-6.92s-2.61-6.43-6-6.92V4c3.95.49 7 3.85 7 7.93z" id="volume-up"/>
+      <path d="M3.15 3.85l4.17 4.17L6.16 9H3v6h3.16L12 19.93v-7.22l2.45 2.45c-.15.07-.3.13-.45.18v1.04c.43-.1.83-.27 1.2-.48l1.81 1.81c-.88.62-1.9 1.04-3.01 1.2v1.01c1.39-.17 2.66-.71 3.73-1.49l2.42 2.42.71-.71-17-17-.71.71zM11 11.71v6.07L6.52 14H4v-4h2.52l1.5-1.27L11 11.71zm-.67-4.92l-.71-.71L12 4.07v4.39l-1-1V6.22l-.67.57zM14 8.66V7.62c2 .46 3.5 2.24 3.5 4.38 0 .58-.13 1.13-.33 1.64l-.79-.79c.07-.27.12-.55.12-.85 0-1.58-1.06-2.9-2.5-3.34zm0-3.58V4.07c3.95.49 7 3.85 7 7.93 0 1.56-.46 3.01-1.23 4.24l-.73-.73c.61-1.03.96-2.23.96-3.51 0-3.52-2.61-6.43-6-6.92z" id="volume-off"/>
+      <path d="M12.7 12l6.6 6.6-.7.7-6.6-6.6-6.6 6.6-.7-.7 6.6-6.6-6.7-6.6.7-.7 6.6 6.6 6.6-6.6.7.7-6.5 6.6z" id="x"/>
+    </defs>
+  </svg>
+
+  <!-- ===== 헤더 (fixed, 64px) ===== -->
+  <header class="site-header" id="site-header">
+    <div class="site-header__row">
+      <div class="site-header__left">
+        <button class="site-header__menu-btn" id="mobile-menu-btn" aria-label="메뉴">
+          <span class="site-header__menu-icon">
+            <span></span>
+          </span>
+        </button>
+        <a class="site-header__logo-wrap" href="/">
+          <img class="site-header__logo" src="../../static/images/logo.png" alt="BIDEO">
+        </a>
+        <a class="site-header__skip" href="#content">Jump to content</a>
+
+        <div class="site-header__nav-wrapper" id="main-nav-wrapper">
+          <nav class="site-header__nav" aria-label="주요 메뉴">
+            <div class="site-header__nav-items" role="menu">
+              <a class="site-header__nav-item" href="/main">작품 둘러보기</a>
+              <a class="site-header__nav-item" href="#highlight">파트너 프로그램</a>
+
+              <!-- BIDEO 사용법 (하위 메뉴) -->
+              <div class="site-header__nav-dropdown">
+                <button class="site-header__nav-item site-header__nav-item--has-sub" aria-expanded="false">
+                  BIDEO 사용법
+                  <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><use href="#chevron-down"/></svg>
+                </button>
+                <div class="site-header__subnav" hidden>
+                  <a class="site-header__subnav-item" href="#features">영상 거래하기</a>
+                  <a class="site-header__subnav-item" href="#features">경매 참여하기</a>
+                  <a class="site-header__subnav-item" href="#features">수익 창출 방법</a>
+                  <a class="site-header__subnav-item" href="#features">컬렉션 관리</a>
+                  <a class="site-header__subnav-item" href="#features">커뮤니티 활동</a>
+                  <a class="site-header__subnav-item" href="#features">정책 및 가이드라인</a>
+                </div>
+              </div>
+
+              <a class="site-header__nav-item" href="#faq">가장 많이 묻는 질문</a>
+            </div>
+          </nav>
+        </div>
+      </div>
+
+      <div class="site-header__right">
+        <button class="site-header__auth-btn" id="btn-start">로그인 / 회원가입</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== 메인 콘텐츠 ===== -->
+  <main id="content" class="site-main">
+
+    <!-- 히어로: 좌측 텍스트 + 우측 비디오 -->
+    <section class="hero" id="hero">
+      <div class="grid">
+        <div class="grid__cell grid__cell--4 grid__cell--md-12 hero__text-col">
+          <div>
+            <h1 class="hero__heading">영상 거래에 필요한 모든 것</h1>
+            <p class="hero__desc">필요한 모든 정보, 조언, 도움을 여기에서 찾으세요.</p>
+          </div>
+        </div>
+        <div class="grid__cell grid__cell--offset5-7 grid__cell--md-12 hero__video-col">
+          <div class="hero__video-container">
+            <video class="hero__video" src="../../static/media/main/main-video.mp4" autoplay muted loop playsinline></video>
+            <button class="hero__mute-btn" id="mute-btn" aria-label="음소거 해제">
+              <svg viewBox="0 0 24 24" class="hero__mute-icon" aria-hidden="true"><use href="#volume-off"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 하이라이트: 추천 카드 -->
+    <section class="highlight highlight--blue" id="highlight">
+      <div class="grid">
+        <div class="grid__cell grid__cell--5 grid__cell--md-12">
+          <a href="#features">
+            <figure class="highlight__image-wrap">
+              <img src="../../static/images/logo.png" alt="BIDEO 경매 플랫폼">
+            </figure>
+          </a>
+        </div>
+        <div class="grid__cell grid__cell--5 grid__cell--md-12 highlight__content">
+          <p class="highlight__top-line">추천</p>
+          <h2 class="highlight__heading">영상 경매로 수익 창출을 시작하세요</h2>
+          <p class="highlight__desc">크리에이터라면 누구나 영상을 출품하고 경매를 통해 작품의 가치를 극대화할 수 있습니다. 시작가 설정부터 실시간 입찰, 정산까지 BIDEO가 함께합니다.</p>
+          <a class="arrow-link" href="#features">
+            세부정보 보기
+            <svg viewBox="0 0 24 24" width="18" height="18"><use href="#arrow-diagonal"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6개 카드 그리드: BIDEO 사용법 -->
+    <section class="related" id="features">
+      <h2 class="related__heading">BIDEO 사용법</h2>
+
+      <ul class="grid related__grid">
+        <li class="grid__cell grid__cell--6">
+          <div class="related__item">
+            <div class="related__media">
+              <img class="related__img" src="../../static/media/main/intro-main/external/710bc2117c-ee9c7ea56c863254d2fde2870e07ab62bff86d3b784d303bbd58b6801376029c2599a422d27f3e3a23bfece1e4a298c60dc09e79cafeceb494d30f6b4a92c67b.svg" alt="영상 거래하기">
+            </div>
+            <div class="related__text">
+              <h3 class="related__title">영상 거래하기</h3>
+              <p class="related__desc">작품을 탐색하고 구매하는 데 필요한 모든 것</p>
+              <a class="arrow-link" href="/main">지금 둘러보기 <svg viewBox="0 0 24 24" width="18" height="18"><use href="#arrow-right"/></svg></a>
+            </div>
+          </div>
+        </li>
+        <li class="grid__cell grid__cell--6">
+          <div class="related__item">
+            <div class="related__media">
+              <img class="related__img" src="../../static/media/main/intro-main/external/3b771b8118-340d99a2493a1b7d58656d5eed867a61d06f5924f80df5ba2d65b78518964ddd00f5eca9c3a7522e67fd473124aa88407dd07a4a6327ba10633b650ba93de62a.svg" alt="경매 참여하기">
+            </div>
+            <div class="related__text">
+              <h3 class="related__title">경매 참여하기</h3>
+              <p class="related__desc">실시간 입찰로 원하는 영상을 낙찰받으세요</p>
+              <a class="arrow-link" href="#">경매 시작하기 <svg viewBox="0 0 24 24" width="18" height="18"><use href="#arrow-right"/></svg></a>
+            </div>
+          </div>
+        </li>
+        <li class="grid__cell grid__cell--6">
+          <div class="related__item">
+            <div class="related__media">
+              <img class="related__img" src="../../static/media/main/intro-main/external/7b390fb3b2-56ac1c911da0a53e3aac1c02136e48d290f61308f43508f1c160f75754e8cbc229bce528a8a050e5cb619afa34596f984e1e18b17193a24dd1d6deb35337d4ca.svg" alt="수익 창출 방법">
+            </div>
+            <div class="related__text">
+              <h3 class="related__title">수익 창출 방법</h3>
+              <p class="related__desc">영상으로 수익을 만드는 다양한 방법을 알아보세요</p>
+              <a class="arrow-link" href="#">수익 창출 알아보기 <svg viewBox="0 0 24 24" width="18" height="18"><use href="#arrow-right"/></svg></a>
+            </div>
+          </div>
+        </li>
+        <li class="grid__cell grid__cell--6">
+          <div class="related__item">
+            <div class="related__media">
+              <img class="related__img" src="../../static/media/main/intro-main/external/53fdbe4ca5-5fe53ccdd011a15f932bf0e145cd6eb8d0c10bd083bc3e31ba81e2860742247ea21f47299ad055e9963f3ddaec22d198965243ac253f611653699c3b6240a507.svg" alt="컬렉션 관리">
+            </div>
+            <div class="related__text">
+              <h3 class="related__title">컬렉션 관리</h3>
+              <p class="related__desc">작품을 모아 나만의 갤러리를 만들어보세요</p>
+              <a class="arrow-link" href="#">컬렉션 만들기 <svg viewBox="0 0 24 24" width="18" height="18"><use href="#arrow-right"/></svg></a>
+            </div>
+          </div>
+        </li>
+        <li class="grid__cell grid__cell--6">
+          <div class="related__item">
+            <div class="related__media">
+              <img class="related__img" src="../../static/media/main/intro-main/external/1fa9a0ab8e-8e603f63e6f9fa8991ec17290d4f8841c60a8e3410c92703b43f53e87b2de2159caf104c63398ce0d6908d432dff2df765fc6cec7296b98336e5eecf496a2bb3.svg" alt="커뮤니티 활동">
+            </div>
+            <div class="related__text">
+              <h3 class="related__title">커뮤니티 활동</h3>
+              <p class="related__desc">크리에이터를 팔로우하고 소통하세요</p>
+              <a class="arrow-link" href="#">커뮤니티 참여하기 <svg viewBox="0 0 24 24" width="18" height="18"><use href="#arrow-right"/></svg></a>
+            </div>
+          </div>
+        </li>
+        <li class="grid__cell grid__cell--6">
+          <div class="related__item">
+            <div class="related__media">
+              <img class="related__img" src="../../static/media/main/intro-main/external/d2ec335731-d68d259c41361592ddb5a6804007490879ef8e5ee919bf78774bfd02c0db2a5b8526ba140e0c4819b12753913562d055bc0f8d1ae3a486c10443e50cd3d86f35.svg" alt="정책 및 가이드라인">
+            </div>
+            <div class="related__text">
+              <h3 class="related__title">정책 및 가이드라인</h3>
+              <p class="related__desc">안전한 거래를 위한 규칙과 정책을 확인하세요</p>
+              <a class="arrow-link" href="#">정책 확인하기 <svg viewBox="0 0 24 24" width="18" height="18"><use href="#arrow-right"/></svg></a>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- FAQ: 탭 형식 (원본 구조 유지) -->
+    <section class="faq-section" id="faq">
+      <div class="faq-tabular">
+        <h2 class="faq-tabular__heading">가장 많이 묻는 질문</h2>
+        <div class="faq-tabular__description">
+          <p>크리에이터와 컬렉터 분들의 궁금증을 해결해 드리고자 BIDEO에서 답변을 준비했습니다. 가장 많이 묻는 질문과 답변, 유용한 사용 방법을 정리하여 제공해 드립니다.</p>
+        </div>
+
+        <div class="faq-tabular__body">
+          <!-- 탭 목록 -->
+          <div class="tablist" role="tablist" aria-label="자주 묻는 질문">
+            <button class="tablist__tab tablist__tab--active" id="faq-tab-0" role="tab" aria-selected="true" aria-controls="faq-panel-0" tabindex="0">
+              <span class="tablist__number">01</span>
+              <span class="tablist__title">영상 경매는 어떻게 진행되나요?</span>
+            </button>
+            <button class="tablist__tab" id="faq-tab-1" role="tab" aria-selected="false" aria-controls="faq-panel-1" tabindex="-1">
+              <span class="tablist__number">02</span>
+              <span class="tablist__title">영상을 판매하려면 어떻게 해야 하나요?</span>
+            </button>
+            <button class="tablist__tab" id="faq-tab-2" role="tab" aria-selected="false" aria-controls="faq-panel-2" tabindex="-1">
+              <span class="tablist__number">03</span>
+              <span class="tablist__title">구매한 영상의 저작권은 어떻게 되나요?</span>
+            </button>
+            <button class="tablist__tab" id="faq-tab-3" role="tab" aria-selected="false" aria-controls="faq-panel-3" tabindex="-1">
+              <span class="tablist__number">04</span>
+              <span class="tablist__title">결제는 어떤 방식으로 이루어지나요?</span>
+            </button>
+            <button class="tablist__tab" id="faq-tab-4" role="tab" aria-selected="false" aria-controls="faq-panel-4" tabindex="-1">
+              <span class="tablist__number">05</span>
+              <span class="tablist__title">수수료는 얼마인가요?</span>
+            </button>
+          </div>
+
+          <!-- 탭 패널 -->
+          <div class="tabpanel-group">
+            <div class="tabpanel tabpanel--active" id="faq-panel-0" role="tabpanel" aria-labelledby="faq-tab-0">
+              <h3>영상 경매는 어떻게 진행되나요?</h3>
+              <p>크리에이터가 영상을 업로드하고 경매에 출품하면, 설정한 시작가부터 입찰이 시작됩니다. 경매 기간 동안 컬렉터들이 실시간으로 입찰에 참여하며, 경매 종료 시 가장 높은 금액을 제시한 입찰자가 영상을 낙찰받습니다.</p>
+              <p>즉시 구매 옵션을 설정하면 경매 종료 전에도 바로 거래가 가능합니다. 입찰 현황은 실시간으로 업데이트되며, 알림을 통해 경매 상황을 놓치지 않을 수 있어요.</p>
+            </div>
+            <div class="tabpanel" id="faq-panel-1" role="tabpanel" aria-labelledby="faq-tab-1" hidden>
+              <h3>영상을 판매하려면 어떻게 해야 하나요?</h3>
+              <p>회원가입 후 크리에이터 인증을 완료하면 영상을 업로드할 수 있어요. 영상 업로드 시 제목, 설명, 카테고리, 태그를 입력하고 경매 또는 즉시 판매 방식을 선택하세요.</p>
+              <p>경매를 선택하면 시작가와 경매 기간을 설정할 수 있어요. 즉시 판매를 선택하면 원하는 판매가를 직접 설정합니다. 두 가지 방식을 동시에 설정할 수도 있어요.</p>
+              <p>거래가 완료되면 판매 금액에서 플랫폼 수수료를 제외한 금액이 정산됩니다. 정산은 거래 완료 후 영업일 기준 3일 이내에 처리돼요.</p>
+            </div>
+            <div class="tabpanel" id="faq-panel-2" role="tabpanel" aria-labelledby="faq-tab-2" hidden>
+              <h3>구매한 영상의 저작권은 어떻게 되나요?</h3>
+              <p>구매한 영상의 라이선스는 판매자가 설정한 조건에 따라 달라요. 각 영상 상세 페이지에서 라이선스 유형(개인용, 상업용, 독점 등)을 확인할 수 있습니다.</p>
+              <p>상업용 라이선스로 구매한 영상은 광고, 프로젝트, 소셜 미디어 등 상업적 목적으로 자유롭게 활용할 수 있어요. 독점 라이선스의 경우 해당 영상의 유일한 소유자가 됩니다.</p>
+              <p>단, 영상의 원저작권은 크리에이터에게 있으며, 구매자는 라이선스 범위 내에서 사용 권한을 갖게 됩니다. 자세한 내용은 이용약관을 확인해 주세요.</p>
+            </div>
+            <div class="tabpanel" id="faq-panel-3" role="tabpanel" aria-labelledby="faq-tab-3" hidden>
+              <h3>결제는 어떤 방식으로 이루어지나요?</h3>
+              <p>BIDEO는 신용카드, 체크카드, 카카오페이, 네이버페이 등 다양한 결제 수단을 지원해요. 경매 입찰 시에는 보증금이 자동으로 예치되며, 낙찰되지 않으면 즉시 환불됩니다.</p>
+              <p>즉시 구매의 경우 결제가 완료되면 바로 영상을 다운로드할 수 있어요. 경매 낙찰 시에는 24시간 이내에 잔금 결제를 완료해야 합니다.</p>
+              <p>모든 거래는 BIDEO의 안전결제 시스템을 통해 처리되며, 구매자와 판매자 모두 보호됩니다. 분쟁 발생 시 고객센터를 통해 중재를 요청할 수 있어요.</p>
+            </div>
+            <div class="tabpanel" id="faq-panel-4" role="tabpanel" aria-labelledby="faq-tab-4" hidden>
+              <h3>수수료는 얼마인가요?</h3>
+              <p>BIDEO는 거래가 성사될 때만 수수료를 받아요. 회원가입, 영상 업로드, 경매 출품은 모두 무료입니다.</p>
+              <p>거래 수수료는 판매 금액의 10%이며, 판매자에게 부과됩니다. 구매자에게는 별도의 수수료가 없어요. 프리미엄 크리에이터 등급을 달성하면 수수료가 7%로 할인됩니다.</p>
+              <p>자세한 수수료 정책은 고객센터에서 확인하실 수 있어요.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="faq-tabular__more">
+          <a class="arrow-link" href="#">모든 질문 보기 <svg viewBox="0 0 24 24" width="18" height="18"><use href="#arrow-right"/></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 리소스 3컬럼 -->
+    <section class="resources" id="resources">
+      <h2 class="resources__heading">리소스</h2>
+
+      <div class="grid">
+        <div class="grid__cell grid__cell--4">
+          <div class="resources__icon-wrap">
+            <img src="../../static/media/main/intro-main/external/52ce030de4-wGb2ZQMwQUNtdZx3bgUb3-ImHKK4kMZLV9fsX1lqtVRYR7enIjhmuVlxfTeRWT_5vM8hJie2J97wpO5qiXQvkcQN5Tz-WppJeJG0SeOvo52r-HhMo4c=v3-s20-fblur=1,20.png" alt="학습" width="64" height="64">
+          </div>
+          <div>
+            <h3 class="resources__title">학습</h3>
+            <p class="resources__desc">이 리소스는 첫 거래부터 수익 향상에 이르기까지 끊임없이 학습하고 성장하는 데 도움이 됩니다.</p>
+            <div class="resources__links">
+              <hr>
+              <p>전문가와 크리에이터가 제공하는 업데이트, 뉴스, 교육 콘텐츠입니다.</p>
+              <a class="arrow-link" href="/main">BIDEO 작품 둘러보기</a>
+              <hr>
+              <p>거래 팁과 경매 전략 관련 최신 소식을 매주 알려줍니다.</p>
+              <a class="arrow-link" href="#">BIDEO 크리에이터 가이드</a>
+            </div>
+          </div>
+        </div>
+        <div class="grid__cell grid__cell--4">
+          <div class="resources__icon-wrap">
+            <img src="../../static/media/main/intro-main/external/568de70c9d-Z5W5sK7_Tue_oFW1zmSVQcK9SM0cPvlS7IciB7LOUodgX8bvZsJw1NNwwM3qldlSUsVlkwe1BVgS5wCKPRVRS1NDBS73Jr2paUgQz8zTG0_eVi69127b=v3-s20-fblur=1,20.png" alt="지원" width="64" height="64">
+          </div>
+          <div>
+            <h3 class="resources__title">지원</h3>
+            <p class="resources__desc">문제가 발생한 경우 문제 해결을 도와드립니다. 거래 문제를 수정하고, 계정 문제 등을 해결하세요.</p>
+            <div class="resources__links">
+              <hr>
+              <p>크리에이터에게 가장 중요한 주제에 대한 분석을 확인하세요.</p>
+              <a class="arrow-link" href="#">고객센터</a>
+              <hr>
+              <p>궁금한 점을 묻고 의견을 전달할 수 있습니다.</p>
+              <a class="arrow-link" href="#">커뮤니티 포럼</a>
+            </div>
+          </div>
+        </div>
+        <div class="grid__cell grid__cell--4">
+          <div class="resources__icon-wrap">
+            <img src="../../static/media/main/intro-main/external/8d7f07383d-rslwADgv9WDSGJPorMnA11IOemtGn_XaXLlAJUUZO0RoXYa-lOEoAIa4hrjJKngoOW9t9O1P15NeXfA9HvIiqMQ94J6zK2-0QQ_31nqm8tUD86lkzhc=v3-s20-fblur=1,20.png" alt="연결" width="64" height="64">
+          </div>
+          <div>
+            <h3 class="resources__title">연결</h3>
+            <p class="resources__desc">BIDEO 소셜 미디어 채널과 이메일을 통해 궁금한 점을 질문하고 답변을 통해 자세히 알아보세요.</p>
+            <div class="resources__links">
+              <p>크리에이터를 위한 최신 도구, 팁 및 아이디어입니다.</p>
+              <a class="arrow-link" href="mailto:hello@bideo.kr">hello@bideo.kr</a>
+              <hr>
+              <p>실시간 답변을 받을 수 있는 고객 지원입니다.</p>
+              <a class="arrow-link" href="#">@BIDEO_support</a>
+              <hr>
+              <p>최신 정보와 리소스를 받은편지함에서 확인하세요.</p>
+              <a class="arrow-link" href="#">BIDEO 뉴스레터</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== 푸터 ===== -->
+  <footer class="site-footer" id="site-footer">
+    <div class="site-footer__inner">
+      <!-- 소셜 링크 -->
+      <div class="site-footer__social">
+        <h3 class="site-footer__social-headline">연결</h3>
+        <div class="site-footer__social-links">
+          <a href="#" aria-label="X (Twitter)">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a href="#" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </a>
+          <a href="#" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- 링크 그리드 -->
+      <div class="site-footer__links">
+        <div class="site-footer__col">
+          <h4>BIDEO 소개</h4>
+          <a href="#">정보</a>
+          <a href="#">블로그</a>
+          <a href="#">BIDEO 작동의 원리</a>
+          <a href="#">채용정보</a>
+        </div>
+        <div class="site-footer__col">
+          <h4>기능</h4>
+          <a href="#">영상 거래</a>
+          <a href="#">경매</a>
+          <a href="#">컬렉션</a>
+          <a href="#">크리에이터 스튜디오</a>
+        </div>
+        <div class="site-footer__col">
+          <h4>비즈니스</h4>
+          <a href="#">개발자 API</a>
+          <a href="#">광고</a>
+        </div>
+        <div class="site-footer__col">
+          <h4>크리에이터</h4>
+          <a href="#">크리에이터 가이드</a>
+          <a href="#">수수료 안내</a>
+          <a href="#">정산 안내</a>
+          <a href="#">콘테스트</a>
+        </div>
+        <div class="site-footer__col">
+          <h4>BIDEO의 약속</h4>
+          <a href="#">안전한 거래</a>
+          <a href="#">저작권 보호</a>
+          <a href="#">투명한 정산</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 최하단 바 -->
+    <div class="site-footer__bottom">
+      <div class="site-footer__bottom-inner">
+        <div class="site-footer__policies">
+          <a href="#">정책 및 안전</a>
+          <a href="#">저작권</a>
+          <a href="#">브랜드 가이드라인</a>
+          <a href="#">개인정보 보호</a>
+          <a href="#">약관</a>
+        </div>
+        <div class="site-footer__bottom-right">
+          <img src="../../static/images/logo.png" alt="BIDEO" class="site-footer__logo">
+          <a href="#">도움말</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script defer src="../../static/js/main/modal-shared.js"></script>
+  <script defer src="../../static/js/main/auth-modal.js"></script>
+  <script defer src="../../static/js/main/signup-modal.js"></script>
+  <script defer src="../../static/js/main/intro-main.js"></script>
+</body>
+</html>

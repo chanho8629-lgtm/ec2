@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/admin-layout}"
+      th:with="activeMenu='reports'">
+<head>
+    <meta charset="UTF-8">
+    <title>신고관리 - BIDEO Admin</title>
+    <link rel="stylesheet" href="../../static/css/admin/admin-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="page-header">
+        <h1 class="page-title">신고관리</h1>
+    </div>
+
+    <div class="filter-bar">
+        <div class="filter-search">
+            <svg class="filter-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input type="text" id="searchInput" placeholder="신고자 검색...">
+        </div>
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-status="all">전체</button>
+            <button class="filter-tab" data-status="PENDING">접수됨</button>
+            <button class="filter-tab" data-status="REVIEWING">검토중</button>
+            <button class="filter-tab" data-status="RESOLVED">처리완료</button>
+            <button class="filter-tab" data-status="CANCELLED">취소됨</button>
+        </div>
+    </div>
+
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th style="width:60px">번호</th>
+            <th style="width:120px">신고자</th>
+            <th style="width:100px">신고 분류</th>
+            <th>신고 사유</th>
+            <th style="width:140px">대상</th>
+            <th style="width:100px">피신고 횟수</th>
+            <th style="width:140px">접수일</th>
+            <th style="width:90px">상태</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="report, iter : ${reportList}" th:onclick="|location.href='@{/admin/reports/{id}(id=${report.id})}'|" style="cursor:pointer">
+            <td th:text="${totalCount - iter.index}">1</td>
+            <td>
+                <a th:href="@{/admin/members/{id}(id=${report.reporterId})}" class="text-link" onclick="event.stopPropagation();" th:text="${report.reporterNickname}">신고자</a>
+            </td>
+            <td th:text="${report.category}">WORK</td>
+            <td>
+                <span th:text="${report.reason}">신고 사유</span>
+                <br th:if="${report.reasonDetail != null}">
+                <span th:if="${report.reasonDetail != null}" class="text-muted text-sm" th:text="${report.reasonDetail}"></span>
+            </td>
+            <td>
+                <span class="clickable-link" th:attr="data-goto-member=${report.targetAuthorId}" onclick="event.stopPropagation();" th:text="${report.targetName}">대상</span>
+            </td>
+            <td>
+                <span th:if="${report.targetReportCount != null and report.targetReportCount > 0}" class="text-warn" th:text="${report.targetReportCount}">0</span>
+                <span th:if="${report.targetReportCount == null or report.targetReportCount == 0}" th:text="${report.targetReportCount ?: 0}">0</span>
+            </td>
+            <td th:text="${report.createdAt}">2024-01-01</td>
+            <td>
+                <span th:if="${report.status == 'PENDING'}" class="status-badge status-pending">접수됨</span>
+                <span th:if="${report.status == 'REVIEWING'}" class="status-badge status-pending">검토중</span>
+                <span th:if="${report.status == 'RESOLVED'}" class="status-badge status-active">처리완료</span>
+                <span th:if="${report.status == 'CANCELLED'}" class="status-badge status-muted">취소됨</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="table-footer">
+        <div class="page-size-group"><span>페이지당 행 수:</span><div class="page-size-trigger" onclick="this.classList.toggle('open'); this.querySelector('.page-size-menu').classList.toggle('open')"><span class="trigger-text">30</span><svg class="trigger-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.707 8.793a1 1 0 00-1.414 0L12 14.086 6.707 8.793a1 1 0 10-1.414 1.414L12 16.914l6.707-6.707a1 1 0 000-1.414Z"/></svg><div class="page-size-menu"><div class="page-size-menu-item selected" data-value="30">30</div><div class="page-size-menu-item" data-value="50">50</div><div class="page-size-menu-item" data-value="100">100</div></div></div></div>
+        <span class="page-description" th:text="${totalCount} ? |${totalCount}개 중 1~${totalCount > 30 ? 30 : totalCount}| : '0개'">0개</span>
+        <div class="page-nav">
+            <button class="page-nav-btn" disabled title="첫 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.293 4.293 10.586 12l7.707 7.707a1 1 0 101.414-1.414L13.414 12l6.293-6.293a1 1 0 10-1.414-1.414ZM6 4a1 1 0 00-1 1v14a1 1 0 102 0V5a1 1 0 00-1-1Z"/></svg></button>
+            <button class="page-nav-btn" disabled title="이전 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.793 5.293 7.086 12l6.707 6.707a1 1 0 101.414-1.414L9.914 12l5.293-5.293a1 1 0 10-1.414-1.414Z"/></svg></button>
+            <!-- 페이지 번호 버튼 (active = 현재 페이지) -->
+            <!--<button class="page-num-btn active">1</button>-->
+            <!--<button class="page-num-btn">2</button>-->
+            <!--<button class="page-num-btn">3</button>-->
+            <button class="page-nav-btn" title="다음 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.793 5.293a1 1 0 000 1.414L14.086 12l-5.293 5.293a1 1 0 101.414 1.414L16.914 12l-6.707-6.707a1 1 0 00-1.414 0Z"/></svg></button>
+        </div>
+    </div>
+
+    <div class="empty-state" id="emptyState" style="display:none">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6h-5.6z"/></svg>
+        <p class="empty-state-text">접수된 신고가 없습니다</p>
+    </div>
+</div>
+</body>
+</html>

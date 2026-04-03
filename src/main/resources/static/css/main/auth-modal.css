@@ -1,0 +1,239 @@
+/* ─── 인증 모달 (로그인) ── auth 전용 스타일 ─────────
+   공통 스타일은 modal-shared.css에서 로드
+   ─────────────────────────────────────────────────── */
+:root {
+    --primary-color: #6800EA;
+}
+
+/* ─── 다이얼로그 (auth 전용: border-radius) ─── */
+.auth-modal__dialog {
+    border-radius: 24px;
+}
+
+/* ─── 닫기 버튼 (auth 전용) ─── */
+.auth-modal__close-btn {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s;
+    z-index: 10;
+    color: var(--text-main);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.auth-modal__close-btn:hover {
+    background: var(--border-color);
+}
+
+/* ═══════════════════════════════════════════════════════
+   로그인 뷰
+   ═══════════════════════════════════════════════════════ */
+.auth-modal__login-view .auth-modal__inner {
+    padding: 24px;
+}
+
+.auth-modal__content-row {
+    display: flex;
+    justify-content: space-between;
+    clear: both;
+}
+
+/* ─── 좌측 폼 ─── */
+.auth-modal__form-side {
+    width: 400px;
+    max-width: 100%;
+    text-align: center;
+    margin: auto;
+}
+
+.auth-modal__logo {
+    margin-bottom: 12px;
+    margin-left: 42%;
+}
+
+.auth-modal__logo img {
+    border-radius: 12px;
+}
+
+.auth-modal__form-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #000;
+    text-align: center;
+    margin-bottom: 20px;
+    line-height: 1.3;
+}
+
+/* ─── 비밀번호 찾기 링크 ─── */
+.auth-modal__forgot-link {
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-decoration: none;
+    margin: 0;
+}
+
+.auth-modal__forgot-link:hover {
+    text-decoration: underline;
+}
+
+.auth-modal__helper-links {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 8px;
+    margin-bottom: 14px;
+}
+
+/* ─── 소셜 로그인 (auth 전용: width, margin-top, color) ─── */
+.auth-modal__social-login {
+    width: 100%;
+    margin-top: 14px;
+    color: #3c4043;
+}
+
+/* ─── 구분 텍스트 ─── */
+.auth-modal__divider-text {
+    font-size: 12px;
+    color: #211922;
+    margin-top: 14px;
+    text-align: center;
+}
+
+/* ─── 약관 (auth 전용: font-size, color, padding) ─── */
+.auth-modal__terms-text {
+    font-size: 11px;
+    color: #767676;
+    margin-top: 14px;
+    line-height: 1.5;
+    padding: 0 4px;
+}
+
+.auth-modal__terms-text a {
+    color: #767676;
+    text-decoration: underline;
+}
+
+.auth-modal__terms-text a:hover {
+    color: #211922;
+}
+
+/* ─── 우측 QR ─── */
+.auth-modal__qr-side {
+    width: 300px;
+    background: #f6f6f3;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.auth-modal__qr-image {
+    width: 56%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 24px;
+}
+
+/* ─── 하단바 (auth 전용: border-radius) ─── */
+.auth-modal__bottom-bar {
+    border-radius: 0 0 24px 24px;
+}
+
+.auth-modal__subview {
+    padding: 24px;
+}
+
+.auth-modal__subview-inner {
+    width: 400px;
+    max-width: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.auth-modal__subcopy {
+    margin: 0 0 20px;
+    color: #5f6368;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.auth-modal__text-btn {
+    margin-top: 12px;
+    border: none;
+    background: none;
+    color: #2b48d4;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.auth-modal__text-btn:hover {
+    text-decoration: underline;
+}
+
+/* ═══════════════════════════════════════════════════════
+   반응형
+   ═══════════════════════════════════════════════════════ */
+@media (max-width: 850px) {
+    .auth-modal__qr-side,
+    .auth-modal__qr-image {
+        display: none;
+    }
+
+    .auth-modal__login-view .auth-modal__dialog-inner {
+        width: auto;
+    }
+}
+
+@media (max-width: 600px) {
+    .auth-modal__dialog {
+        border-radius: 0;
+        width: 100% !important;
+        height: 100%;
+        max-height: 100vh;
+    }
+
+    .auth-modal__form-side {
+        width: 100%;
+    }
+
+    .auth-modal__subview-inner {
+        width: 100%;
+    }
+
+    .auth-modal__login-view .auth-modal__inner {
+        padding: 16px;
+    }
+
+    .auth-modal__subview {
+        padding: 16px;
+    }
+
+    .auth-modal__form-title {
+        font-size: 22px;
+    }
+
+    .auth-modal__bottom-bar {
+        border-radius: 0;
+    }
+
+    .auth-modal__helper-links {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+

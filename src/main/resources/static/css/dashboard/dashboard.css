@@ -1,0 +1,1588 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+button[type="button"],
+button[type="submit"] {
+    padding-top: 2px;
+}
+.Dashboard-Shell {
+    min-width: 0 !important;
+}
+
+body {
+    margin: 0;
+    color: #0f0f0f;
+    background: #fff;
+    font-family: "Roboto", "Noto Sans KR", Arial, sans-serif;
+}
+
+.Dashboard-Page {
+    width: 100%;
+    max-width: 1312px;
+    margin: 0 auto;
+    padding: 12px 20px 40px;
+}
+
+.Dashboard-MainTabs {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 16px 18px;
+    overflow-x: auto;
+}
+
+.Dashboard-MainTab {
+    min-height: 36px;
+    padding: 0 16px;
+    border: 1px solid #dadce0;
+    border-radius: 999px;
+    background: #fff;
+    color: #606060;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.Dashboard-MainTab.is-active {
+    border-color: #0f0f0f;
+    background: #0f0f0f;
+    color: #fff;
+}
+
+.Dashboard-MainPanel {
+    display: none;
+}
+
+.Dashboard-MainPanel.is-active {
+    display: block;
+}
+
+.Dashboard-Header,
+.Dashboard-Toolbar {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.Dashboard-Header {
+    padding: 0 16px 8px;
+}
+
+.Dashboard-Title {
+    margin: 0;
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 400;
+    letter-spacing: 0;
+}
+
+.Dashboard-TonalButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 0 16px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: #f2f2f2;
+    color: #0f0f0f;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    line-height: 20px;
+    transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.Dashboard-TonalButton:hover,
+.Dashboard-TonalButton:focus-visible {
+    background: #e9ecef;
+    outline: none;
+}
+
+.Dashboard-Toolbar {
+    padding: 0 16px;
+}
+
+.Dashboard-Tabs {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    min-width: 0;
+}
+
+.Dashboard-Tab {
+    position: relative;
+    border: 0;
+    background: transparent;
+    color: #606060;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+    padding: 12px 0 14px;
+    cursor: pointer;
+}
+
+.Dashboard-Tab.is-active {
+    color: #0f0f0f;
+}
+
+.Dashboard-Tab.is-active::after {
+    content: none;
+}
+
+.Dashboard-TabIndicator {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 0;
+    background: var(--dashboard-accent);
+    border-radius: 999px;
+    transition: transform 180ms ease, width 180ms ease;
+    pointer-events: none;
+}
+
+.Dashboard-DateButton {
+    display: grid;
+    justify-items: end;
+    row-gap: 1px;
+    border: 0;
+    background: transparent;
+    color: #0f0f0f;
+    position: relative;
+    padding: 4px 24px 10px 0;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.Dashboard-DatePicker {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.Dashboard-DateButton svg {
+    position: absolute;
+    right: -2px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.Dashboard-DateRange {
+    font-size: 12px;
+    line-height: 18px;
+    color: #606060;
+    font-weight: 400;
+}
+
+.Dashboard-DateLabel {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+    letter-spacing: 0;
+}
+
+.Dashboard-DateMenu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 10;
+    min-width: 160px;
+    padding: 8px;
+    border: 1px solid #e5e8eb;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+}
+
+.Dashboard-DateOption {
+    width: 100%;
+    min-height: 38px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #4e5968;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.Dashboard-DateOption:hover,
+.Dashboard-DateOption.is-active {
+    background: #f2f4f6;
+    color: #191f28;
+}
+
+.Dashboard-Rule {
+    height: 1px;
+    margin-top: 1px;
+    background: #e5e5e5;
+}
+
+.Dashboard-Panel {
+    display: none;
+    min-width: 0;
+    padding: 18px 16px 0;
+}
+
+.Dashboard-Panel.is-active {
+    display: block;
+}
+
+.Dashboard-Card,
+.Dashboard-EmptyCard {
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    background: #fff;
+    min-width: 0;
+}
+
+.Dashboard-SummaryCard {
+    overflow: hidden;
+}
+
+.Dashboard-Metrics {
+    display: grid;
+}
+
+.Dashboard-Metrics--4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.Dashboard-Metrics--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.Dashboard-Metric {
+    min-width: 0;
+    min-height: 82px;
+    padding: 12px 18px;
+    text-align: center;
+    border: 0;
+    background: #fff;
+    border-right: 1px solid #e5e5e5;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.Dashboard-Metric::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    transition: background-color 180ms ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.Dashboard-Metric:last-child {
+    border-right: 0;
+}
+
+.Dashboard-Metric.is-active {
+    background: #f8fbff;
+}
+
+.Dashboard-Metric.is-pressing::before {
+    background: rgba(139, 124, 255, 0.08);
+}
+
+.Dashboard-Metric.is-active .Dashboard-MetricKey {
+    color: var(--dashboard-accent);
+}
+
+.Dashboard-MetricRipple {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    margin-left: -12px;
+    margin-top: -12px;
+    border-radius: 50%;
+    background: var(--dashboard-accent-tint-strong);
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.Dashboard-MetricRipple.is-pressing {
+    transition: transform 420ms ease-out, opacity 160ms ease-out;
+    transform: scale(var(--ripple-scale, 18));
+    opacity: 0.55;
+}
+
+.Dashboard-MetricRipple.is-releasing {
+    transition: opacity 240ms ease-out;
+    opacity: 0;
+}
+
+.Dashboard-MetricKey {
+    position: relative;
+    z-index: 1;
+    display: block;
+    font-size: 12px;
+    line-height: 18px;
+    color: #606060;
+    font-weight: 500;
+}
+
+.Dashboard-MetricValue {
+    position: relative;
+    z-index: 1;
+    display: block;
+    margin-top: 3px;
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 500;
+}
+
+.Dashboard-Chart {
+    padding: 8px 18px 18px;
+}
+
+.Dashboard-ChartHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 18px;
+}
+
+.Dashboard-ChartEyebrow {
+    margin: 0;
+    color: #8b95a1;
+    font-size: 12px;
+    line-height: 18px;
+    font-weight: 500;
+}
+
+.Dashboard-ChartTitle {
+    margin: 4px 0 0;
+    color: #191f28;
+    font-size: 22px;
+    line-height: 30px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+}
+
+.Dashboard-ChartSummary {
+    margin: 0;
+    max-width: 360px;
+    color: #6b7684;
+    font-size: 13px;
+    line-height: 20px;
+    text-align: right;
+}
+
+.Dashboard-ChartCanvasWrap {
+    min-height: 280px;
+    padding: 8px 0 4px;
+}
+
+.Dashboard-Grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.Dashboard-Grid--tables {
+    align-items: start;
+}
+
+.Dashboard-SectionGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    align-items: start;
+    padding: 18px 16px 0;
+}
+
+.Dashboard-SectionGrid--masonry {
+    display: block;
+    column-count: 2;
+    column-gap: 18px;
+}
+
+.Dashboard-SectionGrid--masonry > .Dashboard-Card {
+    display: inline-block;
+    width: 100%;
+    margin: 0 0 18px;
+    break-inside: avoid;
+    vertical-align: top;
+}
+
+.Dashboard-CardLayout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr);
+    gap: 18px;
+    align-items: start;
+    padding: 18px 16px 0;
+}
+
+.Dashboard-InfoCard {
+    padding: 16px 20px 18px;
+}
+
+.Dashboard-TableCard {
+    padding-bottom: 20px;
+}
+
+.Dashboard-CardHead--row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.Dashboard-CardHead h2 {
+    margin: 0;
+    font-size: 18px;
+    line-height: 26px;
+    font-weight: 500;
+    letter-spacing: 0;
+    overflow-wrap: anywhere;
+}
+
+.Dashboard-CardHead p {
+    margin: 3px 0 0;
+    font-size: 12px;
+    line-height: 18px;
+    color: #606060;
+    overflow-wrap: anywhere;
+}
+
+.Dashboard-Chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.Dashboard-Chip {
+    min-height: 30px;
+    padding: 0 11px;
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    background: #fff;
+    color: #606060;
+    font-size: 12px;
+    line-height: 18px;
+}
+
+.Dashboard-Chip.is-active {
+    color: var(--dashboard-accent);
+    background: var(--dashboard-accent-soft);
+}
+
+.Dashboard-Muted {
+    margin: 22px 0 0;
+    color: #606060;
+    font-size: 14px;
+    line-height: 21px;
+}
+
+.Dashboard-CardFooter {
+    margin-top: 18px;
+}
+
+.Dashboard-TonalButton--blue {
+    background: var(--dashboard-primary);
+    color: #fff;
+}
+
+.Dashboard-TonalButton--blue:hover,
+.Dashboard-TonalButton--blue:focus-visible {
+    background: #16202b;
+}
+
+.Dashboard-CardList {
+    display: grid;
+    gap: 18px;
+    margin-top: 22px;
+}
+
+.Dashboard-CardPreview {
+    padding: 22px;
+    border-radius: 20px;
+    color: #fff;
+    background: linear-gradient(135deg, #191f28 0%, #2b3340 100%);
+}
+
+.Dashboard-CardPreview {
+    background: var(--dashboard-primary);
+    box-shadow: 0 18px 36px rgba(30, 42, 56, 0.18);
+}
+
+.Dashboard-CardPreviewTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.Dashboard-PaymentBadge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+    font-size: 12px;
+    line-height: 18px;
+    font-weight: 500;
+}
+
+.Dashboard-PaymentBrand {
+    font-size: 12px;
+    line-height: 18px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.Dashboard-PaymentNumber {
+    display: block;
+    margin-top: 34px;
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+}
+
+.Dashboard-PaymentMeta,
+.Dashboard-PaymentFoot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.Dashboard-PaymentMeta {
+    margin-top: 20px;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 13px;
+    line-height: 20px;
+}
+
+.Dashboard-CardRows {
+    display: grid;
+    gap: 12px;
+}
+
+.Dashboard-CardRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 150px 72px;
+    gap: 16px;
+    align-items: center;
+    padding: 18px;
+    border: 1px solid #edf0f3;
+    border-radius: 16px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.Dashboard-CardRow.is-primary {
+    border-color: rgba(139, 124, 255, 0.22);
+    background: var(--dashboard-sub);
+}
+
+.Dashboard-CardRow:hover,
+.Dashboard-CardRow:focus-visible {
+    border-color: rgba(139, 124, 255, 0.2);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    outline: none;
+}
+
+.Dashboard-CardRowTop {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.Dashboard-CardRowTop strong {
+    display: block;
+    min-width: 0;
+    font-size: 15px;
+    line-height: 22px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.Dashboard-CardRowMain p,
+.Dashboard-CardRowMeta span {
+    margin: 6px 0 0;
+    color: #8b95a1;
+    font-size: 12px;
+    line-height: 18px;
+}
+
+.Dashboard-CardRowMeta strong {
+    display: block;
+    margin-top: 4px;
+    color: #191f28;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+}
+
+.Dashboard-CardRowActions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.Dashboard-StatusBadge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: var(--dashboard-accent-soft);
+    color: var(--dashboard-accent);
+    font-size: 11px;
+    line-height: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.Dashboard-StatusBadge--soft {
+    background: rgba(91, 212, 255, 0.14);
+    color: #148fbc;
+}
+
+.Dashboard-TableWrap {
+    margin-top: 22px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.Dashboard-TableWrap--compact {
+    margin-top: 18px;
+}
+
+.Dashboard-Table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.Dashboard-Table thead {
+    background: #f8fafc;
+}
+
+.Dashboard-Table th,
+.Dashboard-Table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid #eef2f6;
+    color: #191f28;
+    font-size: 13px;
+    line-height: 20px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.Dashboard-Table th {
+    color: #6b7684;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.Dashboard-Table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.Dashboard-Table td:last-child,
+.Dashboard-Table th:last-child {
+    text-align: right;
+}
+
+.Dashboard-StatusBadge--pending {
+    background: var(--dashboard-status-pending-bg);
+    color: var(--dashboard-status-pending-text);
+}
+
+.Dashboard-StatusBadge--danger {
+    background: rgba(30, 42, 56, 0.1);
+    color: var(--dashboard-primary);
+}
+
+.Dashboard-TextButton {
+    border: 0;
+    background: transparent;
+    color: #9aa4b2;
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.Dashboard-TextButton[disabled] {
+    color: #9aa4b2;
+    opacity: 1;
+}
+
+.Dashboard-TextButton--danger {
+    color: var(--dashboard-primary);
+}
+
+.Dashboard-Form {
+    display: grid;
+    gap: 16px;
+    margin-top: 22px;
+}
+
+.Dashboard-Field {
+    display: grid;
+    gap: 8px;
+}
+
+.Dashboard-Field > span,
+.Dashboard-Check span {
+    color: #4e5968;
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: 500;
+}
+
+.Dashboard-FieldRow {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.Dashboard-Input {
+    width: 100%;
+    min-height: 46px;
+    padding: 0 14px;
+    border: 1px solid #e5e8eb;
+    border-radius: 12px;
+    background: #fff;
+    color: #191f28;
+    font-size: 14px;
+    line-height: 20px;
+    outline: none;
+}
+
+.Dashboard-Input:focus {
+    border-color: var(--dashboard-accent);
+    box-shadow: 0 0 0 4px rgba(139, 124, 255, 0.08);
+}
+
+.Dashboard-Input[readonly],
+.Dashboard-Input:disabled {
+    border-color: #edf0f3;
+    background: #f5f7fa;
+    color: #8b95a1;
+    box-shadow: none;
+}
+
+.Dashboard-Input[readonly]:focus,
+.Dashboard-Input:disabled:focus {
+    border-color: #edf0f3;
+    box-shadow: none;
+}
+
+.Dashboard-Segments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.Dashboard-Segment {
+    min-height: 38px;
+    padding: 0 14px;
+    border: 1px solid #e5e8eb;
+    border-radius: 999px;
+    background: #fff;
+    color: #6b7684;
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.Dashboard-Segment.is-active {
+    border-color: var(--dashboard-accent);
+    background: var(--dashboard-accent-soft);
+    color: var(--dashboard-accent);
+}
+
+.Dashboard-Check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.Dashboard-Check input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--dashboard-accent);
+}
+
+.Dashboard-CardPreview {
+    margin-top: 4px;
+}
+
+.Dashboard-BootpayBox {
+    display: grid;
+    gap: 8px;
+    padding: 18px;
+    border: 1px solid rgba(139, 124, 255, 0.16);
+    border-radius: 16px;
+    background: var(--dashboard-sub);
+}
+
+.Dashboard-BootpayBox strong {
+    color: #191f28;
+    font-size: 15px;
+    line-height: 22px;
+    font-weight: 600;
+}
+
+.Dashboard-BootpayBox p {
+    margin: 0;
+    color: #6b7684;
+    font-size: 13px;
+    line-height: 20px;
+}
+
+.Dashboard-TooltipRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.Dashboard-TooltipTrigger {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 12px;
+    border: 1px solid #e5e8eb;
+    border-radius: 999px;
+    background: #fff;
+    color: #5b4b74;
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.Dashboard-TooltipBubble {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 12px);
+    z-index: 20;
+    width: 240px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: var(--dashboard-primary);
+    color: #fff;
+    font-size: 12px;
+    line-height: 18px;
+    font-weight: 400;
+    text-align: left;
+    box-shadow: 0 18px 32px rgba(15, 23, 42, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%) translateY(4px);
+    transition: opacity 150ms ease, transform 150ms ease, visibility 150ms ease;
+    pointer-events: none;
+}
+
+.Dashboard-TooltipBubble::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: calc(100% - 7px);
+    width: 12px;
+    height: 12px;
+    background: var(--dashboard-primary);
+    transform: translateX(-50%) rotate(45deg);
+    border-radius: 2px;
+}
+
+.Dashboard-TooltipTrigger:hover .Dashboard-TooltipBubble,
+.Dashboard-TooltipTrigger:focus-visible .Dashboard-TooltipBubble {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.Dashboard-DataList {
+    margin-top: 22px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.Dashboard-DataListHead,
+.Dashboard-DataRow {
+    display: grid;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.Dashboard-DataListHead {
+    padding: 13px 16px;
+    background: #f8fafc;
+    color: #6b7684;
+    font-size: 12px;
+    line-height: 20px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.Dashboard-DataListHead--withdrawal,
+.Dashboard-DataRow--withdrawal {
+    grid-template-columns: minmax(0, 1fr) 96px 96px 72px;
+}
+
+.Dashboard-DataListHead--payment,
+.Dashboard-DataRow--payment {
+    grid-template-columns: 108px 64px 48px minmax(0, 1fr) 88px 72px;
+}
+
+.Dashboard-DataListHead--auction,
+.Dashboard-DataRow--auction {
+    grid-template-columns: minmax(0, 1fr) 96px 88px 72px;
+}
+
+.Dashboard-DataListHead--bid,
+.Dashboard-DataRow--bid {
+    grid-template-columns: minmax(0, 1fr) 72px 96px 72px;
+}
+
+.Dashboard-DataListHead--result,
+.Dashboard-DataRow--result {
+    grid-template-columns: minmax(0, 1fr) 72px 88px 88px;
+}
+
+.Dashboard-DataListHead--contest,
+.Dashboard-DataRow--contest {
+    grid-template-columns: minmax(0, 1fr) 56px 88px 72px;
+}
+
+.Dashboard-DataListHead--contest-result,
+.Dashboard-DataRow--contest-result {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 72px;
+}
+
+.Dashboard-DataListHead--work,
+.Dashboard-DataRow--work {
+    grid-template-columns: minmax(0, 1fr) 56px 88px 72px;
+}
+
+.Dashboard-DataListHead--gallery,
+.Dashboard-DataRow--gallery {
+    grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr);
+}
+
+.Dashboard-DataListHead--sold,
+.Dashboard-DataRow--sold {
+    grid-template-columns: minmax(0, 1fr) 88px 96px 72px;
+}
+
+.Dashboard-DataListBody {
+    display: grid;
+}
+
+.Dashboard-DataRow {
+    padding: 13px 16px;
+    border-top: 1px solid #eef2f6;
+    background: #fff;
+    color: #191f28;
+    font-size: 13px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: background-color 160ms ease;
+}
+
+.Dashboard-DataRow:hover,
+.Dashboard-DataRow:focus-visible {
+    background: var(--dashboard-sub);
+    outline: none;
+}
+
+.Dashboard-DataRow span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.Dashboard-DataRow span:last-child {
+    display: inline-flex;
+    justify-content: center;
+}
+
+.Dashboard-DataListHead--result span:nth-child(2) {
+    text-align: center;
+}
+
+.Dashboard-DataRow--withdrawal span:nth-child(1),
+.Dashboard-DataRow--withdrawal span:nth-child(2),
+.Dashboard-DataRow--withdrawal span:nth-child(3),
+.Dashboard-DataRow--payment span:nth-child(1),
+.Dashboard-DataRow--payment span:nth-child(2),
+.Dashboard-DataRow--payment span:nth-child(3),
+.Dashboard-DataRow--bid span:nth-child(2),
+.Dashboard-DataRow--bid span:nth-child(4),
+.Dashboard-DataRow--result span:nth-child(2),
+.Dashboard-DataRow--contest span:nth-child(2),
+.Dashboard-DataRow--work span:nth-child(2),
+.Dashboard-DataRow--gallery span:nth-child(2),
+.Dashboard-DataRow--sold span:nth-child(2),
+.Dashboard-DataRow--sold span:nth-child(3) {
+    text-align: center;
+}
+
+.Dashboard-DataRow--result span:nth-child(2) {
+    justify-self: center;
+}
+
+.Dashboard-AccentValue {
+    color: var(--dashboard-accent);
+    font-weight: 600;
+}
+
+.Dashboard-DetailGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.Dashboard-DetailItem {
+    padding: 14px 16px;
+    border: 1px solid #edf0f3;
+    border-radius: 16px;
+    background: var(--dashboard-sub);
+}
+
+.Dashboard-DetailItem span {
+    display: block;
+    color: #8b95a1;
+    font-size: 12px;
+    line-height: 18px;
+    font-weight: 600;
+}
+
+.Dashboard-DetailItem strong {
+    display: block;
+    margin-top: 6px;
+    color: #191f28;
+    font-size: 14px;
+    line-height: 22px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.Dashboard-FormActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.Dashboard-CardRegister.is-edit-mode [data-card-register-only] {
+    display: none;
+}
+
+.Dashboard-TonalButton--danger {
+    background: var(--dashboard-primary);
+    color: #fff;
+}
+
+.Dashboard-Modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+}
+
+.Dashboard-ModalBackdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.44);
+}
+
+.Dashboard-ModalDialog {
+    position: relative;
+    z-index: 1;
+    width: min(560px, calc(100% - 32px));
+    margin: 80px auto 0;
+    padding: 22px;
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
+}
+
+.Dashboard-ModalDialog--small {
+    width: min(420px, calc(100% - 32px));
+}
+
+.Dashboard-ModalHead {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.Dashboard-ModalHead h2 {
+    margin: 0;
+    color: #191f28;
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 700;
+}
+
+.Dashboard-ModalHead p {
+    margin: 6px 0 0;
+    color: #6b7684;
+    font-size: 13px;
+    line-height: 20px;
+}
+
+.Dashboard-ModalBody {
+    margin-top: 18px;
+}
+
+.Dashboard-ModalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.Dashboard-IconButton {
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 999px;
+    background: #f2f4f6;
+    color: #191f28;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+html[data-theme="dark"] body {
+    color: var(--dark-text-primary);
+    background: var(--dark-bg-primary);
+    --dashboard-chart-grid: rgba(255, 255, 255, 0.12);
+    --dashboard-chart-label: var(--dark-text-secondary);
+    --dashboard-chart-tooltip-bg: #10161f;
+    --dashboard-chart-tooltip-text: var(--dark-text-primary);
+    --dashboard-chart-point-border: #ffffff;
+    --dashboard-chart-fill-primary: rgba(91, 212, 255, 0.18);
+    --dashboard-chart-fill-secondary: rgba(139, 124, 255, 0.22);
+    --dashboard-chart-fill-tertiary: rgba(91, 212, 255, 0.22);
+    --dashboard-chart-fill-quaternary: rgba(139, 124, 255, 0.16);
+}
+
+html[data-theme="dark"] .Dashboard-Title,
+html[data-theme="dark"] .Dashboard-Tab.is-active,
+html[data-theme="dark"] .Dashboard-ChartTitle,
+html[data-theme="dark"] .Dashboard-MetricValue,
+html[data-theme="dark"] .Dashboard-CardHead h2,
+html[data-theme="dark"] .Dashboard-CardRowMeta strong,
+html[data-theme="dark"] .Dashboard-CardRowAmount strong,
+html[data-theme="dark"] .Dashboard-BootpayBox strong,
+html[data-theme="dark"] .Dashboard-GuideItem strong,
+html[data-theme="dark"] .Dashboard-ModalHead h2,
+html[data-theme="dark"] .Dashboard-IconButton {
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .Dashboard-Tab,
+html[data-theme="dark"] .Dashboard-DateRange,
+html[data-theme="dark"] .Dashboard-CardHead p,
+html[data-theme="dark"] .Dashboard-MetricKey,
+html[data-theme="dark"] .Dashboard-ChartEyebrow,
+html[data-theme="dark"] .Dashboard-ChartSummary,
+html[data-theme="dark"] .Dashboard-CardRowMain p,
+html[data-theme="dark"] .Dashboard-CardRowMeta span,
+html[data-theme="dark"] .Dashboard-CardRowAmount span,
+html[data-theme="dark"] .Dashboard-BootpayBox p,
+html[data-theme="dark"] .Dashboard-GuideItem p,
+html[data-theme="dark"] .Dashboard-ModalHead p,
+html[data-theme="dark"] .Dashboard-Field > span,
+html[data-theme="dark"] .Dashboard-Check span,
+html[data-theme="dark"] .Dashboard-DateLabel {
+    color: var(--dark-text-secondary);
+}
+
+html[data-theme="dark"] .Dashboard-Rule,
+html[data-theme="dark"] .Dashboard-Metric,
+html[data-theme="dark"] .Dashboard-Card,
+html[data-theme="dark"] .Dashboard-EmptyCard,
+html[data-theme="dark"] .Dashboard-CardRow,
+html[data-theme="dark"] .Dashboard-Block,
+html[data-theme="dark"] .Dashboard-GuideItem,
+html[data-theme="dark"] .Dashboard-BootpayBox,
+html[data-theme="dark"] .Dashboard-DateMenu,
+html[data-theme="dark"] .Dashboard-Input,
+html[data-theme="dark"] .Dashboard-Segment,
+html[data-theme="dark"] .Dashboard-ModalDialog {
+    border-color: var(--dark-border-color);
+}
+
+html[data-theme="dark"] .Dashboard-Card,
+html[data-theme="dark"] .Dashboard-EmptyCard,
+html[data-theme="dark"] .Dashboard-CardRow,
+html[data-theme="dark"] .Dashboard-Block,
+html[data-theme="dark"] .Dashboard-GuideItem,
+html[data-theme="dark"] .Dashboard-DateMenu,
+html[data-theme="dark"] .Dashboard-Input,
+html[data-theme="dark"] .Dashboard-Segment,
+html[data-theme="dark"] .Dashboard-ModalDialog,
+html[data-theme="dark"] .Dashboard-IconButton {
+    background: var(--dark-bg-secondary);
+}
+
+html[data-theme="dark"] .Dashboard-Metric {
+    background: #202020;
+    border-right-color: var(--dark-border-color);
+}
+
+html[data-theme="dark"] .Dashboard-Metric.is-active,
+html[data-theme="dark"] .Dashboard-CardRow.is-primary,
+html[data-theme="dark"] .Dashboard-BootpayBox {
+    background: rgba(139, 124, 255, 0.2);
+}
+
+html[data-theme="dark"] .Dashboard-CardRow:hover,
+html[data-theme="dark"] .Dashboard-CardRow:focus-visible {
+    border-color: #4f5b6b;
+    box-shadow: none;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+html[data-theme="dark"] .Dashboard-TabIndicator {
+    background: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .Dashboard-DateButton,
+html[data-theme="dark"] .Dashboard-DateOption,
+html[data-theme="dark"] .Dashboard-Segment,
+html[data-theme="dark"] .Dashboard-TooltipTrigger,
+html[data-theme="dark"] .Dashboard-TextButton,
+html[data-theme="dark"] .Dashboard-TonalButton {
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .Dashboard-Block span {
+    color: var(--dark-text-secondary);
+}
+
+html[data-theme="dark"] .Dashboard-Block strong {
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .Dashboard-DateOption:hover,
+html[data-theme="dark"] .Dashboard-DateOption.is-active,
+html[data-theme="dark"] .Dashboard-Segment.is-active {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .Dashboard-TooltipTrigger {
+    border-color: var(--dark-border-color);
+    background: var(--dark-bg-secondary);
+}
+
+html[data-theme="dark"] .Dashboard-DataList,
+html[data-theme="dark"] .Dashboard-DataRow {
+    border-color: var(--dark-border-color);
+}
+
+html[data-theme="dark"] .Dashboard-DataListHead {
+    background: #1b1b1b;
+    color: var(--dark-text-muted);
+}
+
+html[data-theme="dark"] .Dashboard-TableWrap {
+    border-color: var(--dark-border-color);
+    background: var(--dark-bg-secondary);
+}
+
+html[data-theme="dark"] .Dashboard-Table thead {
+    background: #1b1b1b;
+}
+
+html[data-theme="dark"] .Dashboard-Table th,
+html[data-theme="dark"] .Dashboard-Table td {
+    border-bottom-color: var(--dark-border-color);
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .Dashboard-Table th {
+    color: var(--dark-text-muted);
+}
+
+html[data-theme="dark"] .Dashboard-DataRow {
+    background: var(--dark-bg-secondary);
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .Dashboard-DataRow:hover,
+html[data-theme="dark"] .Dashboard-DataRow:focus-visible {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+html[data-theme="dark"] .Dashboard-AccentValue {
+    color: #b7abff;
+}
+
+html[data-theme="dark"] .Dashboard-DetailItem {
+    border-color: var(--dark-border-color);
+    background: #1b1b1b;
+}
+
+html[data-theme="dark"] .Dashboard-DetailItem span {
+    color: var(--dark-text-muted);
+}
+
+html[data-theme="dark"] .Dashboard-DetailItem strong {
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .Dashboard-TooltipBubble,
+html[data-theme="dark"] .Dashboard-TooltipBubble {
+    background: #f1f1f1;
+    color: #0f0f0f;
+}
+
+html[data-theme="dark"] .Dashboard-TooltipBubble::after {
+    background: #f1f1f1;
+}
+
+html[data-theme="dark"] .Dashboard-TonalButton {
+    background: #343434;
+    color: var(--dark-text-primary);
+}
+
+html[data-theme="dark"] .Dashboard-Input[readonly],
+html[data-theme="dark"] .Dashboard-Input:disabled {
+    border-color: #404040;
+    background: #1c1c1c;
+    color: #8a8a8a;
+}
+
+html[data-theme="dark"] .Dashboard-TonalButton--blue {
+    background: #b7abff;
+    color: #16202b;
+}
+
+html[data-theme="dark"] .Dashboard-TonalButton--danger {
+    background: #f1f1f1;
+    color: #0f0f0f;
+}
+
+html[data-theme="dark"] .Dashboard-CardPreview {
+    background: #18222f;
+}
+
+html[data-theme="dark"] .Dashboard-ModalBackdrop {
+    background: rgba(0, 0, 0, 0.72);
+}
+
+.Dashboard-StackRows,
+.Dashboard-Blocks,
+.Dashboard-BarList {
+    display: grid;
+    gap: 16px;
+    margin-top: 22px;
+}
+
+.Dashboard-StackRows {
+    border: 1px solid #efefef;
+    border-radius: 12px;
+    overflow: hidden;
+    gap: 0;
+}
+
+.Dashboard-StackRow,
+.Dashboard-Block {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 56px;
+    padding: 0 18px;
+    background: #fafafa;
+    border-top: 1px solid #efefef;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.Dashboard-StackRow:first-child {
+    border-top: 0;
+}
+
+.Dashboard-Block {
+    border: 1px solid #efefef;
+    border-radius: 12px;
+}
+
+.Dashboard-BarRow {
+    display: grid;
+    grid-template-columns: 86px 1fr 32px;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.Dashboard-BarTrack {
+    height: 8px;
+    border-radius: 999px;
+    background: #efefef;
+    overflow: hidden;
+}
+
+.Dashboard-BarFill {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: #7a70ff;
+}
+
+.Dashboard-BarFill--wide {
+    width: 68%;
+}
+
+.Dashboard-BarFill--narrow {
+    width: 22%;
+}
+
+.Dashboard-BarFill--none {
+    width: 0;
+}
+
+.Dashboard-EmptyCard {
+    padding: 32px 24px;
+}
+
+.Dashboard-EmptyCard strong {
+    display: block;
+    font-size: 18px;
+    line-height: 26px;
+    font-weight: 500;
+}
+
+.Dashboard-EmptyCard p {
+    margin: 10px 0 0;
+    font-size: 14px;
+    color: #606060;
+    line-height: 21px;
+}
+
+@media (max-width: 1024px) {
+    .Dashboard-Header,
+    .Dashboard-Toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .Dashboard-DateButton {
+        justify-items: start;
+    }
+
+    .Dashboard-DateButton svg {
+        display: none;
+    }
+
+    .Dashboard-Metrics--4,
+    .Dashboard-Metrics--3,
+    .Dashboard-Grid,
+    .Dashboard-SectionGrid,
+    .Dashboard-ChartHeader,
+    .Dashboard-CardLayout,
+    .Dashboard-FieldRow {
+        grid-template-columns: 1fr;
+    }
+
+    .Dashboard-SectionGrid,
+    .Dashboard-SectionGrid--masonry {
+        column-count: 1;
+    }
+
+    .Dashboard-Metric {
+        text-align: left;
+        border-right: 0;
+        border-top: 1px solid #e5e5e5;
+    }
+
+    .Dashboard-Metric:first-child {
+        border-top: 0;
+    }
+
+    .Dashboard-ChartHeader {
+        display: grid;
+        gap: 10px;
+    }
+
+    .Dashboard-CardRow {
+        grid-template-columns: 1fr;
+    }
+
+    .Dashboard-CardRowActions {
+        justify-content: flex-start;
+    }
+
+    .Dashboard-DataListHead {
+        display: none;
+    }
+
+    .Dashboard-DataRow--withdrawal,
+    .Dashboard-DataRow--payment {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .Dashboard-DetailGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 720px) {
+    .Dashboard-Page {
+        padding-inline: 12px;
+    }
+
+    .Dashboard-Header,
+    .Dashboard-Toolbar,
+    .Dashboard-Panel {
+        padding-inline: 8px;
+    }
+
+    .Dashboard-Tabs {
+        width: 100%;
+        gap: 20px;
+        overflow-x: auto;
+    }
+
+    .Dashboard-CardHead h2 {
+        font-size: 18px;
+        line-height: 26px;
+    }
+
+    .Dashboard-BarRow {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .Dashboard-Table th,
+    .Dashboard-Table td {
+        padding-inline: 12px;
+    }
+}

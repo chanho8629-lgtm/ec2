@@ -1,0 +1,15 @@
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+ex/
+key/
+*.zip
+application*
+src/main/resources/certs/
+.claude
+front
+### STS ###
+.idea
+.gstack/
+certs

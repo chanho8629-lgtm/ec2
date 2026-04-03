@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>예술관 작성</title>
+    <link rel="stylesheet" href="../../static/css/work/gallery.css" th:href="@{/css/work/gallery.css}">
+</head>
+<body>
+<div class="modal" id="galleryModal" role="dialog" aria-modal="true" aria-labelledby="galleryTitle">
+    <div class="modal-head">
+        <h1 class="modal-title" id="galleryTitle">새 예술관 만들기</h1>
+        <button class="icon-btn" id="closeBtn" type="button" aria-label="닫기">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" aria-hidden="true">
+                <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 1 0-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 1 0 1.414 1.414L12 13.414l5.293 5.293a1 1 0 0 0 1.414-1.414L13.414 12l5.293-5.293a1 1 0 0 0-1.414-1.414Z"></path>
+            </svg>
+        </button>
+    </div>
+
+    <div class="progress" hidden>
+        <div class="progress-bar"></div>
+    </div>
+
+    <div class="modal-body">
+        <section class="field-wrap title-wrap">
+            <div class="input-box">
+                <span class="inner-label">예술관 이름(필수 항목)</span>
+                <div
+                    class="text-box title-box"
+                    id="titleBox"
+                    contenteditable="true"
+                    role="textbox"
+                    tabindex="0"
+                    aria-label="예술관 이름 추가"
+                    aria-required="true"
+                    aria-invalid="false"
+                ></div>
+                <div class="count" id="titleCount">0/150</div>
+            </div>
+        </section>
+
+        <section class="field-wrap">
+            <div class="input-box">
+                <span class="inner-label">설명</span>
+                <div
+                    class="text-box desc-box"
+                    id="descBox"
+                    contenteditable="true"
+                    role="textbox"
+                    tabindex="0"
+                    aria-label="예술관 설명 추가"
+                ></div>
+                <div class="count" id="descCount">0/500</div>
+            </div>
+        </section>
+
+        <section class="field-wrap">
+            <div class="label">대표 이미지(필수)</div>
+            <p class="sub">
+                예술관을 나타내는 대표 이미지를 업로드하세요.
+                <a href="#">자세히 알아보기</a>
+            </p>
+
+            <div class="thumb-area">
+                <div class="thumb-pick thumb-card" id="thumbPick">
+                    <div class="thumb-btn">
+                        <button class="thumb-btn-main" id="thumbBtn" type="button">
+                            <img id="thumbPreviewImage" class="thumb-preview-image" alt="대표 이미지 미리보기">
+                            <span class="thumb-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" aria-hidden="true">
+                                    <path d="M20 0a1 1 0 0 0-1 1v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 0 0 2 0V5h2a1 1 0 1 0 0-2h-2V1a1 1 0 0 0-1-1Zm-6 4V2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V10h-2v3.233l-2.456-1.473a3 3 0 0 0-3.088 0L4 18.033V4h10ZM9 6a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm0 2a1 1 0 1 1 0 2 1 1 0 0 1 0-2Zm7.515 5.475L20 15.565V20H4.61l10.875-6.525a1 1 0 0 1 1.03 0Z"></path>
+                                </svg>
+                            </span>
+                            <span class="thumb-btn-text">파일 업로드</span>
+                            <span class="thumb-guide">권장 크기 1280 x 1280px, 10MB 미만</span>
+                        </button>
+                    </div>
+                    <div class="thumb-link-meta" id="thumbLinkMeta" hidden>
+                        <div class="thumb-meta-row">
+                            <span class="thumb-meta-label">링크</span>
+                            <div class="thumb-meta-link-row">
+                                <a href="#" id="galleryLinkUrl"></a>
+                                <button type="button" class="thumb-copy-button" id="galleryLinkCopyButton" aria-label="링크 복사">
+                                    <span class="thumb-copy-tooltip">링크 복사</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
+                                        <path d="M19 1H9a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2ZM9 17V3h10v14H9Zm-4 4V5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2H5Z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <input id="thumbInput" type="file" hidden accept="image/jpeg,image/png,image/gif">
+            </div>
+            <div class="error" id="thumbError" hidden></div>
+        </section>
+
+        <section class="field-wrap">
+            <div class="section-title">태그</div>
+            <div class="tag-box">
+                <div class="tag-list" id="tagList"></div>
+                <input class="tag-input" id="tagInput" type="text" placeholder="태그를 입력하세요">
+            </div>
+        </section>
+
+        <section class="field-wrap">
+            <div class="label">작품</div>
+            <p class="sub">
+                예술관은 작품 모음입니다. 기존 작품을 선택해 예술관에 추가하세요.
+            </p>
+            <button class="sub-btn" id="openArtworkModalBtn" type="button">작품 추가</button>
+            <div class="selected-artwork-links" id="selectedArtworkLinks">
+                <div class="selected-artwork-empty">추가된 작품 링크가 여기에 표시됩니다.</div>
+            </div>
+        </section>
+    </div>
+
+    <div class="modal-foot">
+        <button class="main-btn" id="createBtn" type="button" disabled>만들기</button>
+    </div>
+</div>
+
+<div class="artwork-dialog-backdrop" id="artworkDialogBackdrop" hidden>
+    <section class="artwork-dialog" id="artworkDialog" role="dialog" aria-modal="true" aria-labelledby="artworkDialogTitle">
+        <div class="artwork-dialog-header">
+            <div class="artwork-dialog-title-wrap">
+                <h1 class="artwork-dialog-title" id="artworkDialogTitle">동영상 추가</h1>
+            </div>
+            <button class="icon-btn artwork-dialog-close" id="closeArtworkModalBtn" type="button" aria-label="닫기">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" aria-hidden="true">
+                    <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 1 0-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 1 0 1.414 1.414L12 13.414l5.293 5.293a1 1 0 0 0 1.414-1.414L13.414 12l5.293-5.293a1 1 0 0 0-1.414-1.414Z"></path>
+                </svg>
+            </button>
+        </div>
+
+        <div class="artwork-dialog-body">
+            <div class="artwork-picker">
+                <div class="artwork-picker-left">
+                    <div class="artwork-picker-tabs">
+                        <button class="artwork-picker-tab is-active" type="button">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 0 24 24" width="20" aria-hidden="true">
+                                <path d="M11 2a9 9 0 105.641 16.01.966.966 0 00.152.197l3.5 3.5a1 1 0 101.414-1.414l-3.5-3.5a1 1 0 00-.197-.153A8.96 8.96 0 0020 11a9 9 0 00-9-9Zm0 2a7 7 0 110 14 7 7 0 010-14Z"></path>
+                            </svg>
+                            <span>내 동영상</span>
+                        </button>
+                    </div>
+
+                    <div class="artwork-search-wrap">
+                        <input class="artwork-search-input" id="artworkSearchInput" type="text" placeholder="내 동영상">
+                    </div>
+
+                    <div class="artwork-list" id="artworkList">
+                        <label class="artwork-row" data-link="https://bideo.kr/watch/video-1" data-thumb="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=240&q=80">
+                            <input class="artwork-checkbox" type="checkbox" value="video-1">
+                            <span class="artwork-thumb">
+                                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=240&q=80" alt="BIDEO showcase teaser 썸네일">
+                            </span>
+                            <div class="artwork-row-main">
+                                <span class="artwork-row-title">BIDEO showcase teaser</span>
+                                <span class="artwork-row-meta">2026.03.30 업로드</span>
+                            </div>
+                        </label>
+                        <label class="artwork-row" data-link="https://bideo.kr/watch/video-2" data-thumb="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=240&q=80">
+                            <input class="artwork-checkbox" type="checkbox" value="video-2">
+                            <span class="artwork-thumb">
+                                <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=240&q=80" alt="media art concept film 썸네일">
+                            </span>
+                            <div class="artwork-row-main">
+                                <span class="artwork-row-title">media art concept film</span>
+                                <span class="artwork-row-meta">2026.03.28 업로드</span>
+                            </div>
+                        </label>
+                        <label class="artwork-row" data-link="https://bideo.kr/watch/video-3" data-thumb="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=240&q=80">
+                            <input class="artwork-checkbox" type="checkbox" value="video-3">
+                            <span class="artwork-thumb">
+                                <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=240&q=80" alt="artist studio interview 썸네일">
+                            </span>
+                            <div class="artwork-row-main">
+                                <span class="artwork-row-title">artist studio interview</span>
+                                <span class="artwork-row-meta">2026.03.25 업로드</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="artwork-picker-right">
+                    <div class="artwork-selection-header">추가할 동영상</div>
+                    <div class="artwork-selection-list" id="selectedArtworkList">
+                        <div class="artwork-selection-empty">선택한 작품이 여기에 표시됩니다.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="artwork-dialog-footer">
+            <button class="sub-btn" id="cancelArtworkModalBtn" type="button">취소</button>
+            <button class="main-btn" id="confirmArtworkModalBtn" type="button" disabled>완료</button>
+        </div>
+    </section>
+</div>
+
+<script src="../../static/js/work/gallery-register.js" th:src="@{/js/work/gallery-register.js}"></script>
+</body>
+</html>
+<!--  -->

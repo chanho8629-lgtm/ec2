@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BIDEO | 내 프로필</title>
+    <link rel="stylesheet" href="../../static/css/common/reset.css" />
+    <link rel="stylesheet" href="../../static/css/common/font.css" />
+    <link rel="stylesheet" href="../../static/css/common/global.css" />
+    <link rel="stylesheet" href="../../static/css/common/util.css" />
+    <link rel="stylesheet" href="../../static/css/common/common.css" />
+    <link rel="stylesheet" href="../../static/css/profile/profile.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body>
+    <!-- 내 프로필 메인 영역 -->
+    <div id="section" class="profilePage section">
+      <div class="content">
+        <!-- 채널 상단 영역 -->
+        <div class="channelSection">
+          <!-- 배너 영역 -->
+          <div class="banner">
+            <div class="bannerArt">
+              <span class="bannerBadge">배너 뱃지</span>
+              <strong>배너 타이틀</strong>
+              <p>배너 내용</p>
+            </div>
+          </div>
+
+          <!-- 프로필 메타 영역 -->
+          <div class="channelMeta">
+            <!-- 프로필 사진 수정 버튼 -->
+            <button type="button" class="avatar avatarEditable" data-profile-avatar-open>
+              <span class="avatarValue" data-profile-avatar-value>N</span>
+              <span class="avatarHover" aria-hidden="true">
+                <svg viewBox="0 0 24 24" class="avatarHoverIcon">
+                  <path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h2.17a1 1 0 0 0 .8-.4l.86-1.14A1 1 0 0 1 11.13 3h1.74a1 1 0 0 1 .8.46l.86 1.14a1 1 0 0 0 .8.4h2.17A2.5 2.5 0 0 1 20 7.5v9A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"></path>
+                  <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"></circle>
+                </svg>
+              </span>
+            </button>
+            <!-- 프로필 정보 영역 -->
+            <div class="metaInfo">
+              <h1 class="channelTitle"><span data-profile-name>이름 영역</span> <a class="more" href="javascript:void(0)"></a></h1>
+              <p class="channelText"><span data-profile-nickname>닉네임</span> · 팔로우 16.6만명 · 작품 1.56천개</p>
+              <div class="profileBadgeRow" data-profile-badges></div>
+              <p class="channelText">설명글입니다. 설명글입니다. 설명글입니다. 설명글입니다.</p>
+              <div class="channelActionRow">
+                <button type="button" class="moreBtn" data-more-button>더보기</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 프로필 탭 영역 -->
+          <nav class="tabRow">
+            <a href="javascript:void(0)" class="tabBtn is-active" data-channel-tab>예술관</a>
+            <a href="javascript:void(0)" class="tabBtn" data-channel-tab>작품</a>
+          </nav>
+        </div>
+
+        <!-- 작품 / 영상 리스트 영역 -->
+        <div class="videoSection">
+          <!-- 정렬 필터 영역 -->
+          <div class="filterRow">
+            <button type="button" class="filterBtn is-active" data-video-filter>최신순</button>
+            <button type="button" class="filterBtn" data-video-filter>인기순</button>
+            <button type="button" class="filterBtn" data-video-filter>오래된순</button>
+          </div>
+
+          <!-- 작품 / 영상 카드 그리드 -->
+          <div class="videoGrid">
+            <article class="videoCard"><a href="javascript:void(0)" class="videoThumb thumb-01"><span>REAL ESTATE</span></a><h2 class="videoTitle">무주택자가 반드시 알아야 할 부동산 시장 흐름 정리</h2><p class="videoMeta">조회수 17만회 · 3주 전</p></article>
+            <article class="videoCard"><a href="javascript:void(0)" class="videoThumb thumb-02"><span>AI PRODUCT</span></a><h2 class="videoTitle">개발자가 바로 써먹는 AI 프로덕트 설계 방법</h2><p class="videoMeta">조회수 8.7만회 · 1개월 전</p></article>
+            <article class="videoCard"><a href="javascript:void(0)" class="videoThumb thumb-03"><span>DATA VIS</span></a><h2 class="videoTitle">초보도 이해하는 데이터 시각화와 대시보드 구조</h2><p class="videoMeta">조회수 5.3만회 · 1개월 전</p></article>
+            <article class="videoCard"><a href="javascript:void(0)" class="videoThumb thumb-04"><span>MARKET</span></a><h2 class="videoTitle">요즘 시장에서 유의해야 할 포인트 5가지</h2><p class="videoMeta">조회수 11만회 · 2개월 전</p></article>
+            <article class="videoCard"><a href="javascript:void(0)" class="videoThumb thumb-05"><span>REVIEW</span></a><h2 class="videoTitle">실무자가 말하는 코드 리뷰와 제품 완성도</h2><p class="videoMeta">조회수 3.6만회 · 2개월 전</p></article>
+            <article class="videoCard"><a href="javascript:void(0)" class="videoThumb thumb-06"><span>CLONE</span></a><h2 class="videoTitle">유튜브 화면을 기준으로 한 프론트 클론코딩 방식</h2><p class="videoMeta">조회수 9.8만회 · 2개월 전</p></article>
+            <article class="videoCard"><a href="javascript:void(0)" class="videoThumb thumb-07"><span>APP FLOW</span></a><h2 class="videoTitle">처음부터 끝까지 제품 한 페이지를 완성하는 흐름</h2><p class="videoMeta">조회수 4.1만회 · 3개월 전</p></article>
+            <article class="videoCard"><a href="javascript:void(0)" class="videoThumb thumb-08"><span>DESIGN</span></a><h2 class="videoTitle">서비스 화면이 투박해 보이지 않게 만드는 구조 정리</h2><p class="videoMeta">조회수 6.5만회 · 3개월 전</p></article>
+            <article class="videoCard"><a href="javascript:void(0)" class="videoThumb thumb-09"><span>CAREER</span></a><h2 class="videoTitle">주니어 개발자가 실무 문서를 읽는 방법</h2><p class="videoMeta">조회수 2.1만회 · 4개월 전</p></article>
+            <article class="videoCard"><a href="javascript:void(0)" class="videoThumb thumb-10"><span>START</span></a><h2 class="videoTitle">지금 시작해도 늦지 않은 웹 서비스 제작 루틴</h2><p class="videoMeta">조회수 12만회 · 4개월 전</p></article>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 프로필 수정 모달 -->
+    <div id="profile-edit-modal" class="modal none">
+      <div class="profileEditModalPanel">
+        <div class="profileSettingModalHeader">
+          <h2 class="profileSettingModalTitle">프로필 수정</h2>
+          <button type="button" class="profileSettingModalClose" data-modal-close="profile-edit-modal" aria-label="닫기">X</button>
+        </div>
+        <div class="profileEditModalBody">
+          <div class="profileEditPreview" data-profile-edit-preview>N</div>
+          <label class="profileEditUpload" for="profile-edit-file">사진 선택</label>
+          <input id="profile-edit-file" type="file" accept="image/*" data-profile-edit-file />
+          <button type="button" class="profileEditReset" data-profile-avatar-reset>기본 이미지로 변경</button>
+          <div class="profileFormActionRow profileEditActionRow">
+            <button type="button" class="profileFormBtn profileFormBtnGhost" data-modal-close="profile-edit-modal">취소</button>
+            <button type="button" class="profileFormBtn profileFormBtnPrimary" data-profile-avatar-apply>적용하기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 프로필 설정 모달 -->
+    <div id="profile-setting-modal" class="modal none">
+      <div class="profileSettingModalPanel">
+        <div class="profileSettingModalHeader">
+          <h2 class="profileSettingModalTitle">프로필 설정</h2>
+          <button type="button" class="profileSettingModalClose" data-modal-close="profile-setting-modal" aria-label="닫기">X</button>
+        </div>
+        <div class="profileSettingModalList">
+          <button type="button" class="profileSettingModalItem" data-profile-edit-open>프로필 수정</button>
+          <button type="button" class="profileSettingModalItem" data-nickname-open>닉네임 수정</button>
+          <button type="button" class="profileSettingModalItem" data-password-open>비밀번호 수정</button>
+          <button type="button" class="profileSettingModalItem" data-follow-manage-open>팔로잉·팔로우 관리</button>
+          <button type="button" class="profileSettingModalItem" data-badge-manage-open>뱃지관리</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 팔로우 관리 모달 -->
+    <div id="follow-manage-modal" class="modal none">
+      <div class="followManageModalPanel">
+        <div class="profileSettingModalHeader">
+          <h2 class="profileSettingModalTitle">팔로우 관리</h2>
+          <button type="button" class="profileSettingModalClose" data-modal-close="follow-manage-modal" aria-label="닫기">X</button>
+        </div>
+
+        <div class="followManageTabRow">
+          <button type="button" class="followManageTab is-active" data-follow-manage-tab="following">팔로잉</button>
+          <button type="button" class="followManageTab" data-follow-manage-tab="followers">팔로워</button>
+          <button type="button" class="followManageTab" data-follow-manage-tab="blocked">차단 목록</button>
+        </div>
+
+        <div class="followManageSearchRow">
+          <input
+            type="text"
+            class="followManageSearchInput"
+            placeholder="이름 또는 아이디로 검색"
+            autocomplete="off"
+            data-follow-manage-search
+          />
+        </div>
+
+        <p class="followManageSummary" data-follow-manage-summary>팔로잉 목록을 관리하고 있습니다.</p>
+
+        <div class="followManageList" data-follow-manage-list></div>
+      </div>
+    </div>
+
+    <!-- 뱃지 관리 모달 -->
+    <div id="badge-manage-modal" class="modal none">
+      <div class="badgeManageModalPanel">
+        <div class="profileSettingModalHeader">
+          <h2 class="profileSettingModalTitle">뱃지 관리</h2>
+          <button type="button" class="profileSettingModalClose" data-modal-close="badge-manage-modal" aria-label="닫기">X</button>
+        </div>
+
+        <p class="badgeManageSummary">보유한 뱃지 중 최대 2개까지 프로필에 표시할 수 있습니다.</p>
+        <div class="badgeManageGrid" data-badge-manage-grid></div>
+        <div class="profileFormActionRow">
+          <button type="button" class="profileFormBtn profileFormBtnGhost" data-modal-close="badge-manage-modal">취소</button>
+          <button type="button" class="profileFormBtn profileFormBtnPrimary" data-badge-manage-save>저장</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 닉네임 수정 모달 -->
+    <div id="nickname-edit-modal" class="modal none">
+      <div class="profileEditModalPanel">
+        <div class="profileSettingModalHeader">
+          <h2 class="profileSettingModalTitle">닉네임 수정</h2>
+          <button type="button" class="profileSettingModalClose" data-modal-close="nickname-edit-modal" aria-label="닫기">X</button>
+        </div>
+        <div class="profileFormBody">
+          <label class="profileFormLabel" for="profile-nickname-input">닉네임</label>
+          <input id="profile-nickname-input" class="profileFormInput" type="text" value="닉네임" maxlength="20" data-profile-nickname-input />
+          <div class="profileFormActionRow">
+            <button type="button" class="profileFormBtn profileFormBtnGhost" data-modal-close="nickname-edit-modal">취소</button>
+            <button type="button" class="profileFormBtn profileFormBtnPrimary" data-profile-nickname-save>저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 비밀번호 수정 모달 -->
+    <div id="password-edit-modal" class="modal none">
+      <div class="profileEditModalPanel">
+        <div class="profileSettingModalHeader">
+          <h2 class="profileSettingModalTitle">비밀번호 수정</h2>
+          <button type="button" class="profileSettingModalClose" data-modal-close="password-edit-modal" aria-label="닫기">X</button>
+        </div>
+        <div class="profileFormBody">
+          <label class="profileFormLabel" for="profile-password-current">현재 비밀번호</label>
+          <input id="profile-password-current" class="profileFormInput" type="password" placeholder="현재 비밀번호를 입력하세요" />
+          <label class="profileFormLabel" for="profile-password-next">새 비밀번호</label>
+          <input id="profile-password-next" class="profileFormInput" type="password" placeholder="새 비밀번호를 입력하세요" />
+          <label class="profileFormLabel" for="profile-password-confirm">새 비밀번호 확인</label>
+          <input id="profile-password-confirm" class="profileFormInput" type="password" placeholder="새 비밀번호를 다시 입력하세요" />
+          <div class="profileFormActionRow">
+            <button type="button" class="profileFormBtn profileFormBtnGhost" data-modal-close="password-edit-modal">취소</button>
+            <button type="button" class="profileFormBtn profileFormBtnPrimary" data-profile-password-save>저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 공통 모달 스크립트 -->
+    <script src="../../static/js/modal/event.js"></script>
+    <!-- 프로필 이벤트 스크립트 -->
+    <script src="../../static/js/profile/event.js"></script>
+  </body>
+</html>

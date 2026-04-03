@@ -1,0 +1,46 @@
+name: "🎨 Frontend Task"
+description: "프론트엔드 UI 구현 및 기능 개발을 위한 이슈 템플릿입니다."
+title: "[UI/FEATURE_NAME] "
+labels: ["frontend", "enhancement"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 📌 Task Overview
+        어떤 UI를 개발하는지, 그리고 어떤 기능을 담당하는지 간략하게 설명해주세요.
+
+  - type: markdown
+    attributes:
+      value: |
+        ### 📋 To-Do List
+        이슈 해결을 위해 다음 작업들이 수행되어야 합니다:
+        - UI 레이아웃 및 컴포넌트 설계
+        - 기능 구현 (이벤트 핸들링, 유효성 검사 등)
+        - API 연동 및 데이터 바인딩
+        - 스타일링 및 반응형 작업 완료
+        - 컴포넌트 단위 테스트 및 QA 완료
+
+  - type: textarea
+    id: ui-details
+    attributes:
+      label: 🖼 UI/컴포넌트 설계/구현
+      placeholder: |
+        - Component Structure: 컴포넌트 계층 구조
+        - Design System: 사용되는 디자인 가이드라인이나 컴포넌트
+        - Props / State 설계 내용을 적어주세요.
+
+  - type: textarea
+    id: api-integration
+    attributes:
+      label: 🔗 API Integration & State
+      placeholder: "연동할 API 엔드포인트와 전역/지역 상태 관리 변경 사항이 있다면 작성해주세요."
+
+  - type: textarea
+    id: technical-note
+    attributes:
+      label: 🛠 Technical Notes
+      placeholder: |
+        - 특이사항이나 구현 시 고려해야 할 렌더링 최적화, 설계 구조가 있다면 작성해주세요.
+        - 사용한 라이브러리나 특정 알고리즘이 있다면 기록하세요.

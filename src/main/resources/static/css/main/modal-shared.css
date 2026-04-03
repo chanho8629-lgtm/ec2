@@ -1,0 +1,523 @@
+/* ─── Modal Shared Styles ─────────────────────────
+   auth-modal과 signup-modal의 공통 스타일
+   ───────────────────────────────────────────────── */
+
+:root {
+    --primary-color: #6800EA;
+}
+
+/* ─── 오버레이 컨테이너 ─── */
+.auth-modal,
+.signup-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+}
+
+/* ─── 열림 상태 ─── */
+.auth-modal--open,
+.signup-modal--open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ─── 배경 ─── */
+.auth-modal__backdrop,
+.signup-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+/* ─── 다이얼로그 베이스 ─── */
+.auth-modal__dialog,
+.signup-modal__dialog {
+    position: relative;
+    z-index: 1;
+    background: #fff;
+    max-height: 95vh;
+    max-width: 141vh;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+    font-family: var(--font-sans), 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ─── 닫기 버튼 SVG ─── */
+.auth-modal__close-btn svg,
+.signup-modal__close-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ─── 폼 그룹 ─── */
+.auth-modal__form-group,
+.signup-modal__form-group {
+    text-align: left;
+    margin-bottom: 8px;
+}
+
+/* ─── 폼 라벨 ─── */
+.auth-modal__form-label,
+.signup-modal__form-label {
+    font-size: 12px;
+    font-weight: 400;
+    color: #211922;
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* ─── 라벨 행 ─── */
+.auth-modal__label-row,
+.signup-modal__label-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
+/* ─── 정보 아이콘 ─── */
+.auth-modal__info-icon,
+.signup-modal__info-icon {
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1.5px solid #767676;
+    font-size: 10px;
+    color: #767676;
+    cursor: pointer;
+    flex-shrink: 0;
+    font-style: italic;
+    font-weight: 700;
+    font-family: serif;
+    line-height: 1;
+}
+
+/* ─── 입력 래퍼 ─── */
+.auth-modal__input-wrapper,
+.signup-modal__input-wrapper {
+    position: relative;
+}
+
+/* ─── 입력 필드 ─── */
+.auth-modal__input,
+.signup-modal__input {
+    width: 100%;
+    height: 48px;
+    border: 1px solid #91918c;
+    border-radius: 16px;
+    padding: 11px 15px;
+    font-size: 16px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background: transparent;
+    color: #211922;
+    box-sizing: border-box;
+}
+
+.auth-modal__input::placeholder,
+.signup-modal__input::placeholder {
+    color: #91918c;
+}
+
+.auth-modal__input:focus,
+.signup-modal__input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(240, 217, 153, 0.3);
+}
+
+.auth-modal__input[type="date"],
+.signup-modal__input[type="date"] {
+    height: 50px;
+    color: #767676;
+}
+
+/* ─── 비밀번호 토글 ─── */
+.auth-modal__password-toggle,
+.signup-modal__password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.auth-modal__password-toggle:hover,
+.signup-modal__password-toggle:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.auth-modal__password-toggle svg,
+.signup-modal__password-toggle svg {
+    width: 20px;
+    height: 20px;
+    fill: #767676;
+}
+
+/* ─── 힌트 텍스트 ─── */
+.auth-modal__hint-text,
+.signup-modal__hint-text {
+    font-size: 12px;
+    color: #62625b;
+    margin-top: 4px;
+    text-align: left;
+}
+
+/* ─── 제출 버튼 ─── */
+.auth-modal__submit-btn,
+.signup-modal__submit-btn {
+    width: 100%;
+    height: 40px;
+    background: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 24px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.auth-modal__submit-btn:hover,
+.signup-modal__submit-btn:hover {
+    background: color-mix(in srgb, var(--primary-color) 85%, black);
+}
+
+/* ─── 소셜 로그인 (베이스) ─── */
+.auth-modal__social-login,
+.signup-modal__social-login {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #dadce0;
+    border-radius: 24px;
+    padding: 8px 16px;
+    cursor: pointer;
+    background: #fff;
+    transition: background 0.2s;
+    box-sizing: border-box;
+}
+
+.auth-modal__social-login:hover,
+.signup-modal__social-login:hover {
+    background: #f7f8f8;
+}
+
+/* ─── Naver 변형 ─── */
+.auth-modal__social-login--naver,
+.signup-modal__social-login--naver {
+    background: #03C75A;
+    border-color: #03C75A;
+    color: #fff;
+}
+
+.auth-modal__social-login--naver:hover,
+.signup-modal__social-login--naver:hover {
+    background: #02b350;
+}
+
+.auth-modal__social-login--naver .auth-modal__social-name,
+.signup-modal__social-login--naver .signup-modal__social-name {
+    color: #fff;
+}
+
+.auth-modal__social-login--naver .auth-modal__social-avatar,
+.signup-modal__social-login--naver .signup-modal__social-avatar {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* ─── Kakao 변형 ─── */
+.auth-modal__social-login--kakao,
+.signup-modal__social-login--kakao {
+    background: #FEE500;
+    border-color: #FEE500;
+    color: #191919;
+}
+
+.auth-modal__social-login--kakao:hover,
+.signup-modal__social-login--kakao:hover {
+    background: #ebd600;
+}
+
+.auth-modal__social-login--kakao .auth-modal__social-name,
+.signup-modal__social-login--kakao .signup-modal__social-name {
+    color: #191919;
+}
+
+.auth-modal__social-login--kakao .auth-modal__social-avatar,
+.signup-modal__social-login--kakao .signup-modal__social-avatar {
+    background: rgba(0, 0, 0, 0.08);
+    color: #191919;
+}
+
+/* ─── Google 변형 ─── */
+.auth-modal__social-login--google,
+.signup-modal__social-login--google {
+    background: #ffffff;
+    border-color: #dadce0;
+    color: #3c4043;
+}
+
+.auth-modal__social-login--google:hover,
+.signup-modal__social-login--google:hover {
+    background: #f7f8f8;
+}
+
+.auth-modal__social-login--google .auth-modal__social-name,
+.signup-modal__social-login--google .signup-modal__social-name {
+    color: #3c4043;
+}
+
+.auth-modal__social-login--google .auth-modal__social-avatar,
+.signup-modal__social-login--google .signup-modal__social-avatar {
+    background: transparent;
+}
+
+/* ─── 소셜 로그인 왼쪽 ─── */
+.auth-modal__social-login-left,
+.signup-modal__social-login-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    overflow: hidden;
+    flex:1;
+}
+
+/* ─── 소셜 아바타 ─── */
+.auth-modal__social-avatar,
+.signup-modal__social-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e0c8b0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    font-size: 14px;
+    color: #fff;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* ─── 소셜 이름 ─── */
+.auth-modal__social-name,
+.signup-modal__social-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #3c4043;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-align: center;
+    flex: 1;
+}
+
+/* ─── 소셜 아이콘 (auth-modal, signup-modal, modal 공통) ─── */
+.auth-modal__social-icon,
+.signup-modal__social-icon,
+.modal__social-icon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+/* ─── 굵은 링크 ─── */
+.auth-modal__bold-link,
+.signup-modal__bold-link {
+    font-weight: 700;
+    color: #211922;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.auth-modal__bold-link:hover,
+.signup-modal__bold-link:hover {
+    text-decoration: underline;
+}
+
+/* ─── 또는 텍스트 ─── */
+.auth-modal__or-text,
+.signup-modal__or-text {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    margin: 8px 0;
+    text-align: center;
+}
+
+/* ─── 하단바 ─── */
+.auth-modal__bottom-bar,
+.signup-modal__bottom-bar {
+    background: #e5e5e0;
+    padding: 20px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #211922;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.auth-modal__bottom-bar:hover,
+.signup-modal__bottom-bar:hover {
+    background: #d8d8d3;
+}
+
+/* ─── 약관/개인정보 모달 ─── */
+.legal-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10002;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+}
+
+.legal-modal--open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.legal-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.legal-modal__dialog {
+    position: relative;
+    z-index: 1;
+    background: #fff;
+    border-radius: 20px;
+    width: 560px;
+    max-width: 92vw;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+    font-family: var(--font-sans), 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow: hidden;
+}
+
+.legal-modal__close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    transition: background 0.2s;
+}
+
+.legal-modal__close-btn:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.legal-modal__close-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.legal-modal__body {
+    padding: 40px 32px 32px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.legal-modal__title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111;
+    margin: 0 0 20px;
+    flex-shrink: 0;
+}
+
+.legal-modal__scroll {
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 8px;
+}
+
+.legal-modal__scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.legal-modal__scroll::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.legal-modal__scroll h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #111;
+    margin: 20px 0 8px;
+}
+
+.legal-modal__scroll h3:first-child {
+    margin-top: 0;
+}
+
+.legal-modal__scroll p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #444;
+    margin: 0 0 4px;
+}
+
+.legal-modal__date {
+    margin-top: 24px !important;
+    font-size: 13px !important;
+    color: #999 !important;
+}
+
+/* ── 반응형 ── */
+@media (max-width: 600px) {
+    .legal-modal__dialog {
+        width: 100%;
+        max-width: 100%;
+        max-height: 100vh;
+        height: 100%;
+        border-radius: 0;
+    }
+
+    .legal-modal__body {
+        padding: 24px 16px 16px;
+    }
+
+    .legal-modal__title {
+        font-size: 18px;
+    }
+}

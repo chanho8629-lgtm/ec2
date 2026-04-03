@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery Detail | BIDEO</title>
+    <th:block th:replace="templates/layout/youtube-shell :: ytShellHead('Gallery Detail - Bideo')"></th:block>
+    <!-- 새로 만든 CSS 파일 연결 (상대 경로) -->
+    <link rel="stylesheet" href="../../static/css/work/gallery-detail.css" th:href="@{/css/work/gallery-detail.css}">
+</head>
+<body class="gallery-detail-body" id="section">
+    <div th:replace="templates/layout/youtube-shell :: ytShellChrome('gallery')"></div>
+
+    <main class="yt-shell__page-content gallery-page" aria-label="예술관 상세">
+        <ytd-page-manager id="page-manager" class="style-scope ytd-app">
+            <ytd-browse class="style-scope ytd-page-manager" rounded-container="" page-subtype="home">
+                
+                <div id="header" class="style-scope ytd-browse">
+                    <div class="gallery-top-actions" aria-label="상단 액션">
+                        <button class="gallery-top-action-button" type="button" aria-label="추가 작업" aria-expanded="false" data-role="gallery-top-menu-button">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M12 4a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Z"></path>
+                            </svg>
+                        </button>
+                        <button class="gallery-top-action-button" type="button" aria-label="닫기" data-role="gallery-close-button">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 10-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 001.414 1.414L12 13.414l5.293 5.293a1 1 0 001.414-1.414L13.414 12l5.293-5.293a1 1 0 10-1.414-1.414Z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <ytd-carousel-header-renderer class="style-scope ytd-browse">
+                        <div id="contents" class="style-scope ytd-carousel-header-renderer">
+                            <ytd-carousel-item-renderer class="style-scope ytd-carousel-header-renderer grid grid-disabled">
+                                <div id="carousel-item" class="style-scope ytd-carousel-item-renderer">
+                                    <ytd-default-promo-panel-renderer class="style-scope ytd-carousel-item-renderer" panel-layout="DEFAULT_PROMO_PANEL_RENDERER_LAYOUT_B">
+                                        
+                                        <div id="hero" class="style-scope ytd-default-promo-panel-renderer" 
+                                             style="background-image: url('https://i.ytimg.com/vi/JUSvuYc02WA/maxresdefault.jpg');"> 
+                                            </div>
+                                        <div id="scrim" class="style-scope ytd-default-promo-panel-renderer"></div>
+                                       
+                                        <!-- 예술관 내용 -->
+
+                                        <div id="content" class="style-scope ytd-default-promo-panel-renderer grid grid-disabled">
+                                            <div class="promo-text-wrapper">
+                                                
+                                                <h1 id="hero-title" class="style-scope ytd-default-promo-panel-renderer">PHddddddddddddddddOTO FINISH THRILLER! 📸</h1>
+                                                
+                                                <yt-formatted-string id="description" class="style-scope ytd-default-promo-panel-renderer">
+                                                    <span style="color: rgba(255, 255, 255, 0.6); letter-spacing: 1px;">내용입력칸</span>
+                                                </yt-formatted-string>
+
+
+                                                <p class="hero-meta">#스릴러 • 조회수 12.4만회</p>
+
+                                                <!-- [추가] 시청하기 아래 썸네일 내비게이션 영역 -->
+                                                <!-- <div id="pagination-thumbnails" class="style-scope ytd-carousel-item-renderer">
+                                                    <button class="selected style-scope ytd-carousel-item-renderer">
+                                                        <div class="thumb-img-wrapper">
+                                                            <img src="https://i.ytimg.com/vi/JUSvuYc02WA/hqdefault.jpg" alt="Thumb 1">
+                                                        </div>
+                                                        <div class="progress-bar style-scope ytd-carousel-item-renderer"></div>
+                                                    </button>
+                                                    <button class="style-scope ytd-carousel-item-renderer">
+                                                        <div class="thumb-img-wrapper">
+                                                            <img src="https://i.ytimg.com/vi/t8ENzGqyiMI/hqdefault.jpg" alt="Thumb 2">
+                                                        </div>
+                                                        <div class="progress-bar style-scope ytd-carousel-item-renderer"></div>
+                                                    </button>
+                                                    <button class="style-scope ytd-carousel-item-renderer">
+                                                        <div class="thumb-img-wrapper">
+                                                            <img src="https://i.ytimg.com/vi/nMQpvfvQwvQ/hqdefault.jpg" alt="Thumb 3">
+                                                        </div>
+                                                        <div class="progress-bar style-scope ytd-carousel-item-renderer"></div>
+                                                    </button>
+                                                    
+                                                </div> -->
+                                            </div>
+                                        </div>
+
+                                    </ytd-default-promo-panel-renderer>
+                                </div>
+                            </ytd-carousel-item-renderer>
+                        </div>
+                    </ytd-carousel-header-renderer>
+                </div>
+
+                <ytd-two-column-browse-results-renderer class="style-scope ytd-browse grid grid-disabled">
+                    <div id="primary" class="style-scope ytd-two-column-browse-results-renderer">
+                        <ytd-rich-grid-renderer class="style-scope ytd-two-column-browse-results-renderer">
+                            <div id="contents" class="style-scope ytd-rich-grid-renderer">
+                                <!-- Shorts 섹션 -->
+
+                                <!-- 동영상 그리드 -->
+                                <div class="content-row-section">
+                                    <h2>인기 급상승</h2>
+                                    <div class="video-grid">
+                                        <div class="video-item" th:each="i : ${#numbers.sequence(1, 8)}">
+                                            <div class="thumb">
+                                                <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=640&q=80" alt="Thumbnail">
+                                            </div>
+                                            <div class="item-meta">
+                                                <div class="item-avatar">
+                                                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80" alt="스포츠 메이트 프로필">
+                                                </div>
+                                                <div class="item-copy">
+                                                    <h3>일반 동영상 제목 샘플</h3>
+                                                    <p class="item-channel">스포츠 메이트</p>
+                                                    <p class="item-stats">조회수 1.2만회 • 3일 전</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="video-item" th:each="i : ${#numbers.sequence(1, 8)}">
+                                            <div class="thumb">
+                                                <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=640&q=80" alt="Thumbnail">
+                                            </div>
+                                            <div class="item-meta">
+                                                <div class="item-avatar">
+                                                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80" alt="스포츠 메이트 프로필">
+                                                </div>
+                                                <div class="item-copy">
+                                                    <h3>일반 동영상 제목 샘플</h3>
+                                                    <p class="item-channel">스포츠 메이트</p>
+                                                    <p class="item-stats">조회수 1.2만회 • 3일 전</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="video-item" th:each="i : ${#numbers.sequence(1, 8)}">
+                                            <div class="thumb">
+                                                <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=640&q=80" alt="Thumbnail">
+                                            </div>
+                                            <div class="item-meta">
+                                                <div class="item-avatar">
+                                                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80" alt="스포츠 메이트 프로필">
+                                                </div>
+                                                <div class="item-copy">
+                                                    <h3>일반 동영상 제목 샘플</h3>
+                                                    <p class="item-channel">스포츠 메이트</p>
+                                                    <p class="item-stats">조회수 1.2만회 • 3일 전</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="video-item" th:each="i : ${#numbers.sequence(1, 8)}">
+                                            <div class="thumb">
+                                                <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=640&q=80" alt="Thumbnail">
+                                            </div>
+                                            <div class="item-meta">
+                                                <div class="item-avatar">
+                                                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80" alt="스포츠 메이트 프로필">
+                                                </div>
+                                                <div class="item-copy">
+                                                    <h3>일반 동영상 제목 샘플</h3>
+                                                    <p class="item-channel">스포츠 메이트</p>
+                                                    <p class="item-stats">조회수 1.2만회 • 3일 전</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="video-item" th:each="i : ${#numbers.sequence(1, 8)}">
+                                            <div class="thumb">
+                                                <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=640&q=80" alt="Thumbnail">
+                                            </div>
+                                            <div class="item-meta">
+                                                <div class="item-avatar">
+                                                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80" alt="스포츠 메이트 프로필">
+                                                </div>
+                                                <div class="item-copy">
+                                                    <h3>일반 동영상 제목 샘플</h3>
+                                                    <p class="item-channel">스포츠 메이트</p>
+                                                    <p class="item-stats">조회수 1.2만회 • 3일 전</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ytd-rich-grid-renderer>
+                    </div>
+                </ytd-two-column-browse-results-renderer>
+            </ytd-browse>
+        </ytd-page-manager>
+    </main>
+    <div class="work-action-sheet" hidden data-role="gallery-top-action-menu" aria-hidden="true">
+        <button class="danger" type="button">수정하기</button>
+        <button class="danger" type="button">삭제하기</button>
+        <button class="cancel" type="button">취소</button>
+    </div>
+    <th:block th:replace="templates/layout/youtube-shell :: ytShellScripts()"></th:block>
+    <script>
+        (() => {
+            const menuButton = document.querySelector('[data-role="gallery-top-menu-button"]');
+            const menu = document.querySelector('[data-role="gallery-top-action-menu"]');
+            const closeButton = document.querySelector('[data-role="gallery-close-button"]');
+
+            if (!menuButton || !menu) {
+                return;
+            }
+
+            const closeMenu = () => {
+                menu.hidden = true;
+                menu.setAttribute("aria-hidden", "true");
+                menuButton.setAttribute("aria-expanded", "false");
+            };
+
+            const openMenu = () => {
+                menu.hidden = false;
+                menu.setAttribute("aria-hidden", "false");
+                menuButton.setAttribute("aria-expanded", "true");
+            };
+
+            menuButton.addEventListener("click", (event) => {
+                event.stopPropagation();
+                if (menu.hidden) {
+                    openMenu();
+                    return;
+                }
+
+                closeMenu();
+            });
+
+            menu.addEventListener("click", (event) => {
+                const cancelButton = event.target.closest(".cancel");
+                event.stopPropagation();
+                if (cancelButton) {
+                    closeMenu();
+                }
+            });
+
+            document.addEventListener("click", closeMenu);
+
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Escape") {
+                    closeMenu();
+                }
+            });
+
+            closeButton?.addEventListener("click", () => {
+                closeMenu();
+                if (window.history.length > 1) {
+                    window.history.back();
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
+<!--  -->

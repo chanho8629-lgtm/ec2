@@ -1,0 +1,1384 @@
+/* ============================================
+   BIDEO Admin - Override CSS
+   YouTube Studio white mode theme styles.
+   ============================================ */
+
+/* === CSS Variables (YouTube Studio Theme) === */
+:root {
+    /* YouTube Studio color tokens */
+    --ytcp-text-primary: #0d0d0d;
+    --ytcp-text-secondary: #606060;
+    --ytcp-text-disabled: #909090;
+    --ytcp-text-primary-inverse: #ffffff;
+    --ytcp-text-secondary-inverse: #aaaaaa;
+    --ytcp-general-background-a: #ffffff;
+    --ytcp-general-background-b: #f9f9f9;
+    --ytcp-general-background-c: #f1f1f1;
+    --ytcp-general-background-a-inverse: #282828;
+    --ytcp-general-background-b-inverse: #212121;
+    --ytcp-brand-background-solid: #065fd4;
+    --ytcp-hover-item: #3e3e3e;
+    --ytcp-focus: #065fd4;
+    --ytcp-call-to-action: #065fd4;
+    --ytcp-call-to-action-inverse: #3ea6ff;
+    --ytcp-error-red: #cc0000;
+    --ytcp-themed-blue: #065fd4;
+
+    /* Typography tokens */
+    --ytcp-font-title-font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    --ytcp-font-title-font-weight: 400;
+    --ytcp-font-title-font-size: 24px;
+    --ytcp-font-title-line-height: 32px;
+    --ytcp-font-subheading-font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    --ytcp-font-subheading-font-weight: 400;
+    --ytcp-font-subheading-font-size: 16px;
+    --ytcp-font-subheading-line-height: 24px;
+    --ytcp-font-subheading2-font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    --ytcp-font-subheading2-font-weight: 500;
+    --ytcp-font-subheading2-font-size: 14px;
+    --ytcp-font-subheading2-line-height: 20px;
+    --ytcp-font-body1-font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    --ytcp-font-body1-font-weight: 400;
+    --ytcp-font-body1-font-size: 14px;
+    --ytcp-font-body1-line-height: 20px;
+    --ytcp-font-body2-font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    --ytcp-font-body2-font-weight: 400;
+    --ytcp-font-body2-font-size: 13px;
+    --ytcp-font-body2-line-height: 18px;
+
+    /* Admin-specific tokens */
+    --admin-bg-primary: #ffffff;
+    --admin-bg-secondary: #f9f9f9;
+    --admin-bg-sidebar: #ffffff;
+    --admin-bg-sidebar-hover: #f2f2f2;
+    --admin-bg-sidebar-active: #f2f2f2;
+    --admin-bg-row-hover: #f2f2f2;
+    --admin-text-primary: #0d0d0d;
+    --admin-text-secondary: #606060;
+    --admin-text-disabled: #909090;
+    --admin-text-sidebar: #606060;
+    --admin-text-sidebar-active: #0d0d0d;
+    --admin-border: #e0e0e0;
+    --admin-border-light: #f0f0f0;
+    --admin-status-active: #2ba640;
+    --admin-status-active-bg: #e6f4ea;
+    --admin-status-pending: #f29900;
+    --admin-status-pending-bg: #fef7e0;
+    --admin-status-urgent: #cc0000;
+    --admin-status-urgent-bg: #fce8e6;
+    --admin-status-muted: #909090;
+    --admin-status-muted-bg: #f1f3f4;
+    --admin-accent: #065fd4;
+    --admin-accent-hover: #0356c4;
+    --admin-error: #cc0000;
+    --admin-font: 'Roboto', 'Noto Sans KR', sans-serif;
+    --admin-sidebar-width: 240px;
+    --admin-border-radius: 8px;
+
+    /* YouTube Studio border-radius tokens */
+    --ytcp-s-border-radius: 4px;
+    --ytcp-m-border-radius: 8px;
+    --ytcp-l-border-radius: 12px;
+    --ytcp-xl-border-radius: 16px;
+}
+
+/* ============================================
+   SECTION 1: Reset & Base
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: var(--admin-font);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--admin-text-primary);
+    background: var(--admin-bg-secondary);
+    overflow-x: hidden;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul, li {
+    list-style: none;
+}
+
+/* ============================================
+   SECTION 2: YouTube Studio layout classes
+   (compensate for selectors that targeted
+   custom elements like ytcp-app, ytcp-entity-page)
+   ============================================ */
+
+body > .ytcp-app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.ytcp-entity-page {
+    display: flex;
+    flex: 1;
+    min-height: 100vh;
+}
+
+#main-container.style-scope.ytcp-entity-page {
+    display: flex;
+    flex: 1;
+    width: 100%;
+}
+
+.nav-and-main-content.style-scope.ytcp-entity-page {
+    display: flex;
+    flex: 1;
+    width: 100%;
+}
+
+/* ============================================
+   SECTION 3: Sidebar / Navigation Drawer
+   ============================================ */
+
+nav.ytcp-navigation-drawer {
+    width: var(--admin-sidebar-width);
+    background: var(--admin-bg-sidebar);
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-right: 1px solid var(--admin-border);
+}
+
+/* Prevent inner elements with ytcp-navigation-drawer class from inheriting sidebar position */
+nav.ytcp-navigation-drawer * {
+    position: static;
+}
+
+.ytcp-navigation-drawer::-webkit-scrollbar {
+    width: 4px;
+}
+
+.ytcp-navigation-drawer::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: var(--ytcp-s-border-radius);
+}
+
+/* Profile / thumbnail area */
+.thumbnail-wrapper.thumbnail-wrapper-channel.style-scope.ytcp-navigation-drawer {
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--admin-border);
+}
+
+.thumbnail.image-thumbnail.style-scope.ytcp-navigation-drawer {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+#entity-label-container.style-scope.ytcp-navigation-drawer {
+    overflow: hidden;
+}
+
+.entity-type.style-scope.ytcp-navigation-drawer {
+    font-size: 11px;
+    color: var(--admin-text-disabled);
+    letter-spacing: 0.03em;
+}
+
+.entity-name.style-scope.ytcp-navigation-drawer {
+    font-size: 14px;
+    color: var(--admin-text-sidebar-active);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Main menu */
+#main-menu.style-scope.ytcp-navigation-drawer {
+    padding: 8px 0;
+    flex: 1;
+}
+
+#main-menu > li.style-scope.ytcp-navigation-drawer {
+    margin: 0;
+}
+
+.menu-item-link.style-scope.ytcp-navigation-drawer {
+    display: block !important;
+    overflow: visible !important;
+    height: auto !important;
+    position: relative !important;
+    cursor: pointer;
+    color: var(--admin-text-sidebar);
+    font-size: 14px;
+    font-weight: 400;
+    transition: background 0.15s ease;
+}
+
+.menu-item-link.style-scope.ytcp-navigation-drawer:hover {
+    background: var(--admin-bg-sidebar-hover);
+    border-radius: var(--ytcp-xl-border-radius);
+}
+
+.menu-item-link.style-scope.ytcp-navigation-drawer[selected],
+.menu-item-link.style-scope.ytcp-navigation-drawer.active {
+    background: var(--admin-bg-sidebar-active);
+    color: var(--admin-text-sidebar-active);
+    font-weight: 500;
+    border-radius: var(--ytcp-xl-border-radius);
+}
+
+/* Blue bar removed — active state shown by bg highlight only */
+
+.content-icon.style-scope {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.content-icon.style-scope svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.nav-item-text.style-scope.ytcp-navigation-drawer {
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 14px;
+}
+
+/* Sidebar divider */
+.sidebar-divider.style-scope.ytcp-navigation-drawer {
+    height: 1px;
+    background: #3e3e3e;
+    margin: 8px 12px;
+}
+
+/* ============================================
+   SECTION 4: Main Content Area
+   ============================================ */
+
+#main.style-scope.ytcp-entity-page {
+    display: block !important;
+    margin-left: var(--admin-sidebar-width);
+    flex: 1;
+    min-height: 100vh;
+    background: var(--admin-bg-primary);
+}
+
+.all-pages.style-scope.ytcp-app {
+    display: block !important;
+    padding: 24px 32px;
+    max-width: 1280px;
+}
+
+/* Page title */
+.page-title-container.style-scope.ytcp-app {
+    display: block !important;
+    height: auto !important;
+    margin-bottom: 24px;
+}
+
+.page-title.style-scope.ytcp-app {
+    font-family: var(--ytcp-font-title-font-family);
+    font-weight: var(--ytcp-font-title-font-weight);
+    font-size: var(--ytcp-font-title-font-size);
+    line-height: var(--ytcp-font-title-line-height);
+    color: var(--admin-text-primary);
+}
+
+/* ============================================
+   SECTION 5: Filter Bar
+   ============================================ */
+
+/* YouTube Studio style: tabs with sliding selection bar */
+.filter-bar {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0;
+    padding: 0;
+}
+
+/* Tabs wrapper */
+.tabs-wrapper {
+    display: flex;
+    align-items: center;
+    height: 48px;
+    padding: 0;
+    overflow: hidden;
+    order: -1;
+}
+
+/* Tabs container: relative for selection bar */
+.tabs-container {
+    position: relative;
+    display: flex;
+    height: 48px;
+}
+
+/* Selection bar hidden — using ::after underlines instead */
+.selection-bar {
+    display: none;
+}
+
+/* Individual tab button */
+.filter-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    height: 48px;
+    padding: 0;
+    margin-left: 8px;
+    margin-right: 32px;
+    cursor: pointer;
+    user-select: none;
+    background: none;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: var(--admin-font);
+    color: var(--admin-text-secondary);
+    white-space: nowrap;
+    transition: opacity 0.1s cubic-bezier(0.4, 0, 1, 1);
+    line-height: 1;
+}
+
+.filter-tab:first-child {
+    margin-left: 0;
+}
+
+/* Underline: hidden by default, visible on hover and active */
+.filter-tab::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: transparent;
+    border-radius: 2px 2px 0 0;
+}
+
+.filter-tab:hover {
+    color: var(--admin-text-primary);
+}
+
+.filter-tab:hover::after {
+    background: #c0c0c0;
+}
+
+.filter-tab.active {
+    color: var(--admin-text-primary);
+    background: transparent;
+    border: none;
+}
+
+.filter-tab.active::after {
+    background: var(--admin-text-secondary);
+}
+
+/* Legacy filter-tabs wrapper (now replaced by tabs-wrapper/tabs-container in HTML) */
+.filter-tabs {
+    display: none;
+}
+
+/* Search row: full-width, below tabs, above table */
+.filter-search {
+    position: relative;
+    border-bottom: 1px solid var(--admin-border);
+}
+
+.filter-search input {
+    width: 100%;
+    height: 48px;
+    padding: 0 16px 0 48px;
+    border: none;
+    border-radius: 0;
+    font-size: 14px;
+    font-family: var(--admin-font);
+    outline: none;
+    background: transparent;
+    color: var(--admin-text-primary);
+}
+
+.filter-search input::placeholder {
+    color: var(--admin-text-disabled);
+}
+
+.filter-search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--admin-text-disabled);
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+}
+
+/* ============================================
+   SECTION 6: Data Table
+   ============================================ */
+
+.data-table-wrapper {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.data-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--admin-bg-primary);
+}
+
+.data-table th {
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--admin-text-secondary);
+    text-align: center;
+    border-bottom: 2px solid var(--admin-border);
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+
+.data-table td {
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--admin-text-primary);
+    border-bottom: 1px solid var(--admin-border-light);
+    vertical-align: middle;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.data-table tbody tr {
+    transition: background 0.1s;
+}
+
+.data-table tbody tr {
+    cursor: pointer;
+}
+
+.data-table tbody tr:hover {
+    background: var(--admin-bg-row-hover);
+}
+
+.data-table .col-action {
+    text-align: center;
+    width: 80px;
+}
+
+/* ============================================
+   SECTION 7: Status Badges
+   ============================================ */
+
+.status-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: var(--ytcp-s-border-radius);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.status-active {
+    color: var(--admin-status-active);
+    background: var(--admin-status-active-bg);
+}
+
+.status-pending {
+    color: var(--admin-status-pending);
+    background: var(--admin-status-pending-bg);
+}
+
+.status-urgent {
+    color: var(--admin-status-urgent);
+    background: var(--admin-status-urgent-bg);
+}
+
+.status-muted {
+    color: var(--admin-status-muted);
+    background: var(--admin-status-muted-bg);
+}
+
+/* ============================================
+   SECTION 8: Buttons
+   ============================================ */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+    height: 36px;
+    border: none;
+    border-radius: var(--ytcp-s-border-radius);
+    font-size: 14px;
+    font-family: var(--admin-font);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    gap: 6px;
+    line-height: 1;
+}
+
+.btn-primary {
+    background: transparent;
+    color: var(--admin-accent);
+    border: 1px solid var(--admin-accent);
+}
+
+.btn-primary:hover {
+    background: rgba(6, 95, 212, 0.08);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--admin-accent);
+    border: 1px solid var(--admin-accent);
+}
+
+.btn-outline:hover {
+    background: var(--admin-bg-secondary);
+}
+
+.btn-danger {
+    background: transparent;
+    color: var(--admin-error);
+    border: 1px solid var(--admin-error);
+}
+
+.btn-danger:hover {
+    background: rgba(204, 0, 0, 0.08);
+}
+
+.btn-sm {
+    height: 30px;
+    padding: 0 12px;
+    font-size: 13px;
+    line-height: 1;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: var(--admin-accent);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+    font-family: var(--admin-font);
+}
+
+.btn-link:hover {
+    text-decoration: underline;
+}
+
+/* ============================================
+   SECTION 9: Detail Page Layout (2-Column)
+   ============================================ */
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.detail-header .page-title {
+    margin-bottom: 0;
+}
+
+.detail-columns {
+    display: flex;
+    gap: 12px;
+}
+
+.detail-col {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Legacy layout (keep for backward compat) */
+.detail-layout {
+    display: flex;
+    gap: 12px;
+}
+
+.detail-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.detail-sidebar {
+    width: 300px;
+    flex-shrink: 0;
+}
+
+.detail-section {
+    background: var(--admin-bg-primary);
+    border: 1px solid var(--admin-border);
+    border-radius: var(--ytcp-xl-border-radius);
+    padding: 14px;
+    margin-bottom: 10px;
+}
+
+.detail-section-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--admin-text-primary);
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--admin-border-light);
+}
+
+.detail-field {
+    display: flex;
+    padding: 5px 0;
+}
+
+.detail-field-label {
+    width: 110px;
+    flex-shrink: 0;
+    font-size: 13px;
+    color: var(--admin-text-secondary);
+    font-weight: 500;
+}
+
+.detail-field-value {
+    font-size: 13px;
+    color: var(--admin-text-primary);
+    flex: 1;
+    word-break: break-all;
+}
+
+.detail-field-value.text-warn {
+    color: var(--admin-error);
+    font-weight: 500;
+}
+
+.detail-field-value.text-info {
+    color: var(--admin-accent);
+}
+
+/* Blue link tag for clickable names (e.g. report target → member detail) */
+.text-link {
+    color: var(--admin-accent);
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.text-link:hover {
+    text-decoration: underline;
+}
+
+.detail-field-value.text-success {
+    color: var(--admin-status-active);
+}
+
+.detail-field-value.text-muted {
+    color: var(--admin-text-disabled);
+}
+
+/* Summary amount card */
+.detail-amount-card {
+    text-align: center;
+    padding: 12px 0;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--admin-accent);
+}
+
+/* Small action button for detail header */
+.btn-action-sm {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    height: 26px;
+    border: 1px solid transparent;
+    border-radius: 18px;
+    font-size: 12px;
+    font-family: var(--admin-font);
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    background: transparent;
+    transition: background 0.15s;
+    line-height: 1;
+}
+
+.btn-action-sm.btn-primary {
+    color: var(--admin-accent);
+    border-color: var(--admin-accent);
+}
+
+.btn-action-sm.btn-primary:hover {
+    background: rgba(6, 95, 212, 0.08);
+}
+
+.btn-action-sm.btn-danger {
+    color: var(--admin-error);
+    border-color: var(--admin-error);
+}
+
+.btn-action-sm.btn-danger:hover {
+    background: rgba(204, 0, 0, 0.08);
+}
+
+.btn-action-sm.btn-outline {
+    color: var(--admin-accent);
+    border-color: var(--admin-accent);
+}
+
+.btn-action-sm.btn-outline:hover {
+    background: var(--admin-bg-sidebar-hover);
+}
+
+.detail-sidebar-card {
+    background: var(--admin-bg-primary);
+    border: 1px solid var(--admin-border);
+    border-radius: var(--ytcp-xl-border-radius);
+    padding: 14px;
+    margin-bottom: 10px;
+}
+
+.detail-sidebar-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--admin-text-secondary);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.detail-sidebar-value {
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--admin-text-primary);
+}
+
+.detail-sidebar-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.detail-sidebar-actions .btn {
+    width: 100%;
+}
+
+/* ============================================
+   SECTION 10: Back Link
+   ============================================ */
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--admin-text-secondary);
+    font-size: 13px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: var(--admin-font);
+    padding: 0;
+}
+
+.back-link:hover {
+    color: var(--admin-text-primary);
+}
+
+.back-link svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* ============================================
+   SECTION 11: Modal
+   ============================================ */
+
+/* YouTube Studio White Mode Modal */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2201;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    background: #ffffff;
+    border-radius: 24px;
+    width: 576px;
+    min-width: 576px;
+    max-width: 576px;
+    min-height: 468px;
+    max-height: 763px;
+    box-shadow:
+        rgba(0,0,0,0.14) 0px 24px 38px 3px,
+        rgba(0,0,0,0.12) 0px 9px 46px 8px,
+        rgba(0,0,0,0.4) 0px 11px 15px -7px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-size: 14px;
+    font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    font-weight: 400;
+    line-height: 20px;
+    color: var(--admin-text-primary);
+    border: 0 none;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 48px 0;
+}
+
+.modal-header {
+    width: 576px;
+    height: 64px;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.modal-header-title {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 28px;
+    color: var(--admin-text-primary);
+    font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    padding: 7px 8px 5px;
+    margin: 12px 16px;
+    display: flex;
+}
+
+.modal-body {
+    flex: 1;
+    overflow-y: visible;
+}
+
+.modal-body-scroll {
+    padding: 0 24px;
+    overflow-y: auto;
+    max-height: calc(763px - 64px - 68px);
+}
+
+.modal-body-text {
+    padding: 7px 0 17px;
+    font-size: 15px;
+    font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    font-weight: 400;
+    line-height: 24px;
+    color: var(--admin-text-primary);
+}
+
+.modal-body-text p {
+    font-size: 15px;
+    line-height: 24px;
+    margin: 0 0 8px;
+    padding: 0;
+}
+
+.modal-body-text ul {
+    list-style-type: disc;
+    list-style-position: outside;
+    padding: 0;
+    margin: 0 0 8px 24px;
+    font-size: 15px;
+    line-height: 24px;
+}
+
+.modal-body-text li {
+    list-style-type: disc;
+    list-style-position: outside;
+    display: list-item;
+    padding: 0;
+    margin: 0;
+    font-size: 15px;
+    line-height: 24px;
+    color: var(--admin-text-primary);
+}
+
+.modal-body-text a {
+    color: #3ea6ff;
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 400;
+}
+
+.modal-body-text a:hover {
+    text-decoration: underline;
+}
+
+.modal-body input[type="text"],
+.modal-body input[type="date"] {
+    width: 100%;
+    height: 44px;
+    padding: 10px 12px;
+    border: 1px solid var(--admin-border);
+    border-radius: var(--ytcp-m-border-radius);
+    font-size: 14px;
+    font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    outline: none;
+    color: var(--admin-text-primary);
+    background: #ffffff;
+    box-sizing: border-box;
+    margin-top: 8px;
+}
+
+.modal-body input[type="text"]:focus,
+.modal-body input[type="date"]:focus {
+    border-color: var(--admin-accent);
+}
+
+.modal-body input[readonly] {
+    background: var(--admin-bg-secondary);
+    cursor: default;
+    color: var(--admin-text-primary);
+}
+
+.modal-body textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    border: 1px solid var(--admin-border);
+    border-radius: var(--ytcp-m-border-radius);
+    font-size: 14px;
+    font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    resize: vertical;
+    margin-top: 8px;
+    outline: none;
+    color: var(--admin-text-primary);
+    background: #ffffff;
+    box-sizing: border-box;
+}
+
+.modal-body textarea:focus {
+    border-color: var(--admin-accent);
+}
+
+.modal-body label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--admin-text-primary);
+    margin-top: 16px;
+}
+
+.modal-body label:first-child {
+    margin-top: 0;
+}
+
+.modal-footer {
+    width: 576px;
+    height: 68px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* YouTube Studio pill buttons for modals */
+.modal-footer .btn {
+    border-radius: 18px;
+    height: 36px;
+    min-height: 36px;
+    padding: 0 16px;
+    font-size: 14px;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-weight: 500;
+    line-height: 36px;
+    border: 0 none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+}
+
+.modal-footer .btn:last-child {
+    margin-right: 24px;
+}
+
+.modal-footer .btn-outline {
+    background: transparent;
+    color: var(--admin-text-secondary);
+    border: none;
+}
+
+.modal-footer .btn-outline:hover {
+    background: var(--admin-bg-sidebar-hover);
+}
+
+.modal-footer .btn-primary {
+    background: var(--admin-text-primary);
+    color: #ffffff;
+}
+
+.modal-footer .btn-primary:hover {
+    background: #333333;
+}
+
+.modal-footer .btn-danger {
+    background: #cc0000;
+    color: #ffffff;
+}
+
+.modal-footer .btn-danger:hover {
+    background: #aa0000;
+}
+
+/* ============================================
+   SECTION 12: Toast Notification
+   ============================================ */
+
+.toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #323232;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: var(--ytcp-s-border-radius);
+    font-size: 14px;
+    font-family: var(--admin-font);
+    z-index: 300;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ============================================
+   SECTION 13: Utility Classes
+   ============================================ */
+
+.text-accent {
+    color: var(--admin-accent);
+}
+
+.text-muted {
+    color: var(--admin-text-secondary);
+}
+
+.text-sm {
+    font-size: 12px;
+}
+
+.clickable-link {
+    color: var(--admin-accent);
+    cursor: pointer;
+}
+
+.clickable-link:hover {
+    text-decoration: underline;
+}
+
+/* Page section visibility */
+.page-section {
+    display: none;
+}
+
+.page-section.active {
+    display: block;
+}
+
+/* Detail/List toggle */
+.list-view,
+.detail-view {
+    display: none;
+}
+
+.list-view.active,
+.detail-view.active {
+    display: block;
+}
+
+/* ============================================
+   SECTION 14.5: Table Pagination Footer
+   ============================================ */
+
+.table-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 12px 16px;
+    border-top: 1px solid var(--admin-border);
+    font-size: 13px;
+    color: var(--admin-text-secondary);
+    gap: 16px;
+    user-select: none;
+}
+
+.table-footer .page-size-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Custom dropdown trigger (YouTube Studio style) */
+.page-size-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: var(--ytcp-s-border-radius);
+    transition: background 0.15s;
+    position: relative;
+}
+
+.page-size-trigger:hover {
+    background: var(--admin-bg-row-hover);
+}
+
+.page-size-trigger .trigger-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--admin-text-primary);
+}
+
+.page-size-trigger .trigger-arrow {
+    width: 16px;
+    height: 16px;
+    fill: var(--admin-text-secondary);
+    transition: transform 0.2s;
+}
+
+.page-size-trigger.open .trigger-arrow {
+    transform: rotate(180deg);
+}
+
+/* Dropdown menu */
+.page-size-menu {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    margin-bottom: 4px;
+    background: var(--admin-bg-primary);
+    border-radius: var(--ytcp-m-border-radius);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.1);
+    min-width: 56px;
+    padding: 8px 0;
+    z-index: 50;
+}
+
+.page-size-menu.open {
+    display: block;
+}
+
+.page-size-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: var(--admin-text-primary);
+    cursor: pointer;
+    transition: background 0.1s;
+    white-space: nowrap;
+}
+
+.page-size-menu-item:hover {
+    background: var(--admin-bg-row-hover);
+}
+
+.page-size-menu-item.selected {
+    background: var(--admin-bg-row-hover);
+    font-weight: 500;
+}
+
+.table-footer .page-description {
+    color: var(--admin-text-secondary);
+    white-space: nowrap;
+}
+
+.table-footer .page-nav {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.table-footer .page-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--admin-text-secondary);
+    transition: background 0.15s;
+    padding: 0;
+}
+
+.table-footer .page-nav-btn:hover:not(:disabled) {
+    background: var(--admin-bg-row-hover);
+}
+
+.table-footer .page-nav-btn:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.table-footer .page-nav-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+/* ── Pagination: page number buttons (활성화 상태 포함) ── */
+.page-num-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--admin-text-secondary);
+    font-size: 13px;
+    font-family: var(--admin-font);
+    font-weight: 400;
+    line-height: 1;
+    transition: background 0.15s;
+    padding: 0;
+}
+
+.page-num-btn:hover {
+    background: var(--admin-bg-row-hover);
+}
+
+.page-num-btn.active {
+    background: transparent;
+    color: var(--admin-accent);
+    font-weight: 700;
+}
+
+.page-size-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    border: none;
+    font-size: 13px;
+    font-family: inherit;
+    color: #0d0d0d;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 4px 20px 4px 4px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23606060' d='M18.707 8.793a1 1 0 00-1.414 0L12 14.086 6.707 8.793a1 1 0 10-1.414 1.414L12 16.914l6.707-6.707a1 1 0 000-1.414Z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 2px center;
+    outline: none;
+}
+
+/* ============================================
+   SECTION 15: Responsive
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .ytcp-navigation-drawer {
+        width: 72px;
+    }
+
+    #main.style-scope.ytcp-entity-page {
+        margin-left: 72px;
+    }
+
+    .thumbnail-wrapper.thumbnail-wrapper-channel.style-scope.ytcp-navigation-drawer {
+        padding: 12px;
+        justify-content: center;
+    }
+
+    #entity-label-container.style-scope.ytcp-navigation-drawer {
+        display: none;
+    }
+
+    .nav-item-text.style-scope.ytcp-navigation-drawer {
+        display: none;
+    }
+
+    .menu-item-link.style-scope.ytcp-navigation-drawer .dashboard {
+        justify-content: center;
+        padding: 0 !important;
+    }
+
+    .content-icon.style-scope {
+        margin-right: 0 !important;
+    }
+
+    .all-pages.style-scope.ytcp-app {
+        padding: 24px 16px;
+    }
+
+    .filter-search {
+        flex: 1 1 100%;
+    }
+
+    .detail-layout {
+        flex-direction: column;
+    }
+
+    .detail-columns {
+        flex-direction: column;
+    }
+
+    .detail-sidebar {
+        width: 100%;
+    }
+}

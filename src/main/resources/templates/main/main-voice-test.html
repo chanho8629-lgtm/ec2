@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>음성 검색 테스트</title>
+</head>
+<body>
+    <button type="button" id="start-btn">음성 인식 시작</button>
+    <p id="status">버튼을 눌러주세요.</p>
+    <p id="result" style="color: blue; font-weight: bold;"></p>
+
+    <script>
+        const btn = document.querySelector("#start-btn");
+        const status = document.querySelector("#status");
+        const result = document.querySelector("#result");
+
+        // 브라우저 호환성 처리
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            alert("이 브라우저는 음성 인식을 지원하지 않습니다. (크롬 권장)");
+        } else {
+            const recognition = new SpeechRecognition();
+            recognition.lang = "ko-KR"; // 언어 설정
+            recognition.continuous = false; // 한 문장만 인식 후 종료
+            recognition.interimResults = false; // 중간 결과는 무시
+
+            btn.addEventListener("click", () => {
+                recognition.start(); // 마이크 허용 팝업
+                status.innerText = "듣고 있어요... (말을 멈추면 자동으로 종료됩니다)";
+            });
+
+            // 음성 인식 성공 시
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                result.innerText = "인식 결과: " + transcript;
+                console.log("검색어:", transcript);
+                // 여기에 검색 실행 함수 작성
+            };
+
+            // 음성 인식 종료 시
+            recognition.onend = () => {
+                status.innerText = "인식 종료.";
+            };
+
+            // 에러 발생 시
+            recognition.onerror = (event) => {
+                console.error("에러 발생:", event.error);
+                status.innerText = "에러 발생: " + event.error;
+            };
+        }
+    </script>
+</body>
+</html>

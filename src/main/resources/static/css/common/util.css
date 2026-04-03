@@ -1,0 +1,55 @@
+/* 유틸 영역 */
+.flex {
+  display: flex;
+}
+
+.block {
+  display: block;
+}
+
+.none {
+  display: none;
+}
+
+.between {
+  display: flex;
+  justify-content: space-between;
+}
+
+.around {
+  display: flex;
+  justify-content: space-around;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.bold {
+  font-weight: var(--font-weight-bold);
+}
+
+.pointer {
+  cursor: pointer;
+}
