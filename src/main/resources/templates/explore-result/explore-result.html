@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="../../static/css/explore-result/explore-result.css">
+    <th:block th:replace="~{layout/layout :: ytShellHead('검색 결과')}"></th:block>
+    <link rel="stylesheet" href="/css/explore-result/explore-result.css" th:href="@{/css/explore-result/explore-result.css}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    
+    <script defer src="/js/explore-result/explore-result.js" th:src="@{/js/explore-result/explore-result.js}"></script>
 </head>
 <body>
+    <div th:replace="~{layout/layout :: ytShellChrome('search')}"></div>
+    <main class="yt-shell__page-content">
     <div class="main-wrapper">
 
         <!-- 메인 콘텐츠 -->
@@ -37,7 +37,7 @@
                 <!-- 프로필 -->
                 <div class="item-section-content profile-renderer">
                     <div class="channel-avatar">
-                        <img class="avatar-circle" src="../../static/images/logo.png" alt="하이픽션">
+                        <img class="avatar-circle" src="/images/logo.png" alt="하이픽션">
                     </div>
                     <div class="channel-info">
                         <div class="channel-header">
@@ -55,7 +55,7 @@
                 <!-- 예술관 -->
                 <div class="item-section-content gallery-renderer">
                     <div class="gallery-thumbnail">
-                        <img class="thumbnail-img" src="../../static/images/logo.png">
+                        <img class="thumbnail-img" src="/images/logo.png">
                     </div>
                     <div class="gallery-info">
                         <h3 class="gallery-title">예술관자리</h3>
@@ -66,7 +66,7 @@
                         </div>
                         <div class="gallery-channel">
                             <div class="gallery-channel-icon">
-                                <img class="gallery-icon-circle" src="../../static/images/logo.png">
+                                <img class="gallery-icon-circle" src="/images/logo.png">
                             </div>
                             <span class="gallery-channel-name">망고비디오</span>
                             <svg class="verified-badge-small" viewBox="0 0 24 24" width="12" height="12" fill="#606060"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -93,7 +93,7 @@
                             <span class="wishlist-text">찜 목록 추가</span>
                         </div>
                         <div class="gallery-dropdown-item" data-action="no-recommend">
-                            <img src="../../static/images/Icon=minus-circle.png">
+                            <img src="/images/Icon=minus-circle.png">
                             채널 추천 안함
                         </div>
                         <div class="gallery-dropdown-item" data-action="report">
@@ -106,7 +106,7 @@
                 <!-- 작품영상 -->
                 <div class="item-section-content work-renderer">
                     <div class="work-thumbnail">
-                        <img class="thumbnail-img" src="../../static/images/logo.png">
+                        <img class="thumbnail-img" src="/images/logo.png">
                         <span class="work-duration">2:59</span>
                     </div>
                     <div class="work-info">
@@ -118,7 +118,7 @@
                         </div>
                         <div class="work-channel">
                             <div class="work-channel-icon">
-                                <img class="work-icon-circle" src="../../static/images/logo.png">
+                                <img class="work-icon-circle" src="/images/logo.png">
                             </div>
                             <span class="work-channel-name">망고비디오</span>
                             <svg class="verified-badge-small" viewBox="0 0 24 24" width="12" height="12" fill="#606060"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -144,7 +144,7 @@
                             <span class="wishlist-text">찜 목록 추가</span>
                         </div>
                         <div class="work-dropdown-item" data-action="no-recommend">
-                            <img src="../../static/images/Icon=minus-circle.png">
+                            <img src="/images/Icon=minus-circle.png">
                             채널 추천 안함
                         </div>
                         <div class="work-dropdown-item" data-action="report">
@@ -157,7 +157,7 @@
                                 <!-- 프로필 -->
                 <div class="item-section-content profile-renderer">
                     <div class="channel-avatar">
-                        <img class="avatar-circle" src="../../static/images/logo.png" alt="하이픽션">
+                        <img class="avatar-circle" src="/images/logo.png" alt="하이픽션">
                     </div>
                     <div class="channel-info">
                         <div class="channel-header">
@@ -175,7 +175,7 @@
                 <!-- 예술관 -->
                 <div class="item-section-content gallery-renderer">
                     <div class="gallery-thumbnail">
-                        <img class="thumbnail-img" src="../../static/images/logo.png">
+                        <img class="thumbnail-img" src="/images/logo.png">
                     </div>
                     <div class="gallery-info">
                         <h3 class="gallery-title">예술관자리</h3>
@@ -186,7 +186,7 @@
                         </div>
                         <div class="gallery-channel">
                             <div class="gallery-channel-icon">
-                                <img class="gallery-icon-circle" src="../../static/images/logo.png">
+                                <img class="gallery-icon-circle" src="/images/logo.png">
                             </div>
                             <span class="gallery-channel-name">망고비디오</span>
                             <svg class="verified-badge-small" viewBox="0 0 24 24" width="12" height="12" fill="#606060"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -213,7 +213,7 @@
                             <span class="wishlist-text">찜 목록 추가</span>
                         </div>
                         <div class="gallery-dropdown-item" data-action="no-recommend">
-                            <img src="../../static/images/Icon=minus-circle.png">
+                            <img src="/images/Icon=minus-circle.png">
                             채널 추천 안함
                         </div>
                         <div class="gallery-dropdown-item" data-action="report">
@@ -226,7 +226,7 @@
                 <!-- 작품영상 -->
                 <div class="item-section-content work-renderer">
                     <div class="work-thumbnail">
-                        <img class="thumbnail-img" src="../../static/images/logo.png">
+                        <img class="thumbnail-img" src="/images/logo.png">
                         <span class="work-duration">2:59</span>
                     </div>
                     <div class="work-info">
@@ -238,7 +238,7 @@
                         </div>
                         <div class="work-channel">
                             <div class="work-channel-icon">
-                                <img class="work-icon-circle" src="../../static/images/logo.png">
+                                <img class="work-icon-circle" src="/images/logo.png">
                             </div>
                             <span class="work-channel-name">망고비디오</span>
                             <svg class="verified-badge-small" viewBox="0 0 24 24" width="12" height="12" fill="#606060"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -264,7 +264,7 @@
                             <span class="wishlist-text">찜 목록 추가</span>
                         </div>
                         <div class="work-dropdown-item" data-action="no-recommend">
-                            <img src="../../static/images/Icon=minus-circle.png">
+                            <img src="/images/Icon=minus-circle.png">
                             채널 추천 안함
                         </div>
                         <div class="work-dropdown-item" data-action="report">
@@ -276,7 +276,7 @@
                                 <!-- 프로필 -->
                 <div class="item-section-content profile-renderer">
                     <div class="channel-avatar">
-                        <img class="avatar-circle" src="../../static/images/logo.png" alt="하이픽션">
+                        <img class="avatar-circle" src="/images/logo.png" alt="하이픽션">
                     </div>
                     <div class="channel-info">
                         <div class="channel-header">
@@ -294,7 +294,7 @@
                 <!-- 예술관 -->
                 <div class="item-section-content gallery-renderer">
                     <div class="gallery-thumbnail">
-                        <img class="thumbnail-img" src="../../static/images/logo.png">
+                        <img class="thumbnail-img" src="/images/logo.png">
                     </div>
                     <div class="gallery-info">
                         <h3 class="gallery-title">예술관자리</h3>
@@ -305,7 +305,7 @@
                         </div>
                         <div class="gallery-channel">
                             <div class="gallery-channel-icon">
-                                <img class="gallery-icon-circle" src="../../static/images/logo.png">
+                                <img class="gallery-icon-circle" src="/images/logo.png">
                             </div>
                             <span class="gallery-channel-name">망고비디오</span>
                             <svg class="verified-badge-small" viewBox="0 0 24 24" width="12" height="12" fill="#606060"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -332,7 +332,7 @@
                             <span class="wishlist-text">찜 목록 추가</span>
                         </div>
                         <div class="gallery-dropdown-item" data-action="no-recommend">
-                            <img src="../../static/images/Icon=minus-circle.png">
+                            <img src="/images/Icon=minus-circle.png">
                             채널 추천 안함
                         </div>
                         <div class="gallery-dropdown-item" data-action="report">
@@ -345,7 +345,7 @@
                 <!-- 작품영상 -->
                 <div class="item-section-content work-renderer">
                     <div class="work-thumbnail">
-                        <img class="thumbnail-img" src="../../static/images/logo.png">
+                        <img class="thumbnail-img" src="/images/logo.png">
                         <span class="work-duration">2:59</span>
                     </div>
                     <div class="work-info">
@@ -357,7 +357,7 @@
                         </div>
                         <div class="work-channel">
                             <div class="work-channel-icon">
-                                <img class="work-icon-circle" src="../../static/images/logo.png">
+                                <img class="work-icon-circle" src="/images/logo.png">
                             </div>
                             <span class="work-channel-name">망고비디오</span>
                             <svg class="verified-badge-small" viewBox="0 0 24 24" width="12" height="12" fill="#606060"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -383,7 +383,7 @@
                             <span class="wishlist-text">찜 목록 추가</span>
                         </div>
                         <div class="work-dropdown-item" data-action="no-recommend">
-                            <img src="../../static/images/Icon=minus-circle.png">
+                            <img src="/images/Icon=minus-circle.png">
                             채널 추천 안함
                         </div>
                         <div class="work-dropdown-item" data-action="report">
@@ -395,7 +395,7 @@
                                 <!-- 프로필 -->
                 <div class="item-section-content profile-renderer">
                     <div class="channel-avatar">
-                        <img class="avatar-circle" src="../../static/images/logo.png" alt="하이픽션">
+                        <img class="avatar-circle" src="/images/logo.png" alt="하이픽션">
                     </div>
                     <div class="channel-info">
                         <div class="channel-header">
@@ -413,7 +413,7 @@
                 <!-- 예술관 -->
                 <div class="item-section-content gallery-renderer">
                     <div class="gallery-thumbnail">
-                        <img class="thumbnail-img" src="../../static/images/logo.png">
+                        <img class="thumbnail-img" src="/images/logo.png">
                     </div>
                     <div class="gallery-info">
                         <h3 class="gallery-title">예술관자리</h3>
@@ -424,7 +424,7 @@
                         </div>
                         <div class="gallery-channel">
                             <div class="gallery-channel-icon">
-                                <img class="gallery-icon-circle" src="../../static/images/logo.png">
+                                <img class="gallery-icon-circle" src="/images/logo.png">
                             </div>
                             <span class="gallery-channel-name">망고비디오</span>
                             <svg class="verified-badge-small" viewBox="0 0 24 24" width="12" height="12" fill="#606060"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -451,7 +451,7 @@
                             <span class="wishlist-text">찜 목록 추가</span>
                         </div>
                         <div class="gallery-dropdown-item" data-action="no-recommend">
-                            <img src="../../static/images/Icon=minus-circle.png">
+                            <img src="/images/Icon=minus-circle.png">
                             채널 추천 안함
                         </div>
                         <div class="gallery-dropdown-item" data-action="report">
@@ -464,7 +464,7 @@
                 <!-- 작품영상 -->
                 <div class="item-section-content work-renderer">
                     <div class="work-thumbnail">
-                        <img class="thumbnail-img" src="../../static/images/logo.png">
+                        <img class="thumbnail-img" src="/images/logo.png">
                         <span class="work-duration">2:59</span>
                     </div>
                     <div class="work-info">
@@ -476,7 +476,7 @@
                         </div>
                         <div class="work-channel">
                             <div class="work-channel-icon">
-                                <img class="work-icon-circle" src="../../static/images/logo.png">
+                                <img class="work-icon-circle" src="/images/logo.png">
                             </div>
                             <span class="work-channel-name">망고비디오</span>
                             <svg class="verified-badge-small" viewBox="0 0 24 24" width="12" height="12" fill="#606060"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
@@ -502,7 +502,7 @@
                             <span class="wishlist-text">찜 목록 추가</span>
                         </div>
                         <div class="work-dropdown-item" data-action="no-recommend">
-                            <img src="../../static/images/Icon=minus-circle.png">
+                            <img src="/images/Icon=minus-circle.png">
                             채널 추천 안함
                         </div>
                         <div class="work-dropdown-item" data-action="report">
@@ -635,7 +635,7 @@
             <div class="work-share-modal__list off">
                 <button class="work-share-recipient" data-username="mango_art">
                     <div class="work-share-recipient__main">
-                        <div class="work-share-recipient__avatar"><img src="../../static/images/logo.png" alt=""></div>
+                        <div class="work-share-recipient__avatar"><img src="/images/logo.png" alt=""></div>
                         <div class="work-share-recipient__copy">
                             <span class="work-share-recipient__username">mango_art</span>
                             <span class="work-share-recipient__realname">망고아트</span>
@@ -645,7 +645,7 @@
                 </button>
                 <button class="work-share-recipient" data-username="blue_wave">
                     <div class="work-share-recipient__main">
-                        <div class="work-share-recipient__avatar"><img src="../../static/images/logo.png" alt=""></div>
+                        <div class="work-share-recipient__avatar"><img src="/images/logo.png" alt=""></div>
                         <div class="work-share-recipient__copy">
                             <span class="work-share-recipient__username">blue_wave</span>
                             <span class="work-share-recipient__realname">블루웨이브</span>
@@ -655,7 +655,7 @@
                 </button>
                 <button class="work-share-recipient" data-username="pixel_studio">
                     <div class="work-share-recipient__main">
-                        <div class="work-share-recipient__avatar"><img src="../../static/images/logo.png" alt=""></div>
+                        <div class="work-share-recipient__avatar"><img src="/images/logo.png" alt=""></div>
                         <div class="work-share-recipient__copy">
                             <span class="work-share-recipient__username">pixel_studio</span>
                             <span class="work-share-recipient__realname">픽셀스튜디오</span>
@@ -670,6 +670,7 @@
             </div>
         </div>
     </div>
+    </main>
+    <th:block th:replace="~{layout/layout :: ytShellScripts()}"></th:block>
 </body>
-<script src="../../static/js/explore-result/explore-result.js"></script>
 </html>

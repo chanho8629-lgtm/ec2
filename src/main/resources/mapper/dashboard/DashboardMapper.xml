@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.bideo.mapper.dashboard.DashboardMapper">
+
+    <select id="selectCreatorName" resultType="string">
+        select nickname
+        from tbl_member
+        where id = #{memberId}
+    </select>
+
+    <select id="selectDashboardSummary" resultType="com.app.bideo.dto.dashboard.DashboardSummaryRawDTO">
+        select
+            coalesce((
+                select sum(w.view_count)
+                from tbl_work w
+                where w.member_id = #{memberId}
+                  and w.deleted_datetime is null
+                  and w.status != 'DELETED'
+            ), 0) as total_views,
+            coalesce((
+                select count(*)
+                from tbl_auction a
+                where a.seller_id = #{memberId}
+                  and a.status = 'ACTIVE'
+            ), 0) as active_auction_count,
+            coalesce((
+                select count(distinct ce.contest_id)
+                from tbl_contest_entry ce
+                join tbl_contest c on c.id = ce.contest_id
+                where ce.member_id = #{memberId}
+                  and c.deleted_datetime is null
+                  and c.status not in ('DELETED', 'RESULT', 'CLOSED')
+            ), 0) as participating_contest_count,
+            coalesce((
+                select sum(p.total_price)
+                from tbl_payment p
+                where p.buyer_id = #{memberId}
+                  and p.status in ('PENDING', 'AUTHORIZED')
+            ), 0) as pending_payment_amount,
+            coalesce((
+                select count(*)
+                from tbl_auction a
+                where a.seller_id = #{memberId}
+                  and a.status = 'ACTIVE'
+                  and a.closing_at between now() and now() + interval '1 day'
+            ), 0) as closing_soon_auction_count,
+            coalesce((
+                select count(*)
+                from tbl_payment p
+                where p.buyer_id = #{memberId}
+                  and p.status in ('PENDING', 'AUTHORIZED')
+            ), 0) as pending_payment_count,
+            coalesce((
+                select count(*)
+                from tbl_settlement s
+                where s.member_id = #{memberId}
+                  and s.status in ('PENDING', 'APPROVED')
+            ), 0) as pending_settlement_count,
+            coalesce((
+                select count(*)
+                from tbl_notification n
+                where n.member_id = #{memberId}
+                  and n.is_read = false
+            ), 0) as unread_notification_count
+    </select>
+
+    <select id="selectReactionTrend" resultType="com.app.bideo.dto.dashboard.DashboardReactionPointDTO">
+        with days as (
+            select generate_series(current_date - interval '6 day', current_date, interval '1 day')::date as day
+        )
+        select
+            d.day,
+            coalesce((
+                select sum(w.view_count)
+                from tbl_work w
+                where w.member_id = #{memberId}
+                  and w.deleted_datetime is null
+                  and w.status != 'DELETED'
+                  and w.created_datetime::date = d.day
+            ), 0) as view_count,
+            coalesce((
+                select count(*)
+                from tbl_like l
+                join tbl_work w on l.target_type = 'WORK' and l.target_id = w.id
+                where w.member_id = #{memberId}
+                  and w.deleted_datetime is null
+                  and w.status != 'DELETED'
+                  and l.created_datetime::date = d.day
+            ), 0) as like_count,
+            coalesce((
+                select count(*)
+                from tbl_bookmark b
+                left join tbl_work w on b.target_type = 'WORK' and b.target_id = w.id
+                left join tbl_gallery g on b.target_type = 'GALLERY' and b.target_id = g.id
+                where b.created_datetime::date = d.day
+                  and (
+                    (b.target_type = 'WORK' and w.member_id = #{memberId} and w.deleted_datetime is null and w.status != 'DELETED')
+                    or
+                    (b.target_type = 'GALLERY' and g.member_id = #{memberId} and g.deleted_datetime is null and g.status != 'DELETED')
+                  )
+            ), 0) as save_count
+        from days d
+        order by d.day asc
+    </select>
+
+    <select id="selectMyAuctionItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
+        select
+            w.title,
+            case
+                when a.status = 'ACTIVE' then
+                    '입찰 ' || a.bid_count || '건 · 현재 최고가 ₩' || to_char(coalesce(a.current_price, a.starting_price), 'FM999,999,999')
+                when a.status = 'SOLD' then
+                    '낙찰 완료 · 최종가 ₩' || to_char(coalesce(a.final_price, a.current_price, a.asking_price), 'FM999,999,999')
+                when a.status = 'CLOSED' then
+                    '마감 완료 · 결과 확인 필요'
+                else
+                    '상태: ' || a.status
+            end as description
+        from tbl_auction a
+        join tbl_work w on a.work_id = w.id
+        where a.seller_id = #{memberId}
+        order by
+            case when a.status = 'ACTIVE' then 0 else 1 end,
+            a.closing_at asc,
+            a.created_datetime desc
+        limit 5
+    </select>
+
+    <select id="selectParticipatingAuctionItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
+        select
+            w.title,
+            case
+                when bid.is_winning then
+                    '최고 입찰 유지 · 현재가 ₩' || to_char(coalesce(a.current_price, bid.bid_price), 'FM999,999,999')
+                else
+                    '내 입찰가 ₩' || to_char(bid.bid_price, 'FM999,999,999') || ' · 현재 최고가 ₩' || to_char(coalesce(a.current_price, bid.bid_price), 'FM999,999,999')
+            end as description
+        from tbl_auction a
+        join tbl_work w on a.work_id = w.id
+        join lateral (
+            select b.bid_price, b.is_winning, b.created_datetime
+            from tbl_bid b
+            where b.auction_id = a.id
+              and b.member_id = #{memberId}
+            order by b.created_datetime desc
+            limit 1
+        ) bid on true
+        order by
+            case when a.status = 'ACTIVE' then 0 else 1 end,
+            a.closing_at asc,
+            bid.created_datetime desc
+        limit 5
+    </select>
+
+    <select id="selectOwnedWorkItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
+        select
+            item.tag,
+            item.gold_tag,
+            item.title,
+            item.description,
+            item.priority
+        from (
+            select
+                '모음집' as tag,
+                false as gold_tag,
+                g.title,
+                '작품 ' || g.work_count || '개 · 조회수 ' || g.view_count as description,
+                0 as priority,
+                g.created_datetime as created_at,
+                (g.view_count + g.like_count) as score
+            from tbl_gallery g
+            where g.member_id = #{memberId}
+              and g.deleted_datetime is null
+              and g.status != 'DELETED'
+
+            union all
+
+            select
+                '작품' as tag,
+                false as gold_tag,
+                w.title,
+                '조회수 ' || w.view_count || ' · 좋아요 ' || w.like_count as description,
+                1 as priority,
+                w.created_datetime as created_at,
+                (w.view_count + w.like_count + w.save_count) as score
+            from tbl_work w
+            where w.member_id = #{memberId}
+              and w.deleted_datetime is null
+              and w.status != 'DELETED'
+        ) item
+        order by item.priority asc, item.score desc, item.created_at desc
+        limit 5
+    </select>
+
+    <select id="selectHostedContestItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
+        select
+            c.title,
+            case
+                when c.entry_end &gt;= current_date then
+                    '참여작 ' || c.entry_count || '개 · 접수 마감 ' || to_char(c.entry_end, 'MM.DD')
+                when c.result_date is not null then
+                    '심사 진행중 · 결과 발표 ' || to_char(c.result_date, 'MM.DD')
+                else
+                    '마감 완료 · 참여작 ' || c.entry_count || '개'
+            end as description
+        from tbl_contest c
+        where c.member_id = #{memberId}
+          and c.deleted_datetime is null
+          and c.status != 'DELETED'
+        order by c.created_datetime desc
+        limit 5
+    </select>
+
+    <select id="selectParticipatingContestItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
+        select
+            c.title,
+            case
+                when c.result_date is not null then
+                    '출품 완료 · 결과 발표 ' || to_char(c.result_date, 'MM.DD')
+                else
+                    '출품 완료 · 접수 마감 ' || to_char(c.entry_end, 'MM.DD')
+            end as description
+        from tbl_contest_entry ce
+        join tbl_contest c on ce.contest_id = c.id
+        where ce.member_id = #{memberId}
+          and c.deleted_datetime is null
+          and c.status != 'DELETED'
+        order by ce.submitted_at desc
+        limit 5
+    </select>
+
+    <select id="selectGalleryItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
+        select
+            '작품' as tag,
+            true as gold_tag,
+            g.title,
+            case
+                when g.status = 'EXHIBITING' then
+                    '전시중 · 작품 ' || g.work_count || '개'
+                when g.status = 'SCHEDULED' then
+                    '전시 예정 · 오픈 준비중'
+                when g.status = 'ENDED' then
+                    '전시 종료 · 다시 공개 가능'
+                else
+                    '상태: ' || g.status
+            end as description
+        from tbl_gallery g
+        where g.member_id = #{memberId}
+          and g.deleted_datetime is null
+          and g.status != 'DELETED'
+        order by
+            case when g.status = 'EXHIBITING' then 0 when g.status = 'SCHEDULED' then 1 else 2 end,
+            g.updated_datetime desc
+        limit 5
+    </select>
+
+    <select id="selectPaymentHistoryItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
+        select
+            case
+                when p.buyer_id = #{memberId} and p.status in ('PENDING', 'AUTHORIZED') then '결제대기'
+                when p.auction_id is not null then '입찰결제'
+                when p.buyer_id = #{memberId} then '구매내역'
+                else '판매정산대상'
+            end as tag,
+            case
+                when p.buyer_id = #{memberId} then w.title || ' 결제'
+                else w.title || ' 판매'
+            end as title,
+            to_char(coalesce(p.paid_at, p.created_datetime), 'YYYY.MM.DD') || ' · ' || p.pay_method || ' · ' || p.status as description,
+            '₩' || to_char(p.total_price, 'FM999,999,999') as amount
+        from tbl_payment p
+        join tbl_work w on p.work_id = w.id
+        where p.buyer_id = #{memberId}
+           or p.seller_id = #{memberId}
+        order by coalesce(p.paid_at, p.created_datetime) desc
+        limit 5
+    </select>
+
+    <select id="selectSettlementItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
+        select
+            to_char(s.created_datetime, 'MM') || '월 정산' as title,
+            case
+                when s.status = 'PAID' then
+                    '정산 완료 · 지급일 ' || to_char(s.paid_at, 'MM.DD')
+                when s.status = 'APPROVED' then
+                    '승인 완료 · 지급 대기중'
+                when s.status = 'REJECTED' then
+                    '반려됨 · 사유 확인 필요'
+                else
+                    '승인 대기 · 예상 정산금 ₩' || to_char(s.net_amount, 'FM999,999,999')
+            end as description
+        from tbl_settlement s
+        where s.member_id = #{memberId}
+        order by s.created_datetime desc
+        limit 5
+    </select>
+
+    <select id="selectNoticeSummary" resultType="com.app.bideo.dto.dashboard.DashboardNoticeSummaryDTO">
+        select
+            coalesce((
+                select count(*)
+                from tbl_bookmark b
+                left join tbl_work w on b.target_type = 'WORK' and b.target_id = w.id
+                left join tbl_gallery g on b.target_type = 'GALLERY' and b.target_id = g.id
+                where
+                    (b.target_type = 'WORK' and w.member_id = #{memberId} and w.deleted_datetime is null and w.status != 'DELETED')
+                    or
+                    (b.target_type = 'GALLERY' and g.member_id = #{memberId} and g.deleted_datetime is null and g.status != 'DELETED')
+            ), 0) as received_bookmark_count,
+            coalesce((
+                select count(*)
+                from tbl_notification n
+                where n.member_id = #{memberId}
+                  and n.is_read = false
+            ), 0) as unread_notification_count,
+            coalesce((
+                select count(*)
+                from tbl_auction_wishlist aw
+                join tbl_auction a on aw.auction_id = a.id
+                where a.seller_id = #{memberId}
+            ), 0) as auction_wishlist_count
+    </select>
+
+</mapper>

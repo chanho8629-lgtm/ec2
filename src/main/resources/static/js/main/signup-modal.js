@@ -13,7 +13,7 @@ window.addEventListener('load', () => {
     return '' +
         '<div class="signup-modal__content">' +
         '<div class="signup-modal__logo">' +
-        '<img src="../../static/images/favicon.png" alt="BIDEO" width="40" height="40">' +
+        '<img src="/images/favicon.png" alt="BIDEO" width="40" height="40">' +
         '</div>' +
         '<h2 class="signup-modal__title">BIDEO에 오신 것을<br>환영합니다</h2>' +
         '<p class="signup-modal__subtitle">시도해 볼 만한 새로운 아이디어 찾기</p>' +
@@ -83,7 +83,7 @@ window.addEventListener('load', () => {
         '<div class="signup-modal__subview">' +
         '<div class="signup-modal__subview-inner">' +
         '<div class="signup-modal__logo">' +
-        '<img src="../../static/images/favicon.png" alt="BIDEO" width="40" height="40">' +
+        '<img src="/images/favicon.png" alt="BIDEO" width="40" height="40">' +
         '</div>' +
         '<h2 class="signup-modal__title">추가 정보 입력</h2>' +
         '<p class="signup-modal__subtitle">마지막 단계입니다</p>' +

@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.bideo.mapper.gallery.GalleryMapper">
+
+    <insert id="insertGallery" useGeneratedKeys="true" keyProperty="id">
+        insert into tbl_gallery (
+            member_id, title, description, cover_image, allow_comment, show_similar, status
+        ) values (
+            #{memberId}, #{title}, #{description}, #{coverImage}, coalesce(#{allowComment}, true), coalesce(#{showSimilar}, true), 'EXHIBITING'
+        )
+    </insert>
+
+    <select id="selectGalleryListByMemberId" resultType="GalleryListResponseDTO">
+        select
+            g.id,
+            g.member_id,
+            g.title,
+            g.description,
+            g.cover_image,
+            m.nickname as member_nickname,
+            g.work_count,
+            g.like_count,
+            g.view_count,
+            false as is_liked,
+            g.created_datetime
+        from tbl_gallery g
+        left join tbl_member m on g.member_id = m.id
+        where g.member_id = #{memberId}
+          and g.deleted_datetime is null
+          and g.status != 'DELETED'
+        order by g.created_datetime desc, g.id desc
+    </select>
+
+    <select id="selectGalleryMemberId" resultType="long">
+        select member_id
+        from tbl_gallery
+        where id = #{id}
+          and deleted_datetime is null
+          and status != 'DELETED'
+    </select>
+
+    <update id="updateGallery">
+        update tbl_gallery
+        set
+            title = #{gallery.title},
+            description = #{gallery.description},
+            cover_image = coalesce(#{gallery.coverImage}, cover_image),
+            allow_comment = coalesce(#{gallery.allowComment}, allow_comment),
+            show_similar = coalesce(#{gallery.showSimilar}, show_similar),
+            updated_datetime = now()
+        where id = #{id}
+          and deleted_datetime is null
+          and status != 'DELETED'
+    </update>
+
+    <update id="softDeleteGallery">
+        update tbl_gallery
+        set
+            status = 'DELETED',
+            deleted_datetime = now(),
+            updated_datetime = now()
+        where id = #{id}
+          and deleted_datetime is null
+    </update>
+
+    <insert id="insertGalleryWork">
+        insert into tbl_gallery_work (
+            gallery_id, work_id, sort_order
+        ) values (
+            #{galleryId}, #{workId}, 0
+        )
+    </insert>
+
+    <insert id="insertGalleryTag">
+        insert into tbl_gallery_tag (
+            gallery_id, tag_id
+        ) values (
+            #{galleryId}, #{tagId}
+        )
+    </insert>
+
+    <delete id="deleteGalleryWorkByWorkId">
+        delete from tbl_gallery_work
+        where work_id = #{workId}
+    </delete>
+
+    <delete id="deleteGalleryWorkByGalleryId">
+        delete from tbl_gallery_work
+        where gallery_id = #{galleryId}
+    </delete>
+
+    <delete id="deleteGalleryTagByGalleryId">
+        delete from tbl_gallery_tag
+        where gallery_id = #{galleryId}
+    </delete>
+
+    <select id="selectGalleryIdByWorkId" resultType="long">
+        select gallery_id
+        from tbl_gallery_work
+        where work_id = #{workId}
+        order by id asc
+        limit 1
+    </select>
+
+    <select id="selectWorkIdsByGalleryId" resultType="long">
+        select work_id
+        from tbl_gallery_work
+        where gallery_id = #{galleryId}
+        order by id asc
+    </select>
+
+    <update id="refreshGalleryWorkCount">
+        update tbl_gallery
+        set
+            work_count = (
+                select count(*)
+                from tbl_gallery_work gw
+                join tbl_work w on gw.work_id = w.id
+                where gw.gallery_id = #{galleryId}
+                  and w.deleted_datetime is null
+                  and w.status != 'DELETED'
+            ),
+            updated_datetime = now()
+        where id = #{galleryId}
+    </update>
+
+    <insert id="insertGalleryComment" parameterType="com.app.bideo.domain.interaction.CommentVO" useGeneratedKeys="true" keyProperty="id">
+        insert into tbl_comment (
+            member_id, target_type, target_id, parent_id, content, is_pinned, like_count
+        ) values (
+            #{memberId}, #{targetType}, #{targetId}, #{parentId}, #{content}, coalesce(#{isPinned}, false), coalesce(#{likeCount}, 0)
+        )
+    </insert>
+
+    <update id="increaseGalleryCommentCount">
+        update tbl_gallery
+        set
+            comment_count = coalesce(comment_count, 0) + 1,
+            updated_datetime = now()
+        where id = #{galleryId}
+          and deleted_datetime is null
+          and status != 'DELETED'
+    </update>
+
+    <select id="selectGalleryCommentsByGalleryId" resultType="CommentResponseDTO">
+        select
+            c.id,
+            c.member_id,
+            m.nickname as member_nickname,
+            m.profile_image as member_profile_image,
+            c.target_type,
+            c.target_id,
+            c.parent_id,
+            c.content,
+            c.is_pinned,
+            c.like_count,
+            false as is_liked,
+            c.created_datetime,
+            c.updated_datetime
+        from tbl_comment c
+        left join tbl_member m on c.member_id = m.id
+        where c.target_type = 'GALLERY'
+          and c.target_id = #{galleryId}
+          and c.parent_id is null
+          and c.deleted_datetime is null
+        order by c.created_datetime asc, c.id asc
+    </select>
+
+    <select id="selectGalleryTagsByGalleryId" resultType="TagResponseDTO">
+        select
+            t.id,
+            t.tag_name
+        from tbl_gallery_tag gt
+        join tbl_tag t on gt.tag_id = t.id
+        where gt.gallery_id = #{galleryId}
+        order by t.tag_name asc, t.id asc
+    </select>
+
+    <select id="selectTagIdByName" resultType="long">
+        select id
+        from tbl_tag
+        where tag_name = #{tagName}
+        limit 1
+    </select>
+
+    <insert id="insertTag">
+        insert into tbl_tag (
+            tag_name
+        ) values (
+            #{tagName}
+        )
+    </insert>
+
+    <select id="selectGalleryDetail" resultType="GalleryDetailResponseDTO">
+        select
+            g.id,
+            g.member_id,
+            m.nickname as member_nickname,
+            g.title,
+            g.description,
+            g.cover_image,
+            g.allow_comment,
+            g.show_similar,
+            g.work_count,
+            g.like_count,
+            g.comment_count,
+            g.view_count,
+            g.status,
+            g.created_datetime
+        from tbl_gallery g
+        left join tbl_member m on g.member_id = m.id
+        where g.id = #{id}
+          and g.deleted_datetime is null
+          and g.status != 'DELETED'
+    </select>
+
+    <select id="selectGalleryList" resultType="GalleryListResponseDTO">
+        select
+            g.id,
+            g.member_id,
+            g.title,
+            g.description,
+            g.cover_image,
+            m.nickname as member_nickname,
+            g.work_count,
+            g.like_count,
+            g.view_count,
+            false as is_liked,
+            g.created_datetime
+        from tbl_gallery g
+        left join tbl_member m on g.member_id = m.id
+        where g.deleted_datetime is null
+          and g.status != 'DELETED'
+        <if test="keyword != null and keyword != ''">
+            and (g.title ilike '%' || #{keyword} || '%'
+              or g.description ilike '%' || #{keyword} || '%')
+        </if>
+        <if test="memberId != null">
+            and g.member_id = #{memberId}
+        </if>
+        <if test="status != null and status != ''">
+            and g.status = #{status}
+        </if>
+        order by g.created_datetime desc, g.id desc
+        limit #{size} offset (#{page} - 1) * #{size}
+    </select>
+
+    <select id="selectGalleryCount" resultType="int">
+        select count(*)
+        from tbl_gallery g
+        where g.deleted_datetime is null
+          and g.status != 'DELETED'
+        <if test="keyword != null and keyword != ''">
+            and (g.title ilike '%' || #{keyword} || '%'
+              or g.description ilike '%' || #{keyword} || '%')
+        </if>
+        <if test="memberId != null">
+            and g.member_id = #{memberId}
+        </if>
+        <if test="status != null and status != ''">
+            and g.status = #{status}
+        </if>
+    </select>
+
+    <select id="selectRecommendedGalleries" resultType="GalleryListResponseDTO">
+        select
+            g.id,
+            g.member_id,
+            g.title,
+            g.description,
+            g.cover_image,
+            m.nickname as member_nickname,
+            g.work_count,
+            g.like_count,
+            g.view_count,
+            g.created_datetime
+        from tbl_gallery g
+        left join tbl_member m on g.member_id = m.id
+        where g.deleted_datetime is null
+          and g.status = 'EXHIBITING'
+        order by g.view_count desc, g.like_count desc
+        limit 8
+    </select>
+
+    <select id="existsGalleryLike" resultType="boolean">
+        select exists (
+            select 1
+            from tbl_gallery_like
+            where member_id = #{memberId}
+              and gallery_id = #{galleryId}
+        )
+    </select>
+
+    <insert id="insertGalleryLike">
+        insert into tbl_gallery_like (
+            member_id, gallery_id
+        ) values (
+            #{memberId}, #{galleryId}
+        )
+    </insert>
+
+    <delete id="deleteGalleryLike">
+        delete from tbl_gallery_like
+        where member_id = #{memberId}
+          and gallery_id = #{galleryId}
+    </delete>
+
+    <update id="increaseGalleryLikeCount">
+        update tbl_gallery
+        set
+            like_count = coalesce(like_count, 0) + 1,
+            updated_datetime = now()
+        where id = #{galleryId}
+          and deleted_datetime is null
+          and status != 'DELETED'
+    </update>
+
+    <update id="decreaseGalleryLikeCount">
+        update tbl_gallery
+        set
+            like_count = greatest(coalesce(like_count, 0) - 1, 0),
+            updated_datetime = now()
+        where id = #{galleryId}
+          and deleted_datetime is null
+          and status != 'DELETED'
+    </update>
+
+    <select id="selectGalleryLikeCount" resultType="int">
+        select coalesce(like_count, 0)
+        from tbl_gallery
+        where id = #{galleryId}
+          and deleted_datetime is null
+          and status != 'DELETED'
+
+    </select>
+
+    <select id="selectRecommendedSearchGalleries" resultType="SearchGallerySuggestionDTO">
+        select
+            g.id,
+            g.title,
+            case when nullif(g.cover_image, '') is not null then true else false end as has_cover_image
+        from tbl_gallery g
+        where g.deleted_datetime is null
+          and g.status = 'EXHIBITING'
+        order by g.view_count desc, g.like_count desc
+        limit 8
+    </select>
+
+    <select id="selectSearchGalleryCover" resultType="SearchGalleryCoverDataDTO">
+        select
+            g.cover_image,
+            g.updated_datetime
+        from tbl_gallery g
+        where g.id = #{id}
+          and g.deleted_datetime is null
+          and g.status = 'EXHIBITING'
+    </select>
+
+</mapper>

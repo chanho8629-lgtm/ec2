@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.bideo.mapper.admin.AdminReportMapper">
+
+    <select id="selectReportList" resultType="com.app.bideo.dto.admin.ReportResponseDTO">
+        select
+            r.id,
+            r.reporter_id as reporter_id,
+            m.nickname as reporter_nickname,
+            r.target_type as target_type,
+            r.target_id as target_id,
+            r.reason,
+            r.detail,
+            r.status,
+            r.resolved_at as resolved_at,
+            r.created_datetime as created_datetime
+        from tbl_report r
+        join tbl_member m on r.reporter_id = m.id
+        <where>
+            <if test="targetType != null and targetType != ''">
+                and r.target_type = #{targetType}
+            </if>
+            <if test="status != null and status != ''">
+                and r.status = #{status}
+            </if>
+            <if test="reporterId != null">
+                and r.reporter_id = #{reporterId}
+            </if>
+        </where>
+        order by r.created_datetime desc
+        limit #{size} offset (#{page} - 1) * #{size}
+    </select>
+
+    <select id="selectReportDetail" resultType="com.app.bideo.dto.admin.ReportResponseDTO">
+        select
+            r.id,
+            r.reporter_id as reporter_id,
+            m.nickname as reporter_nickname,
+            r.target_type as target_type,
+            r.target_id as target_id,
+            r.reason,
+            r.detail,
+            r.status,
+            r.resolved_at as resolved_at,
+            r.created_datetime as created_datetime
+        from tbl_report r
+        join tbl_member m on r.reporter_id = m.id
+        where r.id = #{id}
+    </select>
+
+    <update id="updateReportStatus">
+        update tbl_report
+        set status = #{status},
+            resolved_at = case when #{status} = 'RESOLVED' then now() else resolved_at end,
+            updated_datetime = now()
+        where id = #{id}
+    </update>
+
+    <select id="countReports" resultType="int">
+        select count(*)
+        from tbl_report r
+        <where>
+            <if test="targetType != null and targetType != ''">
+                and r.target_type = #{targetType}
+            </if>
+            <if test="status != null and status != ''">
+                and r.status = #{status}
+            </if>
+            <if test="reporterId != null">
+                and r.reporter_id = #{reporterId}
+            </if>
+        </where>
+    </select>
+
+</mapper>

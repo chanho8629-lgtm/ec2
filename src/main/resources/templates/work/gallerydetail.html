@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery Detail | BIDEO</title>
-    <th:block th:replace="templates/layout/youtube-shell :: ytShellHead('Gallery Detail - Bideo')"></th:block>
+    <th:block th:replace="~{layout/layout :: ytShellHead('Gallery Detail - Bideo')}"></th:block>
     <!-- 새로 만든 CSS 파일 연결 (상대 경로) -->
-    <link rel="stylesheet" href="../../static/css/work/gallery-detail.css" th:href="@{/css/work/gallery-detail.css}">
+    <link rel="stylesheet" href="/css/work/gallery-detail.css" th:href="@{/css/work/gallery-detail.css}">
 </head>
 <body class="gallery-detail-body" id="section">
-    <div th:replace="templates/layout/youtube-shell :: ytShellChrome('gallery')"></div>
+    <div th:replace="~{layout/layout :: ytShellChrome('gallery')}"></div>
 
     <main class="yt-shell__page-content gallery-page" aria-label="예술관 상세">
         <ytd-page-manager id="page-manager" class="style-scope ytd-app">
@@ -184,7 +184,7 @@
         <button class="danger" type="button">삭제하기</button>
         <button class="cancel" type="button">취소</button>
     </div>
-    <th:block th:replace="templates/layout/youtube-shell :: ytShellScripts()"></th:block>
+    <th:block th:replace="~{layout/layout :: ytShellScripts()}"></th:block>
     <script>
         (() => {
             const menuButton = document.querySelector('[data-role="gallery-top-menu-button"]');

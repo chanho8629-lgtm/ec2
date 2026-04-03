@@ -1,18 +1,19 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BIDEO | 유저 프로필</title>
-    <link rel="stylesheet" href="../../static/css/common/reset.css" />
-    <link rel="stylesheet" href="../../static/css/common/font.css" />
-    <link rel="stylesheet" href="../../static/css/common/global.css" />
-    <link rel="stylesheet" href="../../static/css/common/util.css" />
-    <link rel="stylesheet" href="../../static/css/common/common.css" />
-    <link rel="stylesheet" href="../../static/css/profile/profile.css" />
+    <th:block th:replace="~{layout/layout :: ytShellHead('BIDEO | 유저 프로필')}"></th:block>
+    <link rel="stylesheet" href="/css/common/reset.css" th:href="@{/css/common/reset.css}" />
+    <link rel="stylesheet" href="/css/common/global.css" th:href="@{/css/common/global.css}" />
+    <link rel="stylesheet" href="/css/common/util.css" th:href="@{/css/common/util.css}" />
+    <link rel="stylesheet" href="/css/common/common.css" th:href="@{/css/common/common.css}" />
+    <link rel="stylesheet" href="/css/profile/profile.css" th:href="@{/css/profile/profile.css}" />
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script defer src="/js/modal/event.js" th:src="@{/js/modal/event.js}"></script>
+    <script defer src="/js/profile/event.js" th:src="@{/js/profile/event.js}"></script>
   </head>
   <body>
+    <div th:replace="~{layout/layout :: ytShellChrome('profile')}"></div>
+    <main class="yt-shell__page-content">
     <!-- 프로필 메인 영역 -->
     <div id="section" class="profilePage section">
       <div class="content">
@@ -369,9 +370,7 @@
       </div>
     </div>
 
-    <!-- 공통 모달 스크립트 -->
-    <script src="../../static/js/modal/event.js"></script>
-    <!-- 프로필 스크립트 -->
-    <script src="../../static/js/profile/event.js"></script>
+    </main>
+    <th:block th:replace="~{layout/layout :: ytShellScripts()}"></th:block>
   </body>
 </html>

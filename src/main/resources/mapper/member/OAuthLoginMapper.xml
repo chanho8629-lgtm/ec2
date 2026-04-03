@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.bideo.mapper.member.OAuthLoginMapper">
+    <insert id="insert" parameterType="com.app.bideo.domain.member.OAuthLoginVO" useGeneratedKeys="true" keyProperty="id">
+        insert into tbl_oauth (
+            member_id, provider, provider_id
+        ) values (
+            #{memberId}, #{provider}, #{providerId}
+        )
+    </insert>
+
+    <select id="selectByProviderAndProviderId" resultType="com.app.bideo.domain.member.OAuthLoginVO">
+        select
+            id, member_id, provider, provider_id, connected_at
+        from tbl_oauth
+        where provider = #{provider}
+          and provider_id = #{providerId}
+          and deleted_datetime is null
+    </select>
+
+    <select id="selectByMemberIdAndProvider" resultType="com.app.bideo.domain.member.OAuthLoginVO">
+        select
+            id, member_id, provider, provider_id, connected_at
+        from tbl_oauth
+        where member_id = #{memberId}
+          and provider = #{provider}
+          and deleted_datetime is null
+    </select>
+</mapper>

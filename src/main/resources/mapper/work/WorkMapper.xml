@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.bideo.mapper.work.WorkMapper">
+
+    <insert id="insertTestMember">
+        insert into tbl_member (
+            email, password, nickname, role, status, created_datetime, updated_datetime
+        ) values (
+            #{email}, #{password}, #{nickname}, #{role}, #{status}, now(), now()
+        )
+    </insert>
+
+    <select id="selectMemberIdByEmail" resultType="long">
+        select id
+        from tbl_member
+        where email = #{email}
+    </select>
+
+    <select id="selectFirstMemberId" resultType="long">
+        select id
+        from tbl_member
+        order by id asc
+        limit 1
+    </select>
+
+    <resultMap id="workDetailMap" type="WorkDetailResponseDTO">
+        <id property="id" column="id"/>
+        <result property="galleryId" column="gallery_id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="memberNickname" column="member_nickname"/>
+        <result property="memberProfileImage" column="member_profile_image"/>
+        <result property="title" column="title"/>
+        <result property="category" column="category"/>
+        <result property="description" column="description"/>
+        <result property="price" column="price"/>
+        <result property="licenseType" column="license_type"/>
+        <result property="licenseTerms" column="license_terms"/>
+        <result property="isTradable" column="is_tradable"/>
+        <result property="allowComment" column="allow_comment"/>
+        <result property="showSimilar" column="show_similar"/>
+        <result property="linkUrl" column="link_url"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="likeCount" column="like_count"/>
+        <result property="saveCount" column="save_count"/>
+        <result property="commentCount" column="comment_count"/>
+        <result property="status" column="status"/>
+        <result property="isLiked" column="is_liked"/>
+        <result property="isBookmarked" column="is_bookmarked"/>
+        <result property="createdDatetime" column="created_datetime"/>
+        <result property="updatedDatetime" column="updated_datetime"/>
+        <result property="deletedDatetime" column="deleted_datetime"/>
+        <collection property="tags" ofType="TagResponseDTO" select="selectWorkTagsByWorkId" column="id"/>
+        <collection property="files" ofType="WorkFileResponseDTO" select="selectWorkFilesByWorkId" column="id"/>
+        <collection property="comments" ofType="CommentResponseDTO" select="selectWorkCommentsByWorkId" column="{workId=id}"/>
+    </resultMap>
+
+    <insert id="insertWork" useGeneratedKeys="true" keyProperty="id">
+        insert into tbl_work (
+            member_id, title, category, description, price,
+            license_type, license_terms, is_tradable, allow_comment,
+            show_similar, link_url, status
+        ) values (
+            #{memberId}, #{title}, #{category}, #{description}, #{price},
+            #{licenseType}, #{licenseTerms}, coalesce(#{isTradable}, false), coalesce(#{allowComment}, true),
+            coalesce(#{showSimilar}, true), #{linkUrl}, coalesce(#{status}, 'ACTIVE')
+        )
+    </insert>
+
+    <update id="updateWork">
+        update tbl_work
+        set
+            title = #{title},
+            category = #{category},
+            description = #{description},
+            price = #{price},
+            license_type = #{licenseType},
+            license_terms = #{licenseTerms},
+            is_tradable = #{isTradable},
+            allow_comment = #{allowComment},
+            show_similar = #{showSimilar},
+            link_url = #{linkUrl},
+            status = coalesce(#{status}, status),
+            updated_datetime = now()
+        where id = #{id}
+          and deleted_datetime is null
+    </update>
+
+    <update id="softDeleteWork">
+        update tbl_work
+        set
+            status = 'DELETED',
+            deleted_datetime = now(),
+            updated_datetime = now()
+        where id = #{id}
+          and deleted_datetime is null
+    </update>
+
+    <select id="selectWork" resultType="WorkDTO">
+        select
+            id,
+            member_id,
+            title,
+            category,
+            description,
+            price,
+            license_type,
+            license_terms,
+            is_tradable,
+            allow_comment,
+            show_similar,
+            link_url,
+            view_count,
+            like_count,
+            save_count,
+            comment_count,
+            status,
+            created_datetime,
+            updated_datetime,
+            deleted_datetime
+        from tbl_work
+        where id = #{id}
+    </select>
+
+    <update id="increaseWorkViewCount">
+        update tbl_work
+        set
+            view_count = coalesce(view_count, 0) + 1,
+            updated_datetime = now()
+        where id = #{id}
+          and deleted_datetime is null
+    </update>
+
+    <select id="selectWorkDetail" resultMap="workDetailMap">
+        select
+            w.id,
+            (
+                select gw.gallery_id
+                from tbl_gallery_work gw
+                where gw.work_id = w.id
+                order by gw.id asc
+                limit 1
+            ) as gallery_id,
+            w.member_id,
+            m.nickname as member_nickname,
+            m.profile_image as member_profile_image,
+            w.title,
+            w.category,
+            w.description,
+            w.price,
+            w.license_type,
+            w.license_terms,
+            w.is_tradable,
+            w.allow_comment,
+            w.show_similar,
+            w.link_url,
+            w.view_count,
+            w.like_count,
+            w.save_count,
+            w.comment_count,
+            w.status,
+            false as is_liked,
+            false as is_bookmarked,
+            w.created_datetime,
+            w.updated_datetime,
+            w.deleted_datetime
+        from tbl_work w
+        left join tbl_member m on w.member_id = m.id
+        where w.id = #{id}
+          and w.deleted_datetime is null
+    </select>
+
+    <select id="selectWorkList" resultType="WorkListResponseDTO">
+        select
+            w.id,
+            w.member_id,
+            w.title,
+            w.category,
+            w.is_tradable,
+            w.price,
+            w.status,
+            m.nickname as member_nickname,
+            m.profile_image as member_profile_image,
+            t_file.file_url as thumbnail_url,
+            t_file.width as thumbnail_width,
+            t_file.height as thumbnail_height,
+            w.view_count,
+            w.like_count,
+            w.save_count,
+            w.comment_count,
+            w.created_datetime
+        from tbl_work w
+        left join tbl_member m on w.member_id = m.id
+        left join lateral (
+            select wf.file_url, wf.width, wf.height
+            from tbl_work_file wf
+            where wf.work_id = w.id
+            order by wf.sort_order asc, wf.id asc
+            limit 1
+        ) t_file on true
+        where w.deleted_datetime is null
+          and w.status != 'DELETED'
+        <if test="galleryId != null">
+            and exists (
+                select 1
+                from tbl_gallery_work gw
+                where gw.work_id = w.id
+                  and gw.gallery_id = #{galleryId}
+            )
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (
+                w.title ilike '%' || #{keyword} || '%'
+                or w.description ilike '%' || #{keyword} || '%'
+            )
+        </if>
+        <if test="category != null and category != ''">
+            and w.category = #{category}
+        </if>
+        <if test="memberId != null">
+            and w.member_id = #{memberId}
+        </if>
+        <if test="licenseType != null and licenseType != ''">
+            and w.license_type = #{licenseType}
+        </if>
+        <if test="isTradable != null">
+            and w.is_tradable = #{isTradable}
+        </if>
+        <if test="allowComment != null">
+            and w.allow_comment = #{allowComment}
+        </if>
+        <if test="showSimilar != null">
+            and w.show_similar = #{showSimilar}
+        </if>
+        <if test="status != null and status != ''">
+            and w.status = #{status}
+        </if>
+        order by w.created_datetime desc
+        limit #{size} offset (#{page} - 1) * #{size}
+    </select>
+
+    <select id="selectWorkCount" resultType="int">
+        select count(*)
+        from tbl_work w
+        where w.deleted_datetime is null
+          and w.status != 'DELETED'
+        <if test="galleryId != null">
+            and exists (
+                select 1
+                from tbl_gallery_work gw
+                where gw.work_id = w.id
+                  and gw.gallery_id = #{galleryId}
+            )
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (
+                w.title ilike '%' || #{keyword} || '%'
+                or w.description ilike '%' || #{keyword} || '%'
+            )
+        </if>
+        <if test="category != null and category != ''">
+            and w.category = #{category}
+        </if>
+        <if test="memberId != null">
+            and w.member_id = #{memberId}
+        </if>
+        <if test="licenseType != null and licenseType != ''">
+            and w.license_type = #{licenseType}
+        </if>
+        <if test="isTradable != null">
+            and w.is_tradable = #{isTradable}
+        </if>
+        <if test="allowComment != null">
+            and w.allow_comment = #{allowComment}
+        </if>
+        <if test="showSimilar != null">
+            and w.show_similar = #{showSimilar}
+        </if>
+        <if test="status != null and status != ''">
+            and w.status = #{status}
+        </if>
+    </select>
+
+    <insert id="insertWorkFile" parameterType="com.app.bideo.domain.work.WorkFileVO" useGeneratedKeys="true" keyProperty="id">
+        insert into tbl_work_file (
+            work_id, file_url, file_type, file_size, width, height, sort_order
+        ) values (
+            #{workId}, #{fileUrl}, #{fileType}, #{fileSize}, #{width}, #{height}, coalesce(#{sortOrder}, 0)
+        )
+    </insert>
+
+    <delete id="deleteWorkFilesByWorkId">
+        delete from tbl_work_file
+        where work_id = #{workId}
+    </delete>
+
+    <select id="selectWorkFilesByWorkId" resultType="WorkFileResponseDTO">
+        select
+            id,
+            work_id,
+            file_url,
+            file_type,
+            file_size,
+            width,
+            height,
+            sort_order,
+            created_datetime
+        from tbl_work_file
+        where work_id = #{workId}
+        order by sort_order asc, id asc
+    </select>
+
+    <insert id="insertWorkTag" parameterType="com.app.bideo.domain.work.WorkTagVO" useGeneratedKeys="true" keyProperty="id">
+        insert into tbl_work_tag (
+            work_id, tag_id
+        ) values (
+            #{workId}, #{tagId}
+        )
+    </insert>
+
+    <delete id="deleteWorkTagsByWorkId">
+        delete from tbl_work_tag
+        where work_id = #{workId}
+    </delete>
+
+    <select id="selectTagIdsByWorkId" resultType="long">
+        select tag_id
+        from tbl_work_tag
+        where work_id = #{workId}
+        order by id asc
+    </select>
+
+    <select id="selectTagIdByName" resultType="long">
+        select id
+        from tbl_tag
+        where tag_name = #{tagName}
+    </select>
+
+    <insert id="insertTag">
+        insert into tbl_tag (
+            tag_name
+        ) values (
+            #{tagName}
+        )
+    </insert>
+
+    <select id="selectWorkTagsByWorkId" resultType="TagResponseDTO">
+        select
+            t.id,
+            t.tag_name
+        from tbl_work_tag wt
+        join tbl_tag t on wt.tag_id = t.id
+        where wt.work_id = #{workId}
+        order by t.tag_name asc
+    </select>
+
+    <insert id="insertWorkComment" parameterType="com.app.bideo.domain.interaction.CommentVO" useGeneratedKeys="true" keyProperty="id">
+        insert into tbl_comment (
+            member_id, target_type, target_id, parent_id, content, is_pinned, like_count
+        ) values (
+            #{memberId}, #{targetType}, #{targetId}, #{parentId}, #{content}, coalesce(#{isPinned}, false), coalesce(#{likeCount}, 0)
+        )
+    </insert>
+
+    <update id="increaseWorkCommentCount">
+        update tbl_work
+        set
+            comment_count = coalesce(comment_count, 0) + 1,
+            updated_datetime = now()
+        where id = #{workId}
+          and deleted_datetime is null
+    </update>
+
+    <select id="selectWorkCommentsByWorkId" resultType="CommentResponseDTO">
+        select
+            c.id,
+            c.member_id,
+            m.nickname as member_nickname,
+            m.profile_image as member_profile_image,
+            c.target_type,
+            c.target_id,
+            c.parent_id,
+            c.content,
+            c.is_pinned,
+            c.like_count,
+            false as is_liked,
+            c.created_datetime,
+            c.updated_datetime
+        from tbl_comment c
+        left join tbl_member m on c.member_id = m.id
+        where c.target_type = 'WORK'
+          and c.target_id = #{workId}
+          and c.parent_id is null
+          and c.deleted_datetime is null
+        order by c.created_datetime asc, c.id asc
+    </select>
+
+    <select id="existsActiveAuctionByWorkId" resultType="boolean">
+        select exists (
+            select 1
+            from tbl_auction
+            where work_id = #{workId}
+              and status = 'ACTIVE'
+              and closing_at > now()
+        )
+    </select>
+
+    <select id="existsEndedLatestAuctionByWorkId" resultType="boolean">
+        select exists (
+            select 1
+            from tbl_auction latest
+            where latest.id = (
+                select a.id
+                from tbl_auction a
+                where a.work_id = #{workId}
+                order by a.created_datetime desc, a.id desc
+                limit 1
+            )
+              and (latest.status != 'ACTIVE' or latest.closing_at &lt;= now())
+        )
+    </select>
+
+    <select id="existsWorkLike" resultType="boolean">
+        select exists (
+            select 1
+            from tbl_work_like
+            where member_id = #{memberId}
+              and work_id = #{workId}
+        )
+    </select>
+
+    <insert id="insertWorkLike">
+        insert into tbl_work_like (
+            member_id, work_id
+        ) values (
+            #{memberId}, #{workId}
+        )
+    </insert>
+
+    <delete id="deleteWorkLike">
+        delete from tbl_work_like
+        where member_id = #{memberId}
+          and work_id = #{workId}
+    </delete>
+
+    <update id="increaseWorkLikeCount">
+        update tbl_work
+        set
+            like_count = coalesce(like_count, 0) + 1,
+            updated_datetime = now()
+        where id = #{workId}
+          and deleted_datetime is null
+    </update>
+
+    <update id="decreaseWorkLikeCount">
+        update tbl_work
+        set
+            like_count = greatest(coalesce(like_count, 0) - 1, 0),
+            updated_datetime = now()
+        where id = #{workId}
+          and deleted_datetime is null
+    </update>
+
+    <select id="selectWorkLikeCount" resultType="int">
+        select coalesce(like_count, 0)
+        from tbl_work
+        where id = #{workId}
+          and deleted_datetime is null
+    </select>
+
+</mapper>

@@ -79,15 +79,15 @@ const followManageState = {
 
 // 뱃지 목록 데이터
 const BADGES = [
-  { id: 'first_video', name: '첫 영상 업로드', grade: 'bronze', img: '../../static/images/badge/first_video_badge.png', owned: true },
-  { id: 'write_contest', name: '공모전 참가', grade: 'bronze', img: '../../static/images/badge/write_contest_badge.png', owned: true },
-  { id: 'first_sell', name: '첫 판매', grade: 'bronze', img: '../../static/images/badge/first_sell_badge.png', owned: false },
-  { id: 'upload_5', name: '5회 이상 업로드', grade: 'silver', img: '../../static/images/badge/uploaded_more_than_5_times_badge.png', owned: true },
-  { id: 'first_auction', name: '첫 경매 낙찰', grade: 'silver', img: '../../static/images/badge/first_auction_winner_badge.png', owned: false },
-  { id: 'contest_award', name: '공모전 수상', grade: 'gold', img: '../../static/images/badge/contest_award_badge.png', owned: true },
-  { id: 'auction_1m', name: '낙찰가 100만원', grade: 'gold', img: '../../static/images/badge/auction_price_of_1_million_won_badge.png', owned: false },
-  { id: 'auction_10m', name: '낙찰가 1000만원', grade: 'black', img: '../../static/images/badge/auction_price_of_10_million_won_badge.png', owned: false },
-  { id: 'gallery_views', name: '조회 1000만', grade: 'black', img: '../../static/images/badge/art_gallery_views_over_10_million.png', owned: false },
+  { id: 'first_video', name: '첫 영상 업로드', grade: 'bronze', img: '/images/badge/first_video_badge.png', owned: true },
+  { id: 'write_contest', name: '공모전 참가', grade: 'bronze', img: '/images/badge/write_contest_badge.png', owned: true },
+  { id: 'first_sell', name: '첫 판매', grade: 'bronze', img: '/images/badge/first_sell_badge.png', owned: false },
+  { id: 'upload_5', name: '5회 이상 업로드', grade: 'silver', img: '/images/badge/uploaded_more_than_5_times_badge.png', owned: true },
+  { id: 'first_auction', name: '첫 경매 낙찰', grade: 'silver', img: '/images/badge/first_auction_winner_badge.png', owned: false },
+  { id: 'contest_award', name: '공모전 수상', grade: 'gold', img: '/images/badge/contest_award_badge.png', owned: true },
+  { id: 'auction_1m', name: '낙찰가 100만원', grade: 'gold', img: '/images/badge/auction_price_of_1_million_won_badge.png', owned: false },
+  { id: 'auction_10m', name: '낙찰가 1000만원', grade: 'black', img: '/images/badge/auction_price_of_10_million_won_badge.png', owned: false },
+  { id: 'gallery_views', name: '조회 1000만', grade: 'black', img: '/images/badge/art_gallery_views_over_10_million.png', owned: false },
 ];
 
 // 뱃지 등급 라벨

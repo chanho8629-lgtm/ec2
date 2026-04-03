@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.bideo.mapper.auction.BidMapper">
+
+    <insert id="insertBid" parameterType="BidVO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tbl_bid (auction_id, member_id, bid_price, is_winning)
+        VALUES (#{auctionId}, #{memberId}, #{bidPrice}, #{isWinning})
+    </insert>
+
+    <select id="selectByAuctionId" resultType="BidResponseDTO">
+        SELECT
+            b.id,
+            b.auction_id,
+            b.member_id,
+            m.nickname AS member_nickname,
+            b.bid_price,
+            b.is_winning,
+            b.created_datetime
+        FROM tbl_bid b
+        JOIN tbl_member m ON b.member_id = m.id
+        WHERE b.auction_id = #{auctionId}
+        ORDER BY b.bid_price DESC, b.created_datetime DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <update id="updatePreviousWinning">
+        UPDATE tbl_bid
+        SET is_winning = false
+        WHERE auction_id = #{auctionId}
+          AND is_winning = true
+    </update>
+
+    <select id="selectHighestBid" resultType="BidResponseDTO">
+        SELECT
+            b.id,
+            b.auction_id,
+            b.member_id,
+            m.nickname AS member_nickname,
+            b.bid_price,
+            b.is_winning,
+            b.created_datetime
+        FROM tbl_bid b
+        JOIN tbl_member m ON b.member_id = m.id
+        WHERE b.auction_id = #{auctionId}
+        ORDER BY b.bid_price DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectBidderIds" resultType="long">
+        SELECT DISTINCT member_id
+        FROM tbl_bid
+        WHERE auction_id = #{auctionId}
+    </select>
+
+    <select id="selectClosedBidHistoriesByMemberId" resultType="MyBidHistoryResponseDTO">
+        SELECT
+            a.id AS auction_id,
+            a.work_id,
+            w.title AS work_title,
+            wf.file_url AS work_thumbnail,
+            a.seller_id,
+            seller.nickname AS seller_nickname,
+            my_bid.my_bid_price,
+            a.current_price,
+            a.final_price,
+            CASE
+                WHEN a.status = 'SOLD' THEN 'SOLD'
+                WHEN a.status = 'CLOSED' OR a.closing_at &lt;= now() THEN 'CLOSED'
+                ELSE a.status
+            END AS status,
+            CASE
+                WHEN a.status = 'SOLD' AND a.winner_id = #{memberId} THEN true
+                WHEN (a.status = 'CLOSED' OR a.closing_at &lt;= now()) AND a.current_price = my_bid.my_bid_price THEN true
+                ELSE false
+            END AS is_winning,
+            a.closing_at,
+            my_bid.last_bid_at
+        FROM tbl_auction a
+        JOIN tbl_work w ON a.work_id = w.id
+        JOIN tbl_member seller ON a.seller_id = seller.id
+        LEFT JOIN LATERAL (
+            SELECT wf.file_url
+            FROM tbl_work_file wf
+            WHERE wf.work_id = a.work_id
+            ORDER BY wf.sort_order ASC, wf.id ASC
+            LIMIT 1
+        ) wf ON true
+        JOIN (
+            SELECT
+                b.auction_id,
+                MAX(b.bid_price) AS my_bid_price,
+                MAX(b.created_datetime) AS last_bid_at
+            FROM tbl_bid b
+            WHERE b.member_id = #{memberId}
+            GROUP BY b.auction_id
+        ) my_bid ON my_bid.auction_id = a.id
+        WHERE a.status IN ('CLOSED', 'SOLD')
+           OR a.closing_at &lt;= now()
+        ORDER BY a.closing_at DESC, my_bid.last_bid_at DESC
+    </select>
+
+</mapper>

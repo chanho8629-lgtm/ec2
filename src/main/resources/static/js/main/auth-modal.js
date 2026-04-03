@@ -127,7 +127,7 @@ window.addEventListener('load', () => {
         '<div class="auth-modal__content-row">' +
         '<div class="auth-modal__form-side">' +
         '<div class="auth-modal__logo">' +
-        '<img src="../../static/images/favicon.png" alt="BIDEO" width="40" height="40">' +
+        '<img src="/images/favicon.png" alt="BIDEO" width="40" height="40">' +
         '</div>' +
         '<h2 class="auth-modal__form-title">BIDEO에 오신 것을 환영합니다</h2>' +
         '<form onsubmit="handleLoginSubmit(event)">' +
@@ -177,7 +177,7 @@ window.addEventListener('load', () => {
         '계속하면 BIDEO의 <a href="#" onclick="event.preventDefault(); showLegalModal(\'terms\')">서비스 약관</a>에 동의하고 <a href="#" onclick="event.preventDefault(); showLegalModal(\'privacy\')">개인정보 보호정책</a>을 읽었음을 인정한 것으로 간주합니다.' +
         '</div>' +
         '</div>' +
-        '<img class="auth-modal__qr-image" src="../../static/images/logo.png" alt="BIDEO">' +
+        '<img class="auth-modal__qr-image" src="/images/logo.png" alt="BIDEO">' +
         '</div>' +
         '</div>' +
         '</div>' +
@@ -189,7 +189,7 @@ window.addEventListener('load', () => {
         '<div class="auth-modal__subview">' +
         '<div class="auth-modal__subview-inner">' +
         '<div class="auth-modal__logo">' +
-        '<img src="../../static/images/favicon.png" alt="BIDEO" width="40" height="40">' +
+        '<img src="/images/favicon.png" alt="BIDEO" width="40" height="40">' +
         '</div>' +
         '<h2 class="auth-modal__form-title">이메일 찾기</h2>' +
         '<p class="auth-modal__subcopy">가입한 전화번호로 인증하면 이메일을 확인할 수 있습니다.</p>' +
@@ -220,7 +220,7 @@ window.addEventListener('load', () => {
         '<div class="auth-modal__subview">' +
         '<div class="auth-modal__subview-inner">' +
         '<div class="auth-modal__logo">' +
-        '<img src="../../static/images/favicon.png" alt="BIDEO" width="40" height="40">' +
+        '<img src="/images/favicon.png" alt="BIDEO" width="40" height="40">' +
         '</div>' +
         '<h2 class="auth-modal__form-title">이메일 확인 완료</h2>' +
         '<p class="auth-modal__subcopy">인증된 전화번호로 가입된 이메일은 <strong>' + escapeHtml(authFoundEmail) + '</strong> 입니다.</p>' +
@@ -234,7 +234,7 @@ window.addEventListener('load', () => {
         '<div class="auth-modal__subview">' +
         '<div class="auth-modal__subview-inner">' +
         '<div class="auth-modal__logo">' +
-        '<img src="../../static/images/favicon.png" alt="BIDEO" width="40" height="40">' +
+        '<img src="/images/favicon.png" alt="BIDEO" width="40" height="40">' +
         '</div>' +
         '<h2 class="auth-modal__form-title">비밀번호 찾기</h2>' +
         '<p class="auth-modal__subcopy">가입한 이메일로 인증하면 비밀번호를 재설정할 수 있습니다.</p>' +
@@ -265,7 +265,7 @@ window.addEventListener('load', () => {
         '<div class="auth-modal__subview">' +
         '<div class="auth-modal__subview-inner">' +
         '<div class="auth-modal__logo">' +
-        '<img src="../../static/images/favicon.png" alt="BIDEO" width="40" height="40">' +
+        '<img src="/images/favicon.png" alt="BIDEO" width="40" height="40">' +
         '</div>' +
         '<h2 class="auth-modal__form-title">비밀번호 변경</h2>' +
         '<p class="auth-modal__subcopy">새 비밀번호를 입력하고 변경을 완료하세요.</p>' +
@@ -299,7 +299,7 @@ window.addEventListener('load', () => {
         '<div class="auth-modal__subview">' +
         '<div class="auth-modal__subview-inner">' +
         '<div class="auth-modal__logo">' +
-        '<img src="../../static/images/favicon.png" alt="BIDEO" width="40" height="40">' +
+        '<img src="/images/favicon.png" alt="BIDEO" width="40" height="40">' +
         '</div>' +
         '<h2 class="auth-modal__form-title">비밀번호 변경 완료</h2>' +
         '<p class="auth-modal__subcopy">새 비밀번호로 다시 로그인할 수 있습니다.</p>' +

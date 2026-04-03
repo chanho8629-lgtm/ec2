@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.bideo.mapper.notification.NotificationMapper">
+
+    <insert id="insert" parameterType="com.app.bideo.domain.notification.NotificationVO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tbl_notification (member_id, sender_id, noti_type, target_type, target_id, message)
+        VALUES (#{memberId}, #{senderId}, #{notiType}, #{targetType}, #{targetId}, #{message})
+    </insert>
+
+    <select id="selectByMemberId" resultType="com.app.bideo.dto.notification.NotificationResponseDTO">
+        SELECT
+            n.id,
+            n.sender_id,
+            m.nickname       AS sender_nickname,
+            m.profile_image  AS sender_profile_image,
+            n.noti_type,
+            n.target_type,
+            n.target_id,
+            CASE
+                WHEN n.target_type = 'MESSAGE' THEN message_target.message_room_id
+                ELSE NULL
+            END AS message_room_id,
+            n.message,
+            n.is_read,
+            n.created_datetime
+        FROM tbl_notification n
+        LEFT JOIN tbl_member m ON n.sender_id = m.id
+        LEFT JOIN tbl_message message_target
+            ON n.target_type = 'MESSAGE'
+           AND n.target_id = message_target.id
+        WHERE n.member_id = #{memberId}
+        ORDER BY n.created_datetime DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="selectUnreadCount" resultType="int">
+        SELECT COUNT(*)
+        FROM tbl_notification
+        WHERE member_id = #{memberId}
+          AND is_read = false
+    </select>
+
+    <update id="updateIsRead">
+        UPDATE tbl_notification
+        SET is_read = true
+        WHERE id = #{id}
+          AND member_id = #{memberId}
+    </update>
+
+    <update id="updateAllRead">
+        UPDATE tbl_notification
+        SET is_read = true
+        WHERE member_id = #{memberId}
+          AND is_read = false
+    </update>
+
+    <delete id="deleteNotification">
+        DELETE FROM tbl_notification
+        WHERE id = #{id}
+          AND member_id = #{memberId}
+    </delete>
+
+</mapper>

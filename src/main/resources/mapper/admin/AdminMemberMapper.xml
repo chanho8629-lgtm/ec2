@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.bideo.mapper.admin.AdminMemberMapper">
+
+    <select id="selectMemberList" resultType="com.app.bideo.dto.admin.AdminMemberListResponseDTO">
+        select
+            id,
+            email,
+            nickname,
+            real_name as real_name,
+            role,
+            status,
+            creator_verified as creator_verified,
+            creator_tier as creator_tier,
+            follower_count as follower_count,
+            created_datetime as created_datetime
+        from tbl_member
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and (
+                    email ilike '%' || #{keyword} || '%'
+                    or nickname ilike '%' || #{keyword} || '%'
+                    or real_name ilike '%' || #{keyword} || '%'
+                )
+            </if>
+            <if test="role != null and role != ''">
+                and role = #{role}
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+            <if test="creatorVerified != null">
+                and creator_verified = #{creatorVerified}
+            </if>
+        </where>
+        order by created_datetime desc
+        limit #{size} offset (#{page} - 1) * #{size}
+    </select>
+
+    <select id="selectMemberDetail" resultType="com.app.bideo.dto.admin.AdminMemberDetailResponseDTO">
+        select
+            id,
+            email,
+            nickname,
+            real_name as real_name,
+            birth_date as birth_date,
+            bio,
+            profile_image as profile_image,
+            role,
+            status,
+            creator_verified as creator_verified,
+            seller_verified as seller_verified,
+            creator_tier as creator_tier,
+            follower_count as follower_count,
+            following_count as following_count,
+            gallery_count as gallery_count,
+            phone_number as phone_number,
+            last_login_datetime as last_login_datetime,
+            created_datetime as created_datetime,
+            updated_datetime as updated_datetime
+        from tbl_member
+        where id = #{id}
+    </select>
+
+    <update id="updateMemberStatus">
+        update tbl_member
+        set status = #{status},
+            updated_datetime = now()
+        where id = #{id}
+    </update>
+
+    <select id="countMembers" resultType="int">
+        select count(*)
+        from tbl_member
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and (
+                    email ilike '%' || #{keyword} || '%'
+                    or nickname ilike '%' || #{keyword} || '%'
+                    or real_name ilike '%' || #{keyword} || '%'
+                )
+            </if>
+            <if test="role != null and role != ''">
+                and role = #{role}
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+            <if test="creatorVerified != null">
+                and creator_verified = #{creatorVerified}
+            </if>
+        </where>
+    </select>
+
+</mapper>

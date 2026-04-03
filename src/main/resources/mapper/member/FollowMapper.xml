@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.bideo.mapper.member.FollowMapper">
+
+    <select id="existsFollow" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM tbl_follow
+            WHERE follower_id = #{followerId}
+              AND following_id = #{followingId}
+        )
+    </select>
+
+    <insert id="insertFollow">
+        INSERT INTO tbl_follow (follower_id, following_id)
+        VALUES (#{followerId}, #{followingId})
+    </insert>
+
+    <delete id="deleteFollow">
+        DELETE FROM tbl_follow
+        WHERE follower_id = #{followerId}
+          AND following_id = #{followingId}
+    </delete>
+
+    <select id="selectFollowers" resultType="FollowResponseDTO">
+        SELECT
+            f.id,
+            m.id AS member_id,
+            m.nickname,
+            m.profile_image,
+            m.creator_verified,
+            CASE WHEN cf.id IS NOT NULL THEN true ELSE false END AS is_following,
+            f.created_datetime
+        FROM tbl_follow f
+        JOIN tbl_member m ON f.follower_id = m.id
+        LEFT JOIN tbl_follow cf ON cf.follower_id = #{currentMemberId}
+                               AND cf.following_id = m.id
+        WHERE f.following_id = #{memberId}
+        ORDER BY f.created_datetime DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="selectFollowings" resultType="FollowResponseDTO">
+        SELECT
+            f.id,
+            m.id AS member_id,
+            m.nickname,
+            m.profile_image,
+            m.creator_verified,
+            CASE WHEN cf.id IS NOT NULL THEN true ELSE false END AS is_following,
+            f.created_datetime
+        FROM tbl_follow f
+        JOIN tbl_member m ON f.following_id = m.id
+        LEFT JOIN tbl_follow cf ON cf.follower_id = #{currentMemberId}
+                               AND cf.following_id = m.id
+        WHERE f.follower_id = #{memberId}
+        ORDER BY f.created_datetime DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <update id="increaseFollowerCount">
+        UPDATE tbl_member
+        SET follower_count = coalesce(follower_count, 0) + 1
+        WHERE id = #{memberId}
+    </update>
+
+    <update id="decreaseFollowerCount">
+        UPDATE tbl_member
+        SET follower_count = greatest(coalesce(follower_count, 0) - 1, 0)
+        WHERE id = #{memberId}
+    </update>
+
+    <update id="increaseFollowingCount">
+        UPDATE tbl_member
+        SET following_count = coalesce(following_count, 0) + 1
+        WHERE id = #{memberId}
+    </update>
+
+    <update id="decreaseFollowingCount">
+        UPDATE tbl_member
+        SET following_count = greatest(coalesce(following_count, 0) - 1, 0)
+        WHERE id = #{memberId}
+    </update>
+
+</mapper>

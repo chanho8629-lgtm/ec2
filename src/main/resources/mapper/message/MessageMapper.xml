@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.bideo.mapper.message.MessageMapper">
+
+    <insert id="insert" parameterType="com.app.bideo.domain.message.MessageVO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tbl_message (
+            message_room_id,
+            sender_id,
+            reply_to_message_id,
+            content
+        ) VALUES (
+            #{messageRoomId},
+            #{senderId},
+            #{replyToMessageId},
+            #{content}
+        )
+    </insert>
+
+    <sql id="messageResponseColumns">
+        msg.id,
+        msg.message_room_id,
+        msg.sender_id,
+        sender.nickname AS sender_nickname,
+        sender.profile_image AS sender_profile_image,
+        CASE
+            WHEN msg.deleted_datetime IS NOT NULL THEN '삭제된 메시지입니다.'
+            ELSE msg.content
+        END AS content,
+        msg.is_read,
+        msg.created_datetime,
+        msg.updated_datetime,
+        (msg.updated_datetime &gt; msg.created_datetime AND msg.deleted_datetime IS NULL) AS edited,
+        (msg.deleted_datetime IS NOT NULL) AS deleted,
+        msg.reply_to_message_id,
+        CASE
+            WHEN reply.id IS NULL THEN NULL
+            WHEN reply.deleted_datetime IS NOT NULL THEN '삭제된 메시지입니다.'
+            ELSE reply.content
+        END AS reply_preview,
+        reply_sender.nickname AS reply_sender_nickname,
+        COALESCE(msg.like_count, 0) AS like_count,
+        EXISTS(
+            SELECT 1
+            FROM tbl_message_like message_like
+            WHERE message_like.message_id = msg.id
+              AND message_like.member_id = #{memberId}
+        ) AS is_liked,
+        (msg.sender_id = #{memberId}
+            AND msg.deleted_datetime IS NULL
+            AND msg.created_datetime &gt;= now() - interval '5 minutes') AS can_edit,
+        (msg.sender_id = #{memberId}
+            AND msg.deleted_datetime IS NULL) AS can_delete
+    </sql>
+
+    <select id="selectByRoomId" resultType="com.app.bideo.dto.message.MessageResponseDTO">
+        SELECT
+            <include refid="messageResponseColumns"/>
+        FROM tbl_message msg
+        JOIN tbl_member sender ON msg.sender_id = sender.id
+        LEFT JOIN tbl_message reply ON msg.reply_to_message_id = reply.id
+        LEFT JOIN tbl_member reply_sender ON reply.sender_id = reply_sender.id
+        WHERE msg.message_room_id = #{roomId}
+        ORDER BY msg.created_datetime ASC, msg.id ASC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="selectMessageById" resultType="com.app.bideo.domain.message.MessageVO">
+        SELECT
+            id,
+            message_room_id,
+            sender_id,
+            reply_to_message_id,
+            content,
+            is_read,
+            like_count,
+            created_datetime,
+            updated_datetime,
+            deleted_datetime
+        FROM tbl_message
+        WHERE id = #{messageId}
+    </select>
+
+    <select id="selectMessageResponseById" resultType="com.app.bideo.dto.message.MessageResponseDTO">
+        SELECT
+            <include refid="messageResponseColumns"/>
+        FROM tbl_message msg
+        JOIN tbl_member sender ON msg.sender_id = sender.id
+        LEFT JOIN tbl_message reply ON msg.reply_to_message_id = reply.id
+        LEFT JOIN tbl_member reply_sender ON reply.sender_id = reply_sender.id
+        WHERE msg.id = #{messageId}
+    </select>
+
+    <update id="updateMessageContent">
+        UPDATE tbl_message
+        SET
+            content = #{content},
+            updated_datetime = now()
+        WHERE id = #{messageId}
+          AND deleted_datetime IS NULL
+    </update>
+
+    <update id="softDeleteMessage">
+        UPDATE tbl_message
+        SET
+            deleted_datetime = now(),
+            updated_datetime = now()
+        WHERE id = #{messageId}
+          AND deleted_datetime IS NULL
+    </update>
+
+    <update id="updateReadByRoomId">
+        UPDATE tbl_message
+        SET is_read = true
+        WHERE message_room_id = #{roomId}
+          AND sender_id != #{memberId}
+          AND is_read = false
+          AND deleted_datetime IS NULL
+    </update>
+
+    <select id="selectTotalUnreadCount" resultType="int">
+        SELECT COUNT(*)
+        FROM tbl_message msg
+        JOIN tbl_message_room_member mrm
+          ON msg.message_room_id = mrm.message_room_id
+        WHERE mrm.member_id = #{memberId}
+          AND mrm.left_at IS NULL
+          AND msg.sender_id != #{memberId}
+          AND msg.is_read = false
+          AND msg.deleted_datetime IS NULL
+    </select>
+
+    <select id="existsMessageLike" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1
+            FROM tbl_message_like
+            WHERE member_id = #{memberId}
+              AND message_id = #{messageId}
+        )
+    </select>
+
+    <insert id="insertMessageLike">
+        INSERT INTO tbl_message_like (
+            member_id,
+            message_id
+        ) VALUES (
+            #{memberId},
+            #{messageId}
+        )
+    </insert>
+
+    <delete id="deleteMessageLike">
+        DELETE FROM tbl_message_like
+        WHERE member_id = #{memberId}
+          AND message_id = #{messageId}
+    </delete>
+
+    <update id="increaseMessageLikeCount">
+        UPDATE tbl_message
+        SET
+            like_count = COALESCE(like_count, 0) + 1
+        WHERE id = #{messageId}
+          AND deleted_datetime IS NULL
+    </update>
+
+    <update id="decreaseMessageLikeCount">
+        UPDATE tbl_message
+        SET
+            like_count = GREATEST(COALESCE(like_count, 0) - 1, 0)
+        WHERE id = #{messageId}
+          AND deleted_datetime IS NULL
+    </update>
+
+</mapper>
