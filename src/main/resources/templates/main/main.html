@@ -1,5 +1,7 @@
 <!doctype html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+
 
 <head>
     <th:block th:replace="~{layout/layout :: ytShellHead('BIDEO - 영상 크리에이터를 위한 프리미엄 마켓플레이스')}"></th:block>
@@ -7,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BIDEO - 영상 크리에이터를 위한 프리미엄 마켓플레이스</title>
     <link rel="icon" href="/images/favicon.png" />
+    <link rel="stylesheet" href="/css/main/main.css" />
 
     <!-- Tailwind CSS CDN (빌드 도구 없이 작동하게 함) -->
     <script src="https://cdn.tailwindcss.com"></script>
