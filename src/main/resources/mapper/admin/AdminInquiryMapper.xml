@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.bideo.mapper.admin.AdminInquiryMapper">
+
+    <select id="selectInquiryList" resultType="com.app.bideo.dto.admin.InquiryResponseDTO">
+        select
+            i.id,
+            i.member_id as member_id,
+            m.nickname as member_nickname,
+            m.email as member_email,
+            i.category,
+            i.content,
+            i.reply,
+            i.status,
+            i.created_datetime as created_datetime,
+            i.updated_datetime as updated_datetime
+        from tbl_inquiry i
+        left join tbl_member m on i.member_id = m.id
+        <where>
+            <if test="status != null and status != ''">
+                and i.status = #{status}
+            </if>
+            <if test="category != null and category != ''">
+                and i.category = #{category}
+            </if>
+            <if test="memberId != null">
+                and i.member_id = #{memberId}
+            </if>
+        </where>
+        order by i.created_datetime desc
+        limit #{size} offset (#{page} - 1) * #{size}
+    </select>
+
+    <select id="selectInquiryDetail" resultType="com.app.bideo.dto.admin.InquiryResponseDTO">
+        select
+            i.id,
+            i.member_id as member_id,
+            m.nickname as member_nickname,
+            m.email as member_email,
+            i.category,
+            i.content,
+            i.reply,
+            i.status,
+            i.created_datetime as created_datetime,
+            i.updated_datetime as updated_datetime
+        from tbl_inquiry i
+        left join tbl_member m on i.member_id = m.id
+        where i.id = #{id}
+    </select>
+
+    <update id="updateInquiryReply">
+        update tbl_inquiry
+        set reply = #{reply},
+            status = 'ANSWERED',
+            updated_datetime = now()
+        where id = #{id}
+    </update>
+
+    <select id="countInquiries" resultType="int">
+        select count(*)
+        from tbl_inquiry i
+        <where>
+            <if test="status != null and status != ''">
+                and i.status = #{status}
+            </if>
+            <if test="category != null and category != ''">
+                and i.category = #{category}
+            </if>
+            <if test="memberId != null">
+                and i.member_id = #{memberId}
+            </if>
+        </where>
+    </select>
+
+</mapper>

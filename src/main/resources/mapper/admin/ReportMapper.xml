@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.bideo.mapper.admin.ReportMapper">
+
+    <insert id="insertReport" parameterType="com.app.bideo.domain.admin.ReportVO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tbl_report (
+            reporter_id,
+            target_type,
+            target_id,
+            reason,
+            detail,
+            status
+        )
+        VALUES (
+            #{reporterId},
+            #{targetType},
+            #{targetId},
+            #{reason},
+            #{detail},
+            #{status}
+        )
+    </insert>
+
+</mapper>

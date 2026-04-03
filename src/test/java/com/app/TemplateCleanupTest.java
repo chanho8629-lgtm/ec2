@@ -21,15 +21,15 @@ class TemplateCleanupTest {
         String mainTemplate = readResource("templates/main/main.html");
         String introTemplate = readResource("templates/main/intro-main.html");
 
-        assertTrue(mainTemplate.contains("../../static/css/main/auth-modal.css"));
-        assertTrue(mainTemplate.contains("../../static/css/main/signup-modal.css"));
-        assertTrue(mainTemplate.contains("../../static/js/main/auth-modal.js"));
-        assertTrue(mainTemplate.contains("../../static/js/main/signup-modal.js"));
+        assertTrue(mainTemplate.contains("/css/main/auth-modal.css"));
+        assertTrue(mainTemplate.contains("/css/main/signup-modal.css"));
+        assertTrue(mainTemplate.contains("/js/main/auth-modal.js"));
+        assertTrue(mainTemplate.contains("/js/main/signup-modal.js"));
 
-        assertTrue(introTemplate.contains("../../static/css/main/auth-modal.css"));
-        assertTrue(introTemplate.contains("../../static/css/main/signup-modal.css"));
-        assertTrue(introTemplate.contains("../../static/js/main/auth-modal.js"));
-        assertTrue(introTemplate.contains("../../static/js/main/signup-modal.js"));
+        assertTrue(introTemplate.contains("/css/main/auth-modal.css"));
+        assertTrue(introTemplate.contains("/css/main/signup-modal.css"));
+        assertTrue(introTemplate.contains("/js/main/auth-modal.js"));
+        assertTrue(introTemplate.contains("/js/main/signup-modal.js"));
     }
 
     @Test
@@ -38,7 +38,7 @@ class TemplateCleanupTest {
         String introScript = readResource("static/js/main/intro-main.js");
 
         assertTrue(introTemplate.contains("data-intro-main-root"));
-        assertTrue(introTemplate.contains("../../static/js/main/intro-main.js"));
+        assertTrue(introTemplate.contains("/js/main/intro-main.js"));
 
         assertTrue(introScript.contains("DOMContentLoaded"));
         assertTrue(introScript.contains("data-intro-main-root"));
@@ -56,7 +56,7 @@ class TemplateCleanupTest {
         assertTrue(layoutTemplate.contains("홈"));
         assertTrue(layoutTemplate.contains("Shorts"));
         assertTrue(layoutTemplate.contains("시청 기록"));
-        assertTrue(layoutTemplate.contains("../../static/images/logo.png"));
+        assertTrue(layoutTemplate.contains("/images/logo.png"));
 
         assertFalse(introTemplate.contains("[일러스트]"));
         assertFalse(introTemplate.contains("[아이콘]"));
@@ -87,12 +87,12 @@ class TemplateCleanupTest {
         assertTrue(layoutTemplate.contains("data-yt-shell-overlay"));
         assertTrue(layoutTemplate.contains("data-yt-shell-drawer"));
         assertTrue(layoutTemplate.contains("data-yt-shell-mobile-search"));
-        assertTrue(layoutTemplate.contains("../../static/css/layout/youtube-shell-overrides.css"));
-        assertTrue(layoutTemplate.contains("../../static/css/layout/chat-fab.css"));
-        assertTrue(layoutTemplate.contains("../../static/css/common/font.css"));
-        assertTrue(layoutTemplate.contains("../../static/js/layout/youtube-shell-bridge.js"));
-        assertTrue(layoutTemplate.contains("../../static/js/layout/chat-fab.js"));
-        assertTrue(layoutTemplate.contains("../../static/images/logo.png"));
+        assertTrue(layoutTemplate.contains("/css/layout/youtube-shell-overrides.css"));
+        assertTrue(layoutTemplate.contains("/css/layout/chat-fab.css"));
+        assertTrue(layoutTemplate.contains("/css/common/font.css"));
+        assertTrue(layoutTemplate.contains("/js/layout/youtube-shell-bridge.js"));
+        assertTrue(layoutTemplate.contains("/js/layout/chat-fab.js"));
+        assertTrue(layoutTemplate.contains("/images/logo.png"));
         assertTrue(layoutTemplate.contains("신고 기록"));
         assertTrue(layoutTemplate.contains("YouTube Music"));
         assertTrue(layoutTemplate.contains("YouTube Kids"));
@@ -136,8 +136,8 @@ class TemplateCleanupTest {
         assertTrue(mainTemplate.contains("templates/layout/youtube-shell :: ytShellHead"));
         assertTrue(mainTemplate.contains("templates/layout/youtube-shell :: ytShellChrome"));
         assertTrue(mainTemplate.contains("templates/layout/youtube-shell :: ytShellScripts"));
-        assertTrue(mainTemplate.contains("../../static/css/main/main-standardized.css"));
-        assertTrue(mainTemplate.contains("../../static/js/main/main-standardized.js"));
+        assertTrue(mainTemplate.contains("/css/main/main-standardized.css"));
+        assertTrue(mainTemplate.contains("/js/main/main-standardized.js"));
         assertTrue(mainTemplate.contains("data-main-root"));
         assertTrue(mainTemplate.contains("영화 및 프로그램"));
         assertTrue(mainTemplate.contains("나를 위한 Primetime 영화 추천"));

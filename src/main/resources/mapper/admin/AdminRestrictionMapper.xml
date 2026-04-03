@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.bideo.mapper.admin.AdminRestrictionMapper">
+
+    <select id="selectRestrictionList" resultType="com.app.bideo.dto.admin.AdminRestrictionResponseDTO">
+        select
+            r.id,
+            r.member_id as member_id,
+            m.nickname as member_nickname,
+            m.email as member_email,
+            r.report_id as report_id,
+            r.restriction_type as restriction_type,
+            r.reason,
+            r.status,
+            r.previous_member_status as previous_member_status,
+            r.start_datetime as start_datetime,
+            r.end_datetime as end_datetime,
+            r.released_datetime as released_datetime,
+            r.created_datetime as created_datetime
+        from tbl_member_restriction r
+        join tbl_member m on r.member_id = m.id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and (
+                    m.nickname ilike '%' || #{keyword} || '%'
+                    or m.email ilike '%' || #{keyword} || '%'
+                )
+            </if>
+            <if test="restrictionType != null and restrictionType != ''">
+                and r.restriction_type = #{restrictionType}
+            </if>
+            <if test="status != null and status != ''">
+                and r.status = #{status}
+            </if>
+        </where>
+        order by r.created_datetime desc
+        limit #{size} offset (#{page} - 1) * #{size}
+    </select>
+
+    <select id="selectRestrictionDetail" resultType="com.app.bideo.dto.admin.AdminRestrictionResponseDTO">
+        select
+            r.id,
+            r.member_id as member_id,
+            m.nickname as member_nickname,
+            m.email as member_email,
+            r.report_id as report_id,
+            r.restriction_type as restriction_type,
+            r.reason,
+            r.status,
+            r.previous_member_status as previous_member_status,
+            r.start_datetime as start_datetime,
+            r.end_datetime as end_datetime,
+            r.released_datetime as released_datetime,
+            r.created_datetime as created_datetime
+        from tbl_member_restriction r
+        join tbl_member m on r.member_id = m.id
+        where r.id = #{id}
+    </select>
+
+    <select id="selectActiveRestrictionByMemberId" resultType="com.app.bideo.dto.admin.AdminRestrictionResponseDTO">
+        select
+            r.id,
+            r.member_id as member_id,
+            m.nickname as member_nickname,
+            m.email as member_email,
+            r.report_id as report_id,
+            r.restriction_type as restriction_type,
+            r.reason,
+            r.status,
+            r.previous_member_status as previous_member_status,
+            r.start_datetime as start_datetime,
+            r.end_datetime as end_datetime,
+            r.released_datetime as released_datetime,
+            r.created_datetime as created_datetime
+        from tbl_member_restriction r
+        join tbl_member m on r.member_id = m.id
+        where r.member_id = #{memberId}
+          and r.status = 'ACTIVE'
+        order by r.created_datetime desc
+        limit 1
+    </select>
+
+    <select id="selectExpirableRestrictions" resultType="com.app.bideo.dto.admin.AdminRestrictionResponseDTO">
+        select
+            r.id,
+            r.member_id as member_id,
+            m.nickname as member_nickname,
+            m.email as member_email,
+            r.report_id as report_id,
+            r.restriction_type as restriction_type,
+            r.reason,
+            r.status,
+            r.previous_member_status as previous_member_status,
+            r.start_datetime as start_datetime,
+            r.end_datetime as end_datetime,
+            r.released_datetime as released_datetime,
+            r.created_datetime as created_datetime
+        from tbl_member_restriction r
+        join tbl_member m on r.member_id = m.id
+        where r.status = 'ACTIVE'
+          and r.restriction_type = 'LIMIT'
+          and r.end_datetime is not null
+          and r.end_datetime &lt;= now()
+        order by r.created_datetime desc
+    </select>
+
+    <insert id="insertRestriction" parameterType="com.app.bideo.dto.admin.AdminRestrictionUpsertRequestDTO" useGeneratedKeys="true" keyProperty="id">
+        insert into tbl_member_restriction (
+            member_id,
+            report_id,
+            restriction_type,
+            reason,
+            previous_member_status,
+            end_datetime
+        ) values (
+            #{memberId},
+            #{reportId},
+            #{restrictionType},
+            #{reason},
+            #{previousMemberStatus},
+            #{endDatetime}
+        )
+    </insert>
+
+    <update id="updateRestriction">
+        update tbl_member_restriction
+        set report_id = #{request.reportId},
+            reason = #{request.reason},
+            end_datetime = #{request.endDatetime},
+            updated_datetime = now()
+        where id = #{id}
+          and status = 'ACTIVE'
+    </update>
+
+    <update id="releaseRestriction">
+        update tbl_member_restriction
+        set status = 'RELEASED',
+            released_datetime = now(),
+            updated_datetime = now()
+        where id = #{id}
+          and status = 'ACTIVE'
+    </update>
+
+    <update id="expireRestrictions">
+        update tbl_member_restriction
+        set status = 'EXPIRED',
+            updated_datetime = now()
+        where status = 'ACTIVE'
+          and restriction_type = 'LIMIT'
+          and end_datetime is not null
+          and end_datetime &lt;= now()
+    </update>
+
+</mapper>

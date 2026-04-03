@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=1440" />
-    <title>오프라인 저장 동영상</title>
-    <link rel="stylesheet" href="../../static/css/common/reset.css" />
-    <link rel="stylesheet" href="../../static/css/common/font.css" />
-    <link rel="stylesheet" href="../../static/css/common/global.css" />
-    <link rel="stylesheet" href="../../static/css/common/util.css" />
-    <link rel="stylesheet" href="../../static/css/common/common.css" />
-    <link rel="stylesheet" href="../../static/css/downloads/downloads.css" />
+    <th:block th:replace="~{layout/layout :: ytShellHead('오프라인 저장 동영상')}"></th:block>
+    <link rel="stylesheet" href="/css/common/reset.css" th:href="@{/css/common/reset.css}" />
+    <link rel="stylesheet" href="/css/common/global.css" th:href="@{/css/common/global.css}" />
+    <link rel="stylesheet" href="/css/common/util.css" th:href="@{/css/common/util.css}" />
+    <link rel="stylesheet" href="/css/common/common.css" th:href="@{/css/common/common.css}" />
+    <link rel="stylesheet" href="/css/downloads/downloads.css" th:href="@{/css/downloads/downloads.css}" />
+    <script defer src="/js/downloads/downloads.js" th:src="@{/js/downloads/downloads.js}"></script>
 </head>
 <body>
+    <div th:replace="~{layout/layout :: ytShellChrome('downloads')}"></div>
+    <main class="yt-shell__page-content">
 
 <div id="section" class="Page-Content">
 <div class="Downloads-Page-Contents">
@@ -150,6 +150,7 @@
 </div>
 </div>
 
-<script src="../../static/js/downloads/downloads.js"></script>
+    </main>
+    <th:block th:replace="~{layout/layout :: ytShellScripts()}"></th:block>
 </body>
 </html>

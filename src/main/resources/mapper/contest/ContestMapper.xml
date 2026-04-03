@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.bideo.mapper.contest.ContestMapper">
+
+    <select id="selectContestList" resultType="ContestListResponseDTO">
+        SELECT
+            c.id,
+            c.title,
+            c.organizer,
+            c.category,
+            c.cover_image,
+            c.entry_end,
+            c.status,
+            c.entry_count,
+            c.created_datetime,
+            CASE
+                WHEN c.entry_end &lt; CURRENT_DATE THEN '마감'
+                WHEN c.entry_end = CURRENT_DATE THEN 'D-Day'
+                ELSE 'D-' || (c.entry_end - CURRENT_DATE)
+            END AS d_day
+        FROM tbl_contest c
+        WHERE c.deleted_datetime IS NULL
+          AND c.status != 'DELETED'
+        <if test="participatedMemberId == null">
+            AND c.entry_end >= CURRENT_DATE
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (c.title ILIKE '%' || #{keyword} || '%'
+                 OR c.organizer ILIKE '%' || #{keyword} || '%')
+        </if>
+        <if test="category != null and category != ''">
+            AND c.category = #{category}
+        </if>
+        <if test="status != null and status != ''">
+            AND c.status = #{status}
+        </if>
+        <if test="memberId != null">
+            AND c.member_id = #{memberId}
+        </if>
+        <if test="participatedMemberId != null">
+            AND c.id IN (SELECT ce.contest_id FROM tbl_contest_entry ce WHERE ce.member_id = #{participatedMemberId})
+        </if>
+        <choose>
+            <when test="sort == 'deadline'">
+                ORDER BY c.entry_end ASC
+            </when>
+            <when test="sort == 'entryStart'">
+                ORDER BY c.entry_start ASC
+            </when>
+            <otherwise>
+                ORDER BY c.created_datetime DESC
+            </otherwise>
+        </choose>
+        LIMIT #{size} OFFSET (#{page} - 1) * #{size}
+    </select>
+
+    <select id="selectContestCount" resultType="int">
+        SELECT COUNT(*)
+        FROM tbl_contest c
+        WHERE c.deleted_datetime IS NULL
+          AND c.status != 'DELETED'
+        <if test="participatedMemberId == null">
+            AND c.entry_end >= CURRENT_DATE
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (c.title ILIKE '%' || #{keyword} || '%'
+                 OR c.organizer ILIKE '%' || #{keyword} || '%')
+        </if>
+        <if test="category != null and category != ''">
+            AND c.category = #{category}
+        </if>
+        <if test="status != null and status != ''">
+            AND c.status = #{status}
+        </if>
+        <if test="memberId != null">
+            AND c.member_id = #{memberId}
+        </if>
+        <if test="participatedMemberId != null">
+            AND c.id IN (SELECT ce.contest_id FROM tbl_contest_entry ce WHERE ce.member_id = #{participatedMemberId})
+        </if>
+    </select>
+
+    <resultMap id="contestDetailMap" type="ContestDetailResponseDTO">
+        <id property="id" column="id"/>
+        <result property="memberId" column="member_id"/>
+        <result property="memberNickname" column="member_nickname"/>
+        <result property="title" column="title"/>
+        <result property="organizer" column="organizer"/>
+        <result property="category" column="category"/>
+        <result property="description" column="description"/>
+        <result property="coverImage" column="cover_image"/>
+        <result property="entryStart" column="entry_start"/>
+        <result property="entryEnd" column="entry_end"/>
+        <result property="resultDate" column="result_date"/>
+        <result property="prizeInfo" column="prize_info"/>
+        <result property="price" column="price"/>
+        <result property="status" column="status"/>
+        <result property="entryCount" column="entry_count"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="isBookmarked" column="is_bookmarked"/>
+        <result property="winnerNotifiedAt" column="winner_notified_at"/>
+        <result property="createdDatetime" column="created_datetime"/>
+        <collection property="tags" ofType="TagResponseDTO"
+                    select="selectContestTagsByContestId" column="id"/>
+    </resultMap>
+
+    <select id="selectContestDetail" resultMap="contestDetailMap">
+        SELECT
+            c.id,
+            c.member_id,
+            m.nickname AS member_nickname,
+            c.title,
+            c.organizer,
+            c.category,
+            c.description,
+            c.cover_image,
+            c.entry_start,
+            c.entry_end,
+            c.result_date,
+            c.prize_info,
+            c.price,
+            c.status,
+            c.entry_count,
+            c.view_count,
+            c.winner_notified_at,
+            CASE WHEN #{memberId} IS NOT NULL THEN
+                EXISTS(SELECT 1 FROM tbl_bookmark
+                       WHERE member_id = #{memberId}
+                         AND target_type = 'CONTEST'
+                         AND target_id = c.id)
+                ELSE false
+            END AS is_bookmarked,
+            c.created_datetime
+        FROM tbl_contest c
+        LEFT JOIN tbl_member m ON c.member_id = m.id
+        WHERE c.id = #{id}
+          AND c.deleted_datetime IS NULL
+          AND c.status != 'DELETED'
+    </select>
+
+    <select id="selectContestEntryList" resultType="ContestEntryResponseDTO">
+        SELECT
+            ce.id,
+            ce.contest_id,
+            ce.work_id,
+            w.title AS work_title,
+            (SELECT wf.file_url FROM tbl_work_file wf WHERE wf.work_id = w.id ORDER BY wf.sort_order LIMIT 1) AS work_thumbnail,
+            ce.member_id,
+            m.nickname AS member_nickname,
+            ce.award_rank,
+            ce.submitted_at
+        FROM tbl_contest_entry ce
+        LEFT JOIN tbl_work w ON ce.work_id = w.id
+        LEFT JOIN tbl_member m ON ce.member_id = m.id
+        WHERE ce.contest_id = #{contestId}
+        ORDER BY ce.submitted_at DESC
+    </select>
+
+    <insert id="insertContest"
+            parameterType="map"
+            useGeneratedKeys="true"
+            keyProperty="contest.id"
+            keyColumn="id">
+        INSERT INTO tbl_contest (
+            member_id,
+            title,
+            organizer,
+            category,
+            description,
+            cover_image,
+            entry_start,
+            entry_end,
+            result_date,
+            prize_info,
+            price,
+            status
+        ) VALUES (
+            #{memberId},
+            #{contest.title},
+            #{contest.organizer},
+            #{contest.category},
+            #{contest.description},
+            #{contest.coverImage},
+            #{contest.entryStart},
+            #{contest.entryEnd},
+            #{contest.resultDate},
+            #{contest.prizeInfo},
+            #{contest.price},
+            'UPCOMING'
+        )
+    </insert>
+
+    <select id="selectHostedContestList" resultType="ContestListResponseDTO">
+        SELECT
+            c.id,
+            c.title,
+            c.organizer,
+            c.category,
+            c.cover_image,
+            c.entry_end,
+            c.status,
+            c.entry_count,
+            c.created_datetime,
+            CASE
+                WHEN c.entry_end &lt; CURRENT_DATE THEN '마감'
+                WHEN c.entry_end = CURRENT_DATE THEN 'D-Day'
+                ELSE 'D-' || (c.entry_end - CURRENT_DATE)
+            END AS d_day
+        FROM tbl_contest c
+        WHERE c.member_id = #{memberId}
+          AND c.deleted_datetime IS NULL
+          AND c.status != 'DELETED'
+        ORDER BY c.created_datetime DESC
+    </select>
+
+    <select id="selectParticipatedContestList" resultType="ContestListResponseDTO">
+        SELECT
+            c.id,
+            c.title,
+            c.organizer,
+            c.category,
+            c.cover_image,
+            c.entry_end,
+            c.status,
+            c.entry_count,
+            c.created_datetime,
+            CASE
+                WHEN c.entry_end &lt; CURRENT_DATE THEN '마감'
+                WHEN c.entry_end = CURRENT_DATE THEN 'D-Day'
+                ELSE 'D-' || (c.entry_end - CURRENT_DATE)
+            END AS d_day
+        FROM tbl_contest_entry ce
+        JOIN tbl_contest c ON ce.contest_id = c.id
+        WHERE ce.member_id = #{memberId}
+          AND c.deleted_datetime IS NULL
+          AND c.status != 'DELETED'
+        ORDER BY ce.submitted_at DESC
+    </select>
+
+    <select id="selectContestOwnerId" resultType="java.lang.Long">
+        SELECT member_id
+        FROM tbl_contest
+        WHERE id = #{contestId}
+          AND deleted_datetime IS NULL
+    </select>
+
+    <select id="existsContest" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM tbl_contest
+            WHERE id = #{contestId}
+              AND deleted_datetime IS NULL
+              AND status != 'DELETED'
+        )
+    </select>
+
+    <select id="existsOwnedWork" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM tbl_work
+            WHERE id = #{workId}
+              AND member_id = #{memberId}
+              AND deleted_datetime IS NULL
+              AND status != 'DELETED'
+        )
+    </select>
+
+    <select id="existsContestEntry" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM tbl_contest_entry
+            WHERE contest_id = #{contestId}
+              AND work_id = #{workId}
+        )
+    </select>
+
+    <select id="existsContestEntryById" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM tbl_contest_entry
+            WHERE contest_id = #{contestId}
+              AND id = #{entryId}
+        )
+    </select>
+
+    <insert id="insertContestEntry" parameterType="map">
+        INSERT INTO tbl_contest_entry (
+            contest_id,
+            work_id,
+            member_id,
+            submitted_at
+        ) VALUES (
+            #{entry.contestId},
+            #{entry.workId},
+            #{memberId},
+            now()
+        )
+    </insert>
+
+    <update id="increaseContestEntryCount">
+        UPDATE tbl_contest
+        SET entry_count = entry_count + 1,
+            updated_datetime = now()
+        WHERE id = #{contestId}
+    </update>
+
+    <update id="clearContestWinner">
+        UPDATE tbl_contest_entry
+        SET award_rank = null
+        WHERE contest_id = #{contestId}
+          AND award_rank IS NOT NULL
+    </update>
+
+    <update id="updateContestWinner">
+        UPDATE tbl_contest_entry
+        SET award_rank = #{awardRank}
+        WHERE contest_id = #{contestId}
+          AND id = #{entryId}
+    </update>
+
+    <select id="selectEntryWorkOptions" resultType="ContestWorkOptionDTO">
+        SELECT
+            w.id,
+            w.title,
+            (
+                SELECT wf.file_url
+                FROM tbl_work_file wf
+                WHERE wf.work_id = w.id
+                ORDER BY wf.sort_order ASC, wf.id ASC
+                LIMIT 1
+            ) AS thumbnail_url
+        FROM tbl_work w
+        WHERE w.member_id = #{memberId}
+          AND w.deleted_datetime IS NULL
+          AND w.status != 'DELETED'
+        ORDER BY w.created_datetime DESC
+    </select>
+
+    <update id="updateContest">
+        UPDATE tbl_contest
+        SET title = #{contest.title},
+            organizer = #{contest.organizer},
+            category = #{contest.category},
+            description = #{contest.description},
+            cover_image = #{contest.coverImage},
+            entry_start = #{contest.entryStart},
+            entry_end = #{contest.entryEnd},
+            result_date = #{contest.resultDate},
+            prize_info = #{contest.prizeInfo},
+            price = #{contest.price},
+            status = COALESCE(#{contest.status}, status),
+            updated_datetime = now()
+        WHERE id = #{contestId}
+          AND member_id = #{memberId}
+          AND deleted_datetime IS NULL
+    </update>
+
+    <select id="selectContestTagsByContestId" resultType="TagResponseDTO">
+        SELECT t.id, t.tag_name
+        FROM tbl_contest_tag ct
+        JOIN tbl_tag t ON ct.tag_id = t.id
+        WHERE ct.contest_id = #{contestId}
+        ORDER BY t.tag_name ASC
+    </select>
+
+    <insert id="insertContestTag">
+        INSERT INTO tbl_contest_tag (contest_id, tag_id)
+        VALUES (#{contestId}, #{tagId})
+    </insert>
+
+    <delete id="deleteContestTagsByContestId">
+        DELETE FROM tbl_contest_tag WHERE contest_id = #{contestId}
+    </delete>
+
+    <select id="selectPendingWinnerNotifications" resultType="ContestWinnerNotificationDTO">
+        SELECT
+            c.id AS contest_id,
+            c.member_id AS contest_owner_id,
+            ce.member_id AS winner_member_id,
+            ce.work_id AS winner_work_id
+        FROM tbl_contest c
+        JOIN tbl_contest_entry ce
+          ON ce.contest_id = c.id
+         AND ce.award_rank = '우승'
+        WHERE c.deleted_datetime IS NULL
+          AND c.winner_notified_at IS NULL
+          AND c.result_date IS NOT NULL
+          AND c.result_date &lt;= to_timestamp(#{todayEpochDay} * 86400)::date
+    </select>
+
+    <update id="markWinnerNotificationSent">
+        UPDATE tbl_contest
+        SET winner_notified_at = now(),
+            updated_datetime = now()
+        WHERE id = #{contestId}
+    </update>
+
+</mapper>

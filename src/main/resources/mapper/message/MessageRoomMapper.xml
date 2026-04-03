@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.app.bideo.mapper.message.MessageRoomMapper">
+
+    <insert id="insertRoom" parameterType="com.app.bideo.domain.message.MessageRoomVO" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO tbl_message_room (created_datetime, updated_datetime)
+        VALUES (now(), now())
+    </insert>
+
+    <insert id="insertRoomMember">
+        INSERT INTO tbl_message_room_member (message_room_id, member_id)
+        VALUES (#{messageRoomId}, #{memberId})
+        ON CONFLICT (message_room_id, member_id) DO NOTHING
+    </insert>
+
+    <select id="selectExistingRoomId" resultType="java.lang.Long">
+        SELECT mrm1.message_room_id
+        FROM tbl_message_room_member mrm1
+        JOIN tbl_message_room_member mrm2
+          ON mrm1.message_room_id = mrm2.message_room_id
+        WHERE mrm1.member_id = #{memberId1}
+          AND mrm2.member_id = #{memberId2}
+          AND mrm1.left_at IS NULL
+          AND mrm2.left_at IS NULL
+          AND (
+                SELECT COUNT(*)
+                FROM tbl_message_room_member
+                WHERE message_room_id = mrm1.message_room_id
+                  AND left_at IS NULL
+          ) = 2
+        LIMIT 1
+    </select>
+
+    <select id="selectRoomsByMemberId" resultType="com.app.bideo.dto.message.MessageRoomResponseDTO">
+        SELECT
+            mr.id,
+            (
+                SELECT CASE
+                    WHEN msg.deleted_datetime IS NOT NULL THEN '삭제된 메시지입니다.'
+                    ELSE msg.content
+                END
+                FROM tbl_message msg
+                WHERE msg.message_room_id = mr.id
+                ORDER BY msg.created_datetime DESC, msg.id DESC
+                LIMIT 1
+            ) AS last_message,
+            (
+                SELECT msg.created_datetime
+                FROM tbl_message msg
+                WHERE msg.message_room_id = mr.id
+                ORDER BY msg.created_datetime DESC, msg.id DESC
+                LIMIT 1
+            ) AS last_message_at,
+            (
+                SELECT COUNT(*)
+                FROM tbl_message msg
+                WHERE msg.message_room_id = mr.id
+                  AND msg.sender_id != #{memberId}
+                  AND msg.is_read = false
+                  AND msg.deleted_datetime IS NULL
+            ) AS unread_count
+        FROM tbl_message_room mr
+        JOIN tbl_message_room_member mrm
+          ON mr.id = mrm.message_room_id
+        WHERE mrm.member_id = #{memberId}
+          AND mrm.left_at IS NULL
+        ORDER BY last_message_at DESC NULLS LAST
+    </select>
+
+    <select id="selectRoomMembers" resultType="com.app.bideo.dto.member.MemberListResponseDTO">
+        SELECT
+            m.id,
+            m.nickname,
+            m.profile_image,
+            m.creator_verified,
+            m.creator_tier,
+            m.follower_count
+        FROM tbl_message_room_member mrm
+        JOIN tbl_member m ON mrm.member_id = m.id
+        WHERE mrm.message_room_id = #{roomId}
+          AND mrm.member_id != #{excludeMemberId}
+          AND mrm.left_at IS NULL
+    </select>
+
+    <select id="existsRoomMember" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1
+            FROM tbl_message_room_member
+            WHERE message_room_id = #{roomId}
+              AND member_id = #{memberId}
+              AND left_at IS NULL
+        )
+    </select>
+
+    <update id="updateRoomDatetime">
+        UPDATE tbl_message_room
+        SET updated_datetime = now()
+        WHERE id = #{roomId}
+    </update>
+
+</mapper>

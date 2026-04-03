@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Detail</title>
-    <meta name="shell-head" th:replace="templates/layout/youtube-shell :: ytShellHead('Work Detail - Bideo')">
-    <link rel="stylesheet" href="../../static/css/common/font.css" th:href="@{/css/common/font.css}">
-    <link rel="stylesheet" href="../../static/css/work/workdetail.css" th:href="@{/css/work/workdetail.css}">
-    <link rel="stylesheet" href="../../static/css/auction/auction.css" th:href="@{/css/auction/auction.css}">
+    <meta name="shell-head" th:replace="~{layout/layout :: ytShellHead('Work Detail - Bideo')}">
+    <link rel="stylesheet" href="/css/common/font.css" th:href="@{/css/common/font.css}">
+    <link rel="stylesheet" href="/css/work/workdetail.css" th:href="@{/css/work/workdetail.css}">
+    <link rel="stylesheet" href="/css/auction/auction.css" th:href="@{/css/auction/auction.css}">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
  </head>
 <body class="workdetail-page" id="section">
-    <div th:replace="templates/layout/youtube-shell :: ytShellChrome('workdetail')"></div>
+    <div th:replace="~{layout/layout :: ytShellChrome('workdetail')}"></div>
 
     <main class="yt-shell__page-content workdetail-shell" aria-label="작품 상세">
         <section class="workdetail-stage">
@@ -492,10 +492,10 @@
 
     </div>
 </div>
-    <script src="../../static/js/work/workdetail.js" th:src="@{/js/work/workdetail.js}"></script>
-    <script src="../../static/js/auction/service.js" th:src="@{/js/auction/service.js}"></script>
-    <script src="../../static/js/auction/layout.js" th:src="@{/js/auction/layout.js}"></script>
-    <script src="../../static/js/auction/event.js" th:src="@{/js/auction/event.js}"></script>
-    <th:block th:replace="templates/layout/youtube-shell :: ytShellScripts()"></th:block>
+    <script src="/js/work/workdetail.js" th:src="@{/js/work/workdetail.js}"></script>
+    <script src="/js/auction/service.js" th:src="@{/js/auction/service.js}"></script>
+    <script src="/js/auction/layout.js" th:src="@{/js/auction/layout.js}"></script>
+    <script src="/js/auction/event.js" th:src="@{/js/auction/event.js}"></script>
+    <th:block th:replace="~{layout/layout :: ytShellScripts()}"></th:block>
 </body>
 </html>

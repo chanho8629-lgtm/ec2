@@ -1,0 +1,135 @@
+/* ===== 404 페이지 ===== */
+.Error-Page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: var(--color-bg);
+    padding: 24px;
+}
+
+.Error-Container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 480px;
+}
+
+/* 일러스트 */
+.Error-Illustration {
+    margin-bottom: 32px;
+}
+
+.Error-Icon-Group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.Error-Icon-Circle {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background-color: var(--color-primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+}
+
+.Error-Code {
+    font-size: 80px;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+    letter-spacing: -2px;
+}
+
+/* 텍스트 */
+.Error-Title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 32px;
+    margin-bottom: 8px;
+}
+
+.Error-Description {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--color-text-sub);
+    line-height: 22px;
+    margin-bottom: 32px;
+}
+
+/* 버튼 */
+.Error-Actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 40px;
+}
+
+.Error-Button-Primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    padding: 0 28px;
+    border-radius: 22px;
+    background-color: var(--color-primary);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.15s;
+}
+
+.Error-Button-Primary:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.Error-Button-Outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    padding: 0 28px;
+    border-radius: 22px;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+
+.Error-Button-Outline:hover {
+    background-color: var(--color-bg-muted);
+    border-color: var(--color-border-strong);
+}
+
+/* 도움말 */
+.Error-Help {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.Error-Help-Text {
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.Error-Help-Link {
+    font-size: 13px;
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.Error-Help-Link:hover {
+    text-decoration: underline;
+}
