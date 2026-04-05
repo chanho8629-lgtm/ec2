@@ -53,4 +53,9 @@ public class SearchAPIController {
     public List<TrendingKeywordDTO> trendingKeywords() {
         return searchHistoryService.getTrendingKeywords();
     }
+
+    @GetMapping("/suggestions")
+    public List<SearchGallerySuggestionDTO> gallerySuggestions() {
+        return galleryService.getSearchSuggestions();
+    }
 }

@@ -7,6 +7,8 @@ import com.app.bideo.dto.gallery.GalleryDetailResponseDTO;
 import com.app.bideo.dto.gallery.GalleryListResponseDTO;
 import com.app.bideo.dto.gallery.GallerySearchDTO;
 import com.app.bideo.dto.gallery.GalleryUpdateRequestDTO;
+import com.app.bideo.dto.gallery.SearchGalleryCoverDataDTO;
+import com.app.bideo.dto.gallery.SearchGallerySuggestionDTO;
 import com.app.bideo.dto.interaction.CommentResponseDTO;
 import com.app.bideo.mapper.gallery.GalleryMapper;
 import lombok.RequiredArgsConstructor;
@@ -139,6 +141,18 @@ public class GalleryDAO {
 
     public List<GalleryListResponseDTO> findRecommended() {
         return galleryMapper.selectRecommendedGalleries();
+    }
+
+    public List<TagResponseDTO> findPopularTags(int limit) {
+        return galleryMapper.selectPopularTags(limit);
+    }
+
+    public List<SearchGallerySuggestionDTO> findRecommendedSearchGalleries() {
+        return galleryMapper.selectRecommendedSearchGalleries();
+    }
+
+    public Optional<SearchGalleryCoverDataDTO> findSearchGalleryCover(Long id) {
+        return Optional.ofNullable(galleryMapper.selectSearchGalleryCover(id));
     }
 
 }

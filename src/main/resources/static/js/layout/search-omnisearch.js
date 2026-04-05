@@ -1,14 +1,14 @@
 document.addEventListener("DOMContentLoaded", function () {
-  var sourceForms = Array.from(
+  let sourceForms = Array.from(
     document.querySelectorAll("[data-yt-shell-search-form]")
   );
-  var portal = document.querySelector("[data-yt-shell-search-portal]");
-  var surface = document.querySelector("[data-yt-shell-search-surface]");
-  var scrim = document.querySelector("[data-yt-shell-search-scrim]");
-  var portalForm = document.querySelector("[data-yt-shell-search-portal-form]");
-  var portalInput = document.querySelector("[data-yt-shell-search-portal-input]");
-  var title = document.querySelector("[data-yt-shell-search-title]");
-  var results = document.querySelector("[data-yt-shell-search-results]");
+  let portal = document.querySelector("[data-yt-shell-search-portal]");
+  let surface = document.querySelector("[data-yt-shell-search-surface]");
+  let scrim = document.querySelector("[data-yt-shell-search-scrim]");
+  let portalForm = document.querySelector("[data-yt-shell-search-portal-form]");
+  let portalInput = document.querySelector("[data-yt-shell-search-portal-input]");
+  let title = document.querySelector("[data-yt-shell-search-title]");
+  let results = document.querySelector("[data-yt-shell-search-results]");
 
   if (
     !sourceForms.length ||
@@ -23,140 +23,222 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
-  var searchDataset = [
-    {
-      title: "1-X 1.5배 클리어영상(얼불춤)",
-      description: "싱크가 살짝 안맞는데 고칠수 있는방법 댓글로 적어주세요..",
-      date: "2020. 8. 29.",
-      duration: "1:01",
-      href: "/video/N3SQwDcvZi0/edit",
-      thumbnail:
-        "https://i9.ytimg.com/vi_webp/N3SQwDcvZi0/mqdefault.webp?v=5f4a1fd8&sqp=CNi7tM4G&rs=AOn4CLCjNPRqOhcUMzN_VSjHibveGo8nHA",
-      meta: ["업로드 날짜", "최근 조회"]
-    },
-    {
-      title: "재밌는 브롤스타즈",
-      description: "(☆구독과 좋아요 알림설정 눌러주세요☆)",
-      date: "2019. 9. 7.",
-      duration: "2:47",
-      href: "/video/sa9eSvv0Sm4/edit",
-      thumbnail:
-        "https://i9.ytimg.com/vi_webp/sa9eSvv0Sm4/mqdefault.webp?sqp=CNi7tM4G&rs=AOn4CLDkekDWH5-O7Pfu3e0KvSX6dvFGpw",
-      meta: ["업로드 날짜", "게임"]
-    },
-    {
-      title: "죄송합니다 ㅠㅠ 간단하게 클래식 도전하기!!(CLASH ROYALE)(샤이 유튜브)",
-      description: "원래는 목요일에 올리려고 했으나 개인사정때문에 오늘 올립니다 ㅠㅠ 죄송합니다!",
-      date: "2017. 6. 4.",
-      duration: "18:02",
-      href: "/video/T9f7UjeHXkU/edit",
-      thumbnail:
-        "https://i9.ytimg.com/vi_webp/T9f7UjeHXkU/mqdefault.webp?sqp=CNi7tM4G&rs=AOn4CLAVfqglEkTfxC9YIydXNAC-y1nsmw",
-      meta: ["업로드 날짜", "클래시 로얄"]
-    },
-    {
-      title: "유튜브 활동 예정(샤이 유튜브)",
-      description: "저희의 모든 활동들을 이곳에서 보여드리겠습니다!!",
-      date: "2017. 5. 30.",
-      duration: "0:50",
-      href: "/video/wgZLkNYoaY8/edit",
-      thumbnail:
-        "https://i9.ytimg.com/vi/wgZLkNYoaY8/mqdefault.jpg?sqp=CNi7tM4G-oaymwEmCMACELQB8quKqQMa8AEB-AHABoAC4AOKAgwIABABGH8gKigYMA8=&rs=AOn4CLCh2H74Uhovjc-OnnLqYhRrDT8Zjg",
-      meta: ["업로드 날짜", "공지"]
-    }
-  ];
+  let activeSource = null;
+  let searchDebounce = null;
+  let cachedSuggestions = null;
+  let cachedTrending = null;
+  let cachedRecent = null;
 
-  var activeSource = null;
-
-  function normalize(value) {
-    return (value || "").trim().toLowerCase();
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
-  function createResultItem(item) {
-    var li = document.createElement("li");
-    var link = document.createElement("a");
-    var thumb = document.createElement("span");
-    var img = document.createElement("img");
-    var duration = document.createElement("span");
-    var body = document.createElement("span");
-    var titleEl = document.createElement("span");
-    var description = document.createElement("span");
-    var meta = document.createElement("span");
-    var date = document.createElement("span");
+  function createGalleryItem(gallery) {
+    let li = document.createElement("li");
+    let link = document.createElement("a");
+    let thumb = document.createElement("span");
+    let body = document.createElement("span");
+    let titleEl = document.createElement("span");
 
     link.className = "yt-shell-search-result";
-    link.href = item.href;
+    link.href = "/gallery/" + gallery.id;
 
     thumb.className = "yt-shell-search-result__thumb";
-    img.src = item.thumbnail;
-    img.alt = "동영상 미리보기";
-    duration.className = "yt-shell-search-result__duration";
-    duration.textContent = item.duration;
-    thumb.appendChild(img);
-    thumb.appendChild(duration);
+    if (gallery.coverImageUrl) {
+      let img = document.createElement("img");
+      img.src = gallery.coverImageUrl;
+      img.alt = escapeHtml(gallery.title);
+      thumb.appendChild(img);
+    } else {
+      let placeholder = document.createElement("span");
+      placeholder.className = "yt-shell-search-result__duration";
+      placeholder.textContent = "No Image";
+      thumb.appendChild(placeholder);
+    }
 
     body.className = "yt-shell-search-result__body";
     titleEl.className = "yt-shell-search-result__title";
-    titleEl.textContent = item.title;
-    description.className = "yt-shell-search-result__description";
-    description.textContent = item.description;
-    meta.className = "yt-shell-search-result__meta";
-    item.meta.forEach(function (entry) {
-      var chip = document.createElement("span");
-      chip.className = "yt-shell-search-result__chip";
-      chip.textContent = entry;
-      meta.appendChild(chip);
-    });
+    titleEl.textContent = gallery.title;
     body.appendChild(titleEl);
-    body.appendChild(description);
-    body.appendChild(meta);
-
-    date.className = "yt-shell-search-result__date";
-    date.textContent = item.date;
 
     link.appendChild(thumb);
     link.appendChild(body);
-    link.appendChild(date);
     li.appendChild(link);
     return li;
   }
 
-  function renderResults() {
-    var query = normalize(portalInput.value);
-    var list = document.createElement("ul");
-    var filtered = query
-      ? searchDataset.filter(function (item) {
-          var haystack = normalize(
-            item.title + " " + item.description + " " + item.meta.join(" ")
-          );
-          return haystack.indexOf(query) !== -1;
-        })
-      : searchDataset.slice();
+  function createKeywordItem(keyword, type) {
+    let li = document.createElement("li");
+    let link = document.createElement("a");
+    link.className = "yt-shell-search-result";
+    link.href = "#";
+    link.addEventListener("click", function (e) {
+      e.preventDefault();
+      portalInput.value = keyword;
+      renderSearchResults(keyword);
+    });
 
-    title.textContent = query ? '"' + portalInput.value + '" 검색 결과' : "내 최근 동영상";
+    let icon = document.createElement("span");
+    icon.className = "yt-shell-search-result__thumb";
+    icon.style.cssText = "display:flex;align-items:center;justify-content:center;font-size:1.2rem;";
+    icon.textContent = type === "recent" ? "\u{1F556}" : "\u{1F525}";
+
+    let body = document.createElement("span");
+    body.className = "yt-shell-search-result__body";
+    let titleEl = document.createElement("span");
+    titleEl.className = "yt-shell-search-result__title";
+    titleEl.textContent = keyword;
+    body.appendChild(titleEl);
+
+    link.appendChild(icon);
+    link.appendChild(body);
+    li.appendChild(link);
+    return li;
+  }
+
+  function renderEmpty() {
     results.innerHTML = "";
+    let empty = document.createElement("div");
+    empty.className = "yt-shell-search-empty";
+    empty.innerHTML =
+      "<strong>검색 결과가 없습니다</strong><span>다른 키워드로 다시 시도해 보세요.</span>";
+    results.appendChild(empty);
+  }
 
-    if (!filtered.length) {
-      var empty = document.createElement("div");
-      empty.className = "yt-shell-search-empty";
-      empty.innerHTML =
-        "<strong>검색 결과가 없습니다</strong><span>다른 키워드로 다시 시도해 보세요.</span>";
-      results.appendChild(empty);
+  function renderDefaultView() {
+    results.innerHTML = "";
+    title.textContent = "추천 예술관";
+
+    let promises = [];
+
+    if (!cachedSuggestions) {
+      promises.push(
+        fetch("/api/search/suggestions", { credentials: "same-origin" })
+          .then(function (res) { return res.ok ? res.json() : []; })
+          .then(function (data) { cachedSuggestions = data; })
+          .catch(function () { cachedSuggestions = []; })
+      );
+    }
+    if (!cachedTrending) {
+      promises.push(
+        fetch("/api/search/trending", { credentials: "same-origin" })
+          .then(function (res) { return res.ok ? res.json() : []; })
+          .then(function (data) { cachedTrending = data; })
+          .catch(function () { cachedTrending = []; })
+      );
+    }
+    if (!cachedRecent) {
+      promises.push(
+        fetch("/api/search/recent", { credentials: "same-origin" })
+          .then(function (res) { return res.ok ? res.json() : []; })
+          .then(function (data) { cachedRecent = data; })
+          .catch(function () { cachedRecent = []; })
+      );
+    }
+
+    Promise.all(promises).then(function () {
+      results.innerHTML = "";
+
+      if (cachedRecent && cachedRecent.length > 0) {
+        let recentTitle = document.createElement("div");
+        recentTitle.className = "yt-shell-search-section-title";
+        recentTitle.textContent = "최근 검색";
+        results.appendChild(recentTitle);
+        let recentList = document.createElement("ul");
+        recentList.className = "yt-shell-search-results-list";
+        cachedRecent.slice(0, 5).forEach(function (item) {
+          recentList.appendChild(createKeywordItem(item.keyword, "recent"));
+        });
+        results.appendChild(recentList);
+      }
+
+      if (cachedTrending && cachedTrending.length > 0) {
+        let trendTitle = document.createElement("div");
+        trendTitle.className = "yt-shell-search-section-title";
+        trendTitle.textContent = "인기 검색어";
+        results.appendChild(trendTitle);
+        let trendList = document.createElement("ul");
+        trendList.className = "yt-shell-search-results-list";
+        cachedTrending.slice(0, 5).forEach(function (item) {
+          trendList.appendChild(createKeywordItem(item.keyword, "trending"));
+        });
+        results.appendChild(trendList);
+      }
+
+      if (cachedSuggestions && cachedSuggestions.length > 0) {
+        let suggestTitle = document.createElement("div");
+        suggestTitle.className = "yt-shell-search-section-title";
+        suggestTitle.textContent = "추천 예술관";
+        results.appendChild(suggestTitle);
+        let suggestList = document.createElement("ul");
+        suggestList.className = "yt-shell-search-results-list";
+        cachedSuggestions.forEach(function (gallery) {
+          suggestList.appendChild(createGalleryItem(gallery));
+        });
+        results.appendChild(suggestList);
+      }
+
+      if (
+        (!cachedRecent || cachedRecent.length === 0) &&
+        (!cachedTrending || cachedTrending.length === 0) &&
+        (!cachedSuggestions || cachedSuggestions.length === 0)
+      ) {
+        renderEmpty();
+      }
+    });
+  }
+
+  function renderSearchResults(query) {
+    let normalized = (query || "").trim();
+    if (!normalized) {
+      renderDefaultView();
       return;
     }
 
-    list.className = "yt-shell-search-results-list";
-    filtered.forEach(function (item) {
-      list.appendChild(createResultItem(item));
-    });
-    results.appendChild(list);
+    title.textContent = '"' + normalized + '" 검색 결과';
+    results.innerHTML = "<div class='yt-shell-search-empty'><span>검색 중...</span></div>";
+
+    if (searchDebounce) clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(function () {
+      fetch("/api/galleries?keyword=" + encodeURIComponent(normalized) + "&size=10", { credentials: "same-origin" })
+        .then(function (res) { return res.ok ? res.json() : { content: [] }; })
+        .then(function (data) {
+          let galleries = data.content || [];
+          results.innerHTML = "";
+          title.textContent = '"' + normalized + '" 검색 결과';
+
+          if (!galleries.length) {
+            renderEmpty();
+            return;
+          }
+
+          let list = document.createElement("ul");
+          list.className = "yt-shell-search-results-list";
+          galleries.forEach(function (gallery) {
+            list.appendChild(createGalleryItem({
+              id: gallery.id,
+              title: gallery.title,
+              coverImageUrl: gallery.coverImage || null
+            }));
+          });
+          results.appendChild(list);
+        })
+        .catch(function () {
+          renderEmpty();
+        });
+    }, 300);
   }
 
   function syncSurfacePosition() {
     if (!activeSource) {
       return;
     }
-    var rect = activeSource.form.getBoundingClientRect();
+    let rect = activeSource.form.getBoundingClientRect();
     surface.style.setProperty("--yt-search-top", rect.top + "px");
     surface.style.setProperty("--yt-search-left", rect.left + "px");
     surface.style.setProperty("--yt-search-width", rect.width + "px");
@@ -167,7 +249,17 @@ document.addEventListener("DOMContentLoaded", function () {
     portalInput.value = source.input.value;
     portal.hidden = false;
     syncSurfacePosition();
-    renderResults();
+
+    let query = (portalInput.value || "").trim();
+    if (query) {
+      renderSearchResults(query);
+    } else {
+      cachedSuggestions = null;
+      cachedTrending = null;
+      cachedRecent = null;
+      renderDefaultView();
+    }
+
     requestAnimationFrame(function () {
       portalInput.focus();
       portalInput.setSelectionRange(portalInput.value.length, portalInput.value.length);
@@ -188,8 +280,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   sourceForms.forEach(function (form) {
-    var mode = form.getAttribute("data-yt-shell-search-form");
-    var input = form.querySelector(
+    let mode = form.getAttribute("data-yt-shell-search-form");
+    let input = form.querySelector(
       '[data-yt-shell-search-input="' + mode + '"]'
     );
 
@@ -207,7 +299,12 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   portalInput.addEventListener("input", function () {
-    renderResults();
+    let query = (portalInput.value || "").trim();
+    if (query) {
+      renderSearchResults(query);
+    } else {
+      renderDefaultView();
+    }
   });
 
   portalForm.addEventListener("submit", function (event) {
@@ -215,8 +312,17 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
     event.preventDefault();
-    var source = activeSource;
-    var submitter = source.form.querySelector('[type="submit"]');
+    let keyword = (portalInput.value || "").trim();
+    if (keyword) {
+      fetch("/api/search/recent", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ keyword: keyword })
+      }).catch(function () {});
+    }
+    let source = activeSource;
+    let submitter = source.form.querySelector('[type="submit"]');
     source.input.value = portalInput.value;
     closePortal();
     if (source.form.requestSubmit) {

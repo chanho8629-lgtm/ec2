@@ -3,6 +3,8 @@ package com.app.bideo.mapper.gallery;
 import com.app.bideo.domain.interaction.CommentVO;
 import com.app.bideo.dto.common.TagResponseDTO;
 import com.app.bideo.dto.gallery.GalleryCreateRequestDTO;
+import com.app.bideo.dto.gallery.SearchGalleryCoverDataDTO;
+import com.app.bideo.dto.gallery.SearchGallerySuggestionDTO;
 import com.app.bideo.dto.gallery.GalleryDetailResponseDTO;
 import com.app.bideo.dto.gallery.GalleryListResponseDTO;
 import com.app.bideo.dto.gallery.GallerySearchDTO;
@@ -73,5 +75,11 @@ public interface GalleryMapper {
     int selectGalleryCount(GallerySearchDTO searchDTO);
 
     List<GalleryListResponseDTO> selectRecommendedGalleries();
+
+    List<TagResponseDTO> selectPopularTags(@Param("limit") int limit);
+
+    List<SearchGallerySuggestionDTO> selectRecommendedSearchGalleries();
+
+    SearchGalleryCoverDataDTO selectSearchGalleryCover(@Param("id") Long id);
 
 }

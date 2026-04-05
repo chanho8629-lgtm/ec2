@@ -1,85 +1,37 @@
 document.addEventListener("DOMContentLoaded", function () {
-  var root = document.querySelector("[data-yt-shell-root]");
-  if (!root) {
-    return;
-  }
+  let root = document.querySelector("[data-yt-shell-root]");
+  if (!root) return;
 
-  var toggle = document.querySelector("[data-yt-chat-toggle]");
-  var layer = document.querySelector("[data-yt-chat-layer]");
-  var panel = document.querySelector("[data-yt-chat-panel]");
-  var dismissButtons = Array.from(document.querySelectorAll("[data-yt-chat-dismiss]"));
-  var roomList = document.querySelector("[data-yt-chat-room-list]");
-  var composeToggle = document.querySelector("[data-yt-chat-compose-toggle]");
-  var peopleSearch = document.querySelector("[data-yt-chat-people-search]");
-  var peopleInput = document.querySelector("[data-yt-chat-people-input]");
-  var peopleList = document.querySelector("[data-yt-chat-people-list]");
-  var emptyState = document.querySelector("[data-yt-chat-empty]");
-  var detail = document.querySelector("[data-yt-chat-detail]");
-  var avatar = document.querySelector("[data-yt-chat-avatar]");
-  var nameNode = document.querySelector("[data-yt-chat-name]");
-  var statusNode = document.querySelector("[data-yt-chat-status]");
-  var messagesNode = document.querySelector("[data-yt-chat-messages]");
-  var composer = document.querySelector("[data-yt-chat-composer]");
-  var composerInput = document.querySelector("[data-yt-chat-input]");
-  var composerSend = composer ? composer.querySelector(".yt-chat-composer__send") : null;
-  var roomSearchInput = document.querySelector("[data-yt-chat-room-search]");
+  let toggle = document.querySelector("[data-yt-chat-toggle]");
+  let layer = document.querySelector("[data-yt-chat-layer]");
+  let panel = document.querySelector("[data-yt-chat-panel]");
+  let dismissButtons = Array.from(document.querySelectorAll("[data-yt-chat-dismiss]"));
+  let roomList = document.querySelector("[data-yt-chat-room-list]");
+  let composeToggle = document.querySelector("[data-yt-chat-compose-toggle]");
+  let peopleSearch = document.querySelector("[data-yt-chat-people-search]");
+  let peopleInput = document.querySelector("[data-yt-chat-people-input]");
+  let peopleList = document.querySelector("[data-yt-chat-people-list]");
+  let emptyState = document.querySelector("[data-yt-chat-empty]");
+  let detail = document.querySelector("[data-yt-chat-detail]");
+  let avatar = document.querySelector("[data-yt-chat-avatar]");
+  let nameNode = document.querySelector("[data-yt-chat-name]");
+  let statusNode = document.querySelector("[data-yt-chat-status]");
+  let messagesNode = document.querySelector("[data-yt-chat-messages]");
+  let composer = document.querySelector("[data-yt-chat-composer]");
+  let composerInput = document.querySelector("[data-yt-chat-input]");
+  let composerSend = composer ? composer.querySelector(".yt-chat-composer__send") : null;
+  let roomSearchInput = document.querySelector("[data-yt-chat-room-search]");
+  let badgeNode = document.querySelector(".yt-chat-fab__badge");
 
   if (!toggle || !layer || !panel || !roomList || !emptyState || !detail || !avatar || !nameNode || !statusNode || !messagesNode || !composeToggle || !peopleSearch || !peopleList || !composer || !composerInput || !composerSend) {
     return;
   }
 
-  var rooms = [
-    {
-      id: "room-1",
-      name: "Studio Clid",
-      status: "방금 전 응답 가능",
-      preview: "브랜드 필름 수정본 확인 부탁드려요.",
-      time: "2m",
-      avatar: "C",
-      messages: [
-        { sender: "clid", label: "Studio Clid", body: "브랜드 필름 수정본 확인 부탁드려요. 컷 길이만 조금 더 줄이면 될 것 같아요.", self: false },
-        { sender: "me", label: "나", body: "좋아요. 오프닝 3초 줄인 버전으로 다시 묶어둘게요.", self: true },
-        { sender: "clid", label: "Studio Clid", body: "좋습니다. 오늘 안에만 받으면 바로 검수할게요.", self: false }
-      ]
-    },
-    {
-      id: "room-2",
-      name: "MOTION ARCHIVE",
-      status: "오늘 14:20 마지막 확인",
-      preview: "콜렉션 썸네일 방향성은 지금 무드가 좋아요.",
-      time: "1h",
-      avatar: "M",
-      messages: [
-        { sender: "archive", label: "MOTION ARCHIVE", body: "콜렉션 썸네일 방향성은 지금 무드가 좋아요. 타이포만 조금 더 크게 가도 됩니다.", self: false },
-        { sender: "me", label: "나", body: "네. 커버 타이포 대비를 올려서 다시 맞춰보겠습니다.", self: true }
-      ]
-    },
-    {
-      id: "room-3",
-      name: "BIDEO Curator Team",
-      status: "새 제안 1건",
-      preview: "다음 주 큐레이션 피처드 슬롯이 비어 있습니다.",
-      time: "Mon",
-      avatar: "B",
-      messages: [
-        { sender: "curator", label: "Curator", body: "다음 주 큐레이션 피처드 슬롯이 비어 있습니다. 신작 2개 중 하나를 올릴까요?", self: false },
-        { sender: "me", label: "나", body: "신작 티저보다 경매 종료작 하이라이트를 먼저 올리고 싶습니다.", self: true }
-      ]
-    }
-  ];
-
-  var people = [
-    { id: "person-1", name: "Lee Mina", meta: "브랜드 필름 크리에이터", avatar: "L" },
-    { id: "person-2", name: "Park Doyeon", meta: "광고 컷 편집자", avatar: "P" },
-    { id: "person-3", name: "Han Jiwon", meta: "큐레이터 · 모션 디자이너", avatar: "H" },
-    { id: "person-4", name: "Studio Namu", meta: "아트디렉션 파트너", avatar: "N" }
-  ];
-
-  var backButton = document.querySelector("[data-yt-chat-back]");
-  var panelBody = document.querySelector(".yt-chat-panel__body");
-
-  var activeRoomId = null;
-  var composeOpen = false;
+  let rooms = [];
+  let activeRoomId = null;
+  let composeOpen = false;
+  let backButton = document.querySelector("[data-yt-chat-back]");
+  let panelBody = document.querySelector(".yt-chat-panel__body");
 
   function isMobileChat() {
     return window.matchMedia("(max-width: 640px)").matches;
@@ -92,21 +44,17 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function showListMobile() {
-    if (panelBody) {
-      panelBody.classList.remove("is-thread-open");
-    }
+    if (panelBody) panelBody.classList.remove("is-thread-open");
     activeRoomId = null;
     emptyState.hidden = false;
     detail.hidden = true;
     setComposerPlaceholder(null);
-    Array.from(roomList.querySelectorAll(".yt-chat-room")).forEach(function (button) {
-      button.classList.remove("is-active");
+    Array.from(roomList.querySelectorAll(".yt-chat-room")).forEach(function (btn) {
+      btn.classList.remove("is-active");
     });
   }
 
-  if (backButton) {
-    backButton.addEventListener("click", showListMobile);
-  }
+  if (backButton) backButton.addEventListener("click", showListMobile);
 
   function escapeHtml(value) {
     return String(value)
@@ -121,17 +69,13 @@ document.addEventListener("DOMContentLoaded", function () {
     if (composeOpen === nextState) return;
     composeOpen = nextState;
     composeToggle.setAttribute("aria-expanded", String(nextState));
-
     if (nextState) {
       peopleSearch.classList.remove("is-closing");
       peopleSearch.hidden = false;
     } else if (skipAnimation) {
       peopleSearch.hidden = true;
       peopleSearch.classList.remove("is-closing");
-      if (peopleInput) {
-        peopleInput.value = "";
-        renderPeopleList("");
-      }
+      if (peopleInput) { peopleInput.value = ""; renderPeopleList(""); }
     } else {
       peopleSearch.classList.add("is-closing");
       peopleSearch.addEventListener("animationend", function handler() {
@@ -139,27 +83,17 @@ document.addEventListener("DOMContentLoaded", function () {
         peopleSearch.hidden = true;
         peopleSearch.classList.remove("is-closing");
       });
-      if (peopleInput) {
-        peopleInput.value = "";
-        renderPeopleList("");
-      }
+      if (peopleInput) { peopleInput.value = ""; renderPeopleList(""); }
     }
   }
 
   function findRoom(roomId) {
-    return rooms.find(function (item) {
-      return item.id === roomId;
-    });
+    return rooms.find(function (r) { return String(r.id) === String(roomId); });
   }
 
   function setComposerPlaceholder(room) {
-    if (!room) {
-      composerInput.value = "";
-      composerInput.placeholder = "메시지를 입력하세요.";
-      return;
-    }
-
-    composerInput.placeholder = room.name + " 님에게 메시지를 입력하세요.";
+    composerInput.value = "";
+    composerInput.placeholder = room ? room.name + " 님에게 메시지를 입력하세요." : "메시지를 입력하세요.";
   }
 
   function openLayer() {
@@ -168,6 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
     panel.setAttribute("aria-hidden", "false");
     toggle.setAttribute("aria-expanded", "true");
     document.body.dataset.ytChatOpen = "true";
+    loadRooms();
   }
 
   function closeLayer() {
@@ -175,99 +110,299 @@ document.addEventListener("DOMContentLoaded", function () {
     panel.setAttribute("aria-hidden", "true");
     toggle.setAttribute("aria-expanded", "false");
     delete document.body.dataset.ytChatOpen;
-    if (panelBody) {
-      panelBody.classList.remove("is-thread-open");
-    }
+    if (panelBody) panelBody.classList.remove("is-thread-open");
     window.setTimeout(function () {
-      if (!layer.classList.contains("is-open")) {
-        layer.hidden = true;
-      }
+      if (!layer.classList.contains("is-open")) layer.hidden = true;
     }, 220);
+  }
+
+  function formatTime(dateStr) {
+    if (!dateStr) return "";
+    let d = new Date(dateStr);
+    let now = new Date();
+    let diff = now - d;
+    if (diff < 60000) return "방금";
+    if (diff < 3600000) return Math.floor(diff / 60000) + "분";
+    if (diff < 86400000) return Math.floor(diff / 3600000) + "시간";
+    return (d.getMonth() + 1) + "/" + d.getDate();
+  }
+
+  function loadRooms() {
+    fetch("/api/messages/rooms", { credentials: "same-origin" })
+      .then(function (res) {
+        if (!res.ok) { rooms = []; renderRoomList(""); return; }
+        return res.json();
+      })
+      .then(function (data) {
+        if (!data) return;
+        rooms = data.map(function (room) {
+          let otherMember = room.members && room.members.length > 0 ? room.members[0] : null;
+          return {
+            id: room.id,
+            name: otherMember ? otherMember.nickname : "알 수 없음",
+            profileImage: otherMember ? otherMember.profileImage : null,
+            avatar: otherMember ? (otherMember.nickname || "?").charAt(0).toUpperCase() : "?",
+            preview: room.lastMessage || "",
+            time: formatTime(room.lastMessageAt),
+            unreadCount: room.unreadCount || 0,
+            messages: []
+          };
+        });
+        renderRoomList(roomSearchInput ? roomSearchInput.value : "");
+        updateBadge();
+      })
+      .catch(function () { rooms = []; renderRoomList(""); });
+  }
+
+  function updateBadge() {
+    fetch("/api/messages/unread-count", { credentials: "same-origin" })
+      .then(function (res) { return res.ok ? res.json() : { count: 0 }; })
+      .then(function (data) {
+        if (badgeNode) {
+          let count = data.count || 0;
+          badgeNode.textContent = count;
+          badgeNode.style.display = count > 0 ? "" : "none";
+        }
+      })
+      .catch(function () {});
+  }
+
+  function loadMessages(roomId) {
+    fetch("/api/messages/rooms/" + roomId + "/messages", { credentials: "same-origin" })
+      .then(function (res) { return res.ok ? res.json() : []; })
+      .then(function (messages) {
+        let room = findRoom(roomId);
+        if (!room) return;
+        room.messages = messages;
+        renderMessages(room);
+        messagesNode.scrollTop = messagesNode.scrollHeight;
+        fetch("/api/messages/rooms/" + roomId + "/read", { method: "PATCH", credentials: "same-origin" }).catch(function () {});
+      })
+      .catch(function () {});
   }
 
   function renderMessages(room) {
     messagesNode.innerHTML = room.messages
-      .map(function (message) {
-        var klass = message.self ? "yt-chat-bubble yt-chat-bubble--self" : "yt-chat-bubble";
+      .map(function (msg) {
+        let isSelf = msg.canEdit || msg.canDelete;
+        let klass = isSelf ? "yt-chat-bubble yt-chat-bubble--self" : "yt-chat-bubble";
+        let body = msg.deleted ? "<em>삭제된 메시지</em>" : escapeHtml(msg.content || "");
+        let likedClass = msg.isLiked ? " is-liked" : "";
+        let actionsClass = "yt-chat-bubble__actions" + (msg.isLiked ? " has-liked" : "");
+
+        let actionsHtml = '';
+        if (!msg.deleted) {
+          let deleteBtn = msg.canDelete
+            ? '<button class="yt-chat-bubble__action yt-chat-bubble__action--delete" data-msg-id="' + msg.id + '" type="button" title="삭제">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>' +
+              '</button>'
+            : '';
+          let likeLabel = msg.likeCount > 0 ? ' ' + msg.likeCount : '';
+          actionsHtml =
+            '<span class="' + actionsClass + '">' +
+            deleteBtn +
+            '<button class="yt-chat-bubble__action yt-chat-bubble__action--like' + likedClass + '" data-msg-id="' + msg.id + '" type="button" title="좋아요">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="' + (msg.isLiked ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>' +
+            (likeLabel ? '<span class="yt-chat-bubble__action-count">' + likeLabel + '</span>' : '') +
+            '</button>' +
+            '</span>';
+        }
+
         return (
           '<article class="' + klass + '">' +
-          '<span class="yt-chat-bubble__label">' + escapeHtml(message.label) + "</span>" +
-          '<div class="yt-chat-bubble__body">' + escapeHtml(message.body) + "</div>" +
+          '<div class="yt-chat-bubble__row">' +
+          '<div class="yt-chat-bubble__body">' + body + '</div>' +
+          actionsHtml +
+          '</div>' +
           "</article>"
         );
       })
       .join("");
+
+    Array.from(messagesNode.querySelectorAll(".yt-chat-bubble__action--like")).forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        handleLike(btn.dataset.msgId);
+      });
+    });
+
+    Array.from(messagesNode.querySelectorAll(".yt-chat-bubble__action--delete")).forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        handleDelete(btn.dataset.msgId);
+      });
+    });
+
+    bindLongPress();
+  }
+
+  function handleLike(msgId) {
+    fetch("/api/messages/rooms/" + activeRoomId + "/messages/" + msgId + "/likes", {
+      method: "POST",
+      credentials: "same-origin"
+    })
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function () { loadMessages(activeRoomId); })
+      .catch(function () {});
+  }
+
+  function handleDelete(msgId) {
+    fetch("/api/messages/rooms/" + activeRoomId + "/messages/" + msgId, {
+      method: "DELETE",
+      credentials: "same-origin"
+    })
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function () { loadMessages(activeRoomId); })
+      .catch(function () {});
+  }
+
+  /* ── long-press → bottom-sheet (mobile) ── */
+  let longPressTimer = null;
+  let longPressTriggered = false;
+
+  function isTouchDevice() {
+    return "ontouchstart" in window || navigator.maxTouchPoints > 0;
+  }
+
+  function closeMsgModal() {
+    let existing = panel.querySelector(".yt-chat-msg-modal");
+    if (existing) existing.remove();
+  }
+
+  function openMsgModal(msg) {
+    closeMsgModal();
+
+    let room = findRoom(activeRoomId);
+    if (!room) return;
+
+    let overlay = document.createElement("div");
+    overlay.className = "yt-chat-msg-modal";
+
+    let sheet = document.createElement("div");
+    sheet.className = "yt-chat-msg-modal__sheet";
+
+    let preview = document.createElement("div");
+    preview.className = "yt-chat-msg-modal__preview";
+    preview.textContent = msg.content && msg.content.length > 40
+      ? msg.content.substring(0, 40) + "..."
+      : (msg.content || "");
+    sheet.appendChild(preview);
+
+    let likeBtn = document.createElement("button");
+    likeBtn.className = "yt-chat-msg-modal__btn";
+    if (msg.isLiked) likeBtn.classList.add("is-liked");
+    likeBtn.type = "button";
+    likeBtn.innerHTML =
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="' + (msg.isLiked ? "currentColor" : "none") + '" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>' +
+      '<span>' + (msg.isLiked ? "좋아요 취소" : "좋아요") + (msg.likeCount > 0 ? " " + msg.likeCount : "") + '</span>';
+    likeBtn.addEventListener("click", function () {
+      closeMsgModal();
+      handleLike(msg.id);
+    });
+    sheet.appendChild(likeBtn);
+
+    if (msg.canDelete && !msg.deleted) {
+      let deleteBtn = document.createElement("button");
+      deleteBtn.className = "yt-chat-msg-modal__btn yt-chat-msg-modal__btn--danger";
+      deleteBtn.type = "button";
+      deleteBtn.innerHTML =
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>' +
+        '<span>삭제</span>';
+      deleteBtn.addEventListener("click", function () {
+        closeMsgModal();
+        handleDelete(msg.id);
+      });
+      sheet.appendChild(deleteBtn);
+    }
+
+    let cancelBtn = document.createElement("button");
+    cancelBtn.className = "yt-chat-msg-modal__btn yt-chat-msg-modal__btn--cancel";
+    cancelBtn.type = "button";
+    cancelBtn.textContent = "취소";
+    cancelBtn.addEventListener("click", closeMsgModal);
+    sheet.appendChild(cancelBtn);
+
+    overlay.appendChild(sheet);
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay) closeMsgModal();
+    });
+
+    panel.appendChild(overlay);
+    requestAnimationFrame(function () {
+      overlay.classList.add("is-open");
+    });
+  }
+
+  function findMsgDataFromBubble(bubble) {
+    let room = findRoom(activeRoomId);
+    if (!room) return null;
+    let bubbles = Array.from(messagesNode.querySelectorAll(".yt-chat-bubble"));
+    let idx = bubbles.indexOf(bubble);
+    if (idx < 0 || idx >= room.messages.length) return null;
+    return room.messages[idx];
+  }
+
+  function bindLongPress() {
+    if (!isTouchDevice()) return;
+
+    Array.from(messagesNode.querySelectorAll(".yt-chat-bubble")).forEach(function (bubble) {
+      bubble.addEventListener("touchstart", function (e) {
+        longPressTriggered = false;
+        longPressTimer = setTimeout(function () {
+          longPressTriggered = true;
+          let msg = findMsgDataFromBubble(bubble);
+          if (msg && !msg.deleted) {
+            openMsgModal(msg);
+            if (navigator.vibrate) navigator.vibrate(30);
+          }
+        }, 500);
+      }, { passive: true });
+
+      bubble.addEventListener("touchend", function () {
+        clearTimeout(longPressTimer);
+      });
+
+      bubble.addEventListener("touchmove", function () {
+        clearTimeout(longPressTimer);
+      });
+
+      bubble.addEventListener("touchcancel", function () {
+        clearTimeout(longPressTimer);
+      });
+    });
   }
 
   function renderActiveRoom(roomId) {
-    var room = findRoom(roomId);
-
-    if (!room) {
-      return;
-    }
-
+    let room = findRoom(roomId);
+    if (!room) return;
     activeRoomId = room.id;
     avatar.textContent = room.avatar;
+    if (room.profileImage) {
+      avatar.innerHTML = '<img src="' + escapeHtml(room.profileImage) + '" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />';
+    } else {
+      avatar.textContent = room.avatar;
+    }
     nameNode.textContent = room.name;
-    statusNode.textContent = room.status;
-    renderMessages(room);
+    statusNode.textContent = "";
     emptyState.hidden = true;
     detail.hidden = false;
     setComposerPlaceholder(room);
     showThreadMobile();
-    window.setTimeout(function () {
-      composerInput.focus();
-    }, 0);
-
-    Array.from(roomList.querySelectorAll(".yt-chat-room")).forEach(function (button) {
-      button.classList.toggle("is-active", button.dataset.roomId === roomId);
+    loadMessages(roomId);
+    window.setTimeout(function () { composerInput.focus(); }, 0);
+    Array.from(roomList.querySelectorAll(".yt-chat-room")).forEach(function (btn) {
+      btn.classList.toggle("is-active", String(btn.dataset.roomId) === String(roomId));
     });
-  }
-
-  function openDraftConversation(person) {
-    var existingRoom = rooms.find(function (room) {
-      return room.name === person.name;
-    });
-
-    if (!existingRoom) {
-      existingRoom = {
-        id: "room-" + person.id,
-        name: person.name,
-        status: "새 대화를 시작할 수 있습니다.",
-        preview: "첫 메시지를 보내보세요.",
-        time: "now",
-        avatar: person.avatar,
-        messages: [
-          {
-            sender: "system",
-            label: "새 대화",
-            body: person.name + " 님과 대화를 시작할 준비가 되었습니다.",
-            self: false
-          }
-        ]
-      };
-      rooms.unshift(existingRoom);
-    }
-
-    renderRoomList(roomSearchInput ? roomSearchInput.value : "");
-    renderActiveRoom(existingRoom.id);
-    setComposeOpen(false);
   }
 
   function renderRoomList(query) {
-    var normalized = (query || "").trim().toLowerCase();
-    var filtered = rooms.filter(function (room) {
-      if (!normalized) {
-        return true;
-      }
-      return (
-        room.name.toLowerCase().indexOf(normalized) >= 0 ||
-        room.preview.toLowerCase().indexOf(normalized) >= 0
-      );
+    let normalized = (query || "").trim().toLowerCase();
+    let filtered = rooms.filter(function (room) {
+      if (!normalized) return true;
+      return room.name.toLowerCase().indexOf(normalized) >= 0 || room.preview.toLowerCase().indexOf(normalized) >= 0;
     });
 
     roomList.innerHTML = filtered
       .map(function (room) {
+        let unreadHtml = room.unreadCount > 0 ? '<span class="yt-chat-room__unread">' + room.unreadCount + '</span>' : '';
         return (
           '<button class="yt-chat-room" type="button" data-room-id="' + room.id + '">' +
           '<span class="yt-chat-room__avatar" aria-hidden="true">' + escapeHtml(room.avatar) + "</span>" +
@@ -275,20 +410,20 @@ document.addEventListener("DOMContentLoaded", function () {
           '<strong class="yt-chat-room__name">' + escapeHtml(room.name) + "</strong>" +
           '<span class="yt-chat-room__preview">' + escapeHtml(room.preview) + "</span>" +
           "</span>" +
-          '<span class="yt-chat-room__time">' + escapeHtml(room.time) + "</span>" +
+          '<span class="yt-chat-room__time">' + escapeHtml(room.time) + unreadHtml + "</span>" +
           "</button>"
         );
       })
       .join("");
 
-    Array.from(roomList.querySelectorAll(".yt-chat-room")).forEach(function (button) {
-      button.addEventListener("click", function () {
-        renderActiveRoom(button.dataset.roomId);
-      });
+    Array.from(roomList.querySelectorAll(".yt-chat-room")).forEach(function (btn) {
+      btn.addEventListener("click", function () { renderActiveRoom(btn.dataset.roomId); });
     });
 
-    if (activeRoomId && filtered.some(function (room) { return room.id === activeRoomId; })) {
-      renderActiveRoom(activeRoomId);
+    if (activeRoomId && filtered.some(function (r) { return String(r.id) === String(activeRoomId); })) {
+      Array.from(roomList.querySelectorAll(".yt-chat-room")).forEach(function (btn) {
+        btn.classList.toggle("is-active", String(btn.dataset.roomId) === String(activeRoomId));
+      });
     } else if (!normalized) {
       activeRoomId = null;
       emptyState.hidden = false;
@@ -297,113 +432,102 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  let peopleDebounce = null;
   function renderPeopleList(query) {
-    var normalized = (query || "").trim().toLowerCase();
-    var filtered = people.filter(function (person) {
-      if (!normalized) {
-        return true;
-      }
-      return (
-        person.name.toLowerCase().indexOf(normalized) >= 0 ||
-        person.meta.toLowerCase().indexOf(normalized) >= 0
-      );
-    });
+    let normalized = (query || "").trim();
+    if (!normalized) { peopleList.innerHTML = ""; return; }
+    if (peopleDebounce) clearTimeout(peopleDebounce);
+    peopleDebounce = setTimeout(function () {
+      fetch("/api/messages/search-members?keyword=" + encodeURIComponent(normalized), { credentials: "same-origin" })
+        .then(function (res) { return res.ok ? res.json() : []; })
+        .then(function (members) {
+          peopleList.innerHTML = members.map(function (m) {
+            return (
+              '<button class="yt-chat-person" type="button" data-person-id="' + m.id + '" data-person-nickname="' + escapeHtml(m.nickname) + '">' +
+              '<span class="yt-chat-person__avatar" aria-hidden="true">' + escapeHtml((m.nickname || "?").charAt(0).toUpperCase()) + "</span>" +
+              '<span>' +
+              '<strong class="yt-chat-person__name">' + escapeHtml(m.nickname) + "</strong>" +
+              (m.followerCount ? '<span class="yt-chat-person__meta">팔로워 ' + m.followerCount + '</span>' : '') +
+              "</span>" +
+              "</button>"
+            );
+          }).join("");
 
-    peopleList.innerHTML = filtered
-      .map(function (person) {
-        return (
-          '<button class="yt-chat-person" type="button" data-person-id="' + person.id + '">' +
-          '<span class="yt-chat-person__avatar" aria-hidden="true">' + escapeHtml(person.avatar) + "</span>" +
-          '<span>' +
-          '<strong class="yt-chat-person__name">' + escapeHtml(person.name) + "</strong>" +
-          '<span class="yt-chat-person__meta">' + escapeHtml(person.meta) + "</span>" +
-          "</span>" +
-          "</button>"
-        );
-      })
-      .join("");
-
-    Array.from(peopleList.querySelectorAll(".yt-chat-person")).forEach(function (button) {
-      button.addEventListener("click", function () {
-        var person = people.find(function (item) {
-          return item.id === button.dataset.personId;
-        });
-        if (person) {
-          openDraftConversation(person);
-        }
-      });
-    });
+          Array.from(peopleList.querySelectorAll(".yt-chat-person")).forEach(function (btn) {
+            btn.addEventListener("click", function () {
+              let memberId = btn.dataset.personId;
+              fetch("/api/messages/rooms", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ targetMemberId: Number(memberId) })
+              })
+                .then(function (res) { return res.json(); })
+                .then(function (room) {
+                  loadRooms();
+                  setComposeOpen(false);
+                  setTimeout(function () { renderActiveRoom(room.id); }, 300);
+                })
+                .catch(function () {});
+            });
+          });
+        })
+        .catch(function () { peopleList.innerHTML = ""; });
+    }, 300);
   }
 
   toggle.addEventListener("click", function () {
-    if (layer.classList.contains("is-open")) {
-      closeLayer();
-      return;
-    }
+    if (layer.classList.contains("is-open")) { closeLayer(); return; }
     openLayer();
   });
 
-  dismissButtons.forEach(function (button) {
-    button.addEventListener("click", closeLayer);
-  });
+  dismissButtons.forEach(function (btn) { btn.addEventListener("click", closeLayer); });
 
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && layer.classList.contains("is-open")) {
-      if (composeOpen) {
-        setComposeOpen(false);
-        return;
-      }
+      if (composeOpen) { setComposeOpen(false); return; }
       closeLayer();
     }
   });
 
   composeToggle.addEventListener("click", function () {
     setComposeOpen(!composeOpen);
-    if (composeOpen && peopleInput) {
-      peopleInput.focus();
-    }
+    if (composeOpen && peopleInput) peopleInput.focus();
   });
 
   if (roomSearchInput) {
-    roomSearchInput.addEventListener("input", function () {
-      renderRoomList(roomSearchInput.value);
-    });
+    roomSearchInput.addEventListener("input", function () { renderRoomList(roomSearchInput.value); });
   }
 
   if (peopleInput) {
-    peopleInput.addEventListener("input", function () {
-      renderPeopleList(peopleInput.value);
-    });
+    peopleInput.addEventListener("input", function () { renderPeopleList(peopleInput.value); });
   }
 
   if (composer) {
     composer.addEventListener("submit", function (event) {
       event.preventDefault();
+      let room = findRoom(activeRoomId);
+      let nextMessage = composerInput.value.trim();
+      if (!room || !nextMessage) return;
 
-      var room = findRoom(activeRoomId);
-      var nextMessage = composerInput.value.trim();
-
-      if (!room || !nextMessage) {
-        return;
-      }
-
-      room.messages.push({
-        sender: "me",
-        label: "나",
-        body: nextMessage,
-        self: true
-      });
-      room.preview = nextMessage;
-      room.time = "now";
-      composerInput.value = "";
-      renderRoomList(roomSearchInput ? roomSearchInput.value : "");
-      renderActiveRoom(room.id);
-      messagesNode.scrollTop = messagesNode.scrollHeight;
+      fetch("/api/messages/rooms/" + room.id + "/send", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: nextMessage })
+      })
+        .then(function (res) { return res.json(); })
+        .then(function () {
+          composerInput.value = "";
+          loadMessages(room.id);
+          loadRooms();
+        })
+        .catch(function () {});
     });
   }
 
   setComposeOpen(false, true);
   setComposerPlaceholder(null);
   renderPeopleList("");
-  renderRoomList("");
+  updateBadge();
 });

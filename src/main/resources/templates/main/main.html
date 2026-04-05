@@ -43,278 +43,35 @@
     <div th:replace="~{layout/layout :: ytShellChrome('home')}"></div>
     <main class="yt-shell__page-content">
     <div class="main-page">
-        <div class="shelf-grid">
-
-            <!-- 1. BEAT ON -->
-            <div class="shelf-card">
-                <a href="">
+        <div class="shelf-grid" th:if="${galleries != null and !galleries.isEmpty()}">
+            <div class="shelf-card" th:each="gallery : ${galleries}">
+                <a th:href="@{'/gallery/' + ${gallery.id}}">
                     <div class="shelf-card__thumb">
                         <div class="shelf-card__stacks">
                             <div class="shelf-card__stack2"></div>
                             <div class="shelf-card__stack1"></div>
                         </div>
                         <div class="shelf-card__thumb-inner">
-                            <img src="https://i9.ytimg.com/s_p/RDCLAK5uy_nMqMWmqwZwDvMcqcAohgO_Dp_7zT1nSC8/sddefault.jpg?sqp=CNyWss4Gir7X7AMICJaXsc4GEAE=&rs=AOn4CLD2iLdrYExb9Uej4552sE190YsGOQ&v=1774996374" alt="BEAT ON" />
+                            <img th:src="${gallery.coverImage}" th:alt="${gallery.title}" alt="" />
                         </div>
                         <div class="shelf-card__badge">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M5.5 1.383V6.88a2.25 2.25 0 101 1.871V4.6l2.743 1.647a.5.5 0 00.757-.43V3.485a.5.5 0 00-.243-.429l-3.5-2.1a.5.5 0 00-.757.427Z"/></svg>
-                            90곡
+                            <span th:text="${gallery.workCount != null ? gallery.workCount + '작품' : '0작품'}"></span>
                         </div>
                         <div class="shelf-card__overlay">
                             <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor"><path d="M5 4.623V19.38a1.5 1.5 0 002.26 1.29L22 12 7.26 3.33A1.5 1.5 0 005 4.623Z"></path></svg>
-                            모두 재생
+                            감상하기
                         </div>
                     </div>
                     <div class="shelf-card__meta">
-                        <h3 class="shelf-card__title">BEAT ON</h3>
-                        <p class="shelf-card__desc">지금 가장 핫한 국내 댄스 음악을 감상하세요!</p>
+                        <h3 class="shelf-card__title" th:text="${gallery.title}"></h3>
+                        <p class="shelf-card__desc" th:text="${gallery.description}"></p>
                     </div>
                 </a>
             </div>
-
-            <!-- 2. K-POP 핫 트렌드 -->
-            <div class="shelf-card">
-                <a href="">
-                    <div class="shelf-card__thumb">
-                        <div class="shelf-card__stacks">
-                            <div class="shelf-card__stack2"></div>
-                            <div class="shelf-card__stack1"></div>
-                        </div>
-                        <div class="shelf-card__thumb-inner">
-                            <img src="https://i9.ytimg.com/s_p/RDCLAK5uy_k4EBjGb2O_FDr5yMGNRfqAWMBDHbc6nxY/sddefault.jpg?sqp=CMjoos4Gir7X7AMICJaXsc4GEAE=&rs=AOn4CLDqYC1ynLEGJiZMaGxhXcGjDbaoZQ&v=1774996374" alt="K-POP 핫 트렌드" />
-                        </div>
-                        <div class="shelf-card__badge">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M5.5 1.383V6.88a2.25 2.25 0 101 1.871V4.6l2.743 1.647a.5.5 0 00.757-.43V3.485a.5.5 0 00-.243-.429l-3.5-2.1a.5.5 0 00-.757.427Z"/></svg>
-                            120곡
-                        </div>
-                        <div class="shelf-card__overlay">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor"><path d="M5 4.623V19.38a1.5 1.5 0 002.26 1.29L22 12 7.26 3.33A1.5 1.5 0 005 4.623Z"></path></svg>
-                            모두 재생
-                        </div>
-                    </div>
-                    <div class="shelf-card__meta">
-                        <h3 class="shelf-card__title">K-POP 핫 트렌드</h3>
-                        <p class="shelf-card__desc">지금 가장 인기 있는 K-POP 음악 모음</p>
-                    </div>
-                </a>
-            </div>
-
-            <!-- 3. 감성 발라드 -->
-            <div class="shelf-card">
-                <a href="">
-                    <div class="shelf-card__thumb">
-                        <div class="shelf-card__stacks">
-                            <div class="shelf-card__stack2"></div>
-                            <div class="shelf-card__stack1"></div>
-                        </div>
-                        <div class="shelf-card__thumb-inner">
-                            <img src="https://i9.ytimg.com/s_p/RDCLAK5uy_n9Fb3GFOGAnMG3Nh0dygpVJAsQajBDSoQ/sddefault.jpg?sqp=CKy8os4Gir7X7AMICJaXsc4GEAE=&rs=AOn4CLCxFUVlFBULHkPaLSv4bE7jaAA8JA&v=1774996374" alt="감성 발라드" />
-                        </div>
-                        <div class="shelf-card__badge">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M5.5 1.383V6.88a2.25 2.25 0 101 1.871V4.6l2.743 1.647a.5.5 0 00.757-.43V3.485a.5.5 0 00-.243-.429l-3.5-2.1a.5.5 0 00-.757.427Z"/></svg>
-                            75곡
-                        </div>
-                        <div class="shelf-card__overlay">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor"><path d="M5 4.623V19.38a1.5 1.5 0 002.26 1.29L22 12 7.26 3.33A1.5 1.5 0 005 4.623Z"></path></svg>
-                            모두 재생
-                        </div>
-                    </div>
-                    <div class="shelf-card__meta">
-                        <h3 class="shelf-card__title">감성 발라드</h3>
-                        <p class="shelf-card__desc">마음을 울리는 감성 발라드 명곡 모음</p>
-                    </div>
-                </a>
-            </div>
-
-            <!-- 4. 힙합 & R&B -->
-            <div class="shelf-card">
-                <a href="">
-                    <div class="shelf-card__thumb">
-                        <div class="shelf-card__stacks">
-                            <div class="shelf-card__stack2"></div>
-                            <div class="shelf-card__stack1"></div>
-                        </div>
-                        <div class="shelf-card__thumb-inner">
-                            <img src="https://i9.ytimg.com/s_p/RDCLAK5uy_mFCreBefDBpVqmBr0fKBz0MBJMEbIwVLs/sddefault.jpg?sqp=CMCsos4Gir7X7AMICJaXsc4GEAE=&rs=AOn4CLAoOl0nY6RHJxSqjlWUrmOKdLr7LQ&v=1774996374" alt="힙합 & R&B" />
-                        </div>
-                        <div class="shelf-card__badge">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M5.5 1.383V6.88a2.25 2.25 0 101 1.871V4.6l2.743 1.647a.5.5 0 00.757-.43V3.485a.5.5 0 00-.243-.429l-3.5-2.1a.5.5 0 00-.757.427Z"/></svg>
-                            60곡
-                        </div>
-                        <div class="shelf-card__overlay">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor"><path d="M5 4.623V19.38a1.5 1.5 0 002.26 1.29L22 12 7.26 3.33A1.5 1.5 0 005 4.623Z"></path></svg>
-                            모두 재생
-                        </div>
-                    </div>
-                    <div class="shelf-card__meta">
-                        <h3 class="shelf-card__title">힙합 & R&B</h3>
-                        <p class="shelf-card__desc">트렌디한 국내 힙합과 R&B 플레이리스트</p>
-                    </div>
-                </a>
-            </div>
-
-            <!-- 5. 인디 뮤직 -->
-            <div class="shelf-card">
-                <a href="">
-                    <div class="shelf-card__thumb">
-                        <div class="shelf-card__stacks">
-                            <div class="shelf-card__stack2"></div>
-                            <div class="shelf-card__stack1"></div>
-                        </div>
-                        <div class="shelf-card__thumb-inner">
-                            <img src="https://i9.ytimg.com/s_p/RDCLAK5uy_kBaEB_DEyXR1SqnFMxEq7-_0bE0KGCzWk/sddefault.jpg?sqp=CISbos4Gir7X7AMICJaXsc4GEAE=&rs=AOn4CLAiNqK-fRY6RA8g6j_q7_K3yk6_ug&v=1774996374" alt="인디 뮤직" />
-                        </div>
-                        <div class="shelf-card__badge">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M5.5 1.383V6.88a2.25 2.25 0 101 1.871V4.6l2.743 1.647a.5.5 0 00.757-.43V3.485a.5.5 0 00-.243-.429l-3.5-2.1a.5.5 0 00-.757.427Z"/></svg>
-                            50곡
-                        </div>
-                        <div class="shelf-card__overlay">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor"><path d="M5 4.623V19.38a1.5 1.5 0 002.26 1.29L22 12 7.26 3.33A1.5 1.5 0 005 4.623Z"></path></svg>
-                            모두 재생
-                        </div>
-                    </div>
-                    <div class="shelf-card__meta">
-                        <h3 class="shelf-card__title">인디 뮤직</h3>
-                        <p class="shelf-card__desc">감각적인 인디 아티스트들의 추천곡</p>
-                    </div>
-                </a>
-            </div>
-
-            <!-- 6. 운동할 때 듣는 음악 -->
-            <div class="shelf-card">
-                <a href="">
-                    <div class="shelf-card__thumb">
-                        <div class="shelf-card__stacks">
-                            <div class="shelf-card__stack2"></div>
-                            <div class="shelf-card__stack1"></div>
-                        </div>
-                        <div class="shelf-card__thumb-inner">
-                            <img src="https://i9.ytimg.com/s_p/RDCLAK5uy_nxEfCfGkdMOcKJaB7tnkj5SIfPn7VZPOE/sddefault.jpg?sqp=CMDyos4Gir7X7AMICJaXsc4GEAE=&rs=AOn4CLAOQ6ZkNcE2Hqzma7gVjVEzKY_nWg&v=1774996374" alt="운동할 때 듣는 음악" />
-                        </div>
-                        <div class="shelf-card__badge">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M5.5 1.383V6.88a2.25 2.25 0 101 1.871V4.6l2.743 1.647a.5.5 0 00.757-.43V3.485a.5.5 0 00-.243-.429l-3.5-2.1a.5.5 0 00-.757.427Z"/></svg>
-                            85곡
-                        </div>
-                        <div class="shelf-card__overlay">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor"><path d="M5 4.623V19.38a1.5 1.5 0 002.26 1.29L22 12 7.26 3.33A1.5 1.5 0 005 4.623Z"></path></svg>
-                            모두 재생
-                        </div>
-                    </div>
-                    <div class="shelf-card__meta">
-                        <h3 class="shelf-card__title">운동할 때 듣는 음악</h3>
-                        <p class="shelf-card__desc">에너지 넘치는 워크아웃 플레이리스트</p>
-                    </div>
-                </a>
-            </div>
-
-            <!-- 7. 잔잔한 카페 음악 -->
-            <div class="shelf-card">
-                <a href="">
-                    <div class="shelf-card__thumb">
-                        <div class="shelf-card__stacks">
-                            <div class="shelf-card__stack2"></div>
-                            <div class="shelf-card__stack1"></div>
-                        </div>
-                        <div class="shelf-card__thumb-inner">
-                            <img src="https://i9.ytimg.com/s_p/RDCLAK5uy_lSbKGwFMkBfPXZOwOgGMkvN9ED57GJc-Y/sddefault.jpg?sqp=CNjoos4Gir7X7AMICJaXsc4GEAE=&rs=AOn4CLBqVFJlGm--dDgZVkGKKZ1-1rfCxg&v=1774996374" alt="잔잔한 카페 음악" />
-                        </div>
-                        <div class="shelf-card__badge">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M5.5 1.383V6.88a2.25 2.25 0 101 1.871V4.6l2.743 1.647a.5.5 0 00.757-.43V3.485a.5.5 0 00-.243-.429l-3.5-2.1a.5.5 0 00-.757.427Z"/></svg>
-                            40곡
-                        </div>
-                        <div class="shelf-card__overlay">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor"><path d="M5 4.623V19.38a1.5 1.5 0 002.26 1.29L22 12 7.26 3.33A1.5 1.5 0 005 4.623Z"></path></svg>
-                            모두 재생
-                        </div>
-                    </div>
-                    <div class="shelf-card__meta">
-                        <h3 class="shelf-card__title">잔잔한 카페 음악</h3>
-                        <p class="shelf-card__desc">편안한 분위기의 카페 BGM 모음</p>
-                    </div>
-                </a>
-            </div>
-
-            <!-- 8. 90년대 레트로 -->
-            <div class="shelf-card">
-                <a href="">
-                    <div class="shelf-card__thumb">
-                        <div class="shelf-card__stacks">
-                            <div class="shelf-card__stack2"></div>
-                            <div class="shelf-card__stack1"></div>
-                        </div>
-                        <div class="shelf-card__thumb-inner">
-                            <img src="https://i9.ytimg.com/s_p/RDCLAK5uy_kzGGvMaOBIHnvOeFEiROfqt5gmcn55fwk/sddefault.jpg?sqp=CKSvos4Gir7X7AMICJaXsc4GEAE=&rs=AOn4CLBvz7yAeZ5xF_tg8U8y5u1JLd9h5w&v=1774996374" alt="90년대 레트로" />
-                        </div>
-                        <div class="shelf-card__badge">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M5.5 1.383V6.88a2.25 2.25 0 101 1.871V4.6l2.743 1.647a.5.5 0 00.757-.43V3.485a.5.5 0 00-.243-.429l-3.5-2.1a.5.5 0 00-.757.427Z"/></svg>
-                            100곡
-                        </div>
-                        <div class="shelf-card__overlay">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor"><path d="M5 4.623V19.38a1.5 1.5 0 002.26 1.29L22 12 7.26 3.33A1.5 1.5 0 005 4.623Z"></path></svg>
-                            모두 재생
-                        </div>
-                    </div>
-                    <div class="shelf-card__meta">
-                        <h3 class="shelf-card__title">90년대 레트로</h3>
-                        <p class="shelf-card__desc">추억의 90년대 히트곡 모음</p>
-                    </div>
-                </a>
-            </div>
-
-            <!-- 9. 팝 히츠 글로벌 -->
-            <div class="shelf-card">
-                <a href="">
-                    <div class="shelf-card__thumb">
-                        <div class="shelf-card__stacks">
-                            <div class="shelf-card__stack2"></div>
-                            <div class="shelf-card__stack1"></div>
-                        </div>
-                        <div class="shelf-card__thumb-inner">
-                            <img src="https://i9.ytimg.com/s_p/RDCLAK5uy_kmPRjHDEAGpMR2dMHMnMB2a32xgwlBHIA/sddefault.jpg?sqp=CMyTos4Gir7X7AMICJaXsc4GEAE=&rs=AOn4CLAqjnBHXMZB7YQGB5rNGG3SlVgA3Q&v=1774996374" alt="팝 히츠 글로벌" />
-                        </div>
-                        <div class="shelf-card__badge">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M5.5 1.383V6.88a2.25 2.25 0 101 1.871V4.6l2.743 1.647a.5.5 0 00.757-.43V3.485a.5.5 0 00-.243-.429l-3.5-2.1a.5.5 0 00-.757.427Z"/></svg>
-                            110곡
-                        </div>
-                        <div class="shelf-card__overlay">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor"><path d="M5 4.623V19.38a1.5 1.5 0 002.26 1.29L22 12 7.26 3.33A1.5 1.5 0 005 4.623Z"></path></svg>
-                            모두 재생
-                        </div>
-                    </div>
-                    <div class="shelf-card__meta">
-                        <h3 class="shelf-card__title">팝 히츠 글로벌</h3>
-                        <p class="shelf-card__desc">전 세계에서 사랑받는 팝 음악 TOP</p>
-                    </div>
-                </a>
-            </div>
-
-            <!-- 10. 수면 & 릴렉스 -->
-            <div class="shelf-card">
-                <a href="">
-                    <div class="shelf-card__thumb">
-                        <div class="shelf-card__stacks">
-                            <div class="shelf-card__stack2"></div>
-                            <div class="shelf-card__stack1"></div>
-                        </div>
-                        <div class="shelf-card__thumb-inner">
-                            <img src="https://i9.ytimg.com/s_p/RDCLAK5uy_kJN5dGTPOel6MHQL0fSr3_eTPwSN87uvs/sddefault.jpg?sqp=CODOos4Gir7X7AMICJaXsc4GEAE=&rs=AOn4CLBRnPGT50xLJfWKe0k5yFP4GxuEUw&v=1774996374" alt="수면 & 릴렉스" />
-                        </div>
-                        <div class="shelf-card__badge">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M5.5 1.383V6.88a2.25 2.25 0 101 1.871V4.6l2.743 1.647a.5.5 0 00.757-.43V3.485a.5.5 0 00-.243-.429l-3.5-2.1a.5.5 0 00-.757.427Z"/></svg>
-                            55곡
-                        </div>
-                        <div class="shelf-card__overlay">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor"><path d="M5 4.623V19.38a1.5 1.5 0 002.26 1.29L22 12 7.26 3.33A1.5 1.5 0 005 4.623Z"></path></svg>
-                            모두 재생
-                        </div>
-                    </div>
-                    <div class="shelf-card__meta">
-                        <h3 class="shelf-card__title">수면 & 릴렉스</h3>
-                        <p class="shelf-card__desc">편안한 잠자리를 위한 힐링 음악</p>
-                    </div>
-                </a>
-            </div>
-
+        </div>
+        <div th:if="${galleries == null or galleries.isEmpty()}" style="text-align:center; padding:60px 20px; color:#aaa;">
+            <p>아직 등록된 예술관이 없습니다.</p>
         </div>
     </div>
     </main>
