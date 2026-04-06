@@ -150,9 +150,9 @@
 .yt-chat-panel__body {
   display: grid;
   grid-template-columns: minmax(250px, 286px) minmax(0, 1fr);
-  height: 100%;
+  grid-template-rows: minmax(0, 1fr);
   min-height: 0;
-  flex: 1 1 auto;
+  flex: 1 1 0;
   overflow: hidden;
 }
 
@@ -417,8 +417,6 @@
 }
 
 .yt-chat-thread {
-  display: flex;
-  flex: 1 1 auto;
   min-width: 0;
   min-height: 0;
   background: #ffffff;
@@ -428,6 +426,7 @@
 .yt-chat-thread__empty,
 .yt-chat-thread__detail {
   width: 100%;
+  height: 100%;
   min-width: 0;
   min-height: 0;
 }
@@ -465,7 +464,7 @@
 .yt-chat-thread__detail {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  flex: 1 1 auto;
+  height: 100%;
   min-height: 0;
   overflow: hidden;
 }
@@ -515,10 +514,11 @@
   display: grid;
   align-content: start;
   gap: 14px;
-  height: 100%;
+  min-width: 0;
   min-height: 0;
   padding: 18px 20px;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   background:
     radial-gradient(circle at top right, color-mix(in srgb, var(--yt-chat-accent) 10%, transparent), transparent 28%),
     linear-gradient(180deg, #ffffff 0%, #fcfcfc 100%);
@@ -552,6 +552,164 @@
 .yt-chat-bubble--self .yt-chat-bubble__body {
   background: var(--yt-chat-accent);
   color: #ffffff;
+}
+
+.yt-chat-bubble__row {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.yt-chat-bubble--self .yt-chat-bubble__row {
+  flex-direction: row-reverse;
+}
+
+.yt-chat-bubble__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  flex-shrink: 0;
+}
+
+.yt-chat-bubble__row:hover .yt-chat-bubble__actions,
+.yt-chat-bubble__actions.has-liked {
+  opacity: 1;
+}
+
+.yt-chat-bubble__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.05);
+  color: #999;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.yt-chat-bubble__action:hover {
+  background: rgba(0, 0, 0, 0.10);
+  transform: scale(1.15);
+}
+
+.yt-chat-bubble__action--like:hover,
+.yt-chat-bubble__action--like.is-liked {
+  color: #e53935;
+}
+
+.yt-chat-bubble__action--like.is-liked {
+  background: rgba(229, 57, 53, 0.10);
+}
+
+.yt-chat-bubble__action--delete:hover {
+  color: #666;
+}
+
+.yt-chat-bubble__action-count {
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.yt-chat-bubble__actions.has-liked .yt-chat-bubble__action--delete {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.yt-chat-bubble__actions.has-liked:hover .yt-chat-bubble__action--delete {
+  opacity: 1;
+}
+
+/* ── long-press modal (mobile) ── */
+
+.yt-chat-msg-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.2s ease;
+}
+
+.yt-chat-msg-modal.is-open {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.yt-chat-msg-modal__sheet {
+  width: 100%;
+  max-width: 400px;
+  padding: 8px 12px calc(env(safe-area-inset-bottom, 8px) + 8px);
+  border-radius: 18px 18px 0 0;
+  background: #fff;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
+  transform: translateY(100%);
+  transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.yt-chat-msg-modal.is-open .yt-chat-msg-modal__sheet {
+  transform: translateY(0);
+}
+
+.yt-chat-msg-modal__preview {
+  padding: 12px 14px 10px;
+  margin-bottom: 4px;
+  font-size: 0.88rem;
+  color: #888;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.yt-chat-msg-modal__btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: #222;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.yt-chat-msg-modal__btn:active {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.yt-chat-msg-modal__btn.is-liked {
+  color: #e53935;
+}
+
+.yt-chat-msg-modal__btn--danger {
+  color: #e53935;
+}
+
+.yt-chat-msg-modal__btn--cancel {
+  justify-content: center;
+  margin-top: 4px;
+  color: #888;
+  font-weight: 500;
+}
+
+/* touch device: hide inline hover actions */
+@media (hover: none) and (pointer: coarse) {
+  .yt-chat-bubble__actions {
+    display: none !important;
+  }
 }
 
 .yt-chat-composer {
@@ -692,7 +850,7 @@ body[data-yt-chat-open="true"] .yt-chat-fab {
   }
 
   .yt-chat-panel__body.is-thread-open .yt-chat-thread {
-    display: flex;
+    display: block;
   }
 
   /* 뒤로가기 버튼 표시 */

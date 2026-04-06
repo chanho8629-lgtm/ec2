@@ -100,7 +100,7 @@
               </a>
             </li>
             <li class="yt-shell__guide-item">
-              <a class="yt-shell__guide-link" href="#" title="작품">
+              <a class="yt-shell__guide-link" href="/" title="작품">
                 <svg class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path
                     d="M21 3H3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2ZM3 19V5h18v14H3Zm3.5-8.5 3 3.5 4-5 5.5 7H5l1.5-5.5Z"
@@ -110,7 +110,7 @@
               </a>
             </li>
             <li class="yt-shell__guide-item">
-              <a class="yt-shell__guide-link" href="#" title="공모전">
+              <a class="yt-shell__guide-link" href="/contest/list" title="공모전">
                 <svg class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path
                     d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2Zm0 3.34L9.92 9.53l-4.56.66 3.3 3.22-.78 4.54L12 15.77l4.12 2.17-.78-4.54 3.3-3.22-4.56-.66L12 5.34Z"
@@ -122,34 +122,16 @@
           </ul>
         </section>
 
-        <section class="yt-shell__guide-section">
+        <section class="yt-shell__guide-section" th:if="${followingArtists != null and !followingArtists.isEmpty()}">
           <h2 class="yt-shell__section-title">팔로우 한 아티스트</h2>
           <ul class="yt-shell__guide-list">
-            <li class="yt-shell__guide-item">
-              <a class="yt-shell__guide-link" href="#" title="클리드">
+            <li class="yt-shell__guide-item" th:each="artist : ${followingArtists}">
+              <a class="yt-shell__guide-link" th:href="@{'/profile/' + ${artist.nickname}}" th:title="${artist.nickname}">
                 <img class="yt-shell__guide-avatar"
-                  src="https://yt3.ggpht.com/miEkO9N7ZiYYIz2llXad3t7NZWHbac1Czj24Lfhn6dXZKVoFqsOXQ-i73LrYPfZGtW5m1ehpzA=s88-c-k-c0x00ffffff-no-rj"
+                  th:src="${artist.profileImage != null ? artist.profileImage : '/images/default-avatar.png'}"
                   alt="" />
-                <span class="yt-shell__guide-copy">클리드</span>
-                <span class="yt-shell__guide-meta"><span class="yt-shell__guide-badge"></span></span>
-              </a>
-            </li>
-            <li class="yt-shell__guide-item">
-              <a class="yt-shell__guide-link" href="#" title="마플 마인크래프트 채널">
-                <img class="yt-shell__guide-avatar"
-                  src="https://yt3.ggpht.com/6a0WQjuL06gR4vpF8FFvTSvcLAh1iM3slw7pXk7H-LiLQvA1Tq4H6ME9z2haDeI24hV9d8Hk=s88-c-k-c0x00ffffff-no-rj"
-                  alt="" />
-                <span class="yt-shell__guide-copy">마플 마인크래프트 채널</span>
-                <span class="yt-shell__guide-meta"><span class="yt-shell__guide-badge"></span></span>
-              </a>
-            </li>
-            <li class="yt-shell__guide-item">
-              <a class="yt-shell__guide-link" href="#" title="잡상싱">
-                <img class="yt-shell__guide-avatar"
-                  src="https://yt3.ggpht.com/ytc/AIdro_kv5SPzFJ8qFErJYv1nK4C6e3cA9j2G5dJ1mK0=s88-c-k-c0x00ffffff-no-rj"
-                  alt="" />
-                <span class="yt-shell__guide-copy">잡상싱</span>
-                <span class="yt-shell__guide-meta"><span class="yt-shell__guide-badge"></span></span>
+                <span class="yt-shell__guide-copy" th:text="${artist.nickname}"></span>
+                <span class="yt-shell__guide-meta" th:if="${artist.creatorVerified}"><span class="yt-shell__guide-badge"></span></span>
               </a>
             </li>
           </ul>
@@ -158,12 +140,12 @@
         <section class="yt-shell__guide-section">
           <h2 class="yt-shell__section-title">보관함</h2>
           <ul class="yt-shell__guide-list">
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="#" title="내 페이지"><svg
+            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="/profile" title="내 페이지"><svg
                   class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 12a4 4 0 1 0-4-4a4 4 0 0 0 4 4Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"
                     fill="currentColor" />
                 </svg><span class="yt-shell__guide-copy">내 페이지</span></a></li>
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="#" title="찜한 작품"><svg
+            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="/profile" title="찜한 작품"><svg
                   class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path
                     d="M12 21.35 10.55 20C5.4 15.36 2 12.28 2 8.5A4.5 4.5 0 0 1 6.5 4A5.22 5.22 0 0 1 12 7.09A5.22 5.22 0 0 1 17.5 4A4.5 4.5 0 0 1 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35Z"
@@ -172,29 +154,17 @@
           </ul>
         </section>
 
-        <section class="yt-shell__guide-section">
+        <section class="yt-shell__guide-section" th:if="${popularTags != null and !popularTags.isEmpty()}">
           <h2 class="yt-shell__section-title">인기 태그</h2>
           <ul class="yt-shell__guide-list">
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="#" title="#유화"><svg
-                  class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <li class="yt-shell__guide-item" th:each="tag : ${popularTags}">
+              <a class="yt-shell__guide-link" th:href="@{'/?tag=' + ${tag.tagName}}" th:title="'#' + ${tag.tagName}">
+                <svg class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M5.41 21 1.71 17.29a1 1 0 0 1 0-1.41L13.29 4.29a1 1 0 0 1 1.41 0L18.41 8a1 1 0 0 1 0 1.41L6.83 21H5.41ZM20 7l2-2-3-3-2 2 3 3ZM2 20h4v2H2v-2Z" fill="currentColor" />
-                </svg><span class="yt-shell__guide-copy">#유화</span></a></li>
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="#" title="#디지털아트"><svg
-                  class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M5.41 21 1.71 17.29a1 1 0 0 1 0-1.41L13.29 4.29a1 1 0 0 1 1.41 0L18.41 8a1 1 0 0 1 0 1.41L6.83 21H5.41ZM20 7l2-2-3-3-2 2 3 3ZM2 20h4v2H2v-2Z" fill="currentColor" />
-                </svg><span class="yt-shell__guide-copy">#디지털아트</span></a></li>
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="#" title="#수채화"><svg
-                  class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M5.41 21 1.71 17.29a1 1 0 0 1 0-1.41L13.29 4.29a1 1 0 0 1 1.41 0L18.41 8a1 1 0 0 1 0 1.41L6.83 21H5.41ZM20 7l2-2-3-3-2 2 3 3ZM2 20h4v2H2v-2Z" fill="currentColor" />
-                </svg><span class="yt-shell__guide-copy">#수채화</span></a></li>
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="#" title="#일러스트"><svg
-                  class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M5.41 21 1.71 17.29a1 1 0 0 1 0-1.41L13.29 4.29a1 1 0 0 1 1.41 0L18.41 8a1 1 0 0 1 0 1.41L6.83 21H5.41ZM20 7l2-2-3-3-2 2 3 3ZM2 20h4v2H2v-2Z" fill="currentColor" />
-                </svg><span class="yt-shell__guide-copy">#일러스트</span></a></li>
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="#" title="#조각"><svg
-                  class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M5.41 21 1.71 17.29a1 1 0 0 1 0-1.41L13.29 4.29a1 1 0 0 1 1.41 0L18.41 8a1 1 0 0 1 0 1.41L6.83 21H5.41ZM20 7l2-2-3-3-2 2 3 3ZM2 20h4v2H2v-2Z" fill="currentColor" />
-                </svg><span class="yt-shell__guide-copy">#조각</span></a></li>
+                </svg>
+                <span class="yt-shell__guide-copy" th:text="'#' + ${tag.tagName}"></span>
+              </a>
+            </li>
           </ul>
         </section>
 
@@ -296,13 +266,13 @@
                   class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="m12 3 8 6v11h-5v-6H9v6H4V9l8-6Z" fill="currentColor" />
                 </svg><span class="yt-shell__guide-copy">홈</span></a></li>
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="#" title="작품"><svg
+            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="/" title="작품"><svg
                   class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path
                     d="M21 3H3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2ZM3 19V5h18v14H3Zm3.5-8.5 3 3.5 4-5 5.5 7H5l1.5-5.5Z"
                     fill="currentColor" />
                 </svg><span class="yt-shell__guide-copy">작품</span></a></li>
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="#" title="공모전"><svg
+            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="/contest/list" title="공모전"><svg
                   class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path
                     d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2Zm0 3.34L9.92 9.53l-4.56.66 3.3 3.22-.78 4.54L12 15.77l4.12 2.17-.78-4.54 3.3-3.22-4.56-.66L12 5.34Z"
@@ -313,41 +283,29 @@
         <section class="yt-shell__guide-section">
           <h2 class="yt-shell__section-title">보관함</h2>
           <ul class="yt-shell__guide-list">
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="#" title="내 페이지"><svg
+            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="/profile" title="내 페이지"><svg
                   class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 12a4 4 0 1 0-4-4a4 4 0 0 0 4 4Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"
                     fill="currentColor" />
                 </svg><span class="yt-shell__guide-copy">내 페이지</span></a></li>
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="#"
-                title="오프라인 저장 동영상"><svg class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="/profile"
+                title="다운로드"><svg class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M11 4h2v8.17l2.59-2.58L17 11l-5 5-5-5 1.41-1.41L11 12.17V4ZM5 18h14v2H5v-2Z"
                     fill="currentColor" />
-                </svg><span class="yt-shell__guide-copy">오프라인 저장 동영상</span></a></li>
+                </svg><span class="yt-shell__guide-copy">다운로드</span></a></li>
           </ul>
         </section>
-        <section class="yt-shell__guide-section">
+        <section class="yt-shell__guide-section" th:if="${popularTags != null and !popularTags.isEmpty()}">
           <h2 class="yt-shell__section-title">인기 태그</h2>
           <ul class="yt-shell__guide-list">
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="#" title="#유화"><svg
-                  class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <li class="yt-shell__guide-item" th:each="tag : ${popularTags}">
+              <a class="yt-shell__guide-link" th:href="@{'/?tag=' + ${tag.tagName}}" th:title="'#' + ${tag.tagName}">
+                <svg class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M5.41 21 1.71 17.29a1 1 0 0 1 0-1.41L13.29 4.29a1 1 0 0 1 1.41 0L18.41 8a1 1 0 0 1 0 1.41L6.83 21H5.41ZM20 7l2-2-3-3-2 2 3 3ZM2 20h4v2H2v-2Z" fill="currentColor" />
-                </svg><span class="yt-shell__guide-copy">#유화</span></a></li>
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="#" title="#디지털아트"><svg
-                  class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M5.41 21 1.71 17.29a1 1 0 0 1 0-1.41L13.29 4.29a1 1 0 0 1 1.41 0L18.41 8a1 1 0 0 1 0 1.41L6.83 21H5.41ZM20 7l2-2-3-3-2 2 3 3ZM2 20h4v2H2v-2Z" fill="currentColor" />
-                </svg><span class="yt-shell__guide-copy">#디지털아트</span></a></li>
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="#" title="#수채화"><svg
-                  class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M5.41 21 1.71 17.29a1 1 0 0 1 0-1.41L13.29 4.29a1 1 0 0 1 1.41 0L18.41 8a1 1 0 0 1 0 1.41L6.83 21H5.41ZM20 7l2-2-3-3-2 2 3 3ZM2 20h4v2H2v-2Z" fill="currentColor" />
-                </svg><span class="yt-shell__guide-copy">#수채화</span></a></li>
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="#" title="#일러스트"><svg
-                  class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M5.41 21 1.71 17.29a1 1 0 0 1 0-1.41L13.29 4.29a1 1 0 0 1 1.41 0L18.41 8a1 1 0 0 1 0 1.41L6.83 21H5.41ZM20 7l2-2-3-3-2 2 3 3ZM2 20h4v2H2v-2Z" fill="currentColor" />
-                </svg><span class="yt-shell__guide-copy">#일러스트</span></a></li>
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="#" title="#조각"><svg
-                  class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M5.41 21 1.71 17.29a1 1 0 0 1 0-1.41L13.29 4.29a1 1 0 0 1 1.41 0L18.41 8a1 1 0 0 1 0 1.41L6.83 21H5.41ZM20 7l2-2-3-3-2 2 3 3ZM2 20h4v2H2v-2Z" fill="currentColor" />
-                </svg><span class="yt-shell__guide-copy">#조각</span></a></li>
+                </svg>
+                <span class="yt-shell__guide-copy" th:text="'#' + ${tag.tagName}"></span>
+              </a>
+            </li>
           </ul>
         </section>
       </aside>
@@ -416,7 +374,7 @@
                     class="style-scope yt-multi-page-menu-section-renderer" hide-secondary-string=""
                     compact-link-style="compact-link-style-type-creation-menu"><!--css-build:shady--><!--css_build_scope:ytd-compact-link-renderer--><!--css_build_styles:video.youtube.src.web.polymer.shared.ui.styles.yt_base_styles.yt.base.styles.css.js--><a
                       id="endpoint" class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link"
-                      tabindex="-1" href="#">
+                      tabindex="-1" href="/gallery-register">
 
                       <div role="none" class="style-scope ytd-compact-link-renderer" style-target="host"
                         tabindex="0"
@@ -455,7 +413,7 @@
                     class="style-scope yt-multi-page-menu-section-renderer" hide-secondary-string=""
                     compact-link-style="compact-link-style-type-creation-menu"><!--css-build:shady--><!--css_build_scope:ytd-compact-link-renderer--><!--css_build_styles:video.youtube.src.web.polymer.shared.ui.styles.yt_base_styles.yt.base.styles.css.js--><a
                       id="endpoint" class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link"
-                      tabindex="-1" href="#">
+                      tabindex="-1" href="/work/work-register">
 
                       <div role="none" class="style-scope ytd-compact-link-renderer" style-target="host"
                         tabindex="0"
@@ -494,7 +452,7 @@
                     class="style-scope yt-multi-page-menu-section-renderer" hide-secondary-string=""
                     compact-link-style="compact-link-style-type-creation-menu"><!--css-build:shady--><!--css_build_scope:ytd-compact-link-renderer--><!--css_build_styles:video.youtube.src.web.polymer.shared.ui.styles.yt_base_styles.yt.base.styles.css.js--><a
                       id="endpoint" class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link"
-                      tabindex="-1" href="#">
+                      tabindex="-1" href="/contest/register">
 
                       <div role="none" class="style-scope ytd-compact-link-renderer" style-target="host"
                         tabindex="0"
@@ -554,7 +512,7 @@
                 <span id="account-name" class="style-scope ytd-active-account-header-renderer" ellipsis-truncate-styling="">그필</span>
                 <span id="channel-handle" class="style-scope ytd-active-account-header-renderer" ellipsis-truncate-styling="" style="text-align: left;">@rednose097</span>
                 <span id="manage-account" class="style-scope ytd-active-account-header-renderer complex-string" ellipsis-truncate-styling="">
-                  <a class="yt-simple-endpoint style-scope yt-formatted-string" href="#">내 프로필 보기</a>
+                  <a class="yt-simple-endpoint style-scope yt-formatted-string" href="/profile">내 프로필 보기</a>
                 </span>
               </div>
             </section>
@@ -565,7 +523,7 @@
               <!-- 섹션 1: 작품 관리 -->
               <section class="style-scope ytd-multi-page-menu-renderer">
                 <div id="items" class="style-scope yt-multi-page-menu-section-renderer"><div class="style-scope yt-multi-page-menu-section-renderer" hide-secondary-string="" compact-link-style="">
-                    <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="#">
+                    <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="/profile">
                       <div role="none" class="style-scope ytd-compact-link-renderer" style-target="host" tabindex="0">
                         <div class="style-scope ytd-compact-link-renderer"><span class="style-scope ytd-compact-link-renderer">
                           <span class="yt-icon-shape style-scope yt-icon"><div style="width:100%;height:100%;display:block;fill:currentcolor"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events:none;display:inherit;width:100%;height:100%">
@@ -575,7 +533,7 @@
                       </div>
                     </a>
                   </div><div class="style-scope yt-multi-page-menu-section-renderer" hide-secondary-string="" compact-link-style="">
-                    <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="#">
+                    <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="/profile">
                       <div role="none" class="style-scope ytd-compact-link-renderer" style-target="host" tabindex="0">
                         <div class="style-scope ytd-compact-link-renderer"><span class="style-scope ytd-compact-link-renderer">
                           <span class="yt-icon-shape style-scope yt-icon"><div style="width:100%;height:100%;display:block;fill:currentcolor"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events:none;display:inherit;width:100%;height:100%">
@@ -585,7 +543,7 @@
                       </div>
                     </a>
                   </div><div class="style-scope yt-multi-page-menu-section-renderer" hide-secondary-string="" compact-link-style="">
-                    <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="#">
+                    <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="/profile">
                       <div role="none" class="style-scope ytd-compact-link-renderer" style-target="host" tabindex="0">
                         <div class="style-scope ytd-compact-link-renderer"><span class="style-scope ytd-compact-link-renderer">
                           <span class="yt-icon-shape style-scope yt-icon"><div style="width:100%;height:100%;display:block;fill:currentcolor"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events:none;display:inherit;width:100%;height:100%">
@@ -599,7 +557,7 @@
               <!-- 섹션 2: 아티스트 도구 -->
               <section class="style-scope ytd-multi-page-menu-renderer">
                 <div id="items" class="style-scope yt-multi-page-menu-section-renderer"><div class="style-scope yt-multi-page-menu-section-renderer" hide-secondary-string="" compact-link-style="">
-                    <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="#">
+                    <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="/dashboard">
                       <div role="none" class="style-scope ytd-compact-link-renderer" style-target="host" tabindex="0">
                         <div class="style-scope ytd-compact-link-renderer"><span class="style-scope ytd-compact-link-renderer">
                           <span class="yt-icon-shape style-scope yt-icon"><div style="width:100%;height:100%;display:block;fill:currentcolor"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events:none;display:inherit;width:100%;height:100%">
@@ -609,7 +567,7 @@
                       </div>
                     </a>
                   </div><div class="style-scope yt-multi-page-menu-section-renderer" hide-secondary-string="" compact-link-style="">
-                    <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="#">
+                    <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="/contest/list">
                       <div role="none" class="style-scope ytd-compact-link-renderer" style-target="host" tabindex="0">
                         <div class="style-scope ytd-compact-link-renderer"><span class="style-scope ytd-compact-link-renderer">
                           <span class="yt-icon-shape style-scope yt-icon"><div style="width:100%;height:100%;display:block;fill:currentcolor"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events:none;display:inherit;width:100%;height:100%">
@@ -653,7 +611,7 @@
                   </div>
                   <!-- 고객센터 -->
                   <div class="style-scope yt-multi-page-menu-section-renderer" hide-secondary-string="" compact-link-style="">
-                    <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="#">
+                    <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="/customerservice">
                       <div role="none" class="style-scope ytd-compact-link-renderer" style-target="host" tabindex="0">
                         <div class="style-scope ytd-compact-link-renderer"><span class="style-scope ytd-compact-link-renderer">
                           <span class="yt-icon-shape style-scope yt-icon"><div style="width:100%;height:100%;display:block;fill:currentcolor"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events:none;display:inherit;width:100%;height:100%">
@@ -668,7 +626,7 @@
               <!-- 섹션 4: 로그아웃 -->
               <section class="style-scope ytd-multi-page-menu-renderer">
                 <div id="items" class="style-scope yt-multi-page-menu-section-renderer"><div class="style-scope yt-multi-page-menu-section-renderer" hide-secondary-string="" compact-link-style="">
-                    <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="#">
+                    <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="/api/auth/logout">
                       <div role="none" class="style-scope ytd-compact-link-renderer" style-target="host" tabindex="0">
                         <div class="style-scope ytd-compact-link-renderer"><span class="style-scope ytd-compact-link-renderer">
                           <span class="yt-icon-shape style-scope yt-icon"><div style="width:100%;height:100%;display:block;fill:currentcolor"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events:none;display:inherit;width:100%;height:100%">

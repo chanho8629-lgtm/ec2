@@ -358,4 +358,15 @@
           and g.status = 'EXHIBITING'
     </select>
 
+    <select id="selectPopularTags" resultType="TagResponseDTO">
+        select
+            t.id,
+            t.tag_name
+        from tbl_tag t
+        join tbl_gallery_tag gt on gt.tag_id = t.id
+        group by t.id, t.tag_name
+        order by count(*) desc
+        limit #{limit}
+    </select>
+
 </mapper>

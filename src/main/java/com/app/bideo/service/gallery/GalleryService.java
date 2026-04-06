@@ -10,6 +10,7 @@ import com.app.bideo.dto.gallery.GalleryDetailResponseDTO;
 import com.app.bideo.dto.gallery.GalleryListResponseDTO;
 import com.app.bideo.dto.gallery.GallerySearchDTO;
 import com.app.bideo.dto.gallery.GalleryUpdateRequestDTO;
+import com.app.bideo.dto.gallery.SearchGallerySuggestionDTO;
 import com.app.bideo.dto.interaction.CommentResponseDTO;
 import com.app.bideo.repository.gallery.GalleryDAO;
 import com.app.bideo.repository.interaction.BookmarkDAO;
@@ -122,6 +123,20 @@ public class GalleryService {
         List<GalleryListResponseDTO> galleries = galleryDAO.findRecommended();
         galleries.forEach(g -> g.setCoverImage(s3FileService.getPresignedUrl(g.getCoverImage())));
         return galleries;
+    }
+
+    // 검색 추천 예술관
+    @Transactional(readOnly = true)
+    public List<SearchGallerySuggestionDTO> getSearchSuggestions() {
+        List<SearchGallerySuggestionDTO> suggestions = galleryDAO.findRecommendedSearchGalleries();
+        suggestions.forEach(s -> {
+            if (Boolean.TRUE.equals(s.getHasCoverImage())) {
+                galleryDAO.findSearchGalleryCover(s.getId()).ifPresent(cover ->
+                    s.setCoverImageUrl(s3FileService.getPresignedUrl(cover.getCoverImage()))
+                );
+            }
+        });
+        return suggestions;
     }
 
     public void update(Long id, Long memberId, GalleryUpdateRequestDTO requestDTO, MultipartFile coverFile) {
