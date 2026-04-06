@@ -15,6 +15,7 @@ public class CustomUserDetails implements UserDetails {
     private final String email;
     private final String password;
     private final String nickname;
+    private final String profileImage;
     private final MemberRole role;
     private final MemberStatus status;
 
@@ -23,6 +24,7 @@ public class CustomUserDetails implements UserDetails {
         this.email = memberVO.getEmail();
         this.password = memberVO.getPassword();
         this.nickname = memberVO.getNickname();
+        this.profileImage = memberVO.getProfileImage();
         this.role = memberVO.getRole();
         this.status = memberVO.getStatus();
     }

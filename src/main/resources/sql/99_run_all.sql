@@ -77,3 +77,6 @@ CREATE TABLE IF NOT EXISTS tbl_message_like (
 );
 CREATE INDEX IF NOT EXISTS idx_message_like_message ON tbl_message_like (message_id);
 CREATE INDEX IF NOT EXISTS idx_message_like_member ON tbl_message_like (member_id);
+
+-- oauth_provider enum에 google 추가 (기존 DB 마이그레이션용)
+ALTER TYPE oauth_provider ADD VALUE IF NOT EXISTS 'google';

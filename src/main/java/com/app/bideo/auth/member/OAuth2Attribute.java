@@ -24,6 +24,7 @@ public class OAuth2Attribute {
         return switch (oauthProvider) {
             case KAKAO -> ofKakao(attributes);
             case NAVER -> ofNaver(attributes);
+            case GOOGLE -> ofGoogle(attributes);
         };
     }
 
@@ -51,6 +52,16 @@ public class OAuth2Attribute {
                 .email(response == null ? null : (String) response.get("email"))
                 .name(response == null ? null : (String) response.get("name"))
                 .profileImage(response == null ? null : (String) response.get("profile_image"))
+                .build();
+    }
+
+    private static OAuth2Attribute ofGoogle(Map<String, Object> attributes) {
+        return OAuth2Attribute.builder()
+                .provider(OAuthProvider.GOOGLE)
+                .id(String.valueOf(attributes.get("sub")))
+                .email((String) attributes.get("email"))
+                .name((String) attributes.get("name"))
+                .profileImage((String) attributes.get("picture"))
                 .build();
     }
 

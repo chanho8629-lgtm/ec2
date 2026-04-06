@@ -82,7 +82,7 @@
             </svg>
           </button>
           <button class="yt-shell__icon-button" type="button" aria-label="계정 메뉴" data-yt-shell-account-toggle aria-expanded="false">
-            <img class="yt-shell__avatar" src="https://yt3.ggpht.com/5fHEIs3KKq0CrpuF-IpHCTBon6kgd-7lt5CEYzQYrZoCl3L4fhKpaLtWRJ_j-eLXpl9F2ev1bg=s108-c-k-c0x00ffffff-no-rj" alt="계정" />
+            <img class="yt-shell__avatar" th:src="${currentUserProfileImage != null ? currentUserProfileImage : '/images/default-profile.png'}" src="/images/default-profile.png" alt="계정" />
           </button>
         </div>
       </header>
@@ -506,11 +506,12 @@
               <span class="style-scope ytd-active-account-header-renderer no-transition"
                 style="background-color: transparent;">
                 <img draggable="false" class="style-scope yt-img-shadow" alt="" height="40" width="40"
-                  src="https://yt3.ggpht.com/5fHEIs3KKq0CrpuF-IpHCTBon6kgd-7lt5CEYzQYrZoCl3L4fhKpaLtWRJ_j-eLXpl9F2ev1bg=s108-c-k-c0x00ffffff-no-rj">
+                  th:src="${currentUserProfileImage != null ? currentUserProfileImage : '/images/default-profile.png'}"
+                  src="/images/default-profile.png">
               </span>
               <div class="style-scope ytd-active-account-header-renderer">
-                <span id="account-name" class="style-scope ytd-active-account-header-renderer" ellipsis-truncate-styling="">그필</span>
-                <span id="channel-handle" class="style-scope ytd-active-account-header-renderer" ellipsis-truncate-styling="" style="text-align: left;">@rednose097</span>
+                <span id="account-name" class="style-scope ytd-active-account-header-renderer" ellipsis-truncate-styling="" th:text="${currentUserNickname}"></span>
+                <span id="channel-handle" class="style-scope ytd-active-account-header-renderer" ellipsis-truncate-styling="" style="text-align: left;" th:text="${currentUserNickname != null ? '@' + currentUserNickname : ''}"></span>
                 <span id="manage-account" class="style-scope ytd-active-account-header-renderer complex-string" ellipsis-truncate-styling="">
                   <a class="yt-simple-endpoint style-scope yt-formatted-string" href="/profile">내 프로필 보기</a>
                 </span>
@@ -626,7 +627,7 @@
               <!-- 섹션 4: 로그아웃 -->
               <section class="style-scope ytd-multi-page-menu-renderer">
                 <div id="items" class="style-scope yt-multi-page-menu-section-renderer"><div class="style-scope yt-multi-page-menu-section-renderer" hide-secondary-string="" compact-link-style="">
-                    <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="/api/auth/logout">
+                    <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="javascript:void(0)" onclick="fetch('/api/auth/logout',{method:'POST',credentials:'same-origin'}).then(()=>location.href='/')">
                       <div role="none" class="style-scope ytd-compact-link-renderer" style-target="host" tabindex="0">
                         <div class="style-scope ytd-compact-link-renderer"><span class="style-scope ytd-compact-link-renderer">
                           <span class="yt-icon-shape style-scope yt-icon"><div style="width:100%;height:100%;display:block;fill:currentcolor"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events:none;display:inherit;width:100%;height:100%">
