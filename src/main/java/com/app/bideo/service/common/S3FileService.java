@@ -11,13 +11,20 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
+import java.io.InputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class S3FileService {
+
+    private static final Path ROOT_UPLOAD_DIR = Paths.get("uploads");
 
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
@@ -44,11 +51,10 @@ public class S3FileService {
                     .build();
 
             s3Client.putObject(putRequest, RequestBody.fromBytes(file.getBytes()));
-        } catch (IOException e) {
-            throw new RuntimeException("S3 file upload failed", e);
+            return key;
+        } catch (Exception e) {
+            return saveToLocal(directory, key, file, e);
         }
-
-        return key;
     }
 
     /**
@@ -58,6 +64,10 @@ public class S3FileService {
     public String getPresignedUrl(String key) {
         if (key == null || key.isBlank()) {
             return null;
+        }
+
+        if (key.startsWith("/uploads/")) {
+            return key;
         }
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
@@ -76,5 +86,20 @@ public class S3FileService {
             return "";
         }
         return filename.substring(filename.lastIndexOf("."));
+    }
+
+    private String saveToLocal(String directory, String key, MultipartFile file, Exception cause) {
+        Path targetDirectory = ROOT_UPLOAD_DIR.resolve(directory);
+        Path targetFile = ROOT_UPLOAD_DIR.resolve(key).normalize();
+
+        try {
+            Files.createDirectories(targetDirectory);
+            try (InputStream inputStream = file.getInputStream()) {
+                Files.copy(inputStream, targetFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+            return "/uploads/" + key.replace("\\", "/");
+        } catch (IOException e) {
+            throw new RuntimeException("S3 file upload failed", cause);
+        }
     }
 }

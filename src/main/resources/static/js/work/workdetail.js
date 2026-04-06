@@ -1,153 +1,141 @@
-// 페이지별 샘플 렌더링 데이터
-const workDetails = [
-    {
-        thumb: "https://i.ytimg.com/vi/aqZnrOnnyBA/maxresdefault.jpg",
-        videoSrc: "/images/BIDEO_introduce_video%20-%20%EB%B3%B5%EC%82%AC%EB%B3%B8%20(2).mp4",
-        thumbAlt: "야당 쇼츠 썸네일",
-        caption: "야 그게 뭐야?",
-        likeCount: "1.3만",
-        viewCount: "451,113",
-        publishedDate: "3월 21일",
-        publishedYear: "2026년",
-        dislikeLabel: "싫어요",
-        commentCount: "198",
-        shareLabel: "공유",
-        remixLabel: "거래",
-        marketType: "trade",
-        avatarText: "@",
-        channel: "@지무비",
-        isOwner: true,
-        subscribe: "팔로우",
-        desc: "예매율 38% 미쳤다..유해진 주연의 <내부자들>이 다시 화제가 되는 이유를 한 번에 보여주는 장면입니다.\n정적인 대사처럼 시작하지만 감정선이 점점 쌓이면서 분위기를 완전히 뒤집고, 배우들 호흡과 표정 변화가 이어질수록 몰입감이 훨씬 커집니다.\n특히 유해진 특유의 현실적인 톤이 장면 전체를 단단하게 잡아줘서 짧게 봐도 기억에 남는 클립입니다.",
-        headline: "와.. 연기 개 미쳤다..",
-        pivotThumb: "https://images.unsplash.com/photo-1501612780327-45045538702b?auto=format&fit=crop&w=300&q=80",
-        pivotTitle: "현대 미술관 야간 전시관",
-        pivotMeta: "서울 예술관 · 전시 작품 6점",
-        pivotAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=88&q=80",
-        pivotArtist: "서울 예술관",
-        pivotCount: "작품 6점",
-        pivotItems: [
-            { title: "유리와 빛의 홀", meta: "조회수 12만회", image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=300&q=80" },
-            { title: "붉은 벽면의 조형전", meta: "조회수 8.4만회", image: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=300&q=80" },
-            { title: "회화 아카이브", meta: "조회수 5.1만회", image: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=320&q=80" }
-            ,{ title: "조명 아트룸", meta: "조회수 14만회", image: "https://images.unsplash.com/photo-1501612780327-45045538702b?auto=format&fit=crop&w=300&q=80" }
-            ,{ title: "조형 아카이브", meta: "조회수 6.8만회", image: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?auto=format&fit=crop&w=300&q=80" }
-            ,{ title: "블루 갤러리", meta: "조회수 3.9만회", image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=300&q=80" }
-        ],
-        comments: [
-            {
-                author: "@moremoreplus",
-                avatar: "https://yt3.ggpht.com/ytc/AIdro_n3AexbIABbMKlogUR0dPQIElzbRy40MFOmAi6C0boN4j398k0=s88-c-k-c0x00ffffff-no-rj",
-                time: "2시간 전",
-                text: "준비 해이라 각오 해이라~",
-                likes: "",
-                replies: [
-                    {
-                        author: "@mru2-w2r",
-                        avatar: "https://yt3.ggpht.com/gKiEOfVVZiYgIt-RIdnRrzgUy9F86UzfAtAqsCamarxT03VV39PpkttLgJnrLONWWpmSEAqlEw=s88-c-k-c0x00ffffff-no-rj",
-                        time: "7일 전",
-                        text: "나온다하고 노쇼함 ㅋㅋ",
-                        likes: "2"
-                    },
-                    {
-                        author: "@Jace-rb8wg",
-                        avatar: "https://yt3.ggpht.com/ytc/AIdro_l8eo8-U6Hq182HvGSivhWsfhg3pOCinNGPXomA3iYdj_2Aq9hR3pP-TUmOw-mA8K_Hzw=s88-c-k-c0x00ffffff-no-rj",
-                        time: "3일 전",
-                        text: "나왔으면 너무 밸붕이긴 함",
-                        likes: "2"
-                    },
-                    {
-                        author: "@숙상순",
-                        avatar: "https://yt3.ggpht.com/ytc/AIdro_ng3vdmQ70ckkEDn8ODXy01T1k4iclHBSOBC5Qal-YxKcB6AAI=s88-c-k-c0x00ffffff-no-rj",
-                        time: "1일 전",
-                        text: "@Jace-rb8wg 그 밸붕이신분은 당연히 시즌8에서는 우승하셨겠죠? ㅋ",
-                        likes: ""
-                    }
-                ]
-            },
-            {
-                author: "@다크피카츄-j0907",
-                avatar: "https://yt3.ggpht.com/ytc/AIdro_lCRXNeKiz9AFIaW5BsxEsnOxDqGipjZUV7gL1AjUVHoD6z0SvKCjTFUGPKCbcymbELIQ=s88-c-k-c0x00ffffff-no-rj",
-                time: "8일 전",
-                text: "이 장면은 진짜 몇 번을 봐도 소름 돋는다.",
-                likes: "254",
-                replies: []
-            }
-        ]
-    },
-    {
-        thumb: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
-        thumbAlt: "미디어 아트 썸네일",
-        caption: "빛이 움직인다",
-        likeCount: "8,421",
-        viewCount: "128,440",
-        publishedDate: "2월 8일",
-        publishedYear: "2026년",
-        dislikeLabel: "싫어요",
-        commentCount: "57",
-        shareLabel: "공유",
-        remixLabel: "경매",
-        marketType: "auction",
-        avatarText: "A",
-        channel: "@artflux",
-        isOwner: false,
-        subscribe: "팔로우",
-        desc: "설치 미술 전시장 안에서 빛과 사운드가 같이 반응하는 순간",
-        headline: "공간 전체가 작품이 되는 연출",
-        pivotThumb: "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=300&q=80",
-        pivotTitle: "미디어 아트 특별관",
-        pivotMeta: "BIDEO 아트센터 · 전시 작품 4점",
-        pivotAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=88&q=80",
-        pivotArtist: "BIDEO 아트센터",
-        pivotCount: "작품 4점",
-        pivotItems: [
-            { title: "반응형 조명 터널", meta: "조회수 21만회", image: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?auto=format&fit=crop&w=300&q=80" },
-            { title: "네온 파편 설치", meta: "조회수 17만회", image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=300&q=80" },
-            { title: "사운드 웨이브 룸", meta: "조회수 9.7만회", image: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=300&q=80" },
-            { title: "디지털 캔버스", meta: "조회수 11만회", image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=300&q=80" }
-        ],
-        comments: [
-            { author: "@artlover", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=88&q=80", time: "2일 전", text: "실제로 보면 더 웅장할 것 같네요.", likes: "32", replies: [] },
-            { author: "@lightnote", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=88&q=80", time: "1일 전", text: "색감이 너무 좋다.", likes: "11", replies: [] }
-        ]
-    },
-    {
-        thumb: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&q=80",
-        thumbAlt: "인터뷰 영상 썸네일",
-        caption: "작업실 비하인드",
-        likeCount: "2,903",
-        viewCount: "82,019",
-        publishedDate: "1월 14일",
-        publishedYear: "2026년",
-        dislikeLabel: "싫어요",
-        commentCount: "34",
-        shareLabel: "공유",
-        remixLabel: "",
-        avatarText: "S",
-        channel: "@studioframe",
-        isOwner: false,
-        subscribe: "팔로우",
-        desc: "작가가 직접 설명하는 제작 과정과 재료 선택 이야기",
-        headline: "작업실에서 바로 듣는 제작 비하인드",
-        pivotThumb: "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=300&q=80",
-        pivotTitle: "작가 아카이브 관람",
-        pivotMeta: "스튜디오 큐레이션 · 전시 작품 5점",
-        pivotAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=88&q=80",
-        pivotArtist: "스튜디오 큐레이션",
-        pivotCount: "작품 5점",
-        pivotItems: [
-            { title: "재료 표본 컬렉션", meta: "조회수 4.2만회", image: "https://images.unsplash.com/photo-1459908676235-d5f02a50184b?auto=format&fit=crop&w=300&q=80" },
-            { title: "스케치 월", meta: "조회수 7.3만회", image: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=280&q=80" },
-            { title: "작업 도구 선반", meta: "조회수 3.1만회", image: "https://images.unsplash.com/photo-1496317899792-9d7dbcd928a1?auto=format&fit=crop&w=300&q=80" },
-            { title: "작품 보존함", meta: "조회수 2.7만회", image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=300&q=80" },
-            { title: "드로잉 캐비닛", meta: "조회수 5.9만회", image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=300&q=80" }
-        ],
-        comments: [
-            { author: "@studiofan", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=88&q=80", time: "4일 전", text: "작업 과정 설명이 깔끔해서 좋았어요.", likes: "8", replies: [] },
-            { author: "@framepick", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=88&q=80", time: "6시간 전", text: "재료 선택 이유 듣는 재미가 있네요.", likes: "5", replies: [] }
-        ]
+const workDetails = [];
+const currentWorkId = Number(window.location.pathname.split("/").filter(Boolean).pop() || "0");
+
+function getCurrentWorkId() {
+    return Number.isFinite(currentWorkId) && currentWorkId > 0 ? currentWorkId : null;
+}
+
+function getMediaSource(detail) {
+    const firstFile = Array.isArray(detail?.files) ? detail.files[0] : null;
+    return firstFile?.fileUrl || "";
+}
+
+function getAvatarText(nickname) {
+    const base = String(nickname || "").replace(/^@/, "").trim();
+    return base ? base.charAt(0).toUpperCase() : "@";
+}
+
+function formatRelativeTime(dateTime) {
+    if (!dateTime) {
+        return "";
     }
-];
+
+    const target = new Date(dateTime);
+    if (Number.isNaN(target.getTime())) {
+        return "";
+    }
+
+    const diff = Date.now() - target.getTime();
+    const minute = 60 * 1000;
+    const hour = 60 * minute;
+    const day = 24 * hour;
+
+    if (diff < minute) {
+        return "방금 전";
+    }
+    if (diff < hour) {
+        return `${Math.floor(diff / minute)}분 전`;
+    }
+    if (diff < day) {
+        return `${Math.floor(diff / hour)}시간 전`;
+    }
+    if (diff < 30 * day) {
+        return `${Math.floor(diff / day)}일 전`;
+    }
+
+    return `${target.getFullYear()}.${String(target.getMonth() + 1).padStart(2, "0")}.${String(target.getDate()).padStart(2, "0")}`;
+}
+
+function formatPublishedDate(dateTime) {
+    const target = new Date(dateTime);
+    if (Number.isNaN(target.getTime())) {
+        return "";
+    }
+
+    return `${target.getMonth() + 1}월 ${target.getDate()}일`;
+}
+
+function formatPublishedYear(dateTime) {
+    const target = new Date(dateTime);
+    if (Number.isNaN(target.getTime())) {
+        return "";
+    }
+
+    return `${target.getFullYear()}년`;
+}
+
+function normalizeComment(comment) {
+    return {
+        id: comment.id,
+        author: `@${comment.memberNickname || "user"}`,
+        avatar: comment.memberProfileImage || "",
+        time: formatRelativeTime(comment.createdDatetime),
+        text: comment.content || "",
+        likes: comment.likeCount || 0,
+        isLiked: Boolean(comment.isLiked),
+        replies: Array.isArray(comment.replies) ? comment.replies.map(normalizeComment) : []
+    };
+}
+
+function normalizeWorkDetail(detail) {
+    const mediaSource = getMediaSource(detail);
+    const isVideo = Boolean(mediaSource) && !mediaSource.startsWith("data:image");
+    const createdDate = detail.createdDatetime || detail.updatedDatetime;
+
+    return {
+        id: detail.id,
+        thumb: mediaSource,
+        videoSrc: isVideo ? mediaSource : "",
+        thumbAlt: detail.title || "작품",
+        caption: detail.title || "",
+        likeCount: formatDisplayCount(detail.likeCount || 0, { compact: true }),
+        viewCount: formatDisplayCount(detail.viewCount || 0),
+        publishedDate: formatPublishedDate(createdDate),
+        publishedYear: formatPublishedYear(createdDate),
+        commentCount: formatDisplayCount(detail.commentCount || 0),
+        shareLabel: "공유",
+        remixLabel: detail.hasActiveAuction ? "경매" : detail.isTradable ? "거래" : "",
+        marketType: detail.hasActiveAuction ? "auction" : detail.isTradable ? "trade" : "",
+        avatarText: getAvatarText(detail.memberNickname),
+        channel: `@${detail.memberNickname || "artist"}`,
+        isOwner: false,
+        subscribe: "팔로우",
+        desc: detail.description || "",
+        headline: detail.title || "",
+        isBookmarked: Boolean(detail.isBookmarked),
+        isLiked: Boolean(detail.isLiked),
+        shareUrl: `${window.location.origin}/work/detail/${detail.id}`,
+        comments: Array.isArray(detail.comments) ? detail.comments.map(normalizeComment) : [],
+        pivotThumb: "",
+        pivotTitle: "",
+        pivotAvatar: "",
+        pivotArtist: "",
+        pivotCount: "",
+        pivotItems: []
+    };
+}
+
+async function apiRequest(url, options = {}) {
+    const response = await fetch(url, {
+        headers: {
+            ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
+            ...(options.headers || {})
+        },
+        ...options
+    });
+
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || "요청 처리에 실패했습니다.");
+    }
+
+    const contentType = response.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+        return response.json();
+    }
+
+    return null;
+}
 
 // UI 아이콘 경로 정의
 const playIconPath = "M7 5.2v13.6c0 .73.8 1.18 1.43.8L19.98 13a.92.92 0 0 0 0-1.6L8.43 4.4A.92.92 0 0 0 7 5.2Z";
@@ -374,10 +362,24 @@ function formatCommentVoteCount(baseCount, voteState) {
     return "";
 }
 
+function renderCommentsList(commentsList, comments) {
+    if (!commentsList) {
+        return;
+    }
+
+    commentsList.innerHTML = (comments || []).map(renderCommentItem).join("");
+}
+
+function updateCountFields(page, fieldName, value, compact = false) {
+    page.querySelectorAll(`[data-field="${fieldName}"]`).forEach((node) => {
+        node.textContent = formatDisplayCount(value || 0, { compact });
+    });
+}
+
 // 댓글 패널 마크업 렌더링
 function renderReplyItem(reply) {
     return `
-        <article class="rp">
+        <article class="rp" data-comment-id="${escapeHtml(reply.id || "")}">
             <div class="rp-ln"></div>
             <button class="rp-av" type="button" aria-label="${escapeHtml(reply.author)}">
                 <img src="${escapeHtml(reply.avatar || "")}" alt="">
@@ -389,10 +391,10 @@ function renderReplyItem(reply) {
                 </div>
                 <p class="rp-tx">${escapeHtml(reply.text)}</p>
                 <div class="rp-ft">
-                    <button class="rp-ic" type="button" aria-label="좋아요" data-vote="like" aria-pressed="false">
+                    <button class="rp-ic${reply.isLiked ? " is-active" : ""}" type="button" aria-label="좋아요" data-vote="like" aria-pressed="${reply.isLiked ? "true" : "false"}">
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.221 1.795a1 1 0 011.109-.656l1.04.173a4 4 0 013.252 4.784L14 9h4.061a3.664 3.664 0 013.576 2.868A3.68 3.68 0 0121 14.85l.02.087A3.815 3.815 0 0120 18.5v.043l-.01.227a2.82 2.82 0 01-.135.663l-.106.282A3.754 3.754 0 0116.295 22h-3.606l-.392-.007a12.002 12.002 0 01-5.223-1.388l-.343-.189-.27-.154a2.005 2.005 0 00-.863-.26l-.13-.004H3.5a1.5 1.5 0 01-1.5-1.5V12.5A1.5 1.5 0 013.5 11h1.79l.157-.013a1 1 0 00.724-.512l.063-.145 2.987-8.535Zm-1.1 9.196A3 3 0 015.29 13H4v4.998h1.468a4 4 0 011.986.528l.27.155.285.157A10 10 0 0012.69 20h3.606c.754 0 1.424-.483 1.663-1.2l.03-.126a.819.819 0 00.012-.131v-.872l.587-.586c.388-.388.577-.927.523-1.465l-.038-.23-.02-.087-.21-.9.55-.744A1.663 1.663 0 0018.061 11H14a2.002 2.002 0 01-1.956-2.418l.623-2.904a2 2 0 00-1.626-2.392l-.21-.035-2.71 7.741Z"></path></svg>
                     </button>
-                    <span class="rp-vt" data-role="vote-count">${escapeHtml(reply.likes || "")}</span>
+                    <span class="rp-vt" data-role="vote-count" data-base-count="${escapeHtml(reply.likes || 0)}">${escapeHtml(reply.likes ? formatDisplayCount(reply.likes) : "")}</span>
                     <button class="rp-ic" type="button" aria-label="싫어요" data-vote="dislike" aria-pressed="false">
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m11.31 2 .392.007c1.824.06 3.61.534 5.223 1.388l.343.189.27.154c.264.152.56.24.863.26l.13.004H20.5a1.5 1.5 0 011.5 1.5V11.5a1.5 1.5 0 01-1.5 1.5h-1.79l-.158.013a1 1 0 00-.723.512l-.064.145-2.987 8.535a1 1 0 01-1.109.656l-1.04-.174a4 4 0 01-3.251-4.783L10 15H5.938a3.664 3.664 0 01-3.576-2.868A3.682 3.682 0 013 9.15l-.02-.088A3.816 3.816 0 014 5.5v-.043l.008-.227a2.86 2.86 0 01.136-.664l.107-.28A3.754 3.754 0 017.705 2h3.605ZM7.705 4c-.755 0-1.425.483-1.663 1.2l-.032.126a.818.818 0 00-.01.131v.872l-.587.586a1.816 1.816 0 00-.524 1.465l.038.23.02.087.21.9-.55.744a1.686 1.686 0 00-.321 1.18l.029.177c.17.76.844 1.302 1.623 1.302H10a2.002 2.002 0 011.956 2.419l-.623 2.904-.034.208a2.002 2.002 0 001.454 2.139l.206.045.21.035 2.708-7.741A3.001 3.001 0 0118.71 11H20V6.002h-1.47c-.696 0-1.38-.183-1.985-.528l-.27-.155-.285-.157A10.002 10.002 0 0011.31 4H7.705Z"></path></svg>
                     </button>
@@ -404,11 +406,10 @@ function renderReplyItem(reply) {
 
 function renderCommentItem(comment) {
     const replies = comment.replies || [];
-    const repliesHtml = replies.length ? `
-    ` : "";
+    const repliesHtml = replies.length ? replies.map(renderReplyItem).join("") : "";
 
     return `
-        <article class="cm">
+        <article class="cm" data-comment-id="${escapeHtml(comment.id || "")}">
             <div class="cm-row">
                 <button class="cm-av" type="button" aria-label="${escapeHtml(comment.author)}">
                     <img src="${escapeHtml(comment.avatar || "")}" alt="">
@@ -420,15 +421,20 @@ function renderCommentItem(comment) {
                     </div>
                     <p class="cm-tx">${escapeHtml(comment.text)}</p>
                     <div class="cm-ft">
-                        <button class="cm-ic" type="button" aria-label="좋아요" data-vote="like" aria-pressed="false">
+                        <button class="cm-ic${comment.isLiked ? " is-active" : ""}" type="button" aria-label="좋아요" data-vote="like" aria-pressed="${comment.isLiked ? "true" : "false"}">
                             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.221 1.795a1 1 0 011.109-.656l1.04.173a4 4 0 013.252 4.784L14 9h4.061a3.664 3.664 0 013.576 2.868A3.68 3.68 0 0121 14.85l.02.087A3.815 3.815 0 0120 18.5v.043l-.01.227a2.82 2.82 0 01-.135.663l-.106.282A3.754 3.754 0 0116.295 22h-3.606l-.392-.007a12.002 12.002 0 01-5.223-1.388l-.343-.189-.27-.154a2.005 2.005 0 00-.863-.26l-.13-.004H3.5a1.5 1.5 0 01-1.5-1.5V12.5A1.5 1.5 0 013.5 11h1.79l.157-.013a1 1 0 00.724-.512l.063-.145 2.987-8.535Zm-1.1 9.196A3 3 0 015.29 13H4v4.998h1.468a4 4 0 011.986.528l.27.155.285.157A10 10 0 0012.69 20h3.606c.754 0 1.424-.483 1.663-1.2l.03-.126a.819.819 0 00.012-.131v-.872l.587-.586c.388-.388.577-.927.523-1.465l-.038-.23-.02-.087-.21-.9.55-.744A1.663 1.663 0 0018.061 11H14a2.002 2.002 0 01-1.956-2.418l.623-2.904a2 2 0 00-1.626-2.392l-.21-.035-2.71 7.741Z"></path></svg>
                         </button>
-                        <span class="cm-vt" data-role="vote-count">${escapeHtml(comment.likes || "")}</span>
+                        <span class="cm-vt" data-role="vote-count" data-base-count="${escapeHtml(comment.likes || 0)}">${escapeHtml(comment.likes ? formatDisplayCount(comment.likes) : "")}</span>
                         <button class="cm-ic" type="button" aria-label="싫어요" data-vote="dislike" aria-pressed="false">
                             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m11.31 2 .392.007c1.824.06 3.61.534 5.223 1.388l.343.189.27.154c.264.152.56.24.863.26l.13.004H20.5a1.5 1.5 0 011.5 1.5V11.5a1.5 1.5 0 01-1.5 1.5h-1.79l-.158.013a1 1 0 00-.723.512l-.064.145-2.987 8.535a1 1 0 01-1.109.656l-1.04-.174a4 4 0 01-3.251-4.783L10 15H5.938a3.664 3.664 0 01-3.576-2.868A3.682 3.682 0 013 9.15l-.02-.088A3.816 3.816 0 014 5.5v-.043l.008-.227a2.86 2.86 0 01.136-.664l.107-.28A3.754 3.754 0 017.705 2h3.605ZM7.705 4c-.755 0-1.425.483-1.663 1.2l-.032.126a.818.818 0 00-.01.131v.872l-.587.586a1.816 1.816 0 00-.524 1.465l.038.23.02.087.21.9-.55.744a1.686 1.686 0 00-.321 1.18l.029.177c.17.76.844 1.302 1.623 1.302H10a2.002 2.002 0 011.956 2.419l-.623 2.904-.034.208a2.002 2.002 0 001.454 2.139l.206.045.21.035 2.708-7.741A3.001 3.001 0 0118.71 11H20V6.002h-1.47c-.696 0-1.38-.183-1.985-.528l-.27-.155-.285-.157A10.002 10.002 0 0011.31 4H7.705Z"></path></svg>
                         </button>
                     </div>
-                    ${repliesHtml}
+                    ${replies.length ? `
+                        <div class="cm-rp">
+                            <button class="cm-rp-tg" type="button" data-role="reply-toggle" aria-expanded="false">답글 ${replies.length}개</button>
+                            <div class="cm-rp-ls" hidden>${repliesHtml}</div>
+                        </div>
+                    ` : ""}
                 </div>
                 <button class="cm-mn" type="button" aria-label="작업 메뉴">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Z"></path></svg>
@@ -543,6 +549,8 @@ function bindPageInteractions(page, data) {
     const commentsPanel = page.querySelector('[data-role="comments-panel"]');
     const commentsPanelClose = page.querySelector('[data-role="comments-panel-close"]');
     const commentsList = page.querySelector('[data-role="comments-list"]');
+    const commentInput = page.querySelector('[data-role="comment-input"]');
+    const commentSubmit = page.querySelector('[data-role="comment-submit"]');
     const pivotPanel = page.querySelector('[data-role="pivot-panel"]');
     const pivotPanelClose = page.querySelector('[data-role="pivot-panel-close"]');
     const pivotGalleryCover = page.querySelector('[data-role="pivot-gallery-cover"]');
@@ -574,6 +582,7 @@ function bindPageInteractions(page, data) {
     const mediaCluster = page.querySelector(".media-cluster");
     const workdetailStage = pageStack?.closest(".workdetail-stage") || document.querySelector(".workdetail-stage");
     let snackbarTimerId = 0;
+    let workState = { ...data };
     const isOwner = Boolean(data.isOwner);
     const closeAuctionPanelForPage = () => {
         if (!auctionModalBackdrop) {
@@ -644,7 +653,7 @@ function bindPageInteractions(page, data) {
     }
 
     if (commentsList) {
-        commentsList.innerHTML = (data.comments || []).map(renderCommentItem).join("");
+        renderCommentsList(commentsList, workState.comments);
 
         commentsList.addEventListener("click", (event) => {
             const toggle = event.target.closest('[data-role="reply-toggle"]');
@@ -664,46 +673,62 @@ function bindPageInteractions(page, data) {
             toggle.textContent = willOpen ? "답글 숨기기" : `답글 ${list.children.length}개`;
         });
 
-        commentsList.addEventListener("click", (event) => {
+        commentsList.addEventListener("click", async (event) => {
             const voteButton = event.target.closest('[data-vote]');
             if (!voteButton) {
                 return;
             }
 
+            const commentItem = voteButton.closest("[data-comment-id]");
+            const commentId = Number(commentItem?.dataset.commentId || "0");
             const voteWrap = voteButton.closest(".cm-ft, .rp-ft");
-            if (!voteWrap) {
+            if (!voteWrap || !commentId || voteButton.dataset.vote !== "like") {
                 return;
             }
 
-            const likeButton = voteWrap.querySelector('[data-vote="like"]');
-            const dislikeButton = voteWrap.querySelector('[data-vote="dislike"]');
-            const countNode = voteWrap.querySelector('[data-role="vote-count"]');
-            const baseCount = parseDisplayCount(countNode?.dataset.baseCount ?? countNode?.textContent ?? "");
-            const currentState = likeButton?.classList.contains("is-active") ? 1 : dislikeButton?.classList.contains("is-active") ? -1 : 0;
-            const nextState = voteButton.dataset.vote === "like"
-                ? currentState === 1 ? 0 : 1
-                : currentState === -1 ? 0 : -1;
+            try {
+                const result = await apiRequest(`/api/comments/${commentId}/likes`, {
+                    method: "POST"
+                });
+                const likeButton = voteWrap.querySelector('[data-vote="like"]');
+                const dislikeButton = voteWrap.querySelector('[data-vote="dislike"]');
+                const countNode = voteWrap.querySelector('[data-role="vote-count"]');
 
-            if (countNode && !countNode.dataset.baseCount) {
-                countNode.dataset.baseCount = String(baseCount);
-            }
+                updateVoteButtonState(likeButton, Boolean(result.liked));
+                updateVoteButtonState(dislikeButton, false);
 
-            updateVoteButtonState(likeButton, nextState === 1);
-            updateVoteButtonState(dislikeButton, nextState === -1);
-
-            if (countNode) {
-                countNode.textContent = formatCommentVoteCount(baseCount, nextState);
+                if (countNode) {
+                    countNode.dataset.baseCount = String(result.likeCount || 0);
+                    countNode.textContent = result.likeCount ? formatDisplayCount(result.likeCount) : "";
+                }
+            } catch (error) {
+                window.alert(error.message || "댓글 좋아요 처리에 실패했습니다.");
             }
         });
     }
 
-    bindVotePair({
-        likeButton: primaryLikeButton,
-        dislikeButton: primaryDislikeButton,
-        countNode: primaryLikeCount,
-        initialCount: parseDisplayCount(data.likeCount),
-        compactCount: true
-    });
+    if (primaryLikeButton) {
+        updateVoteButtonState(primaryLikeButton, Boolean(workState.isLiked));
+
+        primaryLikeButton.addEventListener("click", async () => {
+            if (!workState.id) {
+                return;
+            }
+
+            try {
+                const result = await apiRequest(`/api/works/${workState.id}/likes`, {
+                    method: "POST"
+                });
+                workState.isLiked = Boolean(result.liked);
+                workState.likeCount = formatDisplayCount(result.likeCount || 0, { compact: true });
+                updateVoteButtonState(primaryLikeButton, workState.isLiked);
+                updateVoteButtonState(primaryDislikeButton, false);
+                updateCountFields(page, "likeCount", result.likeCount || 0, true);
+            } catch (error) {
+                window.alert(error.message || "좋아요 처리에 실패했습니다.");
+            }
+        });
+    }
 
     if (bookmarkButton) {
         const syncBookmarkState = (isActive) => {
@@ -716,12 +741,71 @@ function bindPageInteractions(page, data) {
             }
         };
 
-        syncBookmarkState(false);
+        syncBookmarkState(Boolean(workState.isBookmarked));
 
-        bookmarkButton.addEventListener("click", () => {
-            const nextState = bookmarkButton.getAttribute("aria-pressed") !== "true";
-            syncBookmarkState(nextState);
+        bookmarkButton.addEventListener("click", async () => {
+            if (!workState.id) {
+                return;
+            }
+
+            try {
+                const result = await apiRequest("/api/bookmarks", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        targetType: "WORK",
+                        targetId: workState.id
+                    })
+                });
+                workState.isBookmarked = Boolean(result.bookmarked);
+                syncBookmarkState(workState.isBookmarked);
+            } catch (error) {
+                window.alert(error.message || "북마크 처리에 실패했습니다.");
+            }
         });
+    }
+
+    if (commentInput && commentSubmit) {
+        const syncCommentSubmitState = () => {
+            commentSubmit.disabled = !commentInput.value.trim();
+            commentInput.style.height = "auto";
+            commentInput.style.height = `${Math.min(commentInput.scrollHeight, 120)}px`;
+        };
+
+        commentInput.addEventListener("input", syncCommentSubmitState);
+        commentInput.addEventListener("keydown", async (event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                commentSubmit.click();
+            }
+        });
+
+        commentSubmit.addEventListener("click", async () => {
+            const content = commentInput.value.trim();
+
+            if (!content || !workState.id) {
+                return;
+            }
+
+            commentSubmit.disabled = true;
+
+            try {
+                const detail = await apiRequest(`/api/works/${workState.id}/comments`, {
+                    method: "POST",
+                    body: JSON.stringify({ content })
+                });
+                const normalized = normalizeWorkDetail(detail);
+                workState = { ...workState, comments: normalized.comments, commentCount: normalized.commentCount };
+                renderCommentsList(commentsList, workState.comments);
+                updateCountFields(page, "commentCount", detail.commentCount || 0, false);
+                commentInput.value = "";
+                syncCommentSubmitState();
+            } catch (error) {
+                window.alert(error.message || "댓글 등록에 실패했습니다.");
+                syncCommentSubmitState();
+            }
+        });
+
+        syncCommentSubmitState();
     }
 
     if (pivotGalleryCover) {
@@ -1253,12 +1337,14 @@ function bindPageInteractions(page, data) {
                 moreMenu.hidden = true;
                 moreButton.setAttribute("aria-expanded", "false");
             }
-            window.alert("수정 페이지 연결이 필요합니다.");
+            if (workState.id) {
+                window.location.href = `/work/work-edit/${workState.id}`;
+            }
         });
     }
 
     if (deleteButton) {
-        deleteButton.addEventListener("click", (event) => {
+        deleteButton.addEventListener("click", async (event) => {
             event.stopPropagation();
             if (moreMenu && moreButton) {
                 moreMenu.hidden = true;
@@ -1267,7 +1353,14 @@ function bindPageInteractions(page, data) {
 
             const confirmed = window.confirm("이 작품을 삭제하시겠습니까?");
             if (confirmed) {
-                window.alert("삭제 API 연결이 필요합니다.");
+                try {
+                    await apiRequest(`/api/works/${workState.id}`, {
+                        method: "DELETE"
+                    });
+                    window.location.href = "/profile";
+                } catch (error) {
+                    window.alert(error.message || "작품 삭제에 실패했습니다.");
+                }
             }
         });
     }
@@ -1426,40 +1519,56 @@ function resetInactivePages() {
     });
 }
 
-// 템플릿 복제 후 데이터/이벤트 바인딩으로 페이지 스택 구성
-if (pageStack && workPageTemplate) {
-    workDetails.forEach((data) => {
+async function initializeWorkDetailPage() {
+    if (!pageStack || !workPageTemplate) {
+        return;
+    }
+
+    const workId = getCurrentWorkId();
+    if (!workId) {
+        pageStack.innerHTML = "";
+        return;
+    }
+
+    try {
+        const detail = await apiRequest(`/api/works/${workId}`);
+        const normalized = normalizeWorkDetail(detail);
         const fragment = workPageTemplate.content.cloneNode(true);
         const page = fragment.querySelector(".page");
 
-        bindPageData(page, data);
-        bindPageInteractions(page, data);
+        bindPageData(page, normalized);
+        bindPageInteractions(page, normalized);
+        pageStack.innerHTML = "";
         pageStack.appendChild(fragment);
-    });
 
-    if (navigationButtonUp && navigationButtonDown) {
-        navigationButtonUp.addEventListener("click", () => {
-            const currentIndex = getCurrentPageIndex();
-            if (currentIndex > 0) {
-                scrollToPage(currentIndex - 1);
-            }
-        });
+        if (navigationButtonUp && navigationButtonDown) {
+            navigationButtonUp.addEventListener("click", () => {
+                const currentIndex = getCurrentPageIndex();
+                if (currentIndex > 0) {
+                    scrollToPage(currentIndex - 1);
+                }
+            });
 
-        navigationButtonDown.addEventListener("click", () => {
-            const currentIndex = getCurrentPageIndex();
-            scrollToPage(currentIndex + 1);
-        });
+            navigationButtonDown.addEventListener("click", () => {
+                const currentIndex = getCurrentPageIndex();
+                scrollToPage(currentIndex + 1);
+            });
 
-        pageStack.addEventListener("scroll", () => {
-            updateNavigationState();
+            pageStack.addEventListener("scroll", () => {
+                updateNavigationState();
+                resetInactivePages();
+                if (document.querySelector(".workdetail-stage")?.classList.contains("stage-fullscreen")) {
+                    syncFullscreenActivePage();
+                }
+            }, { passive: true });
+            window.addEventListener("resize", updateNavigationState);
             resetInactivePages();
-            if (document.querySelector(".workdetail-stage")?.classList.contains("stage-fullscreen")) {
-                syncFullscreenActivePage();
-            }
-        }, { passive: true });
-        window.addEventListener("resize", updateNavigationState);
-        resetInactivePages();
-        updateNavigationState();
-        syncFullscreenActivePage();
+            updateNavigationState();
+            syncFullscreenActivePage();
+        }
+    } catch (error) {
+        pageStack.innerHTML = `<div style="padding: 32px; text-align: center;">${escapeHtml(error.message || "작품 정보를 불러오지 못했습니다.")}</div>`;
     }
 }
+
+initializeWorkDetailPage();

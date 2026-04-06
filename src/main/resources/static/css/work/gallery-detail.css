@@ -7,12 +7,14 @@
     --yt-font: "Roboto", "Arial", sans-serif;
 }
 
-body {
+body,
+.gallery-detail-body {
     margin: 0;
     padding: 0;
     font-family: var(--yt-font);
     background-color: var(--main-bg);
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
 }
 
 /* Base Layout */
@@ -22,20 +24,44 @@ body {
     margin-top: 56px;
     margin-left: 240px;
     background: #ffffff;
+    overflow-x: hidden;
 }
 
 .gallery-container {
     max-width: 100%;
 }
 
+#page-manager,
+ytd-browse,
+ytd-two-column-browse-results-renderer,
+#primary,
+ytd-rich-grid-renderer {
+    display: block;
+}
+
+.gallery-page-manager,
+.gallery-browse,
+.gallery-results,
+.gallery-results-primary,
+.gallery-rich-grid,
+.gallery-rich-grid-contents {
+    display: block;
+}
+
+.content-row-section {
+    padding: 40px 48px 56px;
+}
+
 /* [핵심] 50/50 무한 페이드 배너 스타일 */
-ytd-carousel-header-renderer {
+ytd-carousel-header-renderer,
+.gallery-carousel-header {
     display: block;
     width: 100%;
     background-color: #000; /* 전체 배경을 짙은 검은색으로 고정 */
 }
 
-#header.ytd-browse {
+#header.ytd-browse,
+.gallery-header {
     position: relative;
 }
 
@@ -43,9 +69,10 @@ ytd-carousel-header-renderer {
     position: absolute;
     top: 18px;
     right: 24px;
-    z-index: 5;
+    z-index: 10;
     display: flex;
     align-items: center;
+    gap: 8px;
 }
 
 .gallery-top-action-button {
@@ -72,7 +99,8 @@ ytd-carousel-header-renderer {
     fill: currentColor;
 }
 
-ytd-default-promo-panel-renderer {
+ytd-default-promo-panel-renderer,
+.gallery-promo-panel {
     display: flex;
     position: relative;
     width: 100%;
@@ -82,7 +110,8 @@ ytd-default-promo-panel-renderer {
 }
 
 /* 우측 사진 영역: 마스크 기법을 사용하여 왼쪽으로 갈수록 투명하게 소멸 */
-#hero {
+#hero,
+.gallery-hero {
     position: absolute;
     top: 0;
     right: 0;
@@ -97,7 +126,8 @@ ytd-default-promo-panel-renderer {
 }
 
 /* 텍스트 가독성을 위한 전체적인 어두운 톤 유지 */
-#scrim {
+#scrim,
+.gallery-scrim {
     position: absolute;
     top: 0;
     left: 0;
@@ -108,7 +138,8 @@ ytd-default-promo-panel-renderer {
 }
 
 /* 좌측 콘텐츠 영역: 검은색 배경 위에 배치 */
-#content.ytd-default-promo-panel-renderer {
+#content.ytd-default-promo-panel-renderer,
+.gallery-promo-content {
     position: relative;
     z-index: 3;
     width: 50%;
@@ -126,7 +157,8 @@ ytd-default-promo-panel-renderer {
     width: 100%;
 }
 
-#description.style-scope {
+#description.style-scope,
+.gallery-description {
     display: block;
     font-size: 15px;
     font-weight: 500;
@@ -136,7 +168,8 @@ ytd-default-promo-panel-renderer {
     letter-spacing: 2px;
 }
 
-#hero-title.ytd-default-promo-panel-renderer {
+#hero-title.ytd-default-promo-panel-renderer,
+.gallery-hero-title {
     font-size: 35px;
     font-weight: 800;
     margin: 0 0 32px 0;
@@ -366,23 +399,36 @@ ytd-rich-shelf-renderer h2, .content-row-section h2 {
 /* Responsive */
 @media (max-width: 1024px) {
     #content.ytd-default-promo-panel-renderer { padding: 0 40px; }
+    .gallery-promo-content { padding: 0 40px; }
     .gallery-nav ul, .gallery-content { padding-left: 40px; padding-right: 40px; }
+    .content-row-section { padding: 32px 32px 48px; }
     .video-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (max-width: 768px) {
     .yt-shell__page-content.gallery-page { margin-left: 72px; }
     ytd-default-promo-panel-renderer { height: 320px; }
+    .gallery-promo-panel { height: 320px; }
     #hero { width: 100%; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 50%); }
+    .gallery-hero { width: 100%; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 50%); mask-image: linear-gradient(to bottom, transparent 0%, black 50%); }
     #content.ytd-default-promo-panel-renderer { width: 100%; align-items: center; text-align: center; }
+    .gallery-promo-content { width: 100%; align-items: center; text-align: center; }
+    .content-row-section { padding: 24px 20px 36px; }
     .video-grid { grid-template-columns: minmax(0, 1fr); }
+    .gallery-top-actions { top: 16px; right: 16px; }
+}
+
+@media (max-width: 640px) {
+    .yt-shell__page-content.gallery-page { margin-left: 0; }
+    .gallery-top-actions { top: 14px; right: 12px; }
 }
 
 .work-action-sheet {
-    position: absolute;
-    left: 1651px;
-    top: 106px;
-    z-index: 3;
+    position: fixed;
+    top: 72px;
+    right: 24px;
+    left: auto;
+    z-index: 30;
     width: 180px;
     border: 1px solid #e6e6e6;
     border-radius: 16px;
@@ -415,4 +461,11 @@ ytd-rich-shelf-renderer h2, .content-row-section h2 {
 
 .work-action-sheet button + button {
     border-top: 1px solid #efefef;
+}
+
+@media (max-width: 768px) {
+    .work-action-sheet {
+        top: 112px;
+        right: 16px;
+    }
 }

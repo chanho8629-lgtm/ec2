@@ -56,9 +56,9 @@ svg {
 .page {
     min-height: 100%;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: 24px 32px;
+    padding: 8px 32px 20px;
     scroll-snap-align: start;
     scroll-snap-stop: always;
     background: #ffffff;
@@ -72,6 +72,7 @@ svg {
     margin: 0 auto;
     max-width: 980px;
     width: 100%;
+    transform: translateY(15px);
 }
 
 .media {
@@ -415,7 +416,7 @@ svg {
 
 @media (max-width: 760px) {
     .page {
-        padding: 20px 14px 28px;
+        padding: 12px 14px 24px;
     }
 
     .view {
@@ -424,6 +425,7 @@ svg {
         align-items: center;
         max-width: none;
         width: 100%;
+        transform: none;
     }
 
     .media {
@@ -1101,6 +1103,50 @@ svg {
     color: #606060;
     font-size: 14px;
     line-height: 1.43;
+}
+
+.cp-input-wrap {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.cp-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 32px;
+    max-height: 120px;
+    padding: 0 0 6px;
+    border: 0;
+    border-bottom: 1px solid #d9d9d9;
+    resize: none;
+    outline: none;
+    color: #111111;
+    background: transparent;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.43;
+}
+
+.cp-submit {
+    flex: 0 0 auto;
+    height: 32px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 999px;
+    background: #111111;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.cp-submit:disabled {
+    background: #d9d9d9;
+    color: #7a7a7a;
+    cursor: default;
 }
 
 .comments-list {

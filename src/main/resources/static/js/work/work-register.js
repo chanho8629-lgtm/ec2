@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var playlistDropdownMenu = document.getElementById("playlist-dropdown-menu");
     var playlistDropdownText = document.getElementById("playlist-dropdown-text");
     var playlistOptions = document.querySelectorAll(".playlist-option");
+    var submitButton = document.getElementById("work-submit-button");
     var thumbnailUploadButtons = document.querySelectorAll(".thumbnail-upload-button");
     var thumbnailFileInputs = document.querySelectorAll('input[id^="thumbnail-file-input-"]');
     var aiPromptModal = document.getElementById("ai-prompt-modal");
@@ -63,6 +64,9 @@ document.addEventListener("DOMContentLoaded", function () {
     var currentPreviewUrl = "";
     var currentAiPromptAttachmentUrl = "";
     var thumbnailPreviewUrls = {};
+    var currentMediaFile = null;
+    var selectedGalleryId = null;
+    var isSubmitting = false;
 
     if (!modal || !dialogContent || !uploadScreen || !detailsScreen || !uploadPanel || !fileInput || !selectFileButton || !closeButton || !fileNameText) {
         return;
@@ -390,6 +394,175 @@ document.addEventListener("DOMContentLoaded", function () {
         return numbersOnly ? Number(numbersOnly).toLocaleString("ko-KR") : "";
     }
 
+    function parseNumber(value) {
+        var numbersOnly;
+
+        if (!value) {
+            return null;
+        }
+
+        numbersOnly = String(value).replace(/,/g, "").replace(/\D/g, "");
+        return numbersOnly ? Number(numbersOnly) : null;
+    }
+
+    function getSelectedMediaFile() {
+        if (currentMediaFile) {
+            return currentMediaFile;
+        }
+
+        return fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+    }
+
+    function getSelectedGalleryOption() {
+        if (!selectedGalleryId) {
+            return null;
+        }
+
+        return Array.prototype.find.call(playlistOptions, function (option) {
+            return option.getAttribute("data-gallery-id") === String(selectedGalleryId);
+        }) || null;
+    }
+
+    function selectGalleryOption(option) {
+        var galleryName;
+        var galleryId;
+
+        if (!option || !playlistDropdownText) {
+            return;
+        }
+
+        galleryName = option.getAttribute("data-playlist-name") || option.textContent.trim();
+        galleryId = option.getAttribute("data-gallery-id");
+
+        selectedGalleryId = galleryId ? Number(galleryId) : null;
+        playlistDropdownText.textContent = galleryName || "선택";
+    }
+
+    function extractTagNames(rawTags) {
+        if (!rawTags) {
+            return [];
+        }
+
+        return rawTags.split(",")
+            .map(function (tag) {
+                return tag.trim();
+            })
+            .filter(function (tag) {
+                return !!tag;
+            });
+    }
+
+    function buildWorkFormData(file) {
+        var formData = new FormData();
+        var title = videoTitleInput ? videoTitleInput.value.trim() : "";
+        var description = videoDescriptionInput ? videoDescriptionInput.value.trim() : "";
+        var tradePrice = tradePriceInput ? parseNumber(tradePriceInput.value) : null;
+        var auctionStartingPrice = auctionBidPriceInput ? parseNumber(auctionBidPriceInput.value) : null;
+        var auctionDeadlineHours = auctionDeadlineHoursInput ? Number(auctionDeadlineHoursInput.value || "0") : 0;
+        var linkUrlText = videoLinkUrl ? videoLinkUrl.textContent.trim() : "";
+        var tags = extractTagNames(videoTagsInput ? videoTagsInput.value : "");
+
+        if (!file) {
+            throw new Error("업로드할 파일을 선택해주세요.");
+        }
+
+        if (!title) {
+            throw new Error("제목을 입력해주세요.");
+        }
+
+        if (!selectedGalleryId) {
+            throw new Error("예술관을 선택해주세요.");
+        }
+
+        formData.append("galleryId", String(selectedGalleryId));
+        formData.append("title", title);
+        formData.append("category", file.type.indexOf("image/") === 0 ? "IMAGE" : "VIDEO");
+        formData.append("description", description);
+        formData.append("licenseType", "");
+        formData.append("licenseTerms", "");
+        formData.append("isTradable", String(!!(tradeToggle && tradeToggle.checked)));
+        formData.append("allowComment", "true");
+        formData.append("showSimilar", "true");
+        formData.append("linkUrl", linkUrlText);
+        formData.append("auctionEnabled", String(!!(auctionConfig && !auctionConfig.hidden)));
+        formData.append("auctionDeadlineHours", String(auctionDeadlineHours));
+        formData.append("mediaFile", file);
+
+        if (tradePrice !== null) {
+            formData.append("price", String(tradePrice));
+        }
+
+        if (auctionStartingPrice !== null) {
+            formData.append("auctionStartingPrice", String(auctionStartingPrice));
+        }
+
+        tags.forEach(function (tagName) {
+            formData.append("tagNames", tagName);
+        });
+
+        return formData;
+    }
+
+    function resolveProfileRedirectUrl() {
+        if (selectedGalleryId) {
+            return "/profile?tab=works&galleryId=" + encodeURIComponent(String(selectedGalleryId));
+        }
+
+        return "/profile?tab=works";
+    }
+
+    function setSubmittingState(submitting) {
+        if (!submitButton) {
+            return;
+        }
+
+        isSubmitting = submitting;
+        submitButton.disabled = submitting;
+        submitButton.textContent = submitting ? "등록 중..." : "등록";
+    }
+
+    function submitWork() {
+        var file;
+        var formData;
+
+        if (isSubmitting) {
+            return;
+        }
+
+        try {
+            file = getSelectedMediaFile();
+            formData = buildWorkFormData(file);
+        } catch (error) {
+            window.alert(error.message);
+            return;
+        }
+
+        setSubmittingState(true);
+
+        fetch("/api/works", {
+            method: "POST",
+            body: formData
+        })
+            .then(function (response) {
+                if (!response.ok) {
+                    return response.text().then(function (message) {
+                        throw new Error(message || "작품 등록에 실패했습니다.");
+                    });
+                }
+
+                return response.json();
+            })
+            .then(function () {
+                window.location.href = resolveProfileRedirectUrl();
+            })
+            .catch(function (error) {
+                window.alert(error.message || "작품 등록 중 오류가 발생했습니다.");
+            })
+            .finally(function () {
+                setSubmittingState(false);
+            });
+    }
+
     function copyVideoLink() {
         if (!videoLinkUrl || !navigator.clipboard || !navigator.clipboard.writeText) {
             return;
@@ -435,6 +608,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var file = files && files[0];
 
         if (!file) {
+            currentMediaFile = null;
             updateSelectedFile(null);
             updateMediaPreview(null);
             return;
@@ -444,6 +618,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        currentMediaFile = file;
         updateSelectedFile(file);
         updateMediaPreview(file);
         showDetailsScreen(file);
@@ -594,7 +769,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         playlistOptions.forEach(function (option) {
             option.addEventListener("click", function () {
-                playlistDropdownText.textContent = option.getAttribute("data-playlist-name") || option.textContent.trim();
+                selectGalleryOption(option);
                 playlistDropdownMenu.hidden = true;
                 playlistDropdownButton.setAttribute("aria-expanded", "false");
             });
@@ -606,6 +781,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 playlistDropdownButton.setAttribute("aria-expanded", "false");
             }
         });
+    }
+
+    if (submitButton) {
+        submitButton.addEventListener("click", submitWork);
     }
 
     if (videoTitleInput && videoTitleCount) {
@@ -751,6 +930,11 @@ document.addEventListener("DOMContentLoaded", function () {
     updateTextCount(videoTitleInput, videoTitleCount, 100);
     updateTextCount(videoDescriptionInput, videoDescriptionCount, 5000);
     updateTextCount(videoTagsInput, videoTagsCount, 500);
+    setSubmittingState(false);
+
+    if (playlistOptions.length) {
+        selectGalleryOption(playlistOptions[0]);
+    }
 
     window.addEventListener("resize", syncDialogSizeToDetailsScreen);
 });

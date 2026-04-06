@@ -41,6 +41,6 @@ public class WorkController {
     public String detail(@PathVariable Long id, Model model) {
         WorkDetailResponseDTO work = workService.getWorkDetail(id);
         model.addAttribute("work", work);
-        return "work/detail";
+        return "work/workdetail";
     }
 }

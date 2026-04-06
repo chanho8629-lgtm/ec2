@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var selectedArtworkLinks = document.getElementById("selectedArtworkLinks");
     var artworkSearchInput = document.getElementById("artworkSearchInput");
     var createBtn = document.getElementById("createBtn");
+    var isSubmitting = false;
     var previewUrl = "";
     var thumbOk = false;
     var tags = [];
@@ -103,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function syncCreateBtn() {
         var hasTitle = setCount(titleBox, titleCount, 150).length > 0;
-        createBtn.disabled = !(hasTitle && thumbOk);
+        createBtn.disabled = isSubmitting || !(hasTitle && thumbOk);
     }
 
     function syncGalleryLink(url) {
@@ -253,6 +254,91 @@ document.addEventListener("DOMContentLoaded", function () {
 
         tags.push(value);
         renderTags();
+    }
+
+    function getSelectedWorkIds() {
+        return getArtworkCheckboxes().filter(function (checkbox) {
+            return checkbox.checked;
+        }).map(function (checkbox) {
+            var numericId = Number(checkbox.value);
+            return Number.isNaN(numericId) ? null : numericId;
+        }).filter(function (workId) {
+            return workId !== null;
+        });
+    }
+
+    function setSubmitting(submitting) {
+        isSubmitting = submitting;
+        createBtn.textContent = submitting ? "만드는 중..." : "만들기";
+        syncCreateBtn();
+    }
+
+    function createGallery() {
+        var formData;
+        var title = setCount(titleBox, titleCount, 150);
+        var description = setCount(descBox, descCount, 500);
+        var coverFile = thumbInput.files && thumbInput.files[0];
+        var workIds = getSelectedWorkIds();
+
+        if (!title) {
+            setTitleError(true);
+            titleBox.focus();
+            return;
+        }
+
+        if (!coverFile) {
+            setThumbError("대표 이미지를 업로드해 주세요.");
+            return;
+        }
+
+        formData = new FormData();
+        formData.append("title", title);
+        formData.append("description", description);
+        formData.append("coverFile", coverFile);
+
+        tags.forEach(function (tag) {
+            formData.append("tagNames", tag);
+        });
+
+        workIds.forEach(function (workId) {
+            formData.append("workIds", String(workId));
+        });
+
+        setSubmitting(true);
+
+        fetch("/api/galleries", {
+            method: "POST",
+            body: formData
+        })
+            .then(function (response) {
+                if (response.redirected) {
+                    throw new Error("login required");
+                }
+
+                if (!response.ok) {
+                    return response.text().then(function (message) {
+                        throw new Error(message || "예술관 생성에 실패했습니다.");
+                    });
+                }
+
+                return response.json();
+            })
+            .then(function (data) {
+                var redirectUrl = data && data.redirectUrl;
+                window.location.href = redirectUrl || "/profile";
+            })
+            .catch(function (error) {
+                if (error.message === "login required") {
+                    window.alert("로그인이 필요합니다.");
+                    window.location.href = "/";
+                    return;
+                }
+
+                window.alert(error.message || "예술관 생성 중 오류가 발생했습니다.");
+            })
+            .finally(function () {
+                setSubmitting(false);
+            });
     }
 
     function resetThumb() {
@@ -431,6 +517,9 @@ document.addEventListener("DOMContentLoaded", function () {
     createBtn.addEventListener("click", function () {
         setTitleError(setCount(titleBox, titleCount, 150).length === 0);
         syncCreateBtn();
+        if (!createBtn.disabled) {
+            createGallery();
+        }
     });
 
     setCount(titleBox, titleCount, 150);
