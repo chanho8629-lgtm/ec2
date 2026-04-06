@@ -40,7 +40,7 @@ public class MainController {
 
     @GetMapping("/error-page")
     public String errorPage() {
-        return "error/error";
+        return "error/404";
     }
 
     private void addGalleryData(Model model) {
