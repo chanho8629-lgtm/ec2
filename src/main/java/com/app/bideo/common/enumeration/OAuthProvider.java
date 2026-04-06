@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public enum OAuthProvider {
-    NAVER("naver"), KAKAO("kakao");
+    NAVER("naver"), KAKAO("kakao"), GOOGLE("google");
 
     private final String value;
 

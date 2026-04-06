@@ -38,4 +38,15 @@ public class GlobalModelAdvice {
         }
         return null;
     }
+
+    @ModelAttribute("currentUserProfileImage")
+    public String currentUserProfileImage() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()
+                && !(auth instanceof AnonymousAuthenticationToken)
+                && auth.getPrincipal() instanceof CustomUserDetails) {
+            return ((CustomUserDetails) auth.getPrincipal()).getProfileImage();
+        }
+        return null;
+    }
 }

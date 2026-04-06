@@ -4,7 +4,7 @@
 drop table if exists tbl_oauth cascade;
 drop type if exists oauth_provider cascade;
 
-create type oauth_provider as enum('kakao', 'naver');
+create type oauth_provider as enum('kakao', 'naver', 'google');
 
 create table tbl_oauth
 (
