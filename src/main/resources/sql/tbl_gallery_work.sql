@@ -22,3 +22,5 @@ comment on column tbl_gallery_work.id              is 'PK';
 comment on column tbl_gallery_work.sort_order      is '전시 순서';
 
 create index idx_gw_work on tbl_gallery_work (work_id);
+
+select * from tbl_gallery_work;

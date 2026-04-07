@@ -23,3 +23,5 @@ comment on column tbl_gallery_like.member_id is '좋아요 한 회원 FK';
 
 create index idx_gallery_like_gallery on tbl_gallery_like (gallery_id);
 create index idx_gallery_like_member on tbl_gallery_like (member_id);
+
+select  * from tbl_gallery_like;
