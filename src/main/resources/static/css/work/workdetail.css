@@ -141,6 +141,12 @@ svg {
     gap: 8px;
 }
 
+.thumb-volume-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
 .thumb-control-button {
     display: inline-flex;
     align-items: center;
@@ -184,6 +190,24 @@ svg {
 
 .thumb-control-button-bookmark.is-active svg {
     fill: currentColor;
+}
+
+.thumb-volume-panel {
+    position: absolute;
+    top: calc(100% + -40px);
+    left: 40px;
+    z-index: 4;
+    width: 120px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(17, 17, 17, 0.88);
+    backdrop-filter: blur(10px);
+}
+
+.thumb-volume-slider {
+    width: 100%;
+    accent-color: #ffffff;
+    cursor: pointer;
 }
 
 .thumb::after {
@@ -1155,6 +1179,7 @@ svg {
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
+    overflow-x: hidden;
     padding-bottom: 8px;
 }
 
@@ -1166,7 +1191,7 @@ svg {
 
 .cm-row {
     display: grid;
-    grid-template-columns: 24px minmax(0, 1fr) 24px;
+    grid-template-columns: 24px minmax(0, 1fr);
     align-items: start;
     gap: 7px;
     padding: 10px 0px 0px 0px;
@@ -1201,8 +1226,9 @@ svg {
     display: flex;
     align-items: center;
     gap: 6px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     margin-bottom: 4px;
+    min-width: 0;
 }
 
 .cm-nm,
@@ -1220,6 +1246,8 @@ svg {
     text-decoration: none;
     font-size: 12px;
     line-height: 1.4;
+    flex: 0 1 auto;
+    min-width: 0;
 }
 
 .cm-tx,
@@ -1229,6 +1257,59 @@ svg {
     font-size: 14px;
     line-height: 1.5;
     white-space: pre-line;
+}
+
+.comment-inline-editor {
+    margin-top: 6px;
+}
+
+.comment-inline-input {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-height: 76px;
+    padding: 10px 12px;
+    border: 1px solid #d9d9d9;
+    border-radius: 12px;
+    resize: vertical;
+    outline: none;
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #111111;
+    background: #ffffff;
+}
+
+.comment-inline-input:focus {
+    border-color: #111111;
+}
+
+.comment-inline-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.comment-inline-button {
+    height: 32px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.comment-inline-button--ghost {
+    background: #f2f2f2;
+    color: #111111;
+}
+
+.comment-inline-button--primary {
+    background: #111111;
+    color: #ffffff;
 }
 
 .cm-ft,
@@ -1275,14 +1356,14 @@ svg {
 
 .cm-ic.is-active,
 .rp-ic.is-active {
-    background: #111111;
-    color: #ffffff;
+    background: transparent;
+    color: #111111;
 }
 
 .cm-ic.is-active:hover,
 .rp-ic.is-active:hover {
-    background: #111111;
-    color: #ffffff;
+    background: transparent;
+    color: #111111;
 }
 
 .cm-vt,
@@ -1355,6 +1436,41 @@ svg {
 .cm-rb:hover,
 .rp-rb:hover {
     color: #0f0f0f;
+}
+
+.comment-action-wrap {
+    position: relative;
+    margin-left: auto;
+    flex: 0 0 auto;
+}
+
+.comment-action-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 5;
+    min-width: 92px;
+    padding: 6px 0;
+    border: 1px solid #e6e6e6;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+}
+
+.comment-action-item {
+    width: 100%;
+    padding: 8px 14px;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    color: #111111;
+    font-size: 13px;
+    line-height: 1.4;
+    cursor: pointer;
+}
+
+.comment-action-item:hover {
+    background: #f7f7f7;
 }
 
 .desc-head {

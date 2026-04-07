@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>예술관 작성</title>
+    <title th:text="${isEditMode} ? '예술관 수정' : '예술관 작성'">예술관 작성</title>
     <link rel="stylesheet" href="/css/work/gallery.css" th:href="@{/css/work/gallery.css}">
 </head>
 <body>
-<div class="modal" id="galleryModal" role="dialog" aria-modal="true" aria-labelledby="galleryTitle">
+<div class="modal"
+     id="galleryModal"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="galleryTitle"
+     th:attr="data-mode=${isEditMode} ? 'edit' : 'create',data-gallery-id=${gallery != null ? gallery.id : ''},data-cover-url=${gallery != null ? gallery.coverImage : ''}">
     <div class="modal-head">
-        <h1 class="modal-title" id="galleryTitle">새 예술관 만들기</h1>
+        <h1 class="modal-title" id="galleryTitle" th:text="${isEditMode} ? '예술관 수정' : '새 예술관 만들기'">새 예술관 만들기</h1>
         <button class="icon-btn" id="closeBtn" type="button" aria-label="닫기">
             <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" aria-hidden="true">
                 <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 1 0-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 1 0 1.414 1.414L12 13.414l5.293 5.293a1 1 0 0 0 1.414-1.414L13.414 12l5.293-5.293a1 1 0 0 0-1.414-1.414Z"></path>
@@ -117,7 +122,7 @@
     </div>
 
     <div class="modal-foot">
-        <button class="main-btn" id="createBtn" type="button" disabled>만들기</button>
+        <button class="main-btn" id="createBtn" type="button" disabled th:text="${isEditMode} ? '수정하기' : '만들기'">만들기</button>
     </div>
 </div>
 
@@ -189,6 +194,16 @@
 </div>
 
 <script src="/js/work/gallery-register.js" th:src="@{/js/work/gallery-register.js}"></script>
+<script th:inline="javascript">
+    window.initialGalleryData = {
+        id: [[${gallery != null ? gallery.id : null}]],
+        title: [[${gallery != null ? gallery.title : ''}]],
+        description: [[${gallery != null ? gallery.description : ''}]],
+        coverImage: [[${gallery != null ? gallery.coverImage : ''}]],
+        workIds: [[${gallery != null and gallery.works != null ? gallery.works.![id] : T(java.util.Collections).emptyList()}]],
+        tagNames: [[${gallery != null and gallery.tags != null ? gallery.tags.![tagName] : T(java.util.Collections).emptyList()}]]
+    };
+</script>
 </body>
 </html>
 <!--  -->

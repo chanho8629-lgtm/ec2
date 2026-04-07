@@ -115771,3 +115771,75 @@ yt-video-as-thumbnail-details[animate-placeholder-on-entrance] #placeholder.yt-v
     box-sizing: border-box;
     margin-bottom: 0
 }
+.yt-compose-open {
+    overflow: hidden;
+}
+
+.yt-compose-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 5000;
+}
+
+.yt-compose-modal[hidden] {
+    display: none;
+}
+
+.yt-compose-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    border: 0;
+    background: rgba(15, 15, 15, 0.72);
+    cursor: pointer;
+}
+
+.yt-compose-modal__content {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+.yt-compose-modal__content .page-shell,
+.yt-compose-modal__content .modal {
+    width: 100%;
+    height: 100%;
+}
+
+.yt-compose-modal__content .page-shell {
+    min-height: 100vh;
+}
+
+.yt-compose-modal__content #work-register-modal {
+    min-height: 100vh;
+    padding: 20px 24px;
+}
+
+.yt-compose-modal__content #work-register-modal .dialog-content {
+    width: min(958px, calc(100vw - 48px));
+    max-height: calc(100vh - 40px);
+}
+
+.yt-compose-modal__content #galleryModal {
+    width: min(576px, calc(100vw - 32px));
+    max-height: min(849px, calc(100vh - 32px));
+}
+
+.yt-compose-modal__loading,
+.yt-compose-modal__error {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 18px 22px;
+    border-radius: 14px;
+    background: #ffffff;
+    color: #111827;
+    font-size: 14px;
+    box-shadow: 0 24px 60px rgba(15, 15, 15, 0.22);
+}

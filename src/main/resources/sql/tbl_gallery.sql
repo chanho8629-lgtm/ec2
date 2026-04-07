@@ -24,6 +24,8 @@ create table tbl_gallery (
         references tbl_member (id)
 );
 
+select  * from tbl_gallery;
+
 -- alter table tbl_gallery alter column  cover_image type text;
 
 comment on table tbl_gallery is '예술관';
@@ -43,3 +45,4 @@ comment on column tbl_gallery.deleted_datetime is '삭제 일시';
 
 create index idx_gallery_member on tbl_gallery (member_id);
 create index idx_gallery_status on tbl_gallery (status, created_datetime desc);
+

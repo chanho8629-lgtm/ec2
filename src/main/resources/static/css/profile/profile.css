@@ -388,10 +388,13 @@ button[type="submit"] {
   aspect-ratio: 16 / 9;
 }
 
-.videoThumb img {
+.videoThumb img,
+.videoThumb video,
+.videoThumbMedia {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .videoThumb span {

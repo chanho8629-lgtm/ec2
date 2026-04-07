@@ -57,11 +57,15 @@ public interface WorkMapper {
 
     void insertTag(@Param("tagName") String tagName);
 
+    List<TagResponseDTO> selectTagSuggestions(@Param("keyword") String keyword, @Param("limit") int limit);
+
     List<TagResponseDTO> selectWorkTagsByWorkId(@Param("workId") Long workId);
 
     void insertWorkComment(CommentVO commentVO);
 
     int increaseWorkCommentCount(@Param("workId") Long workId);
+
+    int decreaseWorkCommentCount(@Param("workId") Long workId);
 
     List<CommentResponseDTO> selectWorkCommentsByWorkId(@Param("workId") Long workId);
 

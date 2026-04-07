@@ -29,9 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -121,6 +119,7 @@ public class GalleryService {
         GalleryDetailResponseDTO detail = galleryDAO.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("gallery not found"));
         detail.setCoverImage(s3FileService.getPresignedUrl(detail.getCoverImage()));
+        detail.setMemberProfileImage(s3FileService.getPresignedUrl(detail.getMemberProfileImage()));
         detail.setTags(galleryDAO.findTagsByGalleryId(id));
         detail.setWorks(getGalleryWorks(id, detail.getMemberId()));
 
@@ -133,7 +132,12 @@ public class GalleryService {
                         && !memberId.equals(detail.getMemberId())
                         && followService.isFollowing(memberId, detail.getMemberId())
         );
+        detail.setIsOwner(memberId != null && memberId.equals(detail.getMemberId()));
         return detail;
+    }
+
+    public void increaseViewCount(Long id) {
+        galleryDAO.increaseViewCount(id);
     }
 
     @Transactional(readOnly = true)
@@ -143,7 +147,12 @@ public class GalleryService {
         searchDTO.setMemberId(memberId);
         searchDTO.setPage(1);
         searchDTO.setSize(50);
-        return workDAO.findAll(searchDTO);
+        List<com.app.bideo.dto.work.WorkListResponseDTO> works = workDAO.findAll(searchDTO);
+        works.forEach(work -> {
+            work.setThumbnailUrl(s3FileService.getPresignedUrl(work.getThumbnailUrl()));
+            work.setMemberProfileImage(s3FileService.getPresignedUrl(work.getMemberProfileImage()));
+        });
+        return works;
     }
 
     // 추천 예술관 (인기순)
@@ -183,6 +192,9 @@ public class GalleryService {
         }
 
         galleryDAO.update(id, requestDTO);
+        galleryDAO.deleteWorkLinksByGalleryId(id);
+        saveWorkLinks(id, requestDTO.getWorkIds());
+        galleryDAO.updateWorkCount(id);
         galleryDAO.deleteTagsByGalleryId(id);
         saveTags(id, requestDTO.getTagIds(), requestDTO.getTagNames());
     }
@@ -209,9 +221,11 @@ public class GalleryService {
                 .orElseThrow(() -> new IllegalArgumentException("gallery not found"));
         List<CommentResponseDTO> comments = galleryDAO.findCommentsByGalleryId(id);
         Long memberId = resolveAuthenticatedMemberId();
-        comments.forEach(comment ->
-                comment.setIsLiked(memberId != null && commentService.isLikedByCurrentMember(comment.getId()))
-        );
+        comments.forEach(comment -> {
+            comment.setMemberProfileImage(s3FileService.getPresignedUrl(comment.getMemberProfileImage()));
+            comment.setIsLiked(memberId != null && commentService.isLikedByCurrentMember(comment.getId()));
+            comment.setIsOwner(memberId != null && memberId.equals(comment.getMemberId()));
+        });
         return comments;
     }
 

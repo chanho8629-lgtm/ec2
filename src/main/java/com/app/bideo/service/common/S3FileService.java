@@ -66,15 +66,22 @@ public class S3FileService {
             return null;
         }
 
-        if (key.startsWith("/uploads/")) {
-            return key;
+        String normalizedKey = key.trim();
+
+        if (normalizedKey.startsWith("/uploads/")
+                || normalizedKey.startsWith("/")
+                || normalizedKey.startsWith("http://")
+                || normalizedKey.startsWith("https://")
+                || normalizedKey.startsWith("data:")
+                || normalizedKey.startsWith("blob:")) {
+            return normalizedKey;
         }
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
                 .signatureDuration(PRESIGNED_URL_DURATION)
                 .getObjectRequest(GetObjectRequest.builder()
                         .bucket(bucket)
-                        .key(key)
+                        .key(normalizedKey)
                         .build())
                 .build();
 

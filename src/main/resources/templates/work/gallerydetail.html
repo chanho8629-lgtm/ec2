@@ -17,7 +17,12 @@
                 
                 <div id="header" class="gallery-header">
                     <div class="gallery-top-actions" aria-label="상단 액션">
-                        <button class="gallery-top-action-button" type="button" aria-label="추가 작업" aria-expanded="false" data-role="gallery-top-menu-button">
+                        <button class="gallery-top-action-button"
+                                type="button"
+                                aria-label="추가 작업"
+                                aria-expanded="false"
+                                data-role="gallery-top-menu-button"
+                                th:if="${gallery != null and gallery.isOwner}">
                             <svg viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M12 4a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Z"></path>
                             </svg>
@@ -34,9 +39,14 @@
                                 <div id="carousel-item" class="gallery-carousel-card">
                                     <div class="gallery-promo-panel" data-panel-layout="DEFAULT_PROMO_PANEL_RENDERER_LAYOUT_B">
                                         
-                                        <div id="hero" class="gallery-hero" 
-                                             style="background-image: url('https://i.ytimg.com/vi/JUSvuYc02WA/maxresdefault.jpg');"> 
-                                            </div>
+                                        <div id="hero"
+                                             class="gallery-hero"
+                                             th:if="${gallery != null and gallery.coverImage != null and !#strings.isEmpty(gallery.coverImage)}"
+                                             th:style="|background-image: url('${gallery.coverImage}');|"></div>
+                                        <div id="hero"
+                                             class="gallery-hero"
+                                             th:unless="${gallery != null and gallery.coverImage != null and !#strings.isEmpty(gallery.coverImage)}"
+                                             style="background-image: url('https://i.ytimg.com/vi/JUSvuYc02WA/maxresdefault.jpg');"></div>
                                         <div id="scrim" class="gallery-scrim"></div>
                                        
                                         <!-- 예술관 내용 -->
@@ -44,16 +54,16 @@
                                         <div id="content" class="gallery-promo-content grid grid-disabled">
                                             <div class="promo-text-wrapper">
                                                 
-                                                <h1 id="hero-title" class="gallery-hero-title" th:text="${gallery.title}">예술관 제목</h1>
+                                                <h1 id="hero-title" class="gallery-hero-title" th:text="${gallery != null ? gallery.title : '예술관 제목'}">예술관 제목</h1>
                                                 
                                                 <div id="description" class="gallery-description">
                                                     <span style="color: rgba(255, 255, 255, 0.6); letter-spacing: 1px;"
-                                                          th:text="${gallery.description}">예술관 설명</span>
+                                                          th:text="${gallery != null ? gallery.description : '예술관 설명'}">예술관 설명</span>
                                                 </div>
 
 
                                                 <p class="hero-meta"
-                                                   th:text="|작품 ${gallery.workCount == null ? 0 : gallery.workCount}개 · 좋아요 ${gallery.likeCount == null ? 0 : gallery.likeCount}개|">작품 0개 · 좋아요 0개</p>
+                                                   th:text="|작품 ${gallery != null and gallery.workCount != null ? gallery.workCount : 0}개 · 조회수 ${gallery != null and gallery.viewCount != null ? gallery.viewCount : 0}회|">작품 0개 · 조회수 0회</p>
 
                                                 <!-- [추가] 시청하기 아래 썸네일 내비게이션 영역 -->
                                                 <!-- <div id="pagination-thumbnails" class="style-scope ytd-carousel-item-renderer">
@@ -98,7 +108,7 @@
                                     <h2>인기 급상승</h2>
                                     <div class="video-grid">
                                         <a class="video-item"
-                                           th:if="${!#lists.isEmpty(gallery.works)}"
+                                           th:if="${gallery != null and !#lists.isEmpty(gallery.works)}"
                                            th:each="work : ${gallery.works}"
                                            th:href="@{/work/detail/{id}(id=${work.id})}">
                                             <div class="thumb">
@@ -108,19 +118,19 @@
                                             </div>
                                             <div class="item-meta">
                                                 <div class="item-avatar">
-                                                    <img th:if="${gallery.coverImage != null and !#strings.isEmpty(gallery.coverImage)}"
-                                                         th:src="${gallery.coverImage}"
-                                                         th:alt="${gallery.memberNickname}">
+                                                    <img th:if="${work.memberProfileImage != null and !#strings.isEmpty(work.memberProfileImage)}"
+                                                         th:src="${work.memberProfileImage}"
+                                                         th:alt="${work.memberNickname != null ? work.memberNickname : '작가'}">
                                                 </div>
                                                 <div class="item-copy">
                                                     <h3 th:text="${work.title}">작품 제목</h3>
-                                                    <p class="item-channel" th:text="${gallery.memberNickname}">작가명</p>
+                                                    <p class="item-channel" th:text="${gallery != null ? gallery.memberNickname : '작가명'}">작가명</p>
                                                     <p class="item-stats"
                                                        th:text="|조회수 ${work.viewCount == null ? 0 : work.viewCount}회 · 좋아요 ${work.likeCount == null ? 0 : work.likeCount}개|">조회수 0회 · 좋아요 0개</p>
                                                 </div>
                                             </div>
                                         </a>
-                                        <div th:if="${#lists.isEmpty(gallery.works)}">
+                                        <div th:if="${gallery == null or #lists.isEmpty(gallery.works)}">
                                             등록된 작품이 없습니다.
                                         </div>
                                     </div>
@@ -132,49 +142,93 @@
             </div>
         </div>
     </main>
-    <div class="work-action-sheet" hidden data-role="gallery-top-action-menu" aria-hidden="true">
-        <button class="danger" type="button">수정하기</button>
-        <button class="danger" type="button">삭제하기</button>
+    <div class="work-action-sheet"
+         hidden
+         data-role="gallery-top-action-menu"
+         aria-hidden="true"
+         th:if="${gallery != null and gallery.isOwner}">
+        <button class="danger" type="button" data-role="gallery-edit-button">수정하기</button>
+        <button class="danger" type="button" data-role="gallery-delete-button">삭제하기</button>
         <button class="cancel" type="button">취소</button>
     </div>
     <th:block th:replace="~{layout/layout :: ytShellScripts()}"></th:block>
-    <script>
+    <script th:inline="javascript">
         (() => {
+            const galleryId = [[${gallery != null ? gallery.id : null}]];
             const menuButton = document.querySelector('[data-role="gallery-top-menu-button"]');
             const menu = document.querySelector('[data-role="gallery-top-action-menu"]');
             const closeButton = document.querySelector('[data-role="gallery-close-button"]');
-
-            if (!menuButton || !menu) {
-                return;
-            }
+            const editButton = document.querySelector('[data-role="gallery-edit-button"]');
+            const deleteButton = document.querySelector('[data-role="gallery-delete-button"]');
 
             const closeMenu = () => {
+                if (!menu || !menuButton) {
+                    return;
+                }
                 menu.hidden = true;
                 menu.setAttribute("aria-hidden", "true");
                 menuButton.setAttribute("aria-expanded", "false");
             };
 
             const openMenu = () => {
+                if (!menu || !menuButton) {
+                    return;
+                }
                 menu.hidden = false;
                 menu.setAttribute("aria-hidden", "false");
                 menuButton.setAttribute("aria-expanded", "true");
             };
 
-            menuButton.addEventListener("click", (event) => {
-                event.stopPropagation();
-                if (menu.hidden) {
-                    openMenu();
+            if (menuButton && menu) {
+                menuButton.addEventListener("click", (event) => {
+                    event.stopPropagation();
+                    if (menu.hidden) {
+                        openMenu();
+                        return;
+                    }
+
+                    closeMenu();
+                });
+
+                menu.addEventListener("click", (event) => {
+                    const cancelButton = event.target.closest(".cancel");
+                    event.stopPropagation();
+                    if (cancelButton) {
+                        closeMenu();
+                    }
+                });
+            }
+
+            editButton?.addEventListener("click", () => {
+                closeMenu();
+                if (galleryId) {
+                    window.location.href = `/gallery/${galleryId}/edit`;
+                }
+            });
+
+            deleteButton?.addEventListener("click", async () => {
+                closeMenu();
+                if (!galleryId) {
                     return;
                 }
 
-                closeMenu();
-            });
+                if (!window.confirm("예술관을 삭제하시겠습니까? 포함된 작품도 함께 삭제됩니다.")) {
+                    return;
+                }
 
-            menu.addEventListener("click", (event) => {
-                const cancelButton = event.target.closest(".cancel");
-                event.stopPropagation();
-                if (cancelButton) {
-                    closeMenu();
+                try {
+                    const response = await fetch(`/api/galleries/${galleryId}`, {
+                        method: "DELETE"
+                    });
+
+                    if (!response.ok) {
+                        const message = await response.text();
+                        throw new Error(message || "예술관 삭제에 실패했습니다.");
+                    }
+
+                    window.location.href = "/profile";
+                } catch (error) {
+                    window.alert(error.message || "예술관 삭제 중 오류가 발생했습니다.");
                 }
             });
 

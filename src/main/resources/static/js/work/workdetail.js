@@ -5,8 +5,27 @@ function getCurrentWorkId() {
     return Number.isFinite(currentWorkId) && currentWorkId > 0 ? currentWorkId : null;
 }
 
+function getMediaFiles(detail) {
+    return Array.isArray(detail?.files) ? detail.files : [];
+}
+
+function getThumbnailSource(detail) {
+    const files = getMediaFiles(detail);
+    const imageFile = files.find((file) => String(file?.fileType || "").startsWith("image/"));
+    const firstFile = files[0];
+
+    return imageFile?.fileUrl || firstFile?.fileUrl || "";
+}
+
 function getMediaSource(detail) {
-    const firstFile = Array.isArray(detail?.files) ? detail.files[0] : null;
+    const files = getMediaFiles(detail);
+
+    if (detail?.category === "VIDEO") {
+        const videoFile = files.find((file) => String(file?.fileType || "").startsWith("video/"));
+        return videoFile?.fileUrl || "";
+    }
+
+    const firstFile = files[0];
     return firstFile?.fileUrl || "";
 }
 
@@ -73,18 +92,74 @@ function normalizeComment(comment) {
         text: comment.content || "",
         likes: comment.likeCount || 0,
         isLiked: Boolean(comment.isLiked),
+        isOwner: Boolean(comment.isOwner),
         replies: Array.isArray(comment.replies) ? comment.replies.map(normalizeComment) : []
     };
 }
 
-function normalizeWorkDetail(detail) {
+function buildPivotData(galleryDetail, workId) {
+    if (!galleryDetail || !Array.isArray(galleryDetail.works) || !galleryDetail.works.length) {
+        return {
+            pivotThumb: "",
+            pivotTitle: "",
+            pivotAvatar: "",
+            pivotArtist: "",
+            pivotCount: "",
+            pivotItems: []
+        };
+    }
+
+    const pivotItems = galleryDetail.works
+        .filter((work) => work && work.id !== workId)
+        .map((work) => ({
+            image: work.thumbnailUrl || "",
+            meta: work.title || "",
+            href: `/work/detail/${work.id}`
+        }));
+
+    return {
+        pivotThumb: galleryDetail.coverImage || galleryDetail.works[0]?.thumbnailUrl || "",
+        pivotTitle: galleryDetail.title || "",
+        pivotAvatar: galleryDetail.memberProfileImage || "",
+        pivotArtist: galleryDetail.memberNickname ? `@${galleryDetail.memberNickname}` : "",
+        pivotCount: `작품 ${galleryDetail.workCount || galleryDetail.works.length || 0}개`,
+        pivotItems
+    };
+}
+
+async function normalizeWorkDetail(detail) {
     const mediaSource = getMediaSource(detail);
-    const isVideo = Boolean(mediaSource) && !mediaSource.startsWith("data:image");
+    const thumbnailSource = getThumbnailSource(detail) || mediaSource;
+    const isVideo = detail.category === "VIDEO" && Boolean(mediaSource);
     const createdDate = detail.createdDatetime || detail.updatedDatetime;
+    let pivotData = {
+        pivotThumb: "",
+        pivotTitle: "",
+        pivotAvatar: "",
+        pivotArtist: "",
+        pivotCount: "",
+        pivotItems: []
+    };
+
+    if (detail.galleryId) {
+        try {
+            const galleryDetail = await apiRequest(`/api/galleries/${detail.galleryId}`);
+            pivotData = buildPivotData(galleryDetail, detail.id);
+        } catch (_) {
+            pivotData = {
+                pivotThumb: "",
+                pivotTitle: "",
+                pivotAvatar: "",
+                pivotArtist: "",
+                pivotCount: "",
+                pivotItems: []
+            };
+        }
+    }
 
     return {
         id: detail.id,
-        thumb: mediaSource,
+        thumb: thumbnailSource,
         videoSrc: isVideo ? mediaSource : "",
         thumbAlt: detail.title || "작품",
         caption: detail.title || "",
@@ -98,7 +173,7 @@ function normalizeWorkDetail(detail) {
         marketType: detail.hasActiveAuction ? "auction" : detail.isTradable ? "trade" : "",
         avatarText: getAvatarText(detail.memberNickname),
         channel: `@${detail.memberNickname || "artist"}`,
-        isOwner: false,
+        isOwner: Boolean(detail.isOwner),
         subscribe: "팔로우",
         desc: detail.description || "",
         headline: detail.title || "",
@@ -106,12 +181,7 @@ function normalizeWorkDetail(detail) {
         isLiked: Boolean(detail.isLiked),
         shareUrl: `${window.location.origin}/work/detail/${detail.id}`,
         comments: Array.isArray(detail.comments) ? detail.comments.map(normalizeComment) : [],
-        pivotThumb: "",
-        pivotTitle: "",
-        pivotAvatar: "",
-        pivotArtist: "",
-        pivotCount: "",
-        pivotItems: []
+        ...pivotData
     };
 }
 
@@ -140,6 +210,11 @@ async function apiRequest(url, options = {}) {
 // UI 아이콘 경로 정의
 const playIconPath = "M7 5.2v13.6c0 .73.8 1.18 1.43.8L19.98 13a.92.92 0 0 0 0-1.6L8.43 4.4A.92.92 0 0 0 7 5.2Z";
 const pauseIconPath = "M6.5 3A1.5 1.5 0 005 4.5v15A1.5 1.5 0 006.5 21h2a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 008.5 3h-2Zm9 0A1.5 1.5 0 0014 4.5v15a1.5 1.5 0 001.5 1.5h2a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0017.5 3h-2Z";
+const volumeHighIconPath = "M11.485 2.143 3.913 6.687A6 6 0 001 11.832v.338a6 6 0 002.913 5.144l7.572 4.543A1 1 0 0013 21V3a1.001 1.001 0 00-1.515-.857Zm6.88 2.079a1 1 0 00-.001 1.414 9 9 0 010 12.728 1 1 0 001.414 1.414 11 11 0 000-15.556 1 1 0 00-1.413 0Zm-2.83 2.828a1 1 0 000 1.415 5 5 0 010 7.07 1 1 0 001.415 1.415 6.999 6.999 0 000-9.9 1 1 0 00-1.415 0Z";
+const volumeLowIconPath = "M11.485 2.143 3.913 6.687A6 6 0 001 11.832v.338a6 6 0 002.913 5.144l7.572 4.543A1 1 0 0013 21V3a1.001 1.001 0 00-1.515-.857Zm4.697 4.907a1 1 0 000 1.415 5 5 0 010 7.07 1 1 0 001.415 1.415 6.999 6.999 0 000-9.9 1 1 0 00-1.415 0Z";
+const volumeMuteIconPath = "M11.485 2.143 3.913 6.687A6 6 0 001 11.832v.338a6 6 0 002.913 5.144l7.572 4.543A1 1 0 0013 21V3a1.001 1.001 0 00-1.515-.857Zm5.222 6.443a1 1 0 0 0-1.414 0L13.88 10l-1.414-1.414a1 1 0 1 0-1.414 1.414L12.466 11.414l-1.414 1.414a1 1 0 0 0 1.414 1.414l1.414-1.414 1.414 1.414a1 1 0 0 0 1.414-1.414L15.294 11.414l1.413-1.414a1 1 0 0 0 0-1.414Z";
+const commentLikeOutlinePath = "M9.221 1.795a1 1 0 011.109-.656l1.04.173a4 4 0 013.252 4.784L14 9h4.061a3.664 3.664 0 013.576 2.868A3.68 3.68 0 0121 14.85l.02.087A3.815 3.815 0 0120 18.5v.043l-.01.227a2.82 2.82 0 01-.135.663l-.106.282A3.754 3.754 0 0116.295 22h-3.606l-.392-.007a12.002 12.002 0 01-5.223-1.388l-.343-.189-.27-.154a2.005 2.005 0 00-.863-.26l-.13-.004H3.5a1.5 1.5 0 01-1.5-1.5V12.5A1.5 1.5 0 013.5 11h1.79l.157-.013a1 1 0 00.724-.512l.063-.145 2.987-8.535Zm-1.1 9.196A3 3 0 015.29 13H4v4.998h1.468a4 4 0 011.986.528l.27.155.285.157A10 10 0 0012.69 20h3.606c.754 0 1.424-.483 1.663-1.2l.03-.126a.819.819 0 00.012-.131v-.872l.587-.586c.388-.388.577-.927.523-1.465l-.038-.23-.02-.087-.21-.9.55-.744A1.663 1.663 0 0018.061 11H14a2.002 2.002 0 01-1.956-2.418l.623-2.904a2 2 0 00-1.626-2.392l-.21-.035-2.71 7.741Z";
+const commentLikeFilledPath = "M2 10.5A1.5 1.5 0 0 1 3.5 9h2.614a.25.25 0 0 0 .239-.183l1.265-4.427A2.75 2.75 0 0 1 10.262 2a.75.75 0 0 1 .75.75v5.999a.75.75 0 0 0 .75.75h6.112a2.25 2.25 0 0 1 2.174 2.835l-1.209 4.836A3.75 3.75 0 0 1 15.201 20H8.574a3.75 3.75 0 0 1-1.06-.153L4.158 18.79A1.5 1.5 0 0 1 2 17.35v-6.85Z";
 const bookmarkOutlinePath = "M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z";
 const bookmarkFilledPath = "M5 2a2 2 0 0 0-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 0 0-2-2H5Z";
 const tradeIconPath = "M21.5 4h-19A1.5 1.5 0 001 5.5v13A1.5 1.5 0 002.5 20h19a1.5 1.5 0 001.5-1.5v-13A1.5 1.5 0 0021.5 4ZM3 18V6h18v12H3Zm9-11.5a1 1 0 00-1 1v.638c-.357.101-.689.26-.979.49A2.35 2.35 0 009.13 10.5c-.007.424.112.84.342 1.197.21.31.497.563.831.734.546.29 1.23.411 1.693.502.557.109.899.19 1.117.315.087.048.11.082.114.09.004.005.028.044.028.162 0 .024-.008.118-.165.235-.162.122-.5.27-1.09.27-.721 0-1.049-.21-1.181-.323a.7.7 0 01-.132-.15l-.01-.018.005.013.006.014.002.009a.996.996 0 00-1.884.64l.947-.316-.003.001c-.9.3-.942.315-.943.317l.001.003.003.006.004.015.012.032c.045.111.1.218.162.321.146.236.324.444.535.624.357.306.841.566 1.476.702v.605a1 1 0 002 0v-.614c1.29-.289 2.245-1.144 2.245-2.386 0-.44-.103-.852-.327-1.212-.22-.355-.52-.6-.82-.77-.555-.316-1.244-.445-1.719-.539-.568-.111-.915-.185-1.143-.305a.5.5 0 01-.1-.07l-.004-.002V10.6a.401.401 0 01-.012-.1c0-.158.053-.244.14-.314.109-.086.34-.19.74-.19.373-.001.73.144.997.404a.995.995 0 001.518-1.286l-.699.58.698-.582v-.001l-.002-.001-.002-.003-.006-.006-.016-.018a2.984 2.984 0 00-.178-.182A3.44 3.44 0 0013 8.154V7.5a1 1 0 00-1-1Z";
@@ -255,7 +330,9 @@ function bindPageData(page, data) {
     const marketButton = page.querySelector('[data-role="market-button"]');
     const marketIconPath = page.querySelector('[data-role="market-icon-path"]');
     const marketIconSvg = marketButton?.querySelector("svg");
+    const pivotButton = page.querySelector('[data-role="pivot-button"]');
     const hasMarketAction = data.marketType === "trade" || data.marketType === "auction";
+    const hasPivotItems = Array.isArray(data.pivotItems) && data.pivotItems.length > 0;
 
     if (marketButton) {
         marketButton.hidden = !hasMarketAction;
@@ -269,6 +346,12 @@ function bindPageData(page, data) {
     if (marketIconSvg) {
         marketIconSvg.style.transform = data.marketType === "trade" ? "scale(1.14)" : "";
         marketIconSvg.style.transformOrigin = "center";
+    }
+
+    if (pivotButton) {
+        pivotButton.hidden = !hasPivotItems;
+        pivotButton.style.display = hasPivotItems ? "" : "none";
+        pivotButton.setAttribute("aria-hidden", hasPivotItems ? "false" : "true");
     }
 }
 
@@ -316,9 +399,12 @@ function updateVoteButtonState(button, isActive) {
 
     button.classList.toggle("is-active", isActive);
     button.setAttribute("aria-pressed", isActive ? "true" : "false");
+    const iconPath = button.querySelector('[data-role="comment-like-icon-path"]');
+    if (iconPath) {
+        iconPath.setAttribute("d", isActive ? commentLikeFilledPath : commentLikeOutlinePath);
+    }
 }
 
-// 좋아요/싫어요 한 쌍의 상태를 동기화
 function bindVotePair({ likeButton, dislikeButton, countNode, initialCount = 0, compactCount = false }) {
     let voteState = 0;
     const baseCount = initialCount;
@@ -352,11 +438,11 @@ function bindVotePair({ likeButton, dislikeButton, countNode, initialCount = 0, 
 
 function formatCommentVoteCount(baseCount, voteState) {
     if (voteState === 1 || voteState === -1) {
-        return formatDisplayCount(baseCount + 1);
+        return `좋아요 ${formatDisplayCount(baseCount + 1)}`;
     }
 
     if (baseCount > 0) {
-        return formatDisplayCount(baseCount);
+        return `좋아요 ${formatDisplayCount(baseCount)}`;
     }
 
     return "";
@@ -368,6 +454,28 @@ function renderCommentsList(commentsList, comments) {
     }
 
     commentsList.innerHTML = (comments || []).map(renderCommentItem).join("");
+}
+
+function updateCommentTree(comments, commentId, updater) {
+    return (comments || []).map((comment) => {
+        if (comment.id === commentId) {
+            return updater(comment);
+        }
+
+        return {
+            ...comment,
+            replies: Array.isArray(comment.replies) ? updateCommentTree(comment.replies, commentId, updater) : []
+        };
+    });
+}
+
+function removeCommentTree(comments, commentId) {
+    return (comments || [])
+        .filter((comment) => comment.id !== commentId)
+        .map((comment) => ({
+            ...comment,
+            replies: Array.isArray(comment.replies) ? removeCommentTree(comment.replies, commentId) : []
+        }));
 }
 
 function updateCountFields(page, fieldName, value, compact = false) {
@@ -388,16 +496,24 @@ function renderReplyItem(reply) {
                 <div class="rp-hd">
                     <a class="rp-nm" href="#">${escapeHtml(reply.author)}</a>
                     <a class="rp-tm" href="#">${escapeHtml(reply.time)}</a>
+                    ${reply.isOwner ? `
+                        <div class="comment-action-wrap">
+                            <button class="cm-mn" type="button" aria-label="작업 메뉴" data-role="comment-menu-toggle" aria-expanded="false">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Z"></path></svg>
+                            </button>
+                            <div class="comment-action-menu" hidden data-role="comment-action-menu">
+                                <button class="comment-action-item" type="button" data-role="comment-edit">수정</button>
+                                <button class="comment-action-item" type="button" data-role="comment-delete">삭제</button>
+                            </div>
+                        </div>
+                    ` : ""}
                 </div>
                 <p class="rp-tx">${escapeHtml(reply.text)}</p>
                 <div class="rp-ft">
                     <button class="rp-ic${reply.isLiked ? " is-active" : ""}" type="button" aria-label="좋아요" data-vote="like" aria-pressed="${reply.isLiked ? "true" : "false"}">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.221 1.795a1 1 0 011.109-.656l1.04.173a4 4 0 013.252 4.784L14 9h4.061a3.664 3.664 0 013.576 2.868A3.68 3.68 0 0121 14.85l.02.087A3.815 3.815 0 0120 18.5v.043l-.01.227a2.82 2.82 0 01-.135.663l-.106.282A3.754 3.754 0 0116.295 22h-3.606l-.392-.007a12.002 12.002 0 01-5.223-1.388l-.343-.189-.27-.154a2.005 2.005 0 00-.863-.26l-.13-.004H3.5a1.5 1.5 0 01-1.5-1.5V12.5A1.5 1.5 0 013.5 11h1.79l.157-.013a1 1 0 00.724-.512l.063-.145 2.987-8.535Zm-1.1 9.196A3 3 0 015.29 13H4v4.998h1.468a4 4 0 011.986.528l.27.155.285.157A10 10 0 0012.69 20h3.606c.754 0 1.424-.483 1.663-1.2l.03-.126a.819.819 0 00.012-.131v-.872l.587-.586c.388-.388.577-.927.523-1.465l-.038-.23-.02-.087-.21-.9.55-.744A1.663 1.663 0 0018.061 11H14a2.002 2.002 0 01-1.956-2.418l.623-2.904a2 2 0 00-1.626-2.392l-.21-.035-2.71 7.741Z"></path></svg>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path data-role="comment-like-icon-path" d="${reply.isLiked ? commentLikeFilledPath : commentLikeOutlinePath}"></path></svg>
                     </button>
-                    <span class="rp-vt" data-role="vote-count" data-base-count="${escapeHtml(reply.likes || 0)}">${escapeHtml(reply.likes ? formatDisplayCount(reply.likes) : "")}</span>
-                    <button class="rp-ic" type="button" aria-label="싫어요" data-vote="dislike" aria-pressed="false">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m11.31 2 .392.007c1.824.06 3.61.534 5.223 1.388l.343.189.27.154c.264.152.56.24.863.26l.13.004H20.5a1.5 1.5 0 011.5 1.5V11.5a1.5 1.5 0 01-1.5 1.5h-1.79l-.158.013a1 1 0 00-.723.512l-.064.145-2.987 8.535a1 1 0 01-1.109.656l-1.04-.174a4 4 0 01-3.251-4.783L10 15H5.938a3.664 3.664 0 01-3.576-2.868A3.682 3.682 0 013 9.15l-.02-.088A3.816 3.816 0 014 5.5v-.043l.008-.227a2.86 2.86 0 01.136-.664l.107-.28A3.754 3.754 0 017.705 2h3.605ZM7.705 4c-.755 0-1.425.483-1.663 1.2l-.032.126a.818.818 0 00-.01.131v.872l-.587.586a1.816 1.816 0 00-.524 1.465l.038.23.02.087.21.9-.55.744a1.686 1.686 0 00-.321 1.18l.029.177c.17.76.844 1.302 1.623 1.302H10a2.002 2.002 0 011.956 2.419l-.623 2.904-.034.208a2.002 2.002 0 001.454 2.139l.206.045.21.035 2.708-7.741A3.001 3.001 0 0118.71 11H20V6.002h-1.47c-.696 0-1.38-.183-1.985-.528l-.27-.155-.285-.157A10.002 10.002 0 0011.31 4H7.705Z"></path></svg>
-                    </button>
+                    <span class="rp-vt" data-role="comment-like-count" data-base-count="${escapeHtml(reply.likes || 0)}">${escapeHtml(reply.likes ? `좋아요 ${formatDisplayCount(reply.likes)}` : "")}</span>
                 </div>
             </div>
         </article>
@@ -418,16 +534,24 @@ function renderCommentItem(comment) {
                     <div class="cm-hd">
                         <a class="cm-nm" href="#">${escapeHtml(comment.author)}</a>
                         <a class="cm-tm" href="#">${escapeHtml(comment.time)}</a>
+                        ${comment.isOwner ? `
+                            <div class="comment-action-wrap">
+                                <button class="cm-mn" type="button" aria-label="작업 메뉴" data-role="comment-menu-toggle" aria-expanded="false">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Z"></path></svg>
+                                </button>
+                                <div class="comment-action-menu" hidden data-role="comment-action-menu">
+                                    <button class="comment-action-item" type="button" data-role="comment-edit">수정</button>
+                                    <button class="comment-action-item" type="button" data-role="comment-delete">삭제</button>
+                                </div>
+                            </div>
+                        ` : ""}
                     </div>
                     <p class="cm-tx">${escapeHtml(comment.text)}</p>
                     <div class="cm-ft">
                         <button class="cm-ic${comment.isLiked ? " is-active" : ""}" type="button" aria-label="좋아요" data-vote="like" aria-pressed="${comment.isLiked ? "true" : "false"}">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.221 1.795a1 1 0 011.109-.656l1.04.173a4 4 0 013.252 4.784L14 9h4.061a3.664 3.664 0 013.576 2.868A3.68 3.68 0 0121 14.85l.02.087A3.815 3.815 0 0120 18.5v.043l-.01.227a2.82 2.82 0 01-.135.663l-.106.282A3.754 3.754 0 0116.295 22h-3.606l-.392-.007a12.002 12.002 0 01-5.223-1.388l-.343-.189-.27-.154a2.005 2.005 0 00-.863-.26l-.13-.004H3.5a1.5 1.5 0 01-1.5-1.5V12.5A1.5 1.5 0 013.5 11h1.79l.157-.013a1 1 0 00.724-.512l.063-.145 2.987-8.535Zm-1.1 9.196A3 3 0 015.29 13H4v4.998h1.468a4 4 0 011.986.528l.27.155.285.157A10 10 0 0012.69 20h3.606c.754 0 1.424-.483 1.663-1.2l.03-.126a.819.819 0 00.012-.131v-.872l.587-.586c.388-.388.577-.927.523-1.465l-.038-.23-.02-.087-.21-.9.55-.744A1.663 1.663 0 0018.061 11H14a2.002 2.002 0 01-1.956-2.418l.623-2.904a2 2 0 00-1.626-2.392l-.21-.035-2.71 7.741Z"></path></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path data-role="comment-like-icon-path" d="${comment.isLiked ? commentLikeFilledPath : commentLikeOutlinePath}"></path></svg>
                         </button>
-                        <span class="cm-vt" data-role="vote-count" data-base-count="${escapeHtml(comment.likes || 0)}">${escapeHtml(comment.likes ? formatDisplayCount(comment.likes) : "")}</span>
-                        <button class="cm-ic" type="button" aria-label="싫어요" data-vote="dislike" aria-pressed="false">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m11.31 2 .392.007c1.824.06 3.61.534 5.223 1.388l.343.189.27.154c.264.152.56.24.863.26l.13.004H20.5a1.5 1.5 0 011.5 1.5V11.5a1.5 1.5 0 01-1.5 1.5h-1.79l-.158.013a1 1 0 00-.723.512l-.064.145-2.987 8.535a1 1 0 01-1.109.656l-1.04-.174a4 4 0 01-3.251-4.783L10 15H5.938a3.664 3.664 0 01-3.576-2.868A3.682 3.682 0 013 9.15l-.02-.088A3.816 3.816 0 014 5.5v-.043l.008-.227a2.86 2.86 0 01.136-.664l.107-.28A3.754 3.754 0 017.705 2h3.605ZM7.705 4c-.755 0-1.425.483-1.663 1.2l-.032.126a.818.818 0 00-.01.131v.872l-.587.586a1.816 1.816 0 00-.524 1.465l.038.23.02.087.21.9-.55.744a1.686 1.686 0 00-.321 1.18l.029.177c.17.76.844 1.302 1.623 1.302H10a2.002 2.002 0 011.956 2.419l-.623 2.904-.034.208a2.002 2.002 0 001.454 2.139l.206.045.21.035 2.708-7.741A3.001 3.001 0 0118.71 11H20V6.002h-1.47c-.696 0-1.38-.183-1.985-.528l-.27-.155-.285-.157A10.002 10.002 0 0011.31 4H7.705Z"></path></svg>
-                        </button>
+                        <span class="cm-vt" data-role="comment-like-count" data-base-count="${escapeHtml(comment.likes || 0)}">${escapeHtml(comment.likes ? `좋아요 ${formatDisplayCount(comment.likes)}` : "")}</span>
                     </div>
                     ${replies.length ? `
                         <div class="cm-rp">
@@ -436,9 +560,6 @@ function renderCommentItem(comment) {
                         </div>
                     ` : ""}
                 </div>
-                <button class="cm-mn" type="button" aria-label="작업 메뉴">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Z"></path></svg>
-                </button>
             </div>
         </article>
     `;
@@ -447,7 +568,7 @@ function renderCommentItem(comment) {
 function renderPivotCard(item) {
     return `
         <article class="pivot-card">
-            <a class="pivot-card-link" href="about:invalid#pivot-card">
+            <a class="pivot-card-link" href="${escapeHtml(item.href || "about:invalid#pivot-card")}">
                 <img src="${escapeHtml(item.image || "")}" alt="">
                 <div class="pivot-card-overlay">
                     <p class="pivot-card-meta">${escapeHtml(item.meta || "")}</p>
@@ -534,6 +655,10 @@ function bindPageInteractions(page, data) {
     const playToggle = page.querySelector('[data-role="play-toggle"]');
     const playTogglePath = page.querySelector('[data-role="play-toggle-path"]');
     const thumbVideo = page.querySelector('[data-role="thumb-video"]');
+    const volumeButton = page.querySelector('[data-role="volume-button"]');
+    const volumeIconPath = page.querySelector('[data-role="volume-icon-path"]');
+    const volumePanel = page.querySelector('[data-role="volume-panel"]');
+    const volumeSlider = page.querySelector('[data-role="volume-slider"]');
     const moreButton = page.querySelector('[data-role="more-button"]');
     const moreMenu = page.querySelector('[data-role="more-menu"]');
     const editButton = page.querySelector('[data-role="edit-button"]');
@@ -578,12 +703,55 @@ function bindPageInteractions(page, data) {
     const reportConfirmButton = page.querySelector('[data-role="report-confirm-button"]');
     const reportReasonInputs = page.querySelectorAll('input[name="report-form-reason-select-page"]');
     const card = page.querySelector(".card");
+    const thumb = page.querySelector(".thumb");
     const fullscreenButton = page.querySelector('[data-role="fullscreen-button"]');
     const mediaCluster = page.querySelector(".media-cluster");
     const workdetailStage = pageStack?.closest(".workdetail-stage") || document.querySelector(".workdetail-stage");
     let snackbarTimerId = 0;
     let workState = { ...data };
     const isOwner = Boolean(data.isOwner);
+    let lastNonZeroVolume = 0.5;
+    let isPaused = false;
+
+    const updateVolumeUi = () => {
+        if (!thumbVideo || !volumeButton || !volumeIconPath) {
+            return;
+        }
+
+        const isMuted = thumbVideo.muted || thumbVideo.volume === 0;
+        const volume = thumbVideo.volume;
+
+        if (volumeSlider) {
+            volumeSlider.value = String(volume);
+        }
+
+        if (isMuted) {
+            volumeIconPath.setAttribute("d", volumeMuteIconPath);
+            volumeButton.setAttribute("aria-label", "음소거 해제");
+            return;
+        }
+
+        volumeIconPath.setAttribute("d", volume > 0.5 ? volumeHighIconPath : volumeLowIconPath);
+        volumeButton.setAttribute("aria-label", "음소거");
+    };
+
+    const closeVolumePanel = () => {
+        if (!volumePanel || !volumeButton) {
+            return;
+        }
+
+        volumePanel.hidden = true;
+        volumeButton.setAttribute("aria-expanded", "false");
+    };
+
+    const openVolumePanel = () => {
+        if (!volumePanel || !volumeButton) {
+            return;
+        }
+
+        volumePanel.hidden = false;
+        volumeButton.setAttribute("aria-expanded", "true");
+    };
     const closeAuctionPanelForPage = () => {
         if (!auctionModalBackdrop) {
             return;
@@ -628,22 +796,34 @@ function bindPageInteractions(page, data) {
         deleteButton.hidden = !isOwner;
     }
 
+    if (notRecommendButton) {
+        notRecommendButton.hidden = isOwner;
+    }
+
+    if (reportButton) {
+        reportButton.hidden = isOwner;
+    }
+
+    const togglePlayback = () => {
+        if (!thumbVideo || thumbVideo.hidden || !playTogglePath || !playToggle) {
+            return;
+        }
+
+        isPaused = !isPaused;
+
+        if (isPaused) {
+            thumbVideo.pause();
+        } else {
+            thumbVideo.play().catch(() => {});
+        }
+
+        playTogglePath.setAttribute("d", isPaused ? playIconPath : pauseIconPath);
+        playToggle.setAttribute("aria-label", isPaused ? "재생" : "일시정지");
+    };
+
     if (playToggle && playTogglePath) {
-        let isPaused = false;
-
         playToggle.addEventListener("click", () => {
-            isPaused = !isPaused;
-
-            if (thumbVideo && !thumbVideo.hidden) {
-                if (isPaused) {
-                    thumbVideo.pause();
-                } else {
-                    thumbVideo.play().catch(() => {});
-                }
-            }
-
-            playTogglePath.setAttribute("d", isPaused ? playIconPath : pauseIconPath);
-            playToggle.setAttribute("aria-label", isPaused ? "재생" : "일시정지");
+            togglePlayback();
         });
 
         if (thumbVideo && !thumbVideo.hidden) {
@@ -652,8 +832,97 @@ function bindPageInteractions(page, data) {
         }
     }
 
+    if (thumb && thumbVideo && !thumbVideo.hidden) {
+        thumb.addEventListener("click", (event) => {
+            if (event.target.closest(".thumb-controls") || event.target.closest(".thumb-more-menu")) {
+                return;
+            }
+
+            togglePlayback();
+        });
+
+        thumbVideo.addEventListener("click", (event) => {
+            event.stopPropagation();
+            togglePlayback();
+        });
+    }
+
+    if (thumbVideo && !thumbVideo.hidden) {
+        thumbVideo.volume = 0.5;
+        thumbVideo.muted = true;
+        updateVolumeUi();
+        thumbVideo.addEventListener("volumechange", updateVolumeUi);
+    } else {
+        closeVolumePanel();
+    }
+
+    if (volumeButton && thumbVideo) {
+        volumeButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+
+            if (!thumbVideo.hidden && thumbVideo.muted) {
+                thumbVideo.muted = false;
+                thumbVideo.volume = lastNonZeroVolume || 0.5;
+            } else if (!thumbVideo.hidden) {
+                if (thumbVideo.volume > 0) {
+                    lastNonZeroVolume = thumbVideo.volume;
+                }
+                thumbVideo.muted = true;
+            }
+
+            if (volumePanel?.hidden) {
+                openVolumePanel();
+            } else {
+                closeVolumePanel();
+            }
+
+            updateVolumeUi();
+        });
+    }
+
+    if (volumeSlider && thumbVideo) {
+        volumeSlider.addEventListener("input", (event) => {
+            const nextVolume = Number(event.target.value || "0");
+            thumbVideo.volume = nextVolume;
+            thumbVideo.muted = nextVolume === 0;
+
+            if (nextVolume > 0) {
+                lastNonZeroVolume = nextVolume;
+            }
+
+            updateVolumeUi();
+        });
+    }
+
+    if (volumePanel) {
+        volumePanel.addEventListener("click", (event) => {
+            event.stopPropagation();
+        });
+    }
+
+    page.addEventListener("click", (event) => {
+        if (!volumeButton || !volumePanel) {
+            return;
+        }
+
+        if (volumeButton.contains(event.target) || volumePanel.contains(event.target)) {
+            return;
+        }
+
+        closeVolumePanel();
+    });
+
     if (commentsList) {
         renderCommentsList(commentsList, workState.comments);
+
+        const closeCommentMenus = () => {
+            commentsList.querySelectorAll('[data-role="comment-action-menu"]').forEach((menu) => {
+                menu.hidden = true;
+            });
+            commentsList.querySelectorAll('[data-role="comment-menu-toggle"]').forEach((button) => {
+                button.setAttribute("aria-expanded", "false");
+            });
+        };
 
         commentsList.addEventListener("click", (event) => {
             const toggle = event.target.closest('[data-role="reply-toggle"]');
@@ -673,6 +942,28 @@ function bindPageInteractions(page, data) {
             toggle.textContent = willOpen ? "답글 숨기기" : `답글 ${list.children.length}개`;
         });
 
+        commentsList.addEventListener("click", (event) => {
+            const menuToggle = event.target.closest('[data-role="comment-menu-toggle"]');
+            if (!menuToggle) {
+                if (!event.target.closest('[data-role="comment-action-menu"]')) {
+                    closeCommentMenus();
+                }
+                return;
+            }
+
+            event.stopPropagation();
+
+            const menu = menuToggle.closest(".comment-action-wrap")?.querySelector('[data-role="comment-action-menu"]');
+            if (!menu) {
+                return;
+            }
+
+            const willOpen = menu.hidden;
+            closeCommentMenus();
+            menu.hidden = !willOpen;
+            menuToggle.setAttribute("aria-expanded", willOpen ? "true" : "false");
+        });
+
         commentsList.addEventListener("click", async (event) => {
             const voteButton = event.target.closest('[data-vote]');
             if (!voteButton) {
@@ -681,7 +972,7 @@ function bindPageInteractions(page, data) {
 
             const commentItem = voteButton.closest("[data-comment-id]");
             const commentId = Number(commentItem?.dataset.commentId || "0");
-            const voteWrap = voteButton.closest(".cm-ft, .rp-ft");
+            const voteWrap = voteButton.closest(".cm-hd, .rp-hd, .cm-ft, .rp-ft");
             if (!voteWrap || !commentId || voteButton.dataset.vote !== "like") {
                 return;
             }
@@ -692,19 +983,129 @@ function bindPageInteractions(page, data) {
                 });
                 const likeButton = voteWrap.querySelector('[data-vote="like"]');
                 const dislikeButton = voteWrap.querySelector('[data-vote="dislike"]');
-                const countNode = voteWrap.querySelector('[data-role="vote-count"]');
+                const countNode = commentItem.querySelector('[data-role="comment-like-count"]');
 
                 updateVoteButtonState(likeButton, Boolean(result.liked));
                 updateVoteButtonState(dislikeButton, false);
 
                 if (countNode) {
                     countNode.dataset.baseCount = String(result.likeCount || 0);
-                    countNode.textContent = result.likeCount ? formatDisplayCount(result.likeCount) : "";
+                    countNode.textContent = result.likeCount ? `좋아요 ${formatDisplayCount(result.likeCount)}` : "";
                 }
             } catch (error) {
                 window.alert(error.message || "댓글 좋아요 처리에 실패했습니다.");
             }
         });
+
+        commentsList.addEventListener("click", async (event) => {
+            const editButton = event.target.closest('[data-role="comment-edit"]');
+            const deleteButton = event.target.closest('[data-role="comment-delete"]');
+            const editSaveButton = event.target.closest('[data-role="comment-edit-save"]');
+            const editCancelButton = event.target.closest('[data-role="comment-edit-cancel"]');
+            const commentItem = event.target.closest("[data-comment-id]");
+            const commentId = Number(commentItem?.dataset.commentId || "0");
+
+            if (!commentId) {
+                return;
+            }
+
+            const closeInlineEditors = () => {
+                commentsList.querySelectorAll('[data-role="comment-inline-editor"]').forEach((editor) => {
+                    editor.remove();
+                });
+                commentsList.querySelectorAll(".cm-tx, .rp-tx").forEach((textNode) => {
+                    textNode.hidden = false;
+                });
+            };
+
+            if (editCancelButton) {
+                closeInlineEditors();
+                return;
+            }
+
+            if (editSaveButton) {
+                closeCommentMenus();
+                const editor = commentItem.querySelector('[data-role="comment-inline-editor"]');
+                const input = editor?.querySelector('[data-role="comment-inline-input"]');
+                const textNode = commentItem.querySelector(".cm-tx, .rp-tx");
+                const currentText = textNode?.textContent?.trim() || "";
+                const normalizedText = input?.value?.trim() || "";
+
+                if (!normalizedText || normalizedText === currentText) {
+                    closeInlineEditors();
+                    return;
+                }
+
+                try {
+                    const updated = await apiRequest(`/api/comments/${commentId}`, {
+                        method: "PUT",
+                        body: JSON.stringify({ content: normalizedText })
+                    });
+
+                    workState.comments = updateCommentTree(workState.comments, commentId, (comment) => ({
+                        ...comment,
+                        text: updated.content || normalizedText,
+                        time: formatRelativeTime(updated.updatedDatetime || updated.createdDatetime)
+                    }));
+                    renderCommentsList(commentsList, workState.comments);
+                } catch (error) {
+                    window.alert(error.message || "댓글 수정에 실패했습니다.");
+                }
+
+                return;
+            }
+
+            if (editButton) {
+                closeCommentMenus();
+                const textNode = commentItem.querySelector(".cm-tx, .rp-tx");
+                const currentText = textNode?.textContent?.trim() || "";
+                const anchorNode =
+                    commentItem.querySelector(".cm-ft, .rp-ft")
+                    || commentItem.querySelector(".cm-rp")
+                    || textNode;
+
+                if (!textNode || !anchorNode) {
+                    return;
+                }
+
+                closeInlineEditors();
+                textNode.hidden = true;
+                anchorNode.insertAdjacentHTML("beforebegin", `
+                    <div class="comment-inline-editor" data-role="comment-inline-editor">
+                        <textarea class="comment-inline-input" data-role="comment-inline-input">${escapeHtml(currentText)}</textarea>
+                        <div class="comment-inline-actions">
+                            <button class="comment-inline-button comment-inline-button--ghost" type="button" data-role="comment-edit-cancel">취소</button>
+                            <button class="comment-inline-button comment-inline-button--primary" type="button" data-role="comment-edit-save">저장</button>
+                        </div>
+                    </div>
+                `);
+                commentItem.querySelector('[data-role="comment-inline-input"]')?.focus();
+
+                return;
+            }
+
+            if (deleteButton) {
+                closeCommentMenus();
+                if (!window.confirm("댓글을 삭제하시겠습니까?")) {
+                    return;
+                }
+
+                try {
+                    await apiRequest(`/api/comments/${commentId}`, {
+                        method: "DELETE"
+                    });
+
+                    workState.comments = removeCommentTree(workState.comments, commentId);
+                    workState.commentCount = Math.max(0, parseDisplayCount(workState.commentCount) - 1);
+                    renderCommentsList(commentsList, workState.comments);
+                    updateCountFields(page, "commentCount", workState.commentCount);
+                } catch (error) {
+                    window.alert(error.message || "댓글 삭제에 실패했습니다.");
+                }
+            }
+        });
+
+        document.addEventListener("click", closeCommentMenus);
     }
 
     if (primaryLikeButton) {
@@ -793,12 +1194,23 @@ function bindPageInteractions(page, data) {
                     method: "POST",
                     body: JSON.stringify({ content })
                 });
-                const normalized = normalizeWorkDetail(detail);
-                workState = { ...workState, comments: normalized.comments, commentCount: normalized.commentCount };
+                const normalizedComments = Array.isArray(detail.comments)
+                    ? detail.comments.map(normalizeComment)
+                    : workState.comments;
+                const nextCommentCount = detail.commentCount || normalizedComments.length || 0;
+
+                workState = {
+                    ...workState,
+                    comments: normalizedComments,
+                    commentCount: formatDisplayCount(nextCommentCount)
+                };
                 renderCommentsList(commentsList, workState.comments);
-                updateCountFields(page, "commentCount", detail.commentCount || 0, false);
+                updateCountFields(page, "commentCount", nextCommentCount, false);
                 commentInput.value = "";
                 syncCommentSubmitState();
+                if (commentsList) {
+                    commentsList.scrollTop = commentsList.scrollHeight;
+                }
             } catch (error) {
                 window.alert(error.message || "댓글 등록에 실패했습니다.");
                 syncCommentSubmitState();
@@ -929,28 +1341,50 @@ function bindPageInteractions(page, data) {
         shareModalBackdrop.style.display = "none";
         shareModalBackdrop.style.background = "rgba(15, 23, 42, 0.42)";
         shareModalBackdrop.style.padding = "16px";
+        shareModalBackdrop.style.alignItems = "center";
+        shareModalBackdrop.style.justifyContent = "center";
 
         if (shareModal) {
-            shareModal.style.position = "fixed";
+            shareModal.style.position = "relative";
+            shareModal.style.left = "auto";
+            shareModal.style.top = "auto";
+            shareModal.style.margin = "auto";
             shareModal.style.zIndex = "10000";
         }
 
         const openShareModal = () => {
             shareModalBackdrop.hidden = false;
-            shareModalBackdrop.style.display = "block";
+            shareModalBackdrop.setAttribute("aria-hidden", "false");
+            shareModalBackdrop.style.display = "flex";
         };
 
         const closeShareModal = () => {
             shareModalBackdrop.hidden = true;
+            shareModalBackdrop.setAttribute("aria-hidden", "true");
             shareModalBackdrop.style.display = "none";
         };
 
-        shareButton.addEventListener("click", (event) => {
+        shareButton.addEventListener("click", async (event) => {
             event.stopPropagation();
 
             if (!shareModalBackdrop.hidden) {
                 closeShareModal();
                 return;
+            }
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: workState.headline || document.title,
+                        text: workState.desc || "",
+                        url: workState.shareUrl || window.location.href
+                    });
+                    return;
+                } catch (error) {
+                    if (error?.name === "AbortError") {
+                        return;
+                    }
+                }
             }
 
             openShareModal();
@@ -1252,6 +1686,9 @@ function bindPageInteractions(page, data) {
     if (fullscreenButton && workdetailStage) {
         const fullscreenTarget = workdetailStage;
         let fallbackFullscreenActive = false;
+        let normalModeScrollTop = null;
+        let normalWindowScrollX = 0;
+        let normalWindowScrollY = 0;
         const closeTransientUi = () => {
             workdetailStage.querySelectorAll(".page").forEach((targetPage) => {
                 const targetMoreMenu = targetPage.querySelector('[data-role="more-menu"]');
@@ -1286,6 +1723,20 @@ function bindPageInteractions(page, data) {
                 workdetailStage.querySelectorAll(".page").forEach((targetPage) => {
                     targetPage.classList.remove("fullscreen-active-page");
                 });
+                requestAnimationFrame(() => {
+                    if (pageStack && normalModeScrollTop !== null) {
+                        pageStack.scrollTop = normalModeScrollTop;
+                    }
+                    window.scrollTo(normalWindowScrollX, normalWindowScrollY);
+                    requestAnimationFrame(() => {
+                        if (pageStack && normalModeScrollTop !== null) {
+                            pageStack.scrollTop = normalModeScrollTop;
+                        }
+                        window.scrollTo(normalWindowScrollX, normalWindowScrollY);
+                    });
+                    updateNavigationState();
+                    resetInactivePages();
+                });
             }
             workdetailStage.querySelectorAll('[data-role="fullscreen-button"]').forEach((button) => {
                 button.setAttribute("aria-label", isFullscreen ? "전체 화면 종료" : "전체 화면");
@@ -1297,7 +1748,12 @@ function bindPageInteractions(page, data) {
             const willOpen = !(getFullscreenElement() === fullscreenTarget || fallbackFullscreenActive);
             closeTransientUi();
             if (willOpen) {
-                page.scrollIntoView({ behavior: "auto", block: "start" });
+                normalModeScrollTop = pageStack ? pageStack.scrollTop : null;
+                normalWindowScrollX = window.scrollX;
+                normalWindowScrollY = window.scrollY;
+                if (pageStack) {
+                    pageStack.scrollTop = page.offsetTop;
+                }
                 setFullscreenActivePage(page);
             }
 
@@ -1532,7 +1988,7 @@ async function initializeWorkDetailPage() {
 
     try {
         const detail = await apiRequest(`/api/works/${workId}`);
-        const normalized = normalizeWorkDetail(detail);
+        const normalized = await normalizeWorkDetail(detail);
         const fragment = workPageTemplate.content.cloneNode(true);
         const page = fragment.querySelector(".page");
 

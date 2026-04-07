@@ -2,8 +2,10 @@ package com.app.bideo.controller.work;
 
 import com.app.bideo.dto.common.PageResponseDTO;
 import com.app.bideo.dto.common.LikeToggleResponseDTO;
+import com.app.bideo.dto.common.TagResponseDTO;
 import com.app.bideo.dto.interaction.CommentCreateRequestDTO;
 import com.app.bideo.dto.work.WorkCreateRequestDTO;
+import com.app.bideo.dto.work.WorkCreateResponseDTO;
 import com.app.bideo.dto.work.WorkDetailResponseDTO;
 import com.app.bideo.dto.work.WorkListResponseDTO;
 import com.app.bideo.dto.work.WorkSearchDTO;
@@ -22,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/works")
 @RequiredArgsConstructor
@@ -31,18 +35,24 @@ public class WorkAPIController {
 
     // 작품 등록
     @PostMapping
-    public WorkDetailResponseDTO write(
+    public WorkCreateResponseDTO write(
             @RequestParam(required = false) Long memberId,
             @ModelAttribute WorkCreateRequestDTO requestDTO,
-            @RequestParam("mediaFile") MultipartFile mediaFile
+            @RequestParam("mediaFile") MultipartFile mediaFile,
+            @RequestParam(required = false) MultipartFile thumbnailFile
     ) {
-        return workService.write(memberId, requestDTO, mediaFile);
+        return workService.write(memberId, requestDTO, mediaFile, thumbnailFile);
     }
 
     // 작품 목록 조회
     @GetMapping
     public PageResponseDTO<WorkListResponseDTO> list(@ModelAttribute WorkSearchDTO searchDTO) {
         return workService.getWorkList(searchDTO);
+    }
+
+    @GetMapping("/tags/suggestions")
+    public List<TagResponseDTO> tagSuggestions(@RequestParam String keyword) {
+        return workService.getTagSuggestions(keyword);
     }
 
     // 작품 상세 조회
@@ -72,9 +82,10 @@ public class WorkAPIController {
             @PathVariable Long id,
             @RequestParam(required = false) Long memberId,
             @ModelAttribute WorkUpdateRequestDTO requestDTO,
-            @RequestParam(required = false) MultipartFile mediaFile
+            @RequestParam(required = false) MultipartFile mediaFile,
+            @RequestParam(required = false) MultipartFile thumbnailFile
     ) {
-        return workService.update(id, memberId, requestDTO, mediaFile);
+        return workService.update(id, memberId, requestDTO, mediaFile, thumbnailFile);
     }
 
     // 작품 댓글 등록

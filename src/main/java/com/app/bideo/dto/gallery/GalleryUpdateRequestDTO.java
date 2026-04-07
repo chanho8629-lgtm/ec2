@@ -14,6 +14,7 @@ public class GalleryUpdateRequestDTO {
     private String coverImage;
     private Boolean allowComment;
     private Boolean showSimilar;
+    private List<Long> workIds;
     private List<Long> tagIds;
     private List<String> tagNames;
 }

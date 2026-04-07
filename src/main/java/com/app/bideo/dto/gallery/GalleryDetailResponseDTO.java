@@ -15,6 +15,7 @@ public class GalleryDetailResponseDTO {
     private Long id;
     private Long memberId;
     private String memberNickname;
+    private String memberProfileImage;
     private String title;
     private String description;
     private String coverImage;
@@ -30,5 +31,6 @@ public class GalleryDetailResponseDTO {
     private Boolean isLiked;
     private Boolean isBookmarked;
     private Boolean isFollowing;
+    private Boolean isOwner;
     private LocalDateTime createdDatetime;
 }

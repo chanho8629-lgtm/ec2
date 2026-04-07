@@ -97,7 +97,14 @@
               <a th:href="@{/work/detail/{id}(id=${work.id})}"
                  class="videoThumb"
                  th:classappend="${work.thumbnailUrl == null or #strings.isEmpty(work.thumbnailUrl)} ? ' thumb-02' : ''">
-                <img th:if="${work.thumbnailUrl != null and !#strings.isEmpty(work.thumbnailUrl)}"
+                <video th:if="${work.thumbnailUrl != null and !#strings.isEmpty(work.thumbnailUrl) and work.thumbnailFileType != null and #strings.startsWith(work.thumbnailFileType, 'video/')}"
+                       class="videoThumbMedia"
+                       th:src="${work.thumbnailUrl}"
+                       muted
+                       playsinline
+                       preload="metadata"></video>
+                <img th:if="${work.thumbnailUrl != null and !#strings.isEmpty(work.thumbnailUrl) and (work.thumbnailFileType == null or !#strings.startsWith(work.thumbnailFileType, 'video/'))}"
+                     class="videoThumbMedia"
                      th:src="${work.thumbnailUrl}"
                      th:alt="${work.title}">
                 <span th:text="${work.category == null ? 'WORK' : work.category}">WORK</span>

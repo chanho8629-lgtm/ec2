@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+function initializeGalleryRegister() {
     var modal = document.getElementById("galleryModal");
     var closeBtn = document.getElementById("closeBtn");
     var titleBox = document.getElementById("titleBox");
@@ -26,10 +26,13 @@ document.addEventListener("DOMContentLoaded", function () {
     var selectedArtworkLinks = document.getElementById("selectedArtworkLinks");
     var artworkSearchInput = document.getElementById("artworkSearchInput");
     var createBtn = document.getElementById("createBtn");
+    var initialGalleryData = window.initialGalleryData || {};
+    var isEditMode = modal.getAttribute("data-mode") === "edit";
+    var galleryId = modal.getAttribute("data-gallery-id");
     var isSubmitting = false;
     var previewUrl = "";
     var thumbOk = false;
-    var tags = [];
+    var tags = Array.isArray(initialGalleryData.tagNames) ? initialGalleryData.tagNames.slice() : [];
     var committedArtworkLinks = [];
 
     if (!modal || !titleBox || !descBox || !createBtn) {
@@ -37,7 +40,33 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function closeModal() {
+        if (isEditMode) {
+            navigateAfterSubmit("/profile");
+            return;
+        }
+
+        if (typeof window.closeComposeModal === "function") {
+            window.closeComposeModal();
+            return;
+        }
+
+        if (window.parent && window.parent !== window && typeof window.parent.closeComposeModal === "function") {
+            window.parent.closeComposeModal();
+            return;
+        }
+
         modal.style.display = "none";
+    }
+
+    function navigateAfterSubmit(url) {
+        var targetUrl = url || (galleryId ? "/gallery/" + galleryId : "/profile");
+
+        if (window.top && window.top !== window) {
+            window.top.location.href = targetUrl;
+            return;
+        }
+
+        window.location.href = targetUrl;
     }
 
     function setCaretEnd(node) {
@@ -269,11 +298,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function setSubmitting(submitting) {
         isSubmitting = submitting;
-        createBtn.textContent = submitting ? "만드는 중..." : "만들기";
+        createBtn.textContent = submitting ? (isEditMode ? "수정 중..." : "만드는 중...") : (isEditMode ? "수정하기" : "만들기");
         syncCreateBtn();
     }
 
-    function createGallery() {
+    function submitGallery() {
         var formData;
         var title = setCount(titleBox, titleCount, 150);
         var description = setCount(descBox, descCount, 500);
@@ -286,7 +315,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        if (!coverFile) {
+        if (!coverFile && !isEditMode) {
             setThumbError("대표 이미지를 업로드해 주세요.");
             return;
         }
@@ -294,7 +323,9 @@ document.addEventListener("DOMContentLoaded", function () {
         formData = new FormData();
         formData.append("title", title);
         formData.append("description", description);
-        formData.append("coverFile", coverFile);
+        if (coverFile) {
+            formData.append("coverFile", coverFile);
+        }
 
         tags.forEach(function (tag) {
             formData.append("tagNames", tag);
@@ -306,7 +337,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         setSubmitting(true);
 
-        fetch("/api/galleries", {
+        fetch(isEditMode ? "/api/galleries/" + galleryId + "/edit" : "/api/galleries", {
             method: "POST",
             body: formData
         })
@@ -321,20 +352,24 @@ document.addEventListener("DOMContentLoaded", function () {
                     });
                 }
 
+                if (isEditMode) {
+                    return { redirectUrl: "/gallery/" + galleryId };
+                }
+
                 return response.json();
             })
             .then(function (data) {
                 var redirectUrl = data && data.redirectUrl;
-                window.location.href = redirectUrl || "/profile";
+                navigateAfterSubmit(redirectUrl || "/profile");
             })
             .catch(function (error) {
                 if (error.message === "login required") {
                     window.alert("로그인이 필요합니다.");
-                    window.location.href = "/";
+                    navigateAfterSubmit("/");
                     return;
                 }
 
-                window.alert(error.message || "예술관 생성 중 오류가 발생했습니다.");
+                window.alert(error.message || (isEditMode ? "예술관 수정 중 오류가 발생했습니다." : "예술관 생성 중 오류가 발생했습니다."));
             })
             .finally(function () {
                 setSubmitting(false);
@@ -518,17 +553,50 @@ document.addEventListener("DOMContentLoaded", function () {
         setTitleError(setCount(titleBox, titleCount, 150).length === 0);
         syncCreateBtn();
         if (!createBtn.disabled) {
-            createGallery();
+            submitGallery();
         }
     });
 
+    if (isEditMode) {
+        titleBox.textContent = initialGalleryData.title || "";
+        descBox.textContent = initialGalleryData.description || "";
+
+        getArtworkCheckboxes().forEach(function (checkbox) {
+            checkbox.checked = Array.isArray(initialGalleryData.workIds) && initialGalleryData.workIds.indexOf(Number(checkbox.value)) > -1;
+        });
+
+        committedArtworkLinks = getSelectedArtworkData();
+
+        if (initialGalleryData.coverImage && thumbPreviewImage) {
+            thumbPreviewImage.src = initialGalleryData.coverImage;
+            thumbOk = true;
+            if (thumbShell) {
+                thumbShell.classList.add("is-filled");
+            }
+            if (thumbLinkMeta) {
+                thumbLinkMeta.hidden = false;
+            }
+            syncGalleryLink(initialGalleryData.coverImage);
+        }
+    }
+
     setCount(titleBox, titleCount, 150);
     setCount(descBox, descCount, 500);
-    resetThumb();
+    if (!isEditMode) {
+        resetThumb();
+    }
     renderTags();
     renderSelectedArtworks();
     renderSelectedArtworkLinks();
-    syncGalleryLink("");
+    if (!isEditMode) {
+        syncGalleryLink("");
+    }
     setTitleError(false);
     syncCreateBtn();
-});
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeGalleryRegister);
+} else {
+    initializeGalleryRegister();
+}

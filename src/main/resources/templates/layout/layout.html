@@ -374,7 +374,7 @@
                     class="style-scope yt-multi-page-menu-section-renderer" hide-secondary-string=""
                     compact-link-style="compact-link-style-type-creation-menu"><!--css-build:shady--><!--css_build_scope:ytd-compact-link-renderer--><!--css_build_styles:video.youtube.src.web.polymer.shared.ui.styles.yt_base_styles.yt.base.styles.css.js--><a
                       id="endpoint" class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link"
-                      tabindex="-1" href="/gallery-register">
+                      tabindex="-1" href="/gallery-register" data-compose-modal-link data-compose-modal-title="예술관 작성" data-compose-modal-url="/gallery-register">
 
                       <div role="none" class="style-scope ytd-compact-link-renderer" style-target="host"
                         tabindex="0"
@@ -413,7 +413,7 @@
                     class="style-scope yt-multi-page-menu-section-renderer" hide-secondary-string=""
                     compact-link-style="compact-link-style-type-creation-menu"><!--css-build:shady--><!--css_build_scope:ytd-compact-link-renderer--><!--css_build_styles:video.youtube.src.web.polymer.shared.ui.styles.yt_base_styles.yt.base.styles.css.js--><a
                       id="endpoint" class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link"
-                      tabindex="-1" href="/work/work-register">
+                      tabindex="-1" href="/work/work-register" data-compose-modal-link data-compose-modal-title="작품 작성" data-compose-modal-url="/work/work-register">
 
                       <div role="none" class="style-scope ytd-compact-link-renderer" style-target="host"
                         tabindex="0"
@@ -791,6 +791,11 @@
         </div>
       </section>
 
+    </div>
+
+    <div class="yt-compose-modal" hidden data-yt-compose-modal>
+      <button class="yt-compose-modal__backdrop" type="button" aria-label="작성 모달 닫기" data-yt-compose-dismiss></button>
+      <div class="yt-compose-modal__content" data-yt-compose-content></div>
     </div>
   </th:block>
 
