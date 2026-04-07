@@ -1,26 +1,33 @@
 document.addEventListener("DOMContentLoaded", function () {
-  var root = document.querySelector("[data-yt-shell-root]");
+  let root = document.querySelector("[data-bd-shell-root]");
   if (!root) {
     return;
   }
 
-  var desktopQuery = window.matchMedia("(min-width: 901px)");
-  var menuToggle = root.querySelector("[data-yt-shell-menu-toggle]");
-  var searchToggles = Array.from(root.querySelectorAll("[data-yt-shell-search-toggle]"));
-  var overlay = root.querySelector("[data-yt-shell-overlay]");
-  var drawer = root.querySelector("[data-yt-shell-drawer]");
-  var mobileSearch = root.querySelector("[data-yt-shell-mobile-search]");
-  var createToggle = root.querySelector("[data-yt-shell-create-toggle]");
-  var accountToggle = root.querySelector("[data-yt-shell-account-toggle]");
-  var notificationToggle = root.querySelector("[data-yt-shell-notification-toggle]");
-  var createPopup = document.querySelector("[data-yt-shell-create-popup]");
-  var accountPopup = document.querySelector("[data-yt-shell-account-popup]");
-  var notificationPopup = document.querySelector("[data-yt-shell-notification-popup]");
-  var composeModal = document.querySelector("[data-yt-compose-modal]");
-  var composeContent = document.querySelector("[data-yt-compose-content]");
-  var composeDismissButtons = Array.from(document.querySelectorAll("[data-yt-compose-dismiss]"));
-  var composeLinks = Array.from(document.querySelectorAll("[data-compose-modal-link]"));
-  var composeState = {
+  let desktopQuery = window.matchMedia("(min-width: 901px)");
+  let menuToggle = root.querySelector("[data-bd-shell-menu-toggle]");
+  let searchToggles = Array.from(
+    root.querySelectorAll("[data-bd-search-toggle]")
+  );
+
+
+  // Popup elements (popups are outside [data-bd-shell-root], so query from document)
+
+
+  let overlay = root.querySelector("[data-bd-shell-overlay]");
+  let drawer = root.querySelector("[data-bd-shell-drawer]");
+  let mobileSearch = root.querySelector("[data-bd-shell-mobile-search]");
+  let createToggle = root.querySelector("[data-bd-shell-create-toggle]");
+  let accountToggle = root.querySelector("[data-bd-shell-account-toggle]");
+  let notificationToggle = root.querySelector("[data-bd-shell-notification-toggle]");
+  let createPopup = document.querySelector("[data-bd-shell-create-popup]");
+  let accountPopup = document.querySelector("[data-bd-shell-account-popup]");
+  let notificationPopup = document.querySelector("[data-bd-shell-notification-popup]");
+  let composeModal = document.querySelector("[data-yt-compose-modal]");
+  let composeContent = document.querySelector("[data-yt-compose-content]");
+  let composeDismissButtons = Array.from(document.querySelectorAll("[data-yt-compose-dismiss]"));
+  let composeLinks = Array.from(document.querySelectorAll("[data-compose-modal-link]"));
+  let composeState = {
     url: "",
     styles: [],
     scripts: [],
@@ -34,14 +41,14 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function syncOverlay() {
-    var open = root.dataset.mobileDrawerOpen === "true" || root.dataset.searchOpen === "true";
+    let open = root.dataset.mobileDrawerOpen === "true" || root.dataset.searchOpen === "true";
     if (overlay) {
       overlay.hidden = !open;
     }
   }
 
   function lockBody(locked) {
-    document.body.classList.toggle("yt-shell-lock", locked);
+    document.body.classList.toggle("bd-shell-lock", locked);
   }
 
   function removeComposeAssets() {
@@ -75,11 +82,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function loadComposeStyles(parsedDocument) {
-    var stylesheetLinks = Array.from(parsedDocument.querySelectorAll('link[rel="stylesheet"]'));
+    let stylesheetLinks = Array.from(parsedDocument.querySelectorAll('link[rel="stylesheet"]'));
 
     stylesheetLinks.forEach(function (linkNode) {
-      var href = linkNode.getAttribute("href");
-      var newLink;
+      let href = linkNode.getAttribute("href");
+      let newLink;
 
       if (!href || document.querySelector('link[data-compose-asset="' + href + '"]')) {
         return;
@@ -95,10 +102,10 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function loadComposeScripts(parsedDocument) {
-    var scriptNodes = Array.from(parsedDocument.querySelectorAll("script[src]"));
-    var loaders = scriptNodes.map(function (scriptNode) {
-      var src = scriptNode.getAttribute("src");
-      var newScript;
+    let scriptNodes = Array.from(parsedDocument.querySelectorAll("script[src]"));
+    let loaders = scriptNodes.map(function (scriptNode) {
+      let src = scriptNode.getAttribute("src");
+      let newScript;
 
       if (!src) {
         return Promise.resolve();
@@ -163,9 +170,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     })
       .then(function (html) {
-        var parser = new DOMParser();
-        var parsedDocument = parser.parseFromString(html, "text/html");
-        var nodes = extractComposeNodes(parsedDocument);
+        let parser = new DOMParser();
+        let parsedDocument = parser.parseFromString(html, "text/html");
+        let nodes = extractComposeNodes(parsedDocument);
 
         if (!nodes.length) {
           throw new Error("작성 모달 내용을 찾지 못했습니다.");
@@ -241,13 +248,13 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function toggleGuide() {
-    var collapsed = root.dataset.guideCollapsed === "true";
+    let collapsed = root.dataset.guideCollapsed === "true";
     root.dataset.guideCollapsed = collapsed ? "false" : "true";
     syncBodyState();
   }
 
   function toggleDrawer() {
-    var nextState = root.dataset.mobileDrawerOpen !== "true";
+    let nextState = root.dataset.mobileDrawerOpen !== "true";
     root.dataset.mobileDrawerOpen = String(nextState);
     if (drawer) {
       drawer.hidden = !nextState;
@@ -268,7 +275,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function toggleSearch() {
-    var nextState = root.dataset.searchOpen !== "true";
+    let nextState = root.dataset.searchOpen !== "true";
     root.dataset.searchOpen = String(nextState);
     if (mobileSearch) {
       mobileSearch.hidden = !nextState;
@@ -287,6 +294,8 @@ document.addEventListener("DOMContentLoaded", function () {
     syncOverlay();
     syncBodyState();
   }
+
+  // ── Popup dropdown functions ──
 
   function closeAllPopups() {
     if (createPopup) {
@@ -310,14 +319,14 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function positionPopup(popup, triggerButton) {
-    var rect = triggerButton.getBoundingClientRect();
-    var rightOffset = window.innerWidth - rect.right;
+    let rect = triggerButton.getBoundingClientRect();
+    let rightOffset = window.innerWidth - rect.right;
     popup.style.top = rect.bottom + "px";
     popup.style.right = rightOffset + "px";
     popup.style.left = "auto";
 
     requestAnimationFrame(function () {
-      var popupRect = popup.getBoundingClientRect();
+      let popupRect = popup.getBoundingClientRect();
       if (popupRect.left < 0) {
         popup.style.right = "auto";
         popup.style.left = "0px";
@@ -329,7 +338,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function toggleCreatePopup() {
-    var willOpen = createPopup && createPopup.hidden;
+    let willOpen = createPopup && createPopup.hidden;
     closeAllPopups();
     if (willOpen) {
       positionPopup(createPopup, createToggle);
@@ -339,7 +348,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function toggleAccountPopup() {
-    var willOpen = accountPopup && accountPopup.hidden;
+    let willOpen = accountPopup && accountPopup.hidden;
     closeAllPopups();
     if (willOpen) {
       positionPopup(accountPopup, accountToggle);
@@ -349,7 +358,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function toggleNotificationPopup() {
-    var willOpen = notificationPopup && notificationPopup.hidden;
+    let willOpen = notificationPopup && notificationPopup.hidden;
     closeAllPopups();
     if (willOpen) {
       positionPopup(notificationPopup, notificationToggle);
@@ -357,6 +366,8 @@ document.addEventListener("DOMContentLoaded", function () {
       notificationToggle.setAttribute("aria-expanded", "true");
     }
   }
+
+  // ── Initialization ──
 
   root.dataset.guideCollapsed = "false";
   root.dataset.mobileDrawerOpen = "false";
@@ -378,6 +389,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   syncOverlay();
   syncBodyState();
+
+  // ── Event listeners ──
 
   if (menuToggle) {
     menuToggle.addEventListener("click", function () {
@@ -427,13 +440,13 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   document.addEventListener("click", function (event) {
-    var anyPopupOpen = (createPopup && !createPopup.hidden) || (accountPopup && !accountPopup.hidden) || (notificationPopup && !notificationPopup.hidden);
+    let anyPopupOpen = (createPopup && !createPopup.hidden) || (accountPopup && !accountPopup.hidden) || (notificationPopup && !notificationPopup.hidden);
     if (!anyPopupOpen) {
       return;
     }
 
-    var clickedInsidePopup = (createPopup && createPopup.contains(event.target)) || (accountPopup && accountPopup.contains(event.target)) || (notificationPopup && notificationPopup.contains(event.target));
-    var clickedToggle = (createToggle && createToggle.contains(event.target)) || (accountToggle && accountToggle.contains(event.target)) || (notificationToggle && notificationToggle.contains(event.target));
+    let clickedInsidePopup = (createPopup && createPopup.contains(event.target)) || (accountPopup && accountPopup.contains(event.target)) || (notificationPopup && notificationPopup.contains(event.target));
+    let clickedToggle = (createToggle && createToggle.contains(event.target)) || (accountToggle && accountToggle.contains(event.target)) || (notificationToggle && notificationToggle.contains(event.target));
 
     if (!clickedInsidePopup && !clickedToggle) {
       closeAllPopups();
@@ -457,7 +470,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   composeLinks.forEach(function (link) {
     link.addEventListener("click", function (event) {
-      var url = link.getAttribute("data-compose-modal-url") || link.getAttribute("href");
+      let url = link.getAttribute("data-compose-modal-url") || link.getAttribute("href");
 
       event.preventDefault();
       openComposeModal(url);

@@ -8,49 +8,49 @@
     <title th:text="${pageTitle}">BIDEO - 영상 크리에이터를 위한 프리미엄 마켓플레이스</title>
     <link rel="icon" href="/images/favicon.png" />
     <link rel="stylesheet" href="/css/common/font.css" />
-    <link rel="stylesheet" href="/css/layout/youtube-shell-overrides.css" />
-    <link rel="stylesheet" href="/css/layout/search-omnisearch.css" />
-    <link rel="stylesheet" href="/css/layout/voice-search-modal.css" />
-    <link rel="stylesheet" href="/css/layout/chat-fab.css" />
+    <link rel="stylesheet" href="/css/layout/shell.css" />
+    <link rel="stylesheet" href="/css/layout/search.css" />
+    <link rel="stylesheet" href="/css/layout/voice-search.css" />
+    <link rel="stylesheet" href="/css/layout/chat.css" />
     <link rel="stylesheet" href="/css/layout/layout.css">
   </th:block>
 </head>
 
 <body>
   <th:block th:fragment="ytShellChrome(activeItemKey)">
-    <div class="yt-shell" data-yt-shell-root data-guide-collapsed="false" data-mobile-drawer-open="false"
+    <div class="bd-shell" data-bd-shell-root data-guide-collapsed="false" data-mobile-drawer-open="false"
       data-search-open="false">
-      <a class="yt-shell__skip" href="#main-content">탐색 건너뛰기</a>
+      <a class="bd-shell__skip" href="#main-content">탐색 건너뛰기</a>
 
-      <header class="yt-shell__header" role="banner">
-        <div class="yt-shell__header-group">
-          <button class="yt-shell__icon-button" type="button" aria-label="가이드" aria-expanded="false"
-            data-yt-shell-menu-toggle>
+      <header class="bd-shell__header" role="banner">
+        <div class="bd-shell__header-group">
+          <button class="bd-shell__icon-button" type="button" aria-label="가이드" aria-expanded="false"
+            data-bd-shell-menu-toggle>
             <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
               <path d="M20 5H4v2h16V5Zm0 6H4v2h16v-2Zm0 6H4v2h16v-2Z" fill="currentColor" />
             </svg>
           </button>
-          <a class="yt-shell__brand" href="/" title="BIDEO 홈">
+          <a class="bd-shell__brand" href="/" title="BIDEO 홈">
             <img src="/images/logo.png" alt="BIDEO" />
-            <span class="yt-shell__brand-mark">
-              <span class="yt-shell__brand-name">BIDEO</span>
+            <span class="bd-shell__brand-mark">
+              <span class="bd-shell__brand-name">BIDEO</span>
             </span>
           </a>
         </div>
 
-        <div class="yt-shell__search">
-          <form class="yt-shell__search-form" action="/results" role="search" data-yt-shell-search-form="desktop">
-            <label class="yt-shell__search-field">
-              <input type="text" name="search_query" placeholder="검색" aria-label="검색" data-yt-shell-search-input="desktop" autocomplete="off" />
+        <div class="bd-shell__search">
+          <form class="bd-shell__search-form" action="/results" role="search" data-bd-search-form="desktop">
+            <label class="bd-shell__search-field">
+              <input type="text" name="search_query" placeholder="검색" aria-label="검색" data-bd-search-input="desktop" autocomplete="off" />
             </label>
-            <button class="yt-shell__icon-button yt-shell__search-submit" type="submit" aria-label="검색">
+            <button class="bd-shell__icon-button bd-shell__search-submit" type="submit" aria-label="검색">
               <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
                 <path
                   d="M11 2a9 9 0 1 0 5.64 16.01l3.68 3.69 1.41-1.41-3.69-3.68A9 9 0 0 0 11 2Zm0 2a7 7 0 1 1 0 14a7 7 0 0 1 0-14Z"
                   fill="currentColor" />
               </svg>
             </button>
-            <button class="yt-shell__icon-button" type="button" aria-label="음성으로 검색" data-yt-shell-voice-toggle="desktop">
+            <button class="bd-shell__icon-button" type="button" aria-label="음성으로 검색" data-bd-shell-voice-toggle="desktop">
               <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
                 <path
                   d="M12 3a3 3 0 0 0-3 3v5a3 3 0 1 0 6 0V6a3 3 0 0 0-3-3Zm-7 8a1 1 0 0 1 1 1a6 6 0 0 0 12 0a1 1 0 1 1 2 0a8 8 0 0 1-7 7.94V22h-2v-2.06A8 8 0 0 1 4 12a1 1 0 0 1 1-1Z"
@@ -60,109 +60,109 @@
           </form>
         </div>
 
-        <div class="yt-shell__actions">
-          <button class="yt-shell__icon-button yt-shell__search-toggle-mobile" type="button" aria-label="검색" data-yt-shell-search-toggle aria-expanded="false">
+        <div class="bd-shell__actions">
+          <button class="bd-shell__icon-button bd-shell__search-toggle-mobile" type="button" aria-label="검색" data-bd-search-toggle aria-expanded="false">
             <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
               <path
                 d="M11 2a9 9 0 1 0 5.64 16.01l3.68 3.69 1.41-1.41-3.69-3.68A9 9 0 0 0 11 2Zm0 2a7 7 0 1 1 0 14a7 7 0 0 1 0-14Z"
                 fill="currentColor" />
             </svg>
           </button>
-          <button class="yt-shell__pill-button" type="button" aria-label="만들기" data-yt-shell-create-toggle aria-expanded="false">
+          <button class="bd-shell__pill-button" type="button" aria-label="만들기" data-bd-shell-create-toggle aria-expanded="false">
             <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
               <path d="M19 11h-6V5h-2v6H5v2h6v6h2v-6h6v-2Z" fill="currentColor" />
             </svg>
             <span>만들기</span>
           </button>
-          <button class="yt-shell__icon-button" type="button" aria-label="알림" data-yt-shell-notification-toggle aria-expanded="false">
+          <button class="bd-shell__icon-button" type="button" aria-label="알림" data-bd-shell-notification-toggle aria-expanded="false">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true">
               <path d="M12 3a6 6 0 0 0-6 6v3.586l-1.707 1.707A1 1 0 0 0 5 16h14a1 1 0 0 0 .707-1.707L18 12.586V9a6 6 0 0 0-6-6Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
               <path d="M9.5 17v.5a2.5 2.5 0 0 0 5 0V17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
               <circle cx="18" cy="5" r="3.5" fill="#6800EA" stroke="#fff" stroke-width="1.2"/>
             </svg>
           </button>
-          <button class="yt-shell__icon-button" type="button" aria-label="계정 메뉴" data-yt-shell-account-toggle aria-expanded="false">
-            <img class="yt-shell__avatar" th:src="${currentUserProfileImage != null ? currentUserProfileImage : '/images/default-profile.svg'}" src="/images/default-profile.svg" alt="계정" />
+          <button class="bd-shell__icon-button" type="button" aria-label="계정 메뉴" data-bd-shell-account-toggle aria-expanded="false">
+            <img class="bd-shell__avatar" th:src="${currentUserProfileImage != null ? currentUserProfileImage : '/images/default-profile.svg'}" src="/images/default-profile.svg" alt="계정" />
           </button>
         </div>
       </header>
 
-      <aside class="yt-shell__guide" aria-label="BIDEO 탐색">
-        <section class="yt-shell__guide-section">
-          <ul class="yt-shell__guide-list">
-            <li class="yt-shell__guide-item">
-              <a class="yt-shell__guide-link" th:classappend="${activeItemKey == 'home'} ? ' is-active'" href="/"
+      <aside class="bd-shell__guide" aria-label="BIDEO 탐색">
+        <section class="bd-shell__guide-section">
+          <ul class="bd-shell__guide-list">
+            <li class="bd-shell__guide-item">
+              <a class="bd-shell__guide-link" th:classappend="${activeItemKey == 'home'} ? ' is-active'" href="/"
                 title="홈">
-                <svg class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <svg class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="m12 3 8 6v11h-5v-6H9v6H4V9l8-6Z" fill="currentColor" />
                 </svg>
-                <span class="yt-shell__guide-copy">홈</span>
+                <span class="bd-shell__guide-copy">홈</span>
               </a>
             </li>
-            <li class="yt-shell__guide-item">
-              <a class="yt-shell__guide-link" href="/" title="작품">
-                <svg class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <li class="bd-shell__guide-item">
+              <a class="bd-shell__guide-link" href="/" title="작품">
+                <svg class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path
                     d="M21 3H3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2ZM3 19V5h18v14H3Zm3.5-8.5 3 3.5 4-5 5.5 7H5l1.5-5.5Z"
                     fill="currentColor" />
                 </svg>
-                <span class="yt-shell__guide-copy">작품</span>
+                <span class="bd-shell__guide-copy">작품</span>
               </a>
             </li>
-            <li class="yt-shell__guide-item">
-              <a class="yt-shell__guide-link" href="/contest/list" title="공모전">
-                <svg class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <li class="bd-shell__guide-item">
+              <a class="bd-shell__guide-link" href="/contest/list" title="공모전">
+                <svg class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path
                     d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2Zm0 3.34L9.92 9.53l-4.56.66 3.3 3.22-.78 4.54L12 15.77l4.12 2.17-.78-4.54 3.3-3.22-4.56-.66L12 5.34Z"
                     fill="currentColor" />
                 </svg>
-                <span class="yt-shell__guide-copy">공모전</span>
+                <span class="bd-shell__guide-copy">공모전</span>
               </a>
             </li>
           </ul>
         </section>
 
-        <section class="yt-shell__guide-section" th:if="${followingArtists != null and !followingArtists.isEmpty()}">
-          <h2 class="yt-shell__section-title">팔로우 한 아티스트</h2>
-          <ul class="yt-shell__guide-list">
-            <li class="yt-shell__guide-item" th:each="artist : ${followingArtists}">
-              <a class="yt-shell__guide-link" th:href="@{'/profile/' + ${artist.nickname}}" th:title="${artist.nickname}">
-                <img class="yt-shell__guide-avatar"
+        <section class="bd-shell__guide-section" th:if="${followingArtists != null and !followingArtists.isEmpty()}">
+          <h2 class="bd-shell__section-title">팔로우 한 아티스트</h2>
+          <ul class="bd-shell__guide-list">
+            <li class="bd-shell__guide-item" th:each="artist : ${followingArtists}">
+              <a class="bd-shell__guide-link" th:href="@{'/profile/' + ${artist.nickname}}" th:title="${artist.nickname}">
+                <img class="bd-shell__guide-avatar"
                   th:src="${artist.profileImage != null ? artist.profileImage : '/images/default-profile.svg'}"
                   alt="" />
-                <span class="yt-shell__guide-copy" th:text="${artist.nickname}"></span>
-                <span class="yt-shell__guide-meta" th:if="${artist.creatorVerified}"><span class="yt-shell__guide-badge"></span></span>
+                <span class="bd-shell__guide-copy" th:text="${artist.nickname}"></span>
+                <span class="bd-shell__guide-meta" th:if="${artist.creatorVerified}"><span class="bd-shell__guide-badge"></span></span>
               </a>
             </li>
           </ul>
         </section>
 
-        <section class="yt-shell__guide-section">
-          <h2 class="yt-shell__section-title">보관함</h2>
-          <ul class="yt-shell__guide-list">
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="/profile" title="내 페이지"><svg
-                  class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <section class="bd-shell__guide-section">
+          <h2 class="bd-shell__section-title">보관함</h2>
+          <ul class="bd-shell__guide-list">
+            <li class="bd-shell__guide-item"><a class="bd-shell__guide-link" href="/profile" title="내 페이지"><svg
+                  class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 12a4 4 0 1 0-4-4a4 4 0 0 0 4 4Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"
                     fill="currentColor" />
-                </svg><span class="yt-shell__guide-copy">내 페이지</span></a></li>
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="/profile" title="찜한 작품"><svg
-                  class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+                </svg><span class="bd-shell__guide-copy">내 페이지</span></a></li>
+            <li class="bd-shell__guide-item"><a class="bd-shell__guide-link" href="/profile" title="찜한 작품"><svg
+                  class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path
                     d="M12 21.35 10.55 20C5.4 15.36 2 12.28 2 8.5A4.5 4.5 0 0 1 6.5 4A5.22 5.22 0 0 1 12 7.09A5.22 5.22 0 0 1 17.5 4A4.5 4.5 0 0 1 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35Z"
                     fill="currentColor" />
-                </svg><span class="yt-shell__guide-copy">찜한 작품</span></a></li>
+                </svg><span class="bd-shell__guide-copy">찜한 작품</span></a></li>
           </ul>
         </section>
 
-        <section class="yt-shell__guide-section" th:if="${popularTags != null and !popularTags.isEmpty()}">
-          <h2 class="yt-shell__section-title">인기 태그</h2>
-          <ul class="yt-shell__guide-list">
-            <li class="yt-shell__guide-item" th:each="tag : ${popularTags}">
-              <a class="yt-shell__guide-link" th:href="@{'/?tag=' + ${tag.tagName}}" th:title="'#' + ${tag.tagName}">
-                <svg class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <section class="bd-shell__guide-section" th:if="${popularTags != null and !popularTags.isEmpty()}">
+          <h2 class="bd-shell__section-title">인기 태그</h2>
+          <ul class="bd-shell__guide-list">
+            <li class="bd-shell__guide-item" th:each="tag : ${popularTags}">
+              <a class="bd-shell__guide-link" th:href="@{'/?tag=' + ${tag.tagName}}" th:title="'#' + ${tag.tagName}">
+                <svg class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M5.41 21 1.71 17.29a1 1 0 0 1 0-1.41L13.29 4.29a1 1 0 0 1 1.41 0L18.41 8a1 1 0 0 1 0 1.41L6.83 21H5.41ZM20 7l2-2-3-3-2 2 3 3ZM2 20h4v2H2v-2Z" fill="currentColor" />
                 </svg>
-                <span class="yt-shell__guide-copy" th:text="'#' + ${tag.tagName}"></span>
+                <span class="bd-shell__guide-copy" th:text="'#' + ${tag.tagName}"></span>
               </a>
             </li>
           </ul>
@@ -170,21 +170,21 @@
 
       </aside>
 
-      <button class="yt-shell__overlay" type="button" hidden data-yt-shell-overlay aria-label="닫기"></button>
+      <button class="bd-shell__overlay" type="button" hidden data-bd-shell-overlay aria-label="닫기"></button>
 
-      <div class="yt-shell__mobile-search" hidden data-yt-shell-mobile-search>
-        <form class="yt-shell__search-form" action="/results" role="search" data-yt-shell-search-form="mobile">
-          <label class="yt-shell__search-field">
-            <input type="text" name="search_query" placeholder="검색" aria-label="검색" data-yt-shell-search-input="mobile" autocomplete="off" />
+      <div class="bd-shell__mobile-search" hidden data-bd-shell-mobile-search>
+        <form class="bd-shell__search-form" action="/results" role="search" data-bd-search-form="mobile">
+          <label class="bd-shell__search-field">
+            <input type="text" name="search_query" placeholder="검색" aria-label="검색" data-bd-search-input="mobile" autocomplete="off" />
           </label>
-          <button class="yt-shell__icon-button yt-shell__search-submit" type="submit" aria-label="검색">
+          <button class="bd-shell__icon-button bd-shell__search-submit" type="submit" aria-label="검색">
             <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
               <path
                 d="M11 2a9 9 0 1 0 5.64 16.01l3.68 3.69 1.41-1.41-3.69-3.68A9 9 0 0 0 11 2Zm0 2a7 7 0 1 1 0 14a7 7 0 0 1 0-14Z"
                 fill="currentColor" />
             </svg>
           </button>
-          <button class="yt-shell__icon-button" type="button" aria-label="음성으로 검색" data-yt-shell-voice-toggle="mobile">
+          <button class="bd-shell__icon-button" type="button" aria-label="음성으로 검색" data-bd-shell-voice-toggle="mobile">
             <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
               <path
                 d="M12 3a3 3 0 0 0-3 3v5a3 3 0 1 0 6 0V6a3 3 0 0 0-3-3Zm-7 8a1 1 0 0 1 1 1a6 6 0 0 0 12 0a1 1 0 1 1 2 0a8 8 0 0 1-7 7.94V22h-2v-2.06A8 8 0 0 1 4 12a1 1 0 0 1 1-1Z"
@@ -194,14 +194,14 @@
         </form>
       </div>
 
-      <div class="yt-shell-search-portal" hidden data-yt-shell-search-portal>
-        <div class="yt-shell-search-scrim" data-yt-shell-search-scrim></div>
-        <div class="yt-shell-search-portal__surface" data-yt-shell-search-surface>
-          <form class="yt-shell-search-portal__form" action="/results" role="search" data-yt-shell-search-portal-form>
-            <label class="yt-shell-search-portal__field">
-              <input type="text" name="search_query" placeholder="검색" aria-label="검색" autocomplete="off" data-yt-shell-search-portal-input />
+      <div class="bd-search-portal" hidden data-bd-search-portal>
+        <div class="bd-search-scrim" data-bd-search-scrim></div>
+        <div class="bd-search-portal__surface" data-bd-search-surface>
+          <form class="bd-search-portal__form" action="/results" role="search" data-bd-search-portal-form>
+            <label class="bd-search-portal__field">
+              <input type="text" name="search_query" placeholder="검색" aria-label="검색" autocomplete="off" data-bd-search-portal-input />
             </label>
-            <button class="yt-shell__icon-button yt-shell__search-submit" type="submit" aria-label="검색">
+            <button class="bd-shell__icon-button bd-shell__search-submit" type="submit" aria-label="검색">
               <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
                 <path
                   d="M11 2a9 9 0 1 0 5.64 16.01l3.68 3.69 1.41-1.41-3.69-3.68A9 9 0 0 0 11 2Zm0 2a7 7 0 1 1 0 14a7 7 0 0 1 0-14Z"
@@ -209,101 +209,101 @@
               </svg>
             </button>
           </form>
-          <div class="yt-shell-search-panel">
-            <div class="yt-shell-search-panel__header">
-              <span class="yt-shell-search-panel__eyebrow">검색</span>
-              <span class="yt-shell-search-panel__title" data-yt-shell-search-title>내 최근 동영상</span>
+          <div class="bd-search-panel">
+            <div class="bd-search-panel__header">
+              <span class="bd-search-panel__eyebrow">검색</span>
+              <span class="bd-search-panel__title" data-bd-search-title>내 최근 동영상</span>
             </div>
-            <div class="yt-shell-search-panel__results" data-yt-shell-search-results></div>
+            <div class="bd-search-panel__results" data-bd-search-results></div>
           </div>
         </div>
       </div>
 
-      <div class="yt-voice-search-modal" hidden data-yt-shell-voice-modal data-state="permission">
-        <button class="yt-voice-search-modal__scrim" type="button" aria-label="음성 검색 닫기" data-yt-shell-voice-scrim></button>
-        <div class="yt-voice-search-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="yt-voice-search-prompt">
-          <div class="yt-voice-search-modal__header">
-            <div class="yt-voice-search-modal__header-text" data-yt-shell-voice-header>
-              <div class="yt-voice-search-modal__prompt" id="yt-voice-search-prompt" data-yt-shell-voice-prompt>
+      <div class="bd-voice-modal" hidden data-bd-shell-voice-modal data-state="permission">
+        <button class="bd-voice-modal__scrim" type="button" aria-label="음성 검색 닫기" data-bd-shell-voice-scrim></button>
+        <div class="bd-voice-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="bd-voice-modal-prompt">
+          <div class="bd-voice-modal__header">
+            <div class="bd-voice-modal__header-text" data-bd-shell-voice-header>
+              <div class="bd-voice-modal__prompt" id="bd-voice-modal-prompt" data-bd-shell-voice-prompt>
                 마이크 사용 권한을 허용해 주세요
               </div>
-              <div class="yt-voice-search-modal__transcription yt-voice-search-modal__transcription--high" data-yt-shell-voice-transcription-high></div>
-              <div class="yt-voice-search-modal__transcription yt-voice-search-modal__transcription--low" data-yt-shell-voice-transcription-low></div>
+              <div class="bd-voice-modal__transcription bd-voice-modal__transcription--high" data-bd-shell-voice-transcription-high></div>
+              <div class="bd-voice-modal__transcription bd-voice-modal__transcription--low" data-bd-shell-voice-transcription-low></div>
             </div>
-            <button class="yt-voice-search-modal__close" type="button" aria-label="취소" data-yt-shell-voice-close>
+            <button class="bd-voice-modal__close" type="button" aria-label="취소" data-bd-shell-voice-close>
               <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" aria-hidden="true">
                 <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 1 0-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 0 0 1.414 1.414L12 13.414l5.293 5.293a1 1 0 0 0 1.414-1.414L13.414 12l5.293-5.293a1 1 0 1 0-1.414-1.414Z" fill="currentColor"></path>
               </svg>
             </button>
           </div>
-          <div class="yt-voice-search-modal__body" data-yt-shell-voice-body>
-            <div class="yt-voice-search-modal__body-line">브라우저 권한 팝업이 보이면 마이크를 허용해 주세요.</div>
-            <div class="yt-voice-search-modal__body-line">허용 후 검색어를 말하면 자동으로 검색됩니다.</div>
+          <div class="bd-voice-modal__body" data-bd-shell-voice-body>
+            <div class="bd-voice-modal__body-line">브라우저 권한 팝업이 보이면 마이크를 허용해 주세요.</div>
+            <div class="bd-voice-modal__body-line">허용 후 검색어를 말하면 자동으로 검색됩니다.</div>
           </div>
-          <div class="yt-voice-search-modal__mic" data-yt-shell-voice-mic-state="permission">
-            <div class="yt-voice-search-modal__mic-spinner" aria-hidden="true"></div>
-            <div class="yt-voice-search-modal__mic-container">
-              <div class="yt-voice-search-modal__mic-pulse"></div>
-              <div class="yt-voice-search-modal__mic-levels" data-yt-shell-voice-levels></div>
-              <button class="yt-voice-search-modal__mic-circle" type="button" aria-label="다시 시도하려면 마이크를 탭하세요." data-yt-shell-voice-mic>
+          <div class="bd-voice-modal__mic" data-bd-shell-voice-mic-state="permission">
+            <div class="bd-voice-modal__mic-spinner" aria-hidden="true"></div>
+            <div class="bd-voice-modal__mic-container">
+              <div class="bd-voice-modal__mic-pulse"></div>
+              <div class="bd-voice-modal__mic-levels" data-bd-shell-voice-levels></div>
+              <button class="bd-voice-modal__mic-circle" type="button" aria-label="다시 시도하려면 마이크를 탭하세요." data-bd-shell-voice-mic>
                 <svg xmlns="http://www.w3.org/2000/svg" height="40" viewBox="0 0 24 24" width="40" aria-hidden="true">
                   <path d="M18.063 14.5a1 1 0 1 1 1.73 1A8.998 8.998 0 0 1 13 19.942V22a1 1 0 1 1-2 0v-2.058A8.999 8.999 0 0 1 4.206 15.5l.866-.5.865-.5a7.002 7.002 0 0 0 12.125 0ZM12 1a5 5 0 0 1 5 5v5a5 5 0 0 1-10 0V6a5 5 0 0 1 5-5ZM12 3a3 3 0 0 0-3 3v5a3 3 0 1 0 6 0V6a3 3 0 0 0-3-3Z" fill="currentColor"></path>
                 </svg>
               </button>
             </div>
-            <div class="yt-voice-search-modal__mic-label" data-yt-shell-voice-label>
+            <div class="bd-voice-modal__mic-label" data-bd-shell-voice-label>
               마이크 권한을 기다리는 중입니다.
             </div>
           </div>
         </div>
       </div>
 
-      <aside class="yt-shell__drawer" hidden data-yt-shell-drawer aria-label="모바일 탐색">
-        <section class="yt-shell__guide-section">
-          <ul class="yt-shell__guide-list">
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link"
+      <aside class="bd-shell__drawer" hidden data-bd-shell-drawer aria-label="모바일 탐색">
+        <section class="bd-shell__guide-section">
+          <ul class="bd-shell__guide-list">
+            <li class="bd-shell__guide-item"><a class="bd-shell__guide-link"
                 th:classappend="${activeItemKey == 'home'} ? ' is-active'" href="/" title="홈"><svg
-                  class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="m12 3 8 6v11h-5v-6H9v6H4V9l8-6Z" fill="currentColor" />
-                </svg><span class="yt-shell__guide-copy">홈</span></a></li>
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="/" title="작품"><svg
-                  class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+                </svg><span class="bd-shell__guide-copy">홈</span></a></li>
+            <li class="bd-shell__guide-item"><a class="bd-shell__guide-link" href="/" title="작품"><svg
+                  class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path
                     d="M21 3H3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2ZM3 19V5h18v14H3Zm3.5-8.5 3 3.5 4-5 5.5 7H5l1.5-5.5Z"
                     fill="currentColor" />
-                </svg><span class="yt-shell__guide-copy">작품</span></a></li>
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="/contest/list" title="공모전"><svg
-                  class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+                </svg><span class="bd-shell__guide-copy">작품</span></a></li>
+            <li class="bd-shell__guide-item"><a class="bd-shell__guide-link" href="/contest/list" title="공모전"><svg
+                  class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path
                     d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2Zm0 3.34L9.92 9.53l-4.56.66 3.3 3.22-.78 4.54L12 15.77l4.12 2.17-.78-4.54 3.3-3.22-4.56-.66L12 5.34Z"
                     fill="currentColor" />
-                </svg><span class="yt-shell__guide-copy">공모전</span></a></li>
+                </svg><span class="bd-shell__guide-copy">공모전</span></a></li>
           </ul>
         </section>
-        <section class="yt-shell__guide-section">
-          <h2 class="yt-shell__section-title">보관함</h2>
-          <ul class="yt-shell__guide-list">
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="/profile" title="내 페이지"><svg
-                  class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <section class="bd-shell__guide-section">
+          <h2 class="bd-shell__section-title">보관함</h2>
+          <ul class="bd-shell__guide-list">
+            <li class="bd-shell__guide-item"><a class="bd-shell__guide-link" href="/profile" title="내 페이지"><svg
+                  class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 12a4 4 0 1 0-4-4a4 4 0 0 0 4 4Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"
                     fill="currentColor" />
-                </svg><span class="yt-shell__guide-copy">내 페이지</span></a></li>
-            <li class="yt-shell__guide-item"><a class="yt-shell__guide-link" href="/profile"
-                title="다운로드"><svg class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+                </svg><span class="bd-shell__guide-copy">내 페이지</span></a></li>
+            <li class="bd-shell__guide-item"><a class="bd-shell__guide-link" href="/profile"
+                title="다운로드"><svg class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M11 4h2v8.17l2.59-2.58L17 11l-5 5-5-5 1.41-1.41L11 12.17V4ZM5 18h14v2H5v-2Z"
                     fill="currentColor" />
-                </svg><span class="yt-shell__guide-copy">다운로드</span></a></li>
+                </svg><span class="bd-shell__guide-copy">다운로드</span></a></li>
           </ul>
         </section>
-        <section class="yt-shell__guide-section" th:if="${popularTags != null and !popularTags.isEmpty()}">
-          <h2 class="yt-shell__section-title">인기 태그</h2>
-          <ul class="yt-shell__guide-list">
-            <li class="yt-shell__guide-item" th:each="tag : ${popularTags}">
-              <a class="yt-shell__guide-link" th:href="@{'/?tag=' + ${tag.tagName}}" th:title="'#' + ${tag.tagName}">
-                <svg class="yt-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <section class="bd-shell__guide-section" th:if="${popularTags != null and !popularTags.isEmpty()}">
+          <h2 class="bd-shell__section-title">인기 태그</h2>
+          <ul class="bd-shell__guide-list">
+            <li class="bd-shell__guide-item" th:each="tag : ${popularTags}">
+              <a class="bd-shell__guide-link" th:href="@{'/?tag=' + ${tag.tagName}}" th:title="'#' + ${tag.tagName}">
+                <svg class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M5.41 21 1.71 17.29a1 1 0 0 1 0-1.41L13.29 4.29a1 1 0 0 1 1.41 0L18.41 8a1 1 0 0 1 0 1.41L6.83 21H5.41ZM20 7l2-2-3-3-2 2 3 3ZM2 20h4v2H2v-2Z" fill="currentColor" />
                 </svg>
-                <span class="yt-shell__guide-copy" th:text="'#' + ${tag.tagName}"></span>
+                <span class="bd-shell__guide-copy" th:text="'#' + ${tag.tagName}"></span>
               </a>
             </li>
           </ul>
@@ -311,8 +311,8 @@
       </aside>
     </div>
     <div horizontal-align="auto" vertical-align="top" aria-disabled="false"
-      class="style-scope ytd-popup-container yt-shell__popup yt-shell__popup--create" prevent-autonav="true"
-      hidden data-yt-shell-create-popup><!--css-build:shady--><!--css_build_scope:tp-yt-iron-dropdown--><!--css_build_styles:video.youtube.src.web.polymer.shared.ui.styles.yt_base_styles.yt.base.styles.css.js,third_party.javascript.youtube_components.tp_yt_iron_dropdown.tp.yt.iron.dropdown.css.js-->
+      class="style-scope ytd-popup-container bd-shell__popup bd-shell__popup--create" prevent-autonav="true"
+      hidden data-bd-shell-create-popup><!--css-build:shady--><!--css_build_scope:tp-yt-iron-dropdown--><!--css_build_styles:video.youtube.src.web.polymer.shared.ui.styles.yt_base_styles.yt.base.styles.css.js,third_party.javascript.youtube_components.tp_yt_iron_dropdown.tp.yt.iron.dropdown.css.js-->
       <div id="contentWrapper" class="style-scope tp-yt-iron-dropdown">
         <div slot="dropdown-content" class="style-scope ytd-popup-container"
           menu-style="multi-page-menu-style-type-creation" tabindex="-1"
@@ -495,8 +495,8 @@
         </div>
       </div>
     </div>
-    <div class="yt-shell__popup yt-shell__popup--account"
-      hidden data-yt-shell-account-popup>
+    <div class="bd-shell__popup bd-shell__popup--account"
+      hidden data-bd-shell-account-popup>
       <div class="style-scope tp-yt-iron-dropdown">
         <div slot="dropdown-content" class="style-scope ytd-popup-container"
           style="outline: none; box-sizing: border-box;">
@@ -621,15 +621,15 @@
       </div>
     </div>
     <!-- ── Notification popup ── -->
-    <div class="yt-shell__popup yt-shell__popup--notification" hidden data-yt-shell-notification-popup>
+    <div class="bd-shell__popup bd-shell__popup--notification" hidden data-bd-shell-notification-popup>
       <div id="contentWrapper" class="style-scope tp-yt-iron-dropdown">
         <div slot="dropdown-content" class="style-scope ytd-popup-container"
           menu-style="multi-page-menu-style-type-notifications" tabindex="-1"
           style="outline: none; box-sizing: border-box; max-width: 480px; max-height: 642px;">
           <div id="header" class="style-scope ytd-multi-page-menu-renderer">
-            <div class="yt-shell__notification-header">
-              <h2 class="yt-shell__notification-title">알림</h2>
-              <button type="button" class="yt-shell__notification-toggle" id="notificationToggle" aria-label="알림 설정" title="알림 켜기/끄기" onclick="toggleNotification(this)">
+            <div class="bd-shell__notification-header">
+              <h2 class="bd-shell__notification-title">알림</h2>
+              <button type="button" class="bd-shell__notification-toggle" id="notificationToggle" aria-label="알림 설정" title="알림 켜기/끄기" onclick="toggleNotification(this)">
                 <!-- 알림 ON 아이콘 -->
                 <svg class="notification-icon-on" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"
                   focusable="false" aria-hidden="true"
@@ -648,14 +648,14 @@
           <div id="container" class="menu-container style-scope ytd-multi-page-menu-renderer">
             <div id="sections" class="style-scope ytd-multi-page-menu-renderer">
               <section class="style-scope ytd-multi-page-menu-renderer">
-                <div class="yt-shell__notification-list">
-                  <a class="yt-shell__notification-item is-unread" href="#">
-                    <img class="yt-shell__notification-avatar" src="https://yt3.ggpht.com/5fHEIs3KKq0CrpuF-IpHCTBon6kgd-7lt5CEYzQYrZoCl3L4fhKpaLtWRJ_j-eLXpl9F2ev1bg=s108-c-k-c0x00ffffff-no-rj" alt="" />
-                    <div class="yt-shell__notification-body">
-                      <p class="yt-shell__notification-text"><strong>Studio Clid</strong>님이 회원님의 작품에 댓글을 남겼습니다: "이번 작품 색감이 정말 좋네요!"</p>
-                      <span class="yt-shell__notification-time">3시간 전</span>
+                <div class="bd-shell__notification-list">
+                  <a class="bd-shell__notification-item is-unread" href="#">
+                    <img class="bd-shell__notification-avatar" src="https://yt3.ggpht.com/5fHEIs3KKq0CrpuF-IpHCTBon6kgd-7lt5CEYzQYrZoCl3L4fhKpaLtWRJ_j-eLXpl9F2ev1bg=s108-c-k-c0x00ffffff-no-rj" alt="" />
+                    <div class="bd-shell__notification-body">
+                      <p class="bd-shell__notification-text"><strong>Studio Clid</strong>님이 회원님의 작품에 댓글을 남겼습니다: "이번 작품 색감이 정말 좋네요!"</p>
+                      <span class="bd-shell__notification-time">3시간 전</span>
                     </div>
-                    <div class="yt-shell__notification-dot"></div>
+                    <div class="bd-shell__notification-dot"></div>
                   </a>
                 </div>
               </section>
@@ -668,46 +668,36 @@
     </div>
 
     <button
-      class="yt-chat-fab"
+      class="bd-chat-fab"
       type="button"
       aria-label="채팅 열기"
-      aria-controls="yt-chat-panel"
+      aria-controls="bd-chat-panel"
       aria-expanded="false"
-      data-yt-chat-toggle>
-      <span class="yt-chat-fab__icon" aria-hidden="true">
+      data-bd-chat-toggle>
+      <span class="bd-chat-fab__icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="22" height="22">
           <path
             d="M12 3C6.48 3 2 6.94 2 11.8c0 2.67 1.37 5.06 3.53 6.67L5 22l4.02-2.16c.95.24 1.95.36 2.98.36 5.52 0 10-3.94 10-8.8S17.52 3 12 3Zm-4 7.3a1.2 1.2 0 1 1 0 2.4a1.2 1.2 0 0 1 0-2.4Zm4 0a1.2 1.2 0 1 1 0 2.4a1.2 1.2 0 0 1 0-2.4Zm4 0a1.2 1.2 0 1 1 0 2.4a1.2 1.2 0 0 1 0-2.4Z"
             fill="currentColor" />
         </svg>
       </span>
-      <span class="yt-chat-fab__badge" aria-hidden="true">3</span>
+      <span class="bd-chat-fab__badge" aria-hidden="true">3</span>
     </button>
 
-    <div class="yt-chat-layer" hidden data-yt-chat-layer>
-      <button class="yt-chat-layer__backdrop" type="button" aria-label="채팅 닫기" data-yt-chat-dismiss></button>
+    <div class="bd-chat-layer" hidden data-bd-chat-layer>
+      <button class="bd-chat-layer__backdrop" type="button" aria-label="채팅 닫기" data-bd-chat-dismiss></button>
       <section
-        id="yt-chat-panel"
-        class="yt-chat-panel"
+        id="bd-chat-panel"
+        class="bd-chat-panel"
         aria-label="채팅 패널"
         aria-hidden="true"
-        data-yt-chat-panel>
-        <div class="yt-chat-panel__shell">
-          <div class="yt-chat-panel__body">
-            <aside class="yt-chat-sidebar" aria-label="채팅방 목록">
-              <div class="yt-chat-sidebar__topbar">
-                <div>
-                  <h2 class="yt-chat-sidebar__title">대화</h2>
-                </div>
-                <button class="yt-chat-panel__close" type="button" aria-label="채팅 닫기" data-yt-chat-dismiss data-yt-chat-close>
-                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-                    <path d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6 10.6 12 5 6.4 6.4 5Z" fill="currentColor" />
-                  </svg>
-                </button>
-              </div>
+        data-bd-chat-panel>
+        <div class="bd-chat-panel__shell">
+          <div class="bd-chat-panel__body">
+            <aside class="bd-chat-sidebar" aria-label="채팅방 목록">
 
-              <button class="yt-chat-sidebar__compose" type="button" data-yt-chat-compose-toggle>
-                <span class="yt-chat-sidebar__compose-icon" aria-hidden="true">
+              <button class="bd-chat-sidebar__compose" type="button" data-bd-chat-compose-toggle>
+                <span class="bd-chat-sidebar__compose-icon" aria-hidden="true">
                   <svg viewBox="0 0 24 24" width="16" height="16">
                     <path d="M4 17.25V20h2.75l8.06-8.06-2.75-2.75L4 17.25Zm11.6-9.19 1.59-1.59a1 1 0 0 1 1.41 0l1.34 1.34a1 1 0 0 1 0 1.41l-1.59 1.59-2.75-2.75Z" fill="currentColor" />
                   </svg>
@@ -715,57 +705,57 @@
                 <span>새 대화</span>
               </button>
 
-              <div class="yt-chat-sidebar__people" hidden data-yt-chat-people-search>
-                <div class="yt-chat-sidebar__search yt-chat-sidebar__search--people">
+              <div class="bd-chat-sidebar__people" hidden data-bd-chat-people-search>
+                <div class="bd-chat-sidebar__search bd-chat-sidebar__search--people">
                   <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
                     <path d="M10 4a6 6 0 1 0 3.9 10.57l4.26 4.27 1.42-1.42-4.27-4.26A6 6 0 0 0 10 4Zm0 2a4 4 0 1 1 0 8a4 4 0 0 1 0-8Z" fill="currentColor" />
                   </svg>
-                  <input type="search" placeholder="새로운 사람 찾기" aria-label="새로운 사람 찾기" data-yt-chat-people-input />
+                  <input type="search" placeholder="새로운 사람 찾기" aria-label="새로운 사람 찾기" data-bd-chat-people-input />
                 </div>
-                <div class="yt-chat-sidebar__people-list" role="list" data-yt-chat-people-list></div>
+                <div class="bd-chat-sidebar__people-list" role="list" data-bd-chat-people-list></div>
               </div>
 
-              <div class="yt-chat-sidebar__search">
+              <div class="bd-chat-sidebar__search">
                 <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
                   <path d="M10 4a6 6 0 1 0 3.9 10.57l4.26 4.27 1.42-1.42-4.27-4.26A6 6 0 0 0 10 4Zm0 2a4 4 0 1 1 0 8a4 4 0 0 1 0-8Z" fill="currentColor" />
                 </svg>
-                <input type="search" placeholder="대화 검색" aria-label="대화 검색" data-yt-chat-room-search />
+                <input type="search" placeholder="대화 검색" aria-label="대화 검색" data-bd-chat-room-search />
               </div>
-              <div class="yt-chat-sidebar__list" role="list" data-yt-chat-room-list></div>
+              <div class="bd-chat-sidebar__list" role="list" data-bd-chat-room-list></div>
             </aside>
 
-            <div class="yt-chat-thread">
-              <div class="yt-chat-thread__empty" data-yt-chat-empty>
-                <span class="yt-chat-thread__empty-mark">B</span>
+            <div class="bd-chat-thread">
+              <div class="bd-chat-thread__empty" data-bd-chat-empty>
+                <img class="bd-chat-thread__empty-mark" src="/images/logo.png" alt="Bideo">
                 <h3>대화를 선택하세요</h3>
                 <p>왼쪽 목록에서 상대를 선택하면 아래에 바로 메시지를 입력할 수 있습니다.</p>
               </div>
 
-              <div class="yt-chat-thread__detail" hidden data-yt-chat-detail>
-                <header class="yt-chat-thread__header">
-                  <button class="yt-chat-thread__back" type="button" aria-label="목록으로 돌아가기" data-yt-chat-back>
+              <div class="bd-chat-thread__detail" hidden data-bd-chat-detail>
+                <header class="bd-chat-thread__header">
+                  <button class="bd-chat-thread__back" type="button" aria-label="목록으로 돌아가기" data-bd-chat-back>
                     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                       <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2Z" fill="currentColor"/>
                     </svg>
                   </button>
-                  <div class="yt-chat-thread__identity">
-                    <div class="yt-chat-thread__avatar" data-yt-chat-avatar></div>
+                  <div class="bd-chat-thread__identity">
+                    <div class="bd-chat-thread__avatar" data-bd-chat-avatar></div>
                     <div>
-                      <strong data-yt-chat-name></strong>
-                      <span data-yt-chat-status></span>
+                      <strong data-bd-chat-name></strong>
+                      <span data-bd-chat-status></span>
                     </div>
                   </div>
-                  <button class="yt-chat-thread__ghost" type="button">프로필 보기</button>
+                  <button class="bd-chat-thread__ghost" type="button">프로필 보기</button>
                 </header>
 
-                <div class="yt-chat-thread__messages" data-yt-chat-messages></div>
+                <div class="bd-chat-thread__messages" data-bd-chat-messages></div>
 
-                <form class="yt-chat-composer" data-yt-chat-composer>
-                  <div class="yt-chat-composer__controls">
-                    <label class="yt-chat-composer__field">
-                      <input type="text" placeholder="메시지를 입력하세요." aria-label="메시지 입력" data-yt-chat-input />
+                <form class="bd-chat-composer" data-bd-chat-composer>
+                  <div class="bd-chat-composer__controls">
+                    <label class="bd-chat-composer__field">
+                      <input type="text" placeholder="메시지를 입력하세요." aria-label="메시지 입력" data-bd-chat-input />
                     </label>
-                    <button class="yt-chat-composer__send" type="submit">보내기</button>
+                    <button class="bd-chat-composer__send" type="submit">보내기</button>
                   </div>
                 </form>
               </div>
@@ -783,10 +773,10 @@
   </th:block>
 
   <th:block th:fragment="ytShellScripts()">
-    <script defer src="/js/layout/youtube-shell-bridge.js"></script>
-    <script defer src="/js/layout/search-omnisearch.js"></script>
-    <script defer src="/js/layout/voice-search-modal.js"></script>
-    <script defer src="/js/layout/chat-fab.js"></script>
+    <script defer src="/js/layout/shell.js"></script>
+    <script defer src="/js/layout/search.js"></script>
+    <script defer src="/js/layout/voice-search.js"></script>
+    <script defer src="/js/layout/chat.js"></script>
     <script>
       function toggleNotification(btn) {
         const isOff = btn.classList.toggle('is-off');

@@ -1,14 +1,14 @@
 document.addEventListener("DOMContentLoaded", function () {
   let sourceForms = Array.from(
-    document.querySelectorAll("[data-yt-shell-search-form]")
+    document.querySelectorAll("[data-bd-search-form]")
   );
-  let portal = document.querySelector("[data-yt-shell-search-portal]");
-  let surface = document.querySelector("[data-yt-shell-search-surface]");
-  let scrim = document.querySelector("[data-yt-shell-search-scrim]");
-  let portalForm = document.querySelector("[data-yt-shell-search-portal-form]");
-  let portalInput = document.querySelector("[data-yt-shell-search-portal-input]");
-  let title = document.querySelector("[data-yt-shell-search-title]");
-  let results = document.querySelector("[data-yt-shell-search-results]");
+  let portal = document.querySelector("[data-bd-search-portal]");
+  let surface = document.querySelector("[data-bd-search-surface]");
+  let scrim = document.querySelector("[data-bd-search-scrim]");
+  let portalForm = document.querySelector("[data-bd-search-portal-form]");
+  let portalInput = document.querySelector("[data-bd-search-portal-input]");
+  let title = document.querySelector("[data-bd-search-title]");
+  let results = document.querySelector("[data-bd-search-results]");
 
   if (
     !sourceForms.length ||
@@ -45,10 +45,10 @@ document.addEventListener("DOMContentLoaded", function () {
     let body = document.createElement("span");
     let titleEl = document.createElement("span");
 
-    link.className = "yt-shell-search-result";
+    link.className = "bd-search-result";
     link.href = "/gallery/" + gallery.id;
 
-    thumb.className = "yt-shell-search-result__thumb";
+    thumb.className = "bd-search-result__thumb";
     if (gallery.coverImageUrl) {
       let img = document.createElement("img");
       img.src = gallery.coverImageUrl;
@@ -56,13 +56,13 @@ document.addEventListener("DOMContentLoaded", function () {
       thumb.appendChild(img);
     } else {
       let placeholder = document.createElement("span");
-      placeholder.className = "yt-shell-search-result__duration";
+      placeholder.className = "bd-search-result__duration";
       placeholder.textContent = "No Image";
       thumb.appendChild(placeholder);
     }
 
-    body.className = "yt-shell-search-result__body";
-    titleEl.className = "yt-shell-search-result__title";
+    body.className = "bd-search-result__body";
+    titleEl.className = "bd-search-result__title";
     titleEl.textContent = gallery.title;
     body.appendChild(titleEl);
 
@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function createKeywordItem(keyword, type) {
     let li = document.createElement("li");
     let link = document.createElement("a");
-    link.className = "yt-shell-search-result";
+    link.className = "bd-search-result";
     link.href = "#";
     link.addEventListener("click", function (e) {
       e.preventDefault();
@@ -84,14 +84,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     let icon = document.createElement("span");
-    icon.className = "yt-shell-search-result__thumb";
+    icon.className = "bd-search-result__thumb";
     icon.style.cssText = "display:flex;align-items:center;justify-content:center;font-size:1.2rem;";
     icon.textContent = type === "recent" ? "\u{1F556}" : "\u{1F525}";
 
     let body = document.createElement("span");
-    body.className = "yt-shell-search-result__body";
+    body.className = "bd-search-result__body";
     let titleEl = document.createElement("span");
-    titleEl.className = "yt-shell-search-result__title";
+    titleEl.className = "bd-search-result__title";
     titleEl.textContent = keyword;
     body.appendChild(titleEl);
 
@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function renderEmpty() {
     results.innerHTML = "";
     let empty = document.createElement("div");
-    empty.className = "yt-shell-search-empty";
+    empty.className = "bd-search-empty";
     empty.innerHTML =
       "<strong>검색 결과가 없습니다</strong><span>다른 키워드로 다시 시도해 보세요.</span>";
     results.appendChild(empty);
@@ -146,11 +146,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (cachedRecent && cachedRecent.length > 0) {
         let recentTitle = document.createElement("div");
-        recentTitle.className = "yt-shell-search-section-title";
+        recentTitle.className = "bd-search-section-title";
         recentTitle.textContent = "최근 검색";
         results.appendChild(recentTitle);
         let recentList = document.createElement("ul");
-        recentList.className = "yt-shell-search-results-list";
+        recentList.className = "bd-search-results-list";
         cachedRecent.slice(0, 5).forEach(function (item) {
           recentList.appendChild(createKeywordItem(item.keyword, "recent"));
         });
@@ -159,11 +159,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (cachedTrending && cachedTrending.length > 0) {
         let trendTitle = document.createElement("div");
-        trendTitle.className = "yt-shell-search-section-title";
+        trendTitle.className = "bd-search-section-title";
         trendTitle.textContent = "인기 검색어";
         results.appendChild(trendTitle);
         let trendList = document.createElement("ul");
-        trendList.className = "yt-shell-search-results-list";
+        trendList.className = "bd-search-results-list";
         cachedTrending.slice(0, 5).forEach(function (item) {
           trendList.appendChild(createKeywordItem(item.keyword, "trending"));
         });
@@ -172,11 +172,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (cachedSuggestions && cachedSuggestions.length > 0) {
         let suggestTitle = document.createElement("div");
-        suggestTitle.className = "yt-shell-search-section-title";
+        suggestTitle.className = "bd-search-section-title";
         suggestTitle.textContent = "추천 예술관";
         results.appendChild(suggestTitle);
         let suggestList = document.createElement("ul");
-        suggestList.className = "yt-shell-search-results-list";
+        suggestList.className = "bd-search-results-list";
         cachedSuggestions.forEach(function (gallery) {
           suggestList.appendChild(createGalleryItem(gallery));
         });
@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     title.textContent = '"' + normalized + '" 검색 결과';
-    results.innerHTML = "<div class='yt-shell-search-empty'><span>검색 중...</span></div>";
+    results.innerHTML = "<div class='bd-search-empty'><span>검색 중...</span></div>";
 
     if (searchDebounce) clearTimeout(searchDebounce);
     searchDebounce = setTimeout(function () {
@@ -218,7 +218,7 @@ document.addEventListener("DOMContentLoaded", function () {
           }
 
           let list = document.createElement("ul");
-          list.className = "yt-shell-search-results-list";
+          list.className = "bd-search-results-list";
           galleries.forEach(function (gallery) {
             list.appendChild(createGalleryItem({
               id: gallery.id,
@@ -239,9 +239,9 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
     let rect = activeSource.form.getBoundingClientRect();
-    surface.style.setProperty("--yt-search-top", rect.top + "px");
-    surface.style.setProperty("--yt-search-left", rect.left + "px");
-    surface.style.setProperty("--yt-search-width", rect.width + "px");
+    surface.style.setProperty("--bd-search-top", rect.top + "px");
+    surface.style.setProperty("--bd-search-left", rect.left + "px");
+    surface.style.setProperty("--bd-search-width", rect.width + "px");
   }
 
   function openPortal(source) {
@@ -273,16 +273,16 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     activeSource.input.value = portalInput.value;
     portal.hidden = true;
-    surface.style.removeProperty("--yt-search-top");
-    surface.style.removeProperty("--yt-search-left");
-    surface.style.removeProperty("--yt-search-width");
+    surface.style.removeProperty("--bd-search-top");
+    surface.style.removeProperty("--bd-search-left");
+    surface.style.removeProperty("--bd-search-width");
     activeSource = null;
   }
 
   sourceForms.forEach(function (form) {
-    let mode = form.getAttribute("data-yt-shell-search-form");
+    let mode = form.getAttribute("data-bd-search-form");
     let input = form.querySelector(
-      '[data-yt-shell-search-input="' + mode + '"]'
+      '[data-bd-search-input="' + mode + '"]'
     );
 
     if (!input) {
@@ -355,7 +355,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  document.addEventListener("yt-shell:close-search-portal", function () {
+  document.addEventListener("bd-shell:close-search-portal", function () {
     closePortal();
   });
 
