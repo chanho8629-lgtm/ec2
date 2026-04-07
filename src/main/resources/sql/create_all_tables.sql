@@ -160,7 +160,7 @@ create table tbl_oauth
     provider_id         varchar(255) not null,
     connected_at        timestamp not null default now(),
     created_datetime    timestamp not null default now(),
-    updated_datetime    timestamp not null default now(),
+    updated_datetime    timestamp not null default   now(),
     deleted_datetime    timestamp null,
 
     constraint uk_oauth_provider unique (provider, provider_id),
