@@ -11,6 +11,23 @@
           and deleted_datetime is null
     </select>
 
+    <select id="selectComment" resultType="CommentResponseDTO">
+        select
+            id,
+            member_id,
+            target_type,
+            target_id,
+            parent_id,
+            content,
+            is_pinned,
+            like_count,
+            created_datetime,
+            updated_datetime
+        from tbl_comment
+        where id = #{commentId}
+          and deleted_datetime is null
+    </select>
+
     <select id="existsCommentLike" resultType="boolean">
         select exists (
             select 1
@@ -58,5 +75,23 @@
         where id = #{commentId}
           and deleted_datetime is null
     </select>
+
+    <update id="updateCommentContent">
+        update tbl_comment
+        set
+            content = #{content},
+            updated_datetime = now()
+        where id = #{commentId}
+          and deleted_datetime is null
+    </update>
+
+    <update id="softDeleteComment">
+        update tbl_comment
+        set
+            deleted_datetime = now(),
+            updated_datetime = now()
+        where id = #{commentId}
+          and deleted_datetime is null
+    </update>
 
 </mapper>

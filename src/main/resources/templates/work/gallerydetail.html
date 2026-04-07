@@ -12,12 +12,17 @@
     <div th:replace="~{layout/layout :: ytShellChrome('gallery')}"></div>
 
     <main class="yt-shell__page-content gallery-page" aria-label="예술관 상세">
-        <ytd-page-manager id="page-manager" class="style-scope ytd-app">
-            <ytd-browse class="style-scope ytd-page-manager" rounded-container="" page-subtype="home">
+        <div id="page-manager" class="gallery-page-manager">
+            <div class="gallery-browse" data-rounded-container page-subtype="home">
                 
-                <div id="header" class="style-scope ytd-browse">
+                <div id="header" class="gallery-header">
                     <div class="gallery-top-actions" aria-label="상단 액션">
-                        <button class="gallery-top-action-button" type="button" aria-label="추가 작업" aria-expanded="false" data-role="gallery-top-menu-button">
+                        <button class="gallery-top-action-button"
+                                type="button"
+                                aria-label="추가 작업"
+                                aria-expanded="false"
+                                data-role="gallery-top-menu-button"
+                                th:if="${gallery != null and gallery.isOwner}">
                             <svg viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M12 4a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Z"></path>
                             </svg>
@@ -28,30 +33,36 @@
                             </svg>
                         </button>
                     </div>
-                    <ytd-carousel-header-renderer class="style-scope ytd-browse">
-                        <div id="contents" class="style-scope ytd-carousel-header-renderer">
-                            <ytd-carousel-item-renderer class="style-scope ytd-carousel-header-renderer grid grid-disabled">
-                                <div id="carousel-item" class="style-scope ytd-carousel-item-renderer">
-                                    <ytd-default-promo-panel-renderer class="style-scope ytd-carousel-item-renderer" panel-layout="DEFAULT_PROMO_PANEL_RENDERER_LAYOUT_B">
+                    <div class="gallery-carousel-header">
+                        <div id="contents" class="gallery-carousel-contents">
+                            <div class="gallery-carousel-item grid grid-disabled">
+                                <div id="carousel-item" class="gallery-carousel-card">
+                                    <div class="gallery-promo-panel" data-panel-layout="DEFAULT_PROMO_PANEL_RENDERER_LAYOUT_B">
                                         
-                                        <div id="hero" class="style-scope ytd-default-promo-panel-renderer" 
-                                             style="background-image: url('https://i.ytimg.com/vi/JUSvuYc02WA/maxresdefault.jpg');"> 
-                                            </div>
-                                        <div id="scrim" class="style-scope ytd-default-promo-panel-renderer"></div>
+                                        <div id="hero"
+                                             class="gallery-hero"
+                                             th:if="${gallery != null and gallery.coverImage != null and !#strings.isEmpty(gallery.coverImage)}"
+                                             th:style="|background-image: url('${gallery.coverImage}');|"></div>
+                                        <div id="hero"
+                                             class="gallery-hero"
+                                             th:unless="${gallery != null and gallery.coverImage != null and !#strings.isEmpty(gallery.coverImage)}"
+                                             style="background-image: url('https://i.ytimg.com/vi/JUSvuYc02WA/maxresdefault.jpg');"></div>
+                                        <div id="scrim" class="gallery-scrim"></div>
                                        
                                         <!-- 예술관 내용 -->
 
-                                        <div id="content" class="style-scope ytd-default-promo-panel-renderer grid grid-disabled">
+                                        <div id="content" class="gallery-promo-content grid grid-disabled">
                                             <div class="promo-text-wrapper">
                                                 
-                                                <h1 id="hero-title" class="style-scope ytd-default-promo-panel-renderer">PHddddddddddddddddOTO FINISH THRILLER! 📸</h1>
+                                                <h1 id="hero-title" class="gallery-hero-title" th:text="${gallery != null ? gallery.title : '예술관 제목'}">예술관 제목</h1>
                                                 
-                                                <yt-formatted-string id="description" class="style-scope ytd-default-promo-panel-renderer">
-                                                    <span style="color: rgba(255, 255, 255, 0.6); letter-spacing: 1px;">내용입력칸</span>
-                                                </yt-formatted-string>
+                                                <div id="description" class="gallery-description">
+                                                    <span th:text="${gallery != null ? gallery.description : '예술관 설명'}">예술관 설명</span>
+                                                </div>
 
 
-                                                <p class="hero-meta">#스릴러 • 조회수 12.4만회</p>
+                                                <p class="hero-meta"
+                                                   th:text="|작품 ${gallery != null and gallery.workCount != null ? gallery.workCount : 0}개 · 조회수 ${gallery != null and gallery.viewCount != null ? gallery.viewCount : 0}회|">작품 0개 · 조회수 0회</p>
 
                                                 <!-- [추가] 시청하기 아래 썸네일 내비게이션 영역 -->
                                                 <!-- <div id="pagination-thumbnails" class="style-scope ytd-carousel-item-renderer">
@@ -78,150 +89,150 @@
                                             </div>
                                         </div>
 
-                                    </ytd-default-promo-panel-renderer>
+                                    </div>
                                 </div>
-                            </ytd-carousel-item-renderer>
+                            </div>
                         </div>
-                    </ytd-carousel-header-renderer>
+                    </div>
                 </div>
 
-                <ytd-two-column-browse-results-renderer class="style-scope ytd-browse grid grid-disabled">
-                    <div id="primary" class="style-scope ytd-two-column-browse-results-renderer">
-                        <ytd-rich-grid-renderer class="style-scope ytd-two-column-browse-results-renderer">
-                            <div id="contents" class="style-scope ytd-rich-grid-renderer">
+                <div class="gallery-results grid grid-disabled">
+                    <div id="primary" class="gallery-results-primary">
+                        <div class="gallery-rich-grid">
+                            <div id="contents" class="gallery-rich-grid-contents">
                                 <!-- Shorts 섹션 -->
 
                                 <!-- 동영상 그리드 -->
                                 <div class="content-row-section">
                                     <h2>인기 급상승</h2>
                                     <div class="video-grid">
-                                        <div class="video-item" th:each="i : ${#numbers.sequence(1, 8)}">
+                                        <a class="video-item"
+                                           th:if="${gallery != null and !#lists.isEmpty(gallery.works)}"
+                                           th:each="work : ${gallery.works}"
+                                           th:href="@{/work/detail/{id}(id=${work.id})}">
                                             <div class="thumb">
-                                                <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=640&q=80" alt="Thumbnail">
+                                                <img th:if="${work.thumbnailUrl != null and !#strings.isEmpty(work.thumbnailUrl)}"
+                                                     th:src="${work.thumbnailUrl}"
+                                                     th:alt="${work.title}">
                                             </div>
                                             <div class="item-meta">
                                                 <div class="item-avatar">
-                                                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80" alt="스포츠 메이트 프로필">
+                                                    <img th:if="${work.memberProfileImage != null and !#strings.isEmpty(work.memberProfileImage)}"
+                                                         th:src="${work.memberProfileImage}"
+                                                         th:alt="${work.memberNickname != null ? work.memberNickname : '작가'}">
                                                 </div>
                                                 <div class="item-copy">
-                                                    <h3>일반 동영상 제목 샘플</h3>
-                                                    <p class="item-channel">스포츠 메이트</p>
-                                                    <p class="item-stats">조회수 1.2만회 • 3일 전</p>
+                                                    <h3 th:text="${work.title}">작품 제목</h3>
+                                                    <p class="item-channel" th:text="${gallery != null ? gallery.memberNickname : '작가명'}">작가명</p>
+                                                    <p class="item-stats"
+                                                       th:text="|조회수 ${work.viewCount == null ? 0 : work.viewCount}회 · 좋아요 ${work.likeCount == null ? 0 : work.likeCount}개|">조회수 0회 · 좋아요 0개</p>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="video-item" th:each="i : ${#numbers.sequence(1, 8)}">
-                                            <div class="thumb">
-                                                <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=640&q=80" alt="Thumbnail">
-                                            </div>
-                                            <div class="item-meta">
-                                                <div class="item-avatar">
-                                                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80" alt="스포츠 메이트 프로필">
-                                                </div>
-                                                <div class="item-copy">
-                                                    <h3>일반 동영상 제목 샘플</h3>
-                                                    <p class="item-channel">스포츠 메이트</p>
-                                                    <p class="item-stats">조회수 1.2만회 • 3일 전</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="video-item" th:each="i : ${#numbers.sequence(1, 8)}">
-                                            <div class="thumb">
-                                                <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=640&q=80" alt="Thumbnail">
-                                            </div>
-                                            <div class="item-meta">
-                                                <div class="item-avatar">
-                                                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80" alt="스포츠 메이트 프로필">
-                                                </div>
-                                                <div class="item-copy">
-                                                    <h3>일반 동영상 제목 샘플</h3>
-                                                    <p class="item-channel">스포츠 메이트</p>
-                                                    <p class="item-stats">조회수 1.2만회 • 3일 전</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="video-item" th:each="i : ${#numbers.sequence(1, 8)}">
-                                            <div class="thumb">
-                                                <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=640&q=80" alt="Thumbnail">
-                                            </div>
-                                            <div class="item-meta">
-                                                <div class="item-avatar">
-                                                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80" alt="스포츠 메이트 프로필">
-                                                </div>
-                                                <div class="item-copy">
-                                                    <h3>일반 동영상 제목 샘플</h3>
-                                                    <p class="item-channel">스포츠 메이트</p>
-                                                    <p class="item-stats">조회수 1.2만회 • 3일 전</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="video-item" th:each="i : ${#numbers.sequence(1, 8)}">
-                                            <div class="thumb">
-                                                <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=640&q=80" alt="Thumbnail">
-                                            </div>
-                                            <div class="item-meta">
-                                                <div class="item-avatar">
-                                                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=96&q=80" alt="스포츠 메이트 프로필">
-                                                </div>
-                                                <div class="item-copy">
-                                                    <h3>일반 동영상 제목 샘플</h3>
-                                                    <p class="item-channel">스포츠 메이트</p>
-                                                    <p class="item-stats">조회수 1.2만회 • 3일 전</p>
-                                                </div>
-                                            </div>
+                                        </a>
+                                        <div th:if="${gallery == null or #lists.isEmpty(gallery.works)}">
+                                            등록된 작품이 없습니다.
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </ytd-rich-grid-renderer>
+                        </div>
                     </div>
-                </ytd-two-column-browse-results-renderer>
-            </ytd-browse>
-        </ytd-page-manager>
+                </div>
+            </div>
+        </div>
     </main>
-    <div class="work-action-sheet" hidden data-role="gallery-top-action-menu" aria-hidden="true">
-        <button class="danger" type="button">수정하기</button>
-        <button class="danger" type="button">삭제하기</button>
+    <div class="work-action-sheet"
+         hidden
+         data-role="gallery-top-action-menu"
+         aria-hidden="true"
+         th:if="${gallery != null and gallery.isOwner}">
+        <button class="danger" type="button" data-role="gallery-edit-button">수정하기</button>
+        <button class="danger" type="button" data-role="gallery-delete-button">삭제하기</button>
         <button class="cancel" type="button">취소</button>
     </div>
     <th:block th:replace="~{layout/layout :: ytShellScripts()}"></th:block>
-    <script>
+    <script th:inline="javascript">
         (() => {
+            const galleryId = [[${gallery != null ? gallery.id : null}]];
             const menuButton = document.querySelector('[data-role="gallery-top-menu-button"]');
             const menu = document.querySelector('[data-role="gallery-top-action-menu"]');
             const closeButton = document.querySelector('[data-role="gallery-close-button"]');
-
-            if (!menuButton || !menu) {
-                return;
-            }
+            const editButton = document.querySelector('[data-role="gallery-edit-button"]');
+            const deleteButton = document.querySelector('[data-role="gallery-delete-button"]');
 
             const closeMenu = () => {
+                if (!menu || !menuButton) {
+                    return;
+                }
                 menu.hidden = true;
                 menu.setAttribute("aria-hidden", "true");
                 menuButton.setAttribute("aria-expanded", "false");
             };
 
             const openMenu = () => {
+                if (!menu || !menuButton) {
+                    return;
+                }
                 menu.hidden = false;
                 menu.setAttribute("aria-hidden", "false");
                 menuButton.setAttribute("aria-expanded", "true");
             };
 
-            menuButton.addEventListener("click", (event) => {
-                event.stopPropagation();
-                if (menu.hidden) {
-                    openMenu();
+            if (menuButton && menu) {
+                menuButton.addEventListener("click", (event) => {
+                    event.stopPropagation();
+                    if (menu.hidden) {
+                        openMenu();
+                        return;
+                    }
+
+                    closeMenu();
+                });
+
+                menu.addEventListener("click", (event) => {
+                    const cancelButton = event.target.closest(".cancel");
+                    event.stopPropagation();
+                    if (cancelButton) {
+                        closeMenu();
+                    }
+                });
+            }
+
+            editButton?.addEventListener("click", () => {
+                closeMenu();
+                if (galleryId) {
+                    const editUrl = `/gallery/${galleryId}/edit`;
+                    if (typeof window.openComposeModal === "function") {
+                        window.openComposeModal(editUrl);
+                        return;
+                    }
+                    window.location.href = editUrl;
+                }
+            });
+
+            deleteButton?.addEventListener("click", async () => {
+                closeMenu();
+                if (!galleryId) {
                     return;
                 }
 
-                closeMenu();
-            });
+                if (!window.confirm("예술관을 삭제하시겠습니까? 포함된 작품도 함께 삭제됩니다.")) {
+                    return;
+                }
 
-            menu.addEventListener("click", (event) => {
-                const cancelButton = event.target.closest(".cancel");
-                event.stopPropagation();
-                if (cancelButton) {
-                    closeMenu();
+                try {
+                    const response = await fetch(`/api/galleries/${galleryId}`, {
+                        method: "DELETE"
+                    });
+
+                    if (!response.ok) {
+                        const message = await response.text();
+                        throw new Error(message || "예술관 삭제에 실패했습니다.");
+                    }
+
+                    window.location.href = "/profile";
+                } catch (error) {
+                    window.alert(error.message || "예술관 삭제 중 오류가 발생했습니다.");
                 }
             });
 
@@ -235,9 +246,7 @@
 
             closeButton?.addEventListener("click", () => {
                 closeMenu();
-                if (window.history.length > 1) {
-                    window.history.back();
-                }
+                window.location.href = "/profile";
             });
         })();
     </script>

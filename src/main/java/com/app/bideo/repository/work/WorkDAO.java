@@ -86,6 +86,10 @@ public class WorkDAO {
         workMapper.insertTag(tagName);
     }
 
+    public List<TagResponseDTO> findTagSuggestions(String keyword, int limit) {
+        return workMapper.selectTagSuggestions(keyword, limit);
+    }
+
     // 작품 댓글 저장
     public void saveComment(CommentVO commentVO) {
         workMapper.insertWorkComment(commentVO);
@@ -94,6 +98,10 @@ public class WorkDAO {
     // 작품 댓글 개수 증가
     public void increaseCommentCount(Long workId) {
         workMapper.increaseWorkCommentCount(workId);
+    }
+
+    public void decreaseCommentCount(Long workId) {
+        workMapper.decreaseWorkCommentCount(workId);
     }
 
     // 작품 댓글 목록 조회

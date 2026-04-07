@@ -1,37 +1,47 @@
 document.addEventListener("DOMContentLoaded", function () {
-  var root = document.querySelector("[data-bd-shell-root]");
+  let root = document.querySelector("[data-bd-shell-root]");
   if (!root) {
     return;
   }
 
-  var desktopQuery = window.matchMedia("(min-width: 901px)");
-  var menuToggle = root.querySelector("[data-bd-shell-menu-toggle]");
-  var searchToggles = Array.from(
+  let desktopQuery = window.matchMedia("(min-width: 901px)");
+  let menuToggle = root.querySelector("[data-bd-shell-menu-toggle]");
+  let searchToggles = Array.from(
     root.querySelectorAll("[data-bd-search-toggle]")
   );
-  var overlay = root.querySelector("[data-bd-shell-overlay]");
-  var drawer = root.querySelector("[data-bd-shell-drawer]");
-  var mobileSearch = root.querySelector("[data-bd-shell-mobile-search]");
+
 
   // Popup elements (popups are outside [data-bd-shell-root], so query from document)
-  var createToggle = root.querySelector("[data-bd-shell-create-toggle]");
-  var accountToggle = root.querySelector("[data-bd-shell-account-toggle]");
-  var notificationToggle = root.querySelector("[data-bd-shell-notification-toggle]");
-  var createPopup = document.querySelector("[data-bd-shell-create-popup]");
-  var accountPopup = document.querySelector("[data-bd-shell-account-popup]");
-  var notificationPopup = document.querySelector("[data-bd-shell-notification-popup]");
+
+
+  let overlay = root.querySelector("[data-bd-shell-overlay]");
+  let drawer = root.querySelector("[data-bd-shell-drawer]");
+  let mobileSearch = root.querySelector("[data-bd-shell-mobile-search]");
+  let createToggle = root.querySelector("[data-bd-shell-create-toggle]");
+  let accountToggle = root.querySelector("[data-bd-shell-account-toggle]");
+  let notificationToggle = root.querySelector("[data-bd-shell-notification-toggle]");
+  let createPopup = document.querySelector("[data-bd-shell-create-popup]");
+  let accountPopup = document.querySelector("[data-bd-shell-account-popup]");
+  let notificationPopup = document.querySelector("[data-bd-shell-notification-popup]");
+  let composeModal = document.querySelector("[data-yt-compose-modal]");
+  let composeContent = document.querySelector("[data-yt-compose-content]");
+  let composeDismissButtons = Array.from(document.querySelectorAll("[data-yt-compose-dismiss]"));
+  let composeLinks = Array.from(document.querySelectorAll("[data-compose-modal-link]"));
+  let composeState = {
+    url: "",
+    styles: [],
+    scripts: [],
+    cache: {}
+  };
 
   function syncBodyState() {
     document.body.dataset.guideCollapsed = root.dataset.guideCollapsed || "false";
-    document.body.dataset.mobileDrawerOpen =
-      root.dataset.mobileDrawerOpen || "false";
+    document.body.dataset.mobileDrawerOpen = root.dataset.mobileDrawerOpen || "false";
     document.body.dataset.searchOpen = root.dataset.searchOpen || "false";
   }
 
   function syncOverlay() {
-    var open =
-      root.dataset.mobileDrawerOpen === "true" ||
-      root.dataset.searchOpen === "true";
+    let open = root.dataset.mobileDrawerOpen === "true" || root.dataset.searchOpen === "true";
     if (overlay) {
       overlay.hidden = !open;
     }
@@ -40,6 +50,176 @@ document.addEventListener("DOMContentLoaded", function () {
   function lockBody(locked) {
     document.body.classList.toggle("bd-shell-lock", locked);
   }
+
+  function removeComposeAssets() {
+    composeState.styles.forEach(function (node) {
+      node.remove();
+    });
+    composeState.scripts.forEach(function (node) {
+      node.remove();
+    });
+    composeState.styles = [];
+    composeState.scripts = [];
+    composeState.url = "";
+  }
+
+  function closeComposeModal() {
+    if (!composeModal) {
+      return;
+    }
+
+    composeModal.hidden = true;
+    document.body.classList.remove("yt-compose-open");
+    if (composeContent) {
+      composeContent.removeAttribute("data-compose-view");
+    }
+
+    if (composeContent) {
+      composeContent.innerHTML = "";
+    }
+
+    removeComposeAssets();
+  }
+
+  function loadComposeStyles(parsedDocument) {
+    let stylesheetLinks = Array.from(parsedDocument.querySelectorAll('link[rel="stylesheet"]'));
+
+    stylesheetLinks.forEach(function (linkNode) {
+      let href = linkNode.getAttribute("href");
+      let newLink;
+
+      if (!href || document.querySelector('link[data-compose-asset="' + href + '"]')) {
+        return;
+      }
+
+      newLink = document.createElement("link");
+      newLink.rel = "stylesheet";
+      newLink.href = href;
+      newLink.setAttribute("data-compose-asset", href);
+      document.head.appendChild(newLink);
+      composeState.styles.push(newLink);
+    });
+  }
+
+  function loadComposeScripts(parsedDocument) {
+    let scriptNodes = Array.from(parsedDocument.querySelectorAll("script[src]"));
+    let loaders = scriptNodes.map(function (scriptNode) {
+      let src = scriptNode.getAttribute("src");
+      let newScript;
+
+      if (!src) {
+        return Promise.resolve();
+      }
+
+      return new Promise(function (resolve, reject) {
+        newScript = document.createElement("script");
+        newScript.src = src;
+        newScript.async = false;
+        newScript.setAttribute("data-compose-script", src);
+        newScript.onload = resolve;
+        newScript.onerror = function () {
+          reject(new Error("작성 스크립트를 불러오지 못했습니다."));
+        };
+        document.body.appendChild(newScript);
+        composeState.scripts.push(newScript);
+      });
+    });
+
+    return Promise.all(loaders);
+  }
+
+  function extractComposeNodes(parsedDocument) {
+    return Array.from(parsedDocument.body.children).filter(function (node) {
+      return node.tagName !== "SCRIPT";
+    });
+  }
+
+  function openComposeModal(url) {
+    if (!composeModal || !composeContent || !url) {
+      if (url) {
+        window.location.href = url;
+      }
+      return;
+    }
+
+    closeAllPopups();
+    composeModal.hidden = false;
+    document.body.classList.add("yt-compose-open");
+    composeContent.innerHTML = '<div class="yt-compose-modal__loading">불러오는 중...</div>';
+
+    Promise.resolve(composeState.cache[url]).then(function (cachedHtml) {
+      if (cachedHtml) {
+        return cachedHtml;
+      }
+
+      return fetch(url, {
+        headers: {
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error("작성 화면을 불러오지 못했습니다.");
+          }
+
+          return response.text();
+        })
+        .then(function (html) {
+          composeState.cache[url] = html;
+          return html;
+        });
+    })
+      .then(function (html) {
+        let parser = new DOMParser();
+        let parsedDocument = parser.parseFromString(html, "text/html");
+        let nodes = extractComposeNodes(parsedDocument);
+
+        if (!nodes.length) {
+          throw new Error("작성 모달 내용을 찾지 못했습니다.");
+        }
+
+        if (composeContent) {
+          composeContent.innerHTML = "";
+        }
+
+        removeComposeAssets();
+        loadComposeStyles(parsedDocument);
+
+        nodes.forEach(function (node) {
+          composeContent.appendChild(document.importNode(node, true));
+        });
+
+        if (composeContent) {
+          if (url.indexOf("/gallery-register") > -1) {
+            composeContent.setAttribute("data-compose-view", "gallery-register");
+          } else if (url.indexOf("/work/work-register") > -1) {
+            composeContent.setAttribute("data-compose-view", "work-register");
+          } else {
+            composeContent.removeAttribute("data-compose-view");
+          }
+        }
+
+        Array.from(composeContent.children).forEach(function (childNode) {
+          childNode.setAttribute("data-compose-embedded", "true");
+        });
+
+        return loadComposeScripts(parsedDocument).then(function () {
+          if (url.indexOf("/gallery-register") > -1 && typeof window.initializeGalleryRegister === "function") {
+            window.initializeGalleryRegister();
+          }
+
+          composeState.url = url;
+        });
+      })
+      .catch(function (error) {
+        if (composeContent) {
+          composeContent.innerHTML = '<div class="yt-compose-modal__error">' + (error.message || "작성 화면을 불러오지 못했습니다.") + "</div>";
+        }
+      });
+  }
+
+  window.closeComposeModal = closeComposeModal;
+  window.openComposeModal = openComposeModal;
 
   function closeDrawer() {
     root.dataset.mobileDrawerOpen = "false";
@@ -68,13 +248,13 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function toggleGuide() {
-    var collapsed = root.dataset.guideCollapsed === "true";
+    let collapsed = root.dataset.guideCollapsed === "true";
     root.dataset.guideCollapsed = collapsed ? "false" : "true";
     syncBodyState();
   }
 
   function toggleDrawer() {
-    var nextState = root.dataset.mobileDrawerOpen !== "true";
+    let nextState = root.dataset.mobileDrawerOpen !== "true";
     root.dataset.mobileDrawerOpen = String(nextState);
     if (drawer) {
       drawer.hidden = !nextState;
@@ -95,7 +275,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function toggleSearch() {
-    var nextState = root.dataset.searchOpen !== "true";
+    let nextState = root.dataset.searchOpen !== "true";
     root.dataset.searchOpen = String(nextState);
     if (mobileSearch) {
       mobileSearch.hidden = !nextState;
@@ -139,26 +319,26 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function positionPopup(popup, triggerButton) {
-    var rect = triggerButton.getBoundingClientRect();
-    var rightOffset = window.innerWidth - rect.right;
+    let rect = triggerButton.getBoundingClientRect();
+    let rightOffset = window.innerWidth - rect.right;
     popup.style.top = rect.bottom + "px";
     popup.style.right = rightOffset + "px";
     popup.style.left = "auto";
 
     requestAnimationFrame(function () {
-      var popupRect = popup.getBoundingClientRect();
+      let popupRect = popup.getBoundingClientRect();
       if (popupRect.left < 0) {
         popup.style.right = "auto";
         popup.style.left = "0px";
       }
       if (popupRect.bottom > window.innerHeight) {
-        popup.style.maxHeight = (window.innerHeight - rect.bottom - 8) + "px";
+        popup.style.maxHeight = window.innerHeight - rect.bottom - 8 + "px";
       }
     });
   }
 
   function toggleCreatePopup() {
-    var willOpen = createPopup && createPopup.hidden;
+    let willOpen = createPopup && createPopup.hidden;
     closeAllPopups();
     if (willOpen) {
       positionPopup(createPopup, createToggle);
@@ -168,7 +348,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function toggleAccountPopup() {
-    var willOpen = accountPopup && accountPopup.hidden;
+    let willOpen = accountPopup && accountPopup.hidden;
     closeAllPopups();
     if (willOpen) {
       positionPopup(accountPopup, accountToggle);
@@ -178,7 +358,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function toggleNotificationPopup() {
-    var willOpen = notificationPopup && notificationPopup.hidden;
+    let willOpen = notificationPopup && notificationPopup.hidden;
     closeAllPopups();
     if (willOpen) {
       positionPopup(notificationPopup, notificationToggle);
@@ -260,21 +440,14 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   document.addEventListener("click", function (event) {
-    var anyPopupOpen =
-      (createPopup && !createPopup.hidden) ||
-      (accountPopup && !accountPopup.hidden) ||
-      (notificationPopup && !notificationPopup.hidden);
+    let anyPopupOpen = (createPopup && !createPopup.hidden) || (accountPopup && !accountPopup.hidden) || (notificationPopup && !notificationPopup.hidden);
     if (!anyPopupOpen) {
       return;
     }
-    var clickedInsidePopup =
-      (createPopup && createPopup.contains(event.target)) ||
-      (accountPopup && accountPopup.contains(event.target)) ||
-      (notificationPopup && notificationPopup.contains(event.target));
-    var clickedToggle =
-      (createToggle && createToggle.contains(event.target)) ||
-      (accountToggle && accountToggle.contains(event.target)) ||
-      (notificationToggle && notificationToggle.contains(event.target));
+
+    let clickedInsidePopup = (createPopup && createPopup.contains(event.target)) || (accountPopup && accountPopup.contains(event.target)) || (notificationPopup && notificationPopup.contains(event.target));
+    let clickedToggle = (createToggle && createToggle.contains(event.target)) || (accountToggle && accountToggle.contains(event.target)) || (notificationToggle && notificationToggle.contains(event.target));
+
     if (!clickedInsidePopup && !clickedToggle) {
       closeAllPopups();
     }
@@ -284,9 +457,24 @@ document.addEventListener("DOMContentLoaded", function () {
     if (event.key !== "Escape") {
       return;
     }
+
+    closeComposeModal();
     closeAllPopups();
     closeDrawer();
     closeSearch();
+  });
+
+  composeDismissButtons.forEach(function (button) {
+    button.addEventListener("click", closeComposeModal);
+  });
+
+  composeLinks.forEach(function (link) {
+    link.addEventListener("click", function (event) {
+      let url = link.getAttribute("data-compose-modal-url") || link.getAttribute("href");
+
+      event.preventDefault();
+      openComposeModal(url);
+    });
   });
 
   if (desktopQuery.addEventListener) {

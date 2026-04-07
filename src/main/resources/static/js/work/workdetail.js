@@ -1,157 +1,220 @@
-// 페이지별 샘플 렌더링 데이터
-const workDetails = [
-    {
-        thumb: "https://i.ytimg.com/vi/aqZnrOnnyBA/maxresdefault.jpg",
-        videoSrc: "/images/BIDEO_introduce_video%20-%20%EB%B3%B5%EC%82%AC%EB%B3%B8%20(2).mp4",
-        thumbAlt: "야당 쇼츠 썸네일",
-        caption: "야 그게 뭐야?",
-        likeCount: "1.3만",
-        viewCount: "451,113",
-        publishedDate: "3월 21일",
-        publishedYear: "2026년",
-        dislikeLabel: "싫어요",
-        commentCount: "198",
-        shareLabel: "공유",
-        remixLabel: "거래",
-        marketType: "trade",
-        avatarText: "@",
-        channel: "@지무비",
-        isOwner: true,
-        subscribe: "팔로우",
-        desc: "예매율 38% 미쳤다..유해진 주연의 <내부자들>이 다시 화제가 되는 이유를 한 번에 보여주는 장면입니다.\n정적인 대사처럼 시작하지만 감정선이 점점 쌓이면서 분위기를 완전히 뒤집고, 배우들 호흡과 표정 변화가 이어질수록 몰입감이 훨씬 커집니다.\n특히 유해진 특유의 현실적인 톤이 장면 전체를 단단하게 잡아줘서 짧게 봐도 기억에 남는 클립입니다.",
-        headline: "와.. 연기 개 미쳤다..",
-        pivotThumb: "https://images.unsplash.com/photo-1501612780327-45045538702b?auto=format&fit=crop&w=300&q=80",
-        pivotTitle: "현대 미술관 야간 전시관",
-        pivotMeta: "서울 예술관 · 전시 작품 6점",
-        pivotAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=88&q=80",
-        pivotArtist: "서울 예술관",
-        pivotCount: "작품 6점",
-        pivotItems: [
-            { title: "유리와 빛의 홀", meta: "조회수 12만회", image: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=300&q=80" },
-            { title: "붉은 벽면의 조형전", meta: "조회수 8.4만회", image: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=300&q=80" },
-            { title: "회화 아카이브", meta: "조회수 5.1만회", image: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=320&q=80" }
-            ,{ title: "조명 아트룸", meta: "조회수 14만회", image: "https://images.unsplash.com/photo-1501612780327-45045538702b?auto=format&fit=crop&w=300&q=80" }
-            ,{ title: "조형 아카이브", meta: "조회수 6.8만회", image: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?auto=format&fit=crop&w=300&q=80" }
-            ,{ title: "블루 갤러리", meta: "조회수 3.9만회", image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=300&q=80" }
-        ],
-        comments: [
-            {
-                author: "@moremoreplus",
-                avatar: "https://yt3.ggpht.com/ytc/AIdro_n3AexbIABbMKlogUR0dPQIElzbRy40MFOmAi6C0boN4j398k0=s88-c-k-c0x00ffffff-no-rj",
-                time: "2시간 전",
-                text: "준비 해이라 각오 해이라~",
-                likes: "",
-                replies: [
-                    {
-                        author: "@mru2-w2r",
-                        avatar: "https://yt3.ggpht.com/gKiEOfVVZiYgIt-RIdnRrzgUy9F86UzfAtAqsCamarxT03VV39PpkttLgJnrLONWWpmSEAqlEw=s88-c-k-c0x00ffffff-no-rj",
-                        time: "7일 전",
-                        text: "나온다하고 노쇼함 ㅋㅋ",
-                        likes: "2"
-                    },
-                    {
-                        author: "@Jace-rb8wg",
-                        avatar: "https://yt3.ggpht.com/ytc/AIdro_l8eo8-U6Hq182HvGSivhWsfhg3pOCinNGPXomA3iYdj_2Aq9hR3pP-TUmOw-mA8K_Hzw=s88-c-k-c0x00ffffff-no-rj",
-                        time: "3일 전",
-                        text: "나왔으면 너무 밸붕이긴 함",
-                        likes: "2"
-                    },
-                    {
-                        author: "@숙상순",
-                        avatar: "https://yt3.ggpht.com/ytc/AIdro_ng3vdmQ70ckkEDn8ODXy01T1k4iclHBSOBC5Qal-YxKcB6AAI=s88-c-k-c0x00ffffff-no-rj",
-                        time: "1일 전",
-                        text: "@Jace-rb8wg 그 밸붕이신분은 당연히 시즌8에서는 우승하셨겠죠? ㅋ",
-                        likes: ""
-                    }
-                ]
-            },
-            {
-                author: "@다크피카츄-j0907",
-                avatar: "https://yt3.ggpht.com/ytc/AIdro_lCRXNeKiz9AFIaW5BsxEsnOxDqGipjZUV7gL1AjUVHoD6z0SvKCjTFUGPKCbcymbELIQ=s88-c-k-c0x00ffffff-no-rj",
-                time: "8일 전",
-                text: "이 장면은 진짜 몇 번을 봐도 소름 돋는다.",
-                likes: "254",
-                replies: []
-            }
-        ]
-    },
-    {
-        thumb: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80",
-        thumbAlt: "미디어 아트 썸네일",
-        caption: "빛이 움직인다",
-        likeCount: "8,421",
-        viewCount: "128,440",
-        publishedDate: "2월 8일",
-        publishedYear: "2026년",
-        dislikeLabel: "싫어요",
-        commentCount: "57",
-        shareLabel: "공유",
-        remixLabel: "경매",
-        marketType: "auction",
-        avatarText: "A",
-        channel: "@artflux",
-        isOwner: false,
-        subscribe: "팔로우",
-        desc: "설치 미술 전시장 안에서 빛과 사운드가 같이 반응하는 순간",
-        headline: "공간 전체가 작품이 되는 연출",
-        pivotThumb: "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=300&q=80",
-        pivotTitle: "미디어 아트 특별관",
-        pivotMeta: "BIDEO 아트센터 · 전시 작품 4점",
-        pivotAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=88&q=80",
-        pivotArtist: "BIDEO 아트센터",
-        pivotCount: "작품 4점",
-        pivotItems: [
-            { title: "반응형 조명 터널", meta: "조회수 21만회", image: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?auto=format&fit=crop&w=300&q=80" },
-            { title: "네온 파편 설치", meta: "조회수 17만회", image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=300&q=80" },
-            { title: "사운드 웨이브 룸", meta: "조회수 9.7만회", image: "https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=300&q=80" },
-            { title: "디지털 캔버스", meta: "조회수 11만회", image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=300&q=80" }
-        ],
-        comments: [
-            { author: "@artlover", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=88&q=80", time: "2일 전", text: "실제로 보면 더 웅장할 것 같네요.", likes: "32", replies: [] },
-            { author: "@lightnote", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=88&q=80", time: "1일 전", text: "색감이 너무 좋다.", likes: "11", replies: [] }
-        ]
-    },
-    {
-        thumb: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&q=80",
-        thumbAlt: "인터뷰 영상 썸네일",
-        caption: "작업실 비하인드",
-        likeCount: "2,903",
-        viewCount: "82,019",
-        publishedDate: "1월 14일",
-        publishedYear: "2026년",
-        dislikeLabel: "싫어요",
-        commentCount: "34",
-        shareLabel: "공유",
-        remixLabel: "",
-        avatarText: "S",
-        channel: "@studioframe",
-        isOwner: false,
-        subscribe: "팔로우",
-        desc: "작가가 직접 설명하는 제작 과정과 재료 선택 이야기",
-        headline: "작업실에서 바로 듣는 제작 비하인드",
-        pivotThumb: "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=300&q=80",
-        pivotTitle: "작가 아카이브 관람",
-        pivotMeta: "스튜디오 큐레이션 · 전시 작품 5점",
-        pivotAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=88&q=80",
-        pivotArtist: "스튜디오 큐레이션",
-        pivotCount: "작품 5점",
-        pivotItems: [
-            { title: "재료 표본 컬렉션", meta: "조회수 4.2만회", image: "https://images.unsplash.com/photo-1459908676235-d5f02a50184b?auto=format&fit=crop&w=300&q=80" },
-            { title: "스케치 월", meta: "조회수 7.3만회", image: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=280&q=80" },
-            { title: "작업 도구 선반", meta: "조회수 3.1만회", image: "https://images.unsplash.com/photo-1496317899792-9d7dbcd928a1?auto=format&fit=crop&w=300&q=80" },
-            { title: "작품 보존함", meta: "조회수 2.7만회", image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=300&q=80" },
-            { title: "드로잉 캐비닛", meta: "조회수 5.9만회", image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=300&q=80" }
-        ],
-        comments: [
-            { author: "@studiofan", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=88&q=80", time: "4일 전", text: "작업 과정 설명이 깔끔해서 좋았어요.", likes: "8", replies: [] },
-            { author: "@framepick", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=88&q=80", time: "6시간 전", text: "재료 선택 이유 듣는 재미가 있네요.", likes: "5", replies: [] }
-        ]
+const workDetails = [];
+const currentWorkId = Number(window.location.pathname.split("/").filter(Boolean).pop() || "0");
+
+function getCurrentWorkId() {
+    return Number.isFinite(currentWorkId) && currentWorkId > 0 ? currentWorkId : null;
+}
+
+function getMediaFiles(detail) {
+    return Array.isArray(detail?.files) ? detail.files : [];
+}
+
+function getThumbnailSource(detail) {
+    const files = getMediaFiles(detail);
+    const imageFile = files.find((file) => String(file?.fileType || "").startsWith("image/"));
+    const firstFile = files[0];
+
+    return imageFile?.fileUrl || firstFile?.fileUrl || "";
+}
+
+function getMediaSource(detail) {
+    const files = getMediaFiles(detail);
+
+    if (detail?.category === "VIDEO") {
+        const videoFile = files.find((file) => String(file?.fileType || "").startsWith("video/"));
+        return videoFile?.fileUrl || "";
     }
-];
+
+    const firstFile = files[0];
+    return firstFile?.fileUrl || "";
+}
+
+function getAvatarText(nickname) {
+    const base = String(nickname || "").replace(/^@/, "").trim();
+    return base ? base.charAt(0).toUpperCase() : "@";
+}
+
+function formatRelativeTime(dateTime) {
+    if (!dateTime) {
+        return "";
+    }
+
+    const target = new Date(dateTime);
+    if (Number.isNaN(target.getTime())) {
+        return "";
+    }
+
+    const diff = Date.now() - target.getTime();
+    const minute = 60 * 1000;
+    const hour = 60 * minute;
+    const day = 24 * hour;
+
+    if (diff < minute) {
+        return "방금 전";
+    }
+    if (diff < hour) {
+        return `${Math.floor(diff / minute)}분 전`;
+    }
+    if (diff < day) {
+        return `${Math.floor(diff / hour)}시간 전`;
+    }
+    if (diff < 30 * day) {
+        return `${Math.floor(diff / day)}일 전`;
+    }
+
+    return `${target.getFullYear()}.${String(target.getMonth() + 1).padStart(2, "0")}.${String(target.getDate()).padStart(2, "0")}`;
+}
+
+function formatPublishedDate(dateTime) {
+    const target = new Date(dateTime);
+    if (Number.isNaN(target.getTime())) {
+        return "";
+    }
+
+    return `${target.getMonth() + 1}월 ${target.getDate()}일`;
+}
+
+function formatPublishedYear(dateTime) {
+    const target = new Date(dateTime);
+    if (Number.isNaN(target.getTime())) {
+        return "";
+    }
+
+    return `${target.getFullYear()}년`;
+}
+
+function normalizeComment(comment) {
+    return {
+        id: comment.id,
+        author: `@${comment.memberNickname || "user"}`,
+        avatar: comment.memberProfileImage || "",
+        time: formatRelativeTime(comment.createdDatetime),
+        text: comment.content || "",
+        likes: comment.likeCount || 0,
+        isLiked: Boolean(comment.isLiked),
+        isOwner: Boolean(comment.isOwner),
+        replies: Array.isArray(comment.replies) ? comment.replies.map(normalizeComment) : []
+    };
+}
+
+function buildPivotData(galleryDetail, workId) {
+    if (!galleryDetail || !Array.isArray(galleryDetail.works) || !galleryDetail.works.length) {
+        return {
+            pivotThumb: "",
+            pivotTitle: "",
+            pivotAvatar: "",
+            pivotArtist: "",
+            pivotCount: "",
+            pivotItems: []
+        };
+    }
+
+    const pivotItems = galleryDetail.works
+        .filter((work) => work && work.id !== workId)
+        .map((work) => ({
+            image: work.thumbnailUrl || "",
+            meta: work.title || "",
+            href: `/work/detail/${work.id}`
+        }));
+
+    return {
+        pivotThumb: galleryDetail.coverImage || galleryDetail.works[0]?.thumbnailUrl || "",
+        pivotTitle: galleryDetail.title || "",
+        pivotAvatar: galleryDetail.memberProfileImage || "",
+        pivotArtist: galleryDetail.memberNickname ? `@${galleryDetail.memberNickname}` : "",
+        pivotCount: `작품 ${galleryDetail.workCount || galleryDetail.works.length || 0}개`,
+        pivotItems
+    };
+}
+
+async function normalizeWorkDetail(detail) {
+    const mediaSource = getMediaSource(detail);
+    const thumbnailSource = getThumbnailSource(detail) || mediaSource;
+    const isVideo = detail.category === "VIDEO" && Boolean(mediaSource);
+    const createdDate = detail.createdDatetime || detail.updatedDatetime;
+    let pivotData = {
+        pivotThumb: "",
+        pivotTitle: "",
+        pivotAvatar: "",
+        pivotArtist: "",
+        pivotCount: "",
+        pivotItems: []
+    };
+
+    if (detail.galleryId) {
+        try {
+            const galleryDetail = await apiRequest(`/api/galleries/${detail.galleryId}`);
+            pivotData = buildPivotData(galleryDetail, detail.id);
+        } catch (_) {
+            pivotData = {
+                pivotThumb: "",
+                pivotTitle: "",
+                pivotAvatar: "",
+                pivotArtist: "",
+                pivotCount: "",
+                pivotItems: []
+            };
+        }
+    }
+
+    return {
+        id: detail.id,
+        thumb: thumbnailSource,
+        videoSrc: isVideo ? mediaSource : "",
+        thumbAlt: detail.title || "작품",
+        caption: detail.title || "",
+        likeCount: formatDisplayCount(detail.likeCount || 0, { compact: true }),
+        viewCount: formatDisplayCount(detail.viewCount || 0),
+        publishedDate: formatPublishedDate(createdDate),
+        publishedYear: formatPublishedYear(createdDate),
+        commentCount: formatDisplayCount(detail.commentCount || 0),
+        shareLabel: "공유",
+        remixLabel: detail.hasActiveAuction ? "경매" : detail.isTradable ? "거래" : "",
+        marketType: detail.hasActiveAuction ? "auction" : detail.isTradable ? "trade" : "",
+        avatarText: getAvatarText(detail.memberNickname),
+        channel: `@${detail.memberNickname || "artist"}`,
+        isOwner: Boolean(detail.isOwner),
+        subscribe: "팔로우",
+        desc: detail.description || "",
+        headline: detail.title || "",
+        isBookmarked: Boolean(detail.isBookmarked),
+        isLiked: Boolean(detail.isLiked),
+        shareUrl: `${window.location.origin}/work/detail/${detail.id}`,
+        comments: Array.isArray(detail.comments) ? detail.comments.map(normalizeComment) : [],
+        ...pivotData
+    };
+}
+
+async function apiRequest(url, options = {}) {
+    const response = await fetch(url, {
+        headers: {
+            ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
+            ...(options.headers || {})
+        },
+        ...options
+    });
+
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text || "요청 처리에 실패했습니다.");
+    }
+
+    const contentType = response.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) {
+        return response.json();
+    }
+
+    return null;
+}
 
 // UI 아이콘 경로 정의
 const playIconPath = "M7 5.2v13.6c0 .73.8 1.18 1.43.8L19.98 13a.92.92 0 0 0 0-1.6L8.43 4.4A.92.92 0 0 0 7 5.2Z";
 const pauseIconPath = "M6.5 3A1.5 1.5 0 005 4.5v15A1.5 1.5 0 006.5 21h2a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 008.5 3h-2Zm9 0A1.5 1.5 0 0014 4.5v15a1.5 1.5 0 001.5 1.5h2a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0017.5 3h-2Z";
+const volumeHighIconPath = "M11.485 2.143 3.913 6.687A6 6 0 001 11.832v.338a6 6 0 002.913 5.144l7.572 4.543A1 1 0 0013 21V3a1.001 1.001 0 00-1.515-.857Zm6.88 2.079a1 1 0 00-.001 1.414 9 9 0 010 12.728 1 1 0 001.414 1.414 11 11 0 000-15.556 1 1 0 00-1.413 0Zm-2.83 2.828a1 1 0 000 1.415 5 5 0 010 7.07 1 1 0 001.415 1.415 6.999 6.999 0 000-9.9 1 1 0 00-1.415 0Z";
+const volumeLowIconPath = "M11.485 2.143 3.913 6.687A6 6 0 001 11.832v.338a6 6 0 002.913 5.144l7.572 4.543A1 1 0 0013 21V3a1.001 1.001 0 00-1.515-.857Zm4.697 4.907a1 1 0 000 1.415 5 5 0 010 7.07 1 1 0 001.415 1.415 6.999 6.999 0 000-9.9 1 1 0 00-1.415 0Z";
+const volumeMuteIconPath = "M11.485 2.143 3.913 6.687A6 6 0 001 11.832v.338a6 6 0 002.913 5.144l7.572 4.543A1 1 0 0013 21V3a1.001 1.001 0 00-1.515-.857Zm5.222 6.443a1 1 0 0 0-1.414 0L13.88 10l-1.414-1.414a1 1 0 1 0-1.414 1.414L12.466 11.414l-1.414 1.414a1 1 0 0 0 1.414 1.414l1.414-1.414 1.414 1.414a1 1 0 0 0 1.414-1.414L15.294 11.414l1.413-1.414a1 1 0 0 0 0-1.414Z";
+const commentLikeOutlinePath = "M9.221 1.795a1 1 0 011.109-.656l1.04.173a4 4 0 013.252 4.784L14 9h4.061a3.664 3.664 0 013.576 2.868A3.68 3.68 0 0121 14.85l.02.087A3.815 3.815 0 0120 18.5v.043l-.01.227a2.82 2.82 0 01-.135.663l-.106.282A3.754 3.754 0 0116.295 22h-3.606l-.392-.007a12.002 12.002 0 01-5.223-1.388l-.343-.189-.27-.154a2.005 2.005 0 00-.863-.26l-.13-.004H3.5a1.5 1.5 0 01-1.5-1.5V12.5A1.5 1.5 0 013.5 11h1.79l.157-.013a1 1 0 00.724-.512l.063-.145 2.987-8.535Zm-1.1 9.196A3 3 0 015.29 13H4v4.998h1.468a4 4 0 011.986.528l.27.155.285.157A10 10 0 0012.69 20h3.606c.754 0 1.424-.483 1.663-1.2l.03-.126a.819.819 0 00.012-.131v-.872l.587-.586c.388-.388.577-.927.523-1.465l-.038-.23-.02-.087-.21-.9.55-.744A1.663 1.663 0 0018.061 11H14a2.002 2.002 0 01-1.956-2.418l.623-2.904a2 2 0 00-1.626-2.392l-.21-.035-2.71 7.741Z";
+const commentLikeFilledPath = "M2 10.5A1.5 1.5 0 0 1 3.5 9h2.614a.25.25 0 0 0 .239-.183l1.265-4.427A2.75 2.75 0 0 1 10.262 2a.75.75 0 0 1 .75.75v5.999a.75.75 0 0 0 .75.75h6.112a2.25 2.25 0 0 1 2.174 2.835l-1.209 4.836A3.75 3.75 0 0 1 15.201 20H8.574a3.75 3.75 0 0 1-1.06-.153L4.158 18.79A1.5 1.5 0 0 1 2 17.35v-6.85Z";
 const bookmarkOutlinePath = "M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z";
 const bookmarkFilledPath = "M5 2a2 2 0 0 0-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 0 0-2-2H5Z";
 const tradeIconPath = "M21.5 4h-19A1.5 1.5 0 001 5.5v13A1.5 1.5 0 002.5 20h19a1.5 1.5 0 001.5-1.5v-13A1.5 1.5 0 0021.5 4ZM3 18V6h18v12H3Zm9-11.5a1 1 0 00-1 1v.638c-.357.101-.689.26-.979.49A2.35 2.35 0 009.13 10.5c-.007.424.112.84.342 1.197.21.31.497.563.831.734.546.29 1.23.411 1.693.502.557.109.899.19 1.117.315.087.048.11.082.114.09.004.005.028.044.028.162 0 .024-.008.118-.165.235-.162.122-.5.27-1.09.27-.721 0-1.049-.21-1.181-.323a.7.7 0 01-.132-.15l-.01-.018.005.013.006.014.002.009a.996.996 0 00-1.884.64l.947-.316-.003.001c-.9.3-.942.315-.943.317l.001.003.003.006.004.015.012.032c.045.111.1.218.162.321.146.236.324.444.535.624.357.306.841.566 1.476.702v.605a1 1 0 002 0v-.614c1.29-.289 2.245-1.144 2.245-2.386 0-.44-.103-.852-.327-1.212-.22-.355-.52-.6-.82-.77-.555-.316-1.244-.445-1.719-.539-.568-.111-.915-.185-1.143-.305a.5.5 0 01-.1-.07l-.004-.002V10.6a.401.401 0 01-.012-.1c0-.158.053-.244.14-.314.109-.086.34-.19.74-.19.373-.001.73.144.997.404a.995.995 0 001.518-1.286l-.699.58.698-.582v-.001l-.002-.001-.002-.003-.006-.006-.016-.018a2.984 2.984 0 00-.178-.182A3.44 3.44 0 0013 8.154V7.5a1 1 0 00-1-1Z";
@@ -267,7 +330,9 @@ function bindPageData(page, data) {
     const marketButton = page.querySelector('[data-role="market-button"]');
     const marketIconPath = page.querySelector('[data-role="market-icon-path"]');
     const marketIconSvg = marketButton?.querySelector("svg");
+    const pivotButton = page.querySelector('[data-role="pivot-button"]');
     const hasMarketAction = data.marketType === "trade" || data.marketType === "auction";
+    const hasPivotItems = Array.isArray(data.pivotItems) && data.pivotItems.length > 0;
 
     if (marketButton) {
         marketButton.hidden = !hasMarketAction;
@@ -281,6 +346,12 @@ function bindPageData(page, data) {
     if (marketIconSvg) {
         marketIconSvg.style.transform = data.marketType === "trade" ? "scale(1.14)" : "";
         marketIconSvg.style.transformOrigin = "center";
+    }
+
+    if (pivotButton) {
+        pivotButton.hidden = !hasPivotItems;
+        pivotButton.style.display = hasPivotItems ? "" : "none";
+        pivotButton.setAttribute("aria-hidden", hasPivotItems ? "false" : "true");
     }
 }
 
@@ -328,9 +399,12 @@ function updateVoteButtonState(button, isActive) {
 
     button.classList.toggle("is-active", isActive);
     button.setAttribute("aria-pressed", isActive ? "true" : "false");
+    const iconPath = button.querySelector('[data-role="comment-like-icon-path"]');
+    if (iconPath) {
+        iconPath.setAttribute("d", isActive ? commentLikeFilledPath : commentLikeOutlinePath);
+    }
 }
 
-// 좋아요/싫어요 한 쌍의 상태를 동기화
 function bindVotePair({ likeButton, dislikeButton, countNode, initialCount = 0, compactCount = false }) {
     let voteState = 0;
     const baseCount = initialCount;
@@ -364,20 +438,56 @@ function bindVotePair({ likeButton, dislikeButton, countNode, initialCount = 0, 
 
 function formatCommentVoteCount(baseCount, voteState) {
     if (voteState === 1 || voteState === -1) {
-        return formatDisplayCount(baseCount + 1);
+        return `좋아요 ${formatDisplayCount(baseCount + 1)}`;
     }
 
     if (baseCount > 0) {
-        return formatDisplayCount(baseCount);
+        return `좋아요 ${formatDisplayCount(baseCount)}`;
     }
 
     return "";
 }
 
+function renderCommentsList(commentsList, comments) {
+    if (!commentsList) {
+        return;
+    }
+
+    commentsList.innerHTML = (comments || []).map(renderCommentItem).join("");
+}
+
+function updateCommentTree(comments, commentId, updater) {
+    return (comments || []).map((comment) => {
+        if (comment.id === commentId) {
+            return updater(comment);
+        }
+
+        return {
+            ...comment,
+            replies: Array.isArray(comment.replies) ? updateCommentTree(comment.replies, commentId, updater) : []
+        };
+    });
+}
+
+function removeCommentTree(comments, commentId) {
+    return (comments || [])
+        .filter((comment) => comment.id !== commentId)
+        .map((comment) => ({
+            ...comment,
+            replies: Array.isArray(comment.replies) ? removeCommentTree(comment.replies, commentId) : []
+        }));
+}
+
+function updateCountFields(page, fieldName, value, compact = false) {
+    page.querySelectorAll(`[data-field="${fieldName}"]`).forEach((node) => {
+        node.textContent = formatDisplayCount(value || 0, { compact });
+    });
+}
+
 // 댓글 패널 마크업 렌더링
 function renderReplyItem(reply) {
     return `
-        <article class="rp">
+        <article class="rp" data-comment-id="${escapeHtml(reply.id || "")}">
             <div class="rp-ln"></div>
             <button class="rp-av" type="button" aria-label="${escapeHtml(reply.author)}">
                 <img src="${escapeHtml(reply.avatar || "")}" alt="">
@@ -386,16 +496,24 @@ function renderReplyItem(reply) {
                 <div class="rp-hd">
                     <a class="rp-nm" href="#">${escapeHtml(reply.author)}</a>
                     <a class="rp-tm" href="#">${escapeHtml(reply.time)}</a>
+                    ${reply.isOwner ? `
+                        <div class="comment-action-wrap">
+                            <button class="cm-mn" type="button" aria-label="작업 메뉴" data-role="comment-menu-toggle" aria-expanded="false">
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Z"></path></svg>
+                            </button>
+                            <div class="comment-action-menu" hidden data-role="comment-action-menu">
+                                <button class="comment-action-item" type="button" data-role="comment-edit">수정</button>
+                                <button class="comment-action-item" type="button" data-role="comment-delete">삭제</button>
+                            </div>
+                        </div>
+                    ` : ""}
                 </div>
                 <p class="rp-tx">${escapeHtml(reply.text)}</p>
                 <div class="rp-ft">
-                    <button class="rp-ic" type="button" aria-label="좋아요" data-vote="like" aria-pressed="false">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.221 1.795a1 1 0 011.109-.656l1.04.173a4 4 0 013.252 4.784L14 9h4.061a3.664 3.664 0 013.576 2.868A3.68 3.68 0 0121 14.85l.02.087A3.815 3.815 0 0120 18.5v.043l-.01.227a2.82 2.82 0 01-.135.663l-.106.282A3.754 3.754 0 0116.295 22h-3.606l-.392-.007a12.002 12.002 0 01-5.223-1.388l-.343-.189-.27-.154a2.005 2.005 0 00-.863-.26l-.13-.004H3.5a1.5 1.5 0 01-1.5-1.5V12.5A1.5 1.5 0 013.5 11h1.79l.157-.013a1 1 0 00.724-.512l.063-.145 2.987-8.535Zm-1.1 9.196A3 3 0 015.29 13H4v4.998h1.468a4 4 0 011.986.528l.27.155.285.157A10 10 0 0012.69 20h3.606c.754 0 1.424-.483 1.663-1.2l.03-.126a.819.819 0 00.012-.131v-.872l.587-.586c.388-.388.577-.927.523-1.465l-.038-.23-.02-.087-.21-.9.55-.744A1.663 1.663 0 0018.061 11H14a2.002 2.002 0 01-1.956-2.418l.623-2.904a2 2 0 00-1.626-2.392l-.21-.035-2.71 7.741Z"></path></svg>
+                    <button class="rp-ic${reply.isLiked ? " is-active" : ""}" type="button" aria-label="좋아요" data-vote="like" aria-pressed="${reply.isLiked ? "true" : "false"}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path data-role="comment-like-icon-path" d="${reply.isLiked ? commentLikeFilledPath : commentLikeOutlinePath}"></path></svg>
                     </button>
-                    <span class="rp-vt" data-role="vote-count">${escapeHtml(reply.likes || "")}</span>
-                    <button class="rp-ic" type="button" aria-label="싫어요" data-vote="dislike" aria-pressed="false">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m11.31 2 .392.007c1.824.06 3.61.534 5.223 1.388l.343.189.27.154c.264.152.56.24.863.26l.13.004H20.5a1.5 1.5 0 011.5 1.5V11.5a1.5 1.5 0 01-1.5 1.5h-1.79l-.158.013a1 1 0 00-.723.512l-.064.145-2.987 8.535a1 1 0 01-1.109.656l-1.04-.174a4 4 0 01-3.251-4.783L10 15H5.938a3.664 3.664 0 01-3.576-2.868A3.682 3.682 0 013 9.15l-.02-.088A3.816 3.816 0 014 5.5v-.043l.008-.227a2.86 2.86 0 01.136-.664l.107-.28A3.754 3.754 0 017.705 2h3.605ZM7.705 4c-.755 0-1.425.483-1.663 1.2l-.032.126a.818.818 0 00-.01.131v.872l-.587.586a1.816 1.816 0 00-.524 1.465l.038.23.02.087.21.9-.55.744a1.686 1.686 0 00-.321 1.18l.029.177c.17.76.844 1.302 1.623 1.302H10a2.002 2.002 0 011.956 2.419l-.623 2.904-.034.208a2.002 2.002 0 001.454 2.139l.206.045.21.035 2.708-7.741A3.001 3.001 0 0118.71 11H20V6.002h-1.47c-.696 0-1.38-.183-1.985-.528l-.27-.155-.285-.157A10.002 10.002 0 0011.31 4H7.705Z"></path></svg>
-                    </button>
+                    <span class="rp-vt" data-role="comment-like-count" data-base-count="${escapeHtml(reply.likes || 0)}">${escapeHtml(reply.likes ? `좋아요 ${formatDisplayCount(reply.likes)}` : "")}</span>
                 </div>
             </div>
         </article>
@@ -404,11 +522,10 @@ function renderReplyItem(reply) {
 
 function renderCommentItem(comment) {
     const replies = comment.replies || [];
-    const repliesHtml = replies.length ? `
-    ` : "";
+    const repliesHtml = replies.length ? replies.map(renderReplyItem).join("") : "";
 
     return `
-        <article class="cm">
+        <article class="cm" data-comment-id="${escapeHtml(comment.id || "")}">
             <div class="cm-row">
                 <button class="cm-av" type="button" aria-label="${escapeHtml(comment.author)}">
                     <img src="${escapeHtml(comment.avatar || "")}" alt="">
@@ -417,22 +534,32 @@ function renderCommentItem(comment) {
                     <div class="cm-hd">
                         <a class="cm-nm" href="#">${escapeHtml(comment.author)}</a>
                         <a class="cm-tm" href="#">${escapeHtml(comment.time)}</a>
+                        ${comment.isOwner ? `
+                            <div class="comment-action-wrap">
+                                <button class="cm-mn" type="button" aria-label="작업 메뉴" data-role="comment-menu-toggle" aria-expanded="false">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Z"></path></svg>
+                                </button>
+                                <div class="comment-action-menu" hidden data-role="comment-action-menu">
+                                    <button class="comment-action-item" type="button" data-role="comment-edit">수정</button>
+                                    <button class="comment-action-item" type="button" data-role="comment-delete">삭제</button>
+                                </div>
+                            </div>
+                        ` : ""}
                     </div>
                     <p class="cm-tx">${escapeHtml(comment.text)}</p>
                     <div class="cm-ft">
-                        <button class="cm-ic" type="button" aria-label="좋아요" data-vote="like" aria-pressed="false">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.221 1.795a1 1 0 011.109-.656l1.04.173a4 4 0 013.252 4.784L14 9h4.061a3.664 3.664 0 013.576 2.868A3.68 3.68 0 0121 14.85l.02.087A3.815 3.815 0 0120 18.5v.043l-.01.227a2.82 2.82 0 01-.135.663l-.106.282A3.754 3.754 0 0116.295 22h-3.606l-.392-.007a12.002 12.002 0 01-5.223-1.388l-.343-.189-.27-.154a2.005 2.005 0 00-.863-.26l-.13-.004H3.5a1.5 1.5 0 01-1.5-1.5V12.5A1.5 1.5 0 013.5 11h1.79l.157-.013a1 1 0 00.724-.512l.063-.145 2.987-8.535Zm-1.1 9.196A3 3 0 015.29 13H4v4.998h1.468a4 4 0 011.986.528l.27.155.285.157A10 10 0 0012.69 20h3.606c.754 0 1.424-.483 1.663-1.2l.03-.126a.819.819 0 00.012-.131v-.872l.587-.586c.388-.388.577-.927.523-1.465l-.038-.23-.02-.087-.21-.9.55-.744A1.663 1.663 0 0018.061 11H14a2.002 2.002 0 01-1.956-2.418l.623-2.904a2 2 0 00-1.626-2.392l-.21-.035-2.71 7.741Z"></path></svg>
+                        <button class="cm-ic${comment.isLiked ? " is-active" : ""}" type="button" aria-label="좋아요" data-vote="like" aria-pressed="${comment.isLiked ? "true" : "false"}">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path data-role="comment-like-icon-path" d="${comment.isLiked ? commentLikeFilledPath : commentLikeOutlinePath}"></path></svg>
                         </button>
-                        <span class="cm-vt" data-role="vote-count">${escapeHtml(comment.likes || "")}</span>
-                        <button class="cm-ic" type="button" aria-label="싫어요" data-vote="dislike" aria-pressed="false">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m11.31 2 .392.007c1.824.06 3.61.534 5.223 1.388l.343.189.27.154c.264.152.56.24.863.26l.13.004H20.5a1.5 1.5 0 011.5 1.5V11.5a1.5 1.5 0 01-1.5 1.5h-1.79l-.158.013a1 1 0 00-.723.512l-.064.145-2.987 8.535a1 1 0 01-1.109.656l-1.04-.174a4 4 0 01-3.251-4.783L10 15H5.938a3.664 3.664 0 01-3.576-2.868A3.682 3.682 0 013 9.15l-.02-.088A3.816 3.816 0 014 5.5v-.043l.008-.227a2.86 2.86 0 01.136-.664l.107-.28A3.754 3.754 0 017.705 2h3.605ZM7.705 4c-.755 0-1.425.483-1.663 1.2l-.032.126a.818.818 0 00-.01.131v.872l-.587.586a1.816 1.816 0 00-.524 1.465l.038.23.02.087.21.9-.55.744a1.686 1.686 0 00-.321 1.18l.029.177c.17.76.844 1.302 1.623 1.302H10a2.002 2.002 0 011.956 2.419l-.623 2.904-.034.208a2.002 2.002 0 001.454 2.139l.206.045.21.035 2.708-7.741A3.001 3.001 0 0118.71 11H20V6.002h-1.47c-.696 0-1.38-.183-1.985-.528l-.27-.155-.285-.157A10.002 10.002 0 0011.31 4H7.705Z"></path></svg>
-                        </button>
+                        <span class="cm-vt" data-role="comment-like-count" data-base-count="${escapeHtml(comment.likes || 0)}">${escapeHtml(comment.likes ? `좋아요 ${formatDisplayCount(comment.likes)}` : "")}</span>
                     </div>
-                    ${repliesHtml}
+                    ${replies.length ? `
+                        <div class="cm-rp">
+                            <button class="cm-rp-tg" type="button" data-role="reply-toggle" aria-expanded="false">답글 ${replies.length}개</button>
+                            <div class="cm-rp-ls" hidden>${repliesHtml}</div>
+                        </div>
+                    ` : ""}
                 </div>
-                <button class="cm-mn" type="button" aria-label="작업 메뉴">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Z"></path></svg>
-                </button>
             </div>
         </article>
     `;
@@ -441,7 +568,7 @@ function renderCommentItem(comment) {
 function renderPivotCard(item) {
     return `
         <article class="pivot-card">
-            <a class="pivot-card-link" href="about:invalid#pivot-card">
+            <a class="pivot-card-link" href="${escapeHtml(item.href || "about:invalid#pivot-card")}">
                 <img src="${escapeHtml(item.image || "")}" alt="">
                 <div class="pivot-card-overlay">
                     <p class="pivot-card-meta">${escapeHtml(item.meta || "")}</p>
@@ -528,6 +655,10 @@ function bindPageInteractions(page, data) {
     const playToggle = page.querySelector('[data-role="play-toggle"]');
     const playTogglePath = page.querySelector('[data-role="play-toggle-path"]');
     const thumbVideo = page.querySelector('[data-role="thumb-video"]');
+    const volumeButton = page.querySelector('[data-role="volume-button"]');
+    const volumeIconPath = page.querySelector('[data-role="volume-icon-path"]');
+    const volumePanel = page.querySelector('[data-role="volume-panel"]');
+    const volumeSlider = page.querySelector('[data-role="volume-slider"]');
     const moreButton = page.querySelector('[data-role="more-button"]');
     const moreMenu = page.querySelector('[data-role="more-menu"]');
     const editButton = page.querySelector('[data-role="edit-button"]');
@@ -543,6 +674,8 @@ function bindPageInteractions(page, data) {
     const commentsPanel = page.querySelector('[data-role="comments-panel"]');
     const commentsPanelClose = page.querySelector('[data-role="comments-panel-close"]');
     const commentsList = page.querySelector('[data-role="comments-list"]');
+    const commentInput = page.querySelector('[data-role="comment-input"]');
+    const commentSubmit = page.querySelector('[data-role="comment-submit"]');
     const pivotPanel = page.querySelector('[data-role="pivot-panel"]');
     const pivotPanelClose = page.querySelector('[data-role="pivot-panel-close"]');
     const pivotGalleryCover = page.querySelector('[data-role="pivot-gallery-cover"]');
@@ -570,11 +703,55 @@ function bindPageInteractions(page, data) {
     const reportConfirmButton = page.querySelector('[data-role="report-confirm-button"]');
     const reportReasonInputs = page.querySelectorAll('input[name="report-form-reason-select-page"]');
     const card = page.querySelector(".card");
+    const thumb = page.querySelector(".thumb");
     const fullscreenButton = page.querySelector('[data-role="fullscreen-button"]');
     const mediaCluster = page.querySelector(".media-cluster");
     const workdetailStage = pageStack?.closest(".workdetail-stage") || document.querySelector(".workdetail-stage");
     let snackbarTimerId = 0;
+    let workState = { ...data };
     const isOwner = Boolean(data.isOwner);
+    let lastNonZeroVolume = 0.5;
+    let isPaused = false;
+
+    const updateVolumeUi = () => {
+        if (!thumbVideo || !volumeButton || !volumeIconPath) {
+            return;
+        }
+
+        const isMuted = thumbVideo.muted || thumbVideo.volume === 0;
+        const volume = thumbVideo.volume;
+
+        if (volumeSlider) {
+            volumeSlider.value = String(volume);
+        }
+
+        if (isMuted) {
+            volumeIconPath.setAttribute("d", volumeMuteIconPath);
+            volumeButton.setAttribute("aria-label", "음소거 해제");
+            return;
+        }
+
+        volumeIconPath.setAttribute("d", volume > 0.5 ? volumeHighIconPath : volumeLowIconPath);
+        volumeButton.setAttribute("aria-label", "음소거");
+    };
+
+    const closeVolumePanel = () => {
+        if (!volumePanel || !volumeButton) {
+            return;
+        }
+
+        volumePanel.hidden = true;
+        volumeButton.setAttribute("aria-expanded", "false");
+    };
+
+    const openVolumePanel = () => {
+        if (!volumePanel || !volumeButton) {
+            return;
+        }
+
+        volumePanel.hidden = false;
+        volumeButton.setAttribute("aria-expanded", "true");
+    };
     const closeAuctionPanelForPage = () => {
         if (!auctionModalBackdrop) {
             return;
@@ -619,22 +796,34 @@ function bindPageInteractions(page, data) {
         deleteButton.hidden = !isOwner;
     }
 
+    if (notRecommendButton) {
+        notRecommendButton.hidden = isOwner;
+    }
+
+    if (reportButton) {
+        reportButton.hidden = isOwner;
+    }
+
+    const togglePlayback = () => {
+        if (!thumbVideo || thumbVideo.hidden || !playTogglePath || !playToggle) {
+            return;
+        }
+
+        isPaused = !isPaused;
+
+        if (isPaused) {
+            thumbVideo.pause();
+        } else {
+            thumbVideo.play().catch(() => {});
+        }
+
+        playTogglePath.setAttribute("d", isPaused ? playIconPath : pauseIconPath);
+        playToggle.setAttribute("aria-label", isPaused ? "재생" : "일시정지");
+    };
+
     if (playToggle && playTogglePath) {
-        let isPaused = false;
-
         playToggle.addEventListener("click", () => {
-            isPaused = !isPaused;
-
-            if (thumbVideo && !thumbVideo.hidden) {
-                if (isPaused) {
-                    thumbVideo.pause();
-                } else {
-                    thumbVideo.play().catch(() => {});
-                }
-            }
-
-            playTogglePath.setAttribute("d", isPaused ? playIconPath : pauseIconPath);
-            playToggle.setAttribute("aria-label", isPaused ? "재생" : "일시정지");
+            togglePlayback();
         });
 
         if (thumbVideo && !thumbVideo.hidden) {
@@ -643,8 +832,97 @@ function bindPageInteractions(page, data) {
         }
     }
 
+    if (thumb && thumbVideo && !thumbVideo.hidden) {
+        thumb.addEventListener("click", (event) => {
+            if (event.target.closest(".thumb-controls") || event.target.closest(".thumb-more-menu")) {
+                return;
+            }
+
+            togglePlayback();
+        });
+
+        thumbVideo.addEventListener("click", (event) => {
+            event.stopPropagation();
+            togglePlayback();
+        });
+    }
+
+    if (thumbVideo && !thumbVideo.hidden) {
+        thumbVideo.volume = 0.5;
+        thumbVideo.muted = true;
+        updateVolumeUi();
+        thumbVideo.addEventListener("volumechange", updateVolumeUi);
+    } else {
+        closeVolumePanel();
+    }
+
+    if (volumeButton && thumbVideo) {
+        volumeButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+
+            if (!thumbVideo.hidden && thumbVideo.muted) {
+                thumbVideo.muted = false;
+                thumbVideo.volume = lastNonZeroVolume || 0.5;
+            } else if (!thumbVideo.hidden) {
+                if (thumbVideo.volume > 0) {
+                    lastNonZeroVolume = thumbVideo.volume;
+                }
+                thumbVideo.muted = true;
+            }
+
+            if (volumePanel?.hidden) {
+                openVolumePanel();
+            } else {
+                closeVolumePanel();
+            }
+
+            updateVolumeUi();
+        });
+    }
+
+    if (volumeSlider && thumbVideo) {
+        volumeSlider.addEventListener("input", (event) => {
+            const nextVolume = Number(event.target.value || "0");
+            thumbVideo.volume = nextVolume;
+            thumbVideo.muted = nextVolume === 0;
+
+            if (nextVolume > 0) {
+                lastNonZeroVolume = nextVolume;
+            }
+
+            updateVolumeUi();
+        });
+    }
+
+    if (volumePanel) {
+        volumePanel.addEventListener("click", (event) => {
+            event.stopPropagation();
+        });
+    }
+
+    page.addEventListener("click", (event) => {
+        if (!volumeButton || !volumePanel) {
+            return;
+        }
+
+        if (volumeButton.contains(event.target) || volumePanel.contains(event.target)) {
+            return;
+        }
+
+        closeVolumePanel();
+    });
+
     if (commentsList) {
-        commentsList.innerHTML = (data.comments || []).map(renderCommentItem).join("");
+        renderCommentsList(commentsList, workState.comments);
+
+        const closeCommentMenus = () => {
+            commentsList.querySelectorAll('[data-role="comment-action-menu"]').forEach((menu) => {
+                menu.hidden = true;
+            });
+            commentsList.querySelectorAll('[data-role="comment-menu-toggle"]').forEach((button) => {
+                button.setAttribute("aria-expanded", "false");
+            });
+        };
 
         commentsList.addEventListener("click", (event) => {
             const toggle = event.target.closest('[data-role="reply-toggle"]');
@@ -665,45 +943,193 @@ function bindPageInteractions(page, data) {
         });
 
         commentsList.addEventListener("click", (event) => {
+            const menuToggle = event.target.closest('[data-role="comment-menu-toggle"]');
+            if (!menuToggle) {
+                if (!event.target.closest('[data-role="comment-action-menu"]')) {
+                    closeCommentMenus();
+                }
+                return;
+            }
+
+            event.stopPropagation();
+
+            const menu = menuToggle.closest(".comment-action-wrap")?.querySelector('[data-role="comment-action-menu"]');
+            if (!menu) {
+                return;
+            }
+
+            const willOpen = menu.hidden;
+            closeCommentMenus();
+            menu.hidden = !willOpen;
+            menuToggle.setAttribute("aria-expanded", willOpen ? "true" : "false");
+        });
+
+        commentsList.addEventListener("click", async (event) => {
             const voteButton = event.target.closest('[data-vote]');
             if (!voteButton) {
                 return;
             }
 
-            const voteWrap = voteButton.closest(".cm-ft, .rp-ft");
-            if (!voteWrap) {
+            const commentItem = voteButton.closest("[data-comment-id]");
+            const commentId = Number(commentItem?.dataset.commentId || "0");
+            const voteWrap = voteButton.closest(".cm-hd, .rp-hd, .cm-ft, .rp-ft");
+            if (!voteWrap || !commentId || voteButton.dataset.vote !== "like") {
                 return;
             }
 
-            const likeButton = voteWrap.querySelector('[data-vote="like"]');
-            const dislikeButton = voteWrap.querySelector('[data-vote="dislike"]');
-            const countNode = voteWrap.querySelector('[data-role="vote-count"]');
-            const baseCount = parseDisplayCount(countNode?.dataset.baseCount ?? countNode?.textContent ?? "");
-            const currentState = likeButton?.classList.contains("is-active") ? 1 : dislikeButton?.classList.contains("is-active") ? -1 : 0;
-            const nextState = voteButton.dataset.vote === "like"
-                ? currentState === 1 ? 0 : 1
-                : currentState === -1 ? 0 : -1;
+            try {
+                const result = await apiRequest(`/api/comments/${commentId}/likes`, {
+                    method: "POST"
+                });
+                const likeButton = voteWrap.querySelector('[data-vote="like"]');
+                const dislikeButton = voteWrap.querySelector('[data-vote="dislike"]');
+                const countNode = commentItem.querySelector('[data-role="comment-like-count"]');
 
-            if (countNode && !countNode.dataset.baseCount) {
-                countNode.dataset.baseCount = String(baseCount);
+                updateVoteButtonState(likeButton, Boolean(result.liked));
+                updateVoteButtonState(dislikeButton, false);
+
+                if (countNode) {
+                    countNode.dataset.baseCount = String(result.likeCount || 0);
+                    countNode.textContent = result.likeCount ? `좋아요 ${formatDisplayCount(result.likeCount)}` : "";
+                }
+            } catch (error) {
+                window.alert(error.message || "댓글 좋아요 처리에 실패했습니다.");
+            }
+        });
+
+        commentsList.addEventListener("click", async (event) => {
+            const editButton = event.target.closest('[data-role="comment-edit"]');
+            const deleteButton = event.target.closest('[data-role="comment-delete"]');
+            const editSaveButton = event.target.closest('[data-role="comment-edit-save"]');
+            const editCancelButton = event.target.closest('[data-role="comment-edit-cancel"]');
+            const commentItem = event.target.closest("[data-comment-id]");
+            const commentId = Number(commentItem?.dataset.commentId || "0");
+
+            if (!commentId) {
+                return;
             }
 
-            updateVoteButtonState(likeButton, nextState === 1);
-            updateVoteButtonState(dislikeButton, nextState === -1);
+            const closeInlineEditors = () => {
+                commentsList.querySelectorAll('[data-role="comment-inline-editor"]').forEach((editor) => {
+                    editor.remove();
+                });
+                commentsList.querySelectorAll(".cm-tx, .rp-tx").forEach((textNode) => {
+                    textNode.hidden = false;
+                });
+            };
 
-            if (countNode) {
-                countNode.textContent = formatCommentVoteCount(baseCount, nextState);
+            if (editCancelButton) {
+                closeInlineEditors();
+                return;
+            }
+
+            if (editSaveButton) {
+                closeCommentMenus();
+                const editor = commentItem.querySelector('[data-role="comment-inline-editor"]');
+                const input = editor?.querySelector('[data-role="comment-inline-input"]');
+                const textNode = commentItem.querySelector(".cm-tx, .rp-tx");
+                const currentText = textNode?.textContent?.trim() || "";
+                const normalizedText = input?.value?.trim() || "";
+
+                if (!normalizedText || normalizedText === currentText) {
+                    closeInlineEditors();
+                    return;
+                }
+
+                try {
+                    const updated = await apiRequest(`/api/comments/${commentId}`, {
+                        method: "PUT",
+                        body: JSON.stringify({ content: normalizedText })
+                    });
+
+                    workState.comments = updateCommentTree(workState.comments, commentId, (comment) => ({
+                        ...comment,
+                        text: updated.content || normalizedText,
+                        time: formatRelativeTime(updated.updatedDatetime || updated.createdDatetime)
+                    }));
+                    renderCommentsList(commentsList, workState.comments);
+                } catch (error) {
+                    window.alert(error.message || "댓글 수정에 실패했습니다.");
+                }
+
+                return;
+            }
+
+            if (editButton) {
+                closeCommentMenus();
+                const textNode = commentItem.querySelector(".cm-tx, .rp-tx");
+                const currentText = textNode?.textContent?.trim() || "";
+                const anchorNode =
+                    commentItem.querySelector(".cm-ft, .rp-ft")
+                    || commentItem.querySelector(".cm-rp")
+                    || textNode;
+
+                if (!textNode || !anchorNode) {
+                    return;
+                }
+
+                closeInlineEditors();
+                textNode.hidden = true;
+                anchorNode.insertAdjacentHTML("beforebegin", `
+                    <div class="comment-inline-editor" data-role="comment-inline-editor">
+                        <textarea class="comment-inline-input" data-role="comment-inline-input">${escapeHtml(currentText)}</textarea>
+                        <div class="comment-inline-actions">
+                            <button class="comment-inline-button comment-inline-button--ghost" type="button" data-role="comment-edit-cancel">취소</button>
+                            <button class="comment-inline-button comment-inline-button--primary" type="button" data-role="comment-edit-save">저장</button>
+                        </div>
+                    </div>
+                `);
+                commentItem.querySelector('[data-role="comment-inline-input"]')?.focus();
+
+                return;
+            }
+
+            if (deleteButton) {
+                closeCommentMenus();
+                if (!window.confirm("댓글을 삭제하시겠습니까?")) {
+                    return;
+                }
+
+                try {
+                    await apiRequest(`/api/comments/${commentId}`, {
+                        method: "DELETE"
+                    });
+
+                    workState.comments = removeCommentTree(workState.comments, commentId);
+                    workState.commentCount = Math.max(0, parseDisplayCount(workState.commentCount) - 1);
+                    renderCommentsList(commentsList, workState.comments);
+                    updateCountFields(page, "commentCount", workState.commentCount);
+                } catch (error) {
+                    window.alert(error.message || "댓글 삭제에 실패했습니다.");
+                }
+            }
+        });
+
+        document.addEventListener("click", closeCommentMenus);
+    }
+
+    if (primaryLikeButton) {
+        updateVoteButtonState(primaryLikeButton, Boolean(workState.isLiked));
+
+        primaryLikeButton.addEventListener("click", async () => {
+            if (!workState.id) {
+                return;
+            }
+
+            try {
+                const result = await apiRequest(`/api/works/${workState.id}/likes`, {
+                    method: "POST"
+                });
+                workState.isLiked = Boolean(result.liked);
+                workState.likeCount = formatDisplayCount(result.likeCount || 0, { compact: true });
+                updateVoteButtonState(primaryLikeButton, workState.isLiked);
+                updateVoteButtonState(primaryDislikeButton, false);
+                updateCountFields(page, "likeCount", result.likeCount || 0, true);
+            } catch (error) {
+                window.alert(error.message || "좋아요 처리에 실패했습니다.");
             }
         });
     }
-
-    bindVotePair({
-        likeButton: primaryLikeButton,
-        dislikeButton: primaryDislikeButton,
-        countNode: primaryLikeCount,
-        initialCount: parseDisplayCount(data.likeCount),
-        compactCount: true
-    });
 
     if (bookmarkButton) {
         const syncBookmarkState = (isActive) => {
@@ -716,12 +1142,82 @@ function bindPageInteractions(page, data) {
             }
         };
 
-        syncBookmarkState(false);
+        syncBookmarkState(Boolean(workState.isBookmarked));
 
-        bookmarkButton.addEventListener("click", () => {
-            const nextState = bookmarkButton.getAttribute("aria-pressed") !== "true";
-            syncBookmarkState(nextState);
+        bookmarkButton.addEventListener("click", async () => {
+            if (!workState.id) {
+                return;
+            }
+
+            try {
+                const result = await apiRequest("/api/bookmarks", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        targetType: "WORK",
+                        targetId: workState.id
+                    })
+                });
+                workState.isBookmarked = Boolean(result.bookmarked);
+                syncBookmarkState(workState.isBookmarked);
+            } catch (error) {
+                window.alert(error.message || "북마크 처리에 실패했습니다.");
+            }
         });
+    }
+
+    if (commentInput && commentSubmit) {
+        const syncCommentSubmitState = () => {
+            commentSubmit.disabled = !commentInput.value.trim();
+            commentInput.style.height = "auto";
+            commentInput.style.height = `${Math.min(commentInput.scrollHeight, 120)}px`;
+        };
+
+        commentInput.addEventListener("input", syncCommentSubmitState);
+        commentInput.addEventListener("keydown", async (event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                commentSubmit.click();
+            }
+        });
+
+        commentSubmit.addEventListener("click", async () => {
+            const content = commentInput.value.trim();
+
+            if (!content || !workState.id) {
+                return;
+            }
+
+            commentSubmit.disabled = true;
+
+            try {
+                const detail = await apiRequest(`/api/works/${workState.id}/comments`, {
+                    method: "POST",
+                    body: JSON.stringify({ content })
+                });
+                const normalizedComments = Array.isArray(detail.comments)
+                    ? detail.comments.map(normalizeComment)
+                    : workState.comments;
+                const nextCommentCount = detail.commentCount || normalizedComments.length || 0;
+
+                workState = {
+                    ...workState,
+                    comments: normalizedComments,
+                    commentCount: formatDisplayCount(nextCommentCount)
+                };
+                renderCommentsList(commentsList, workState.comments);
+                updateCountFields(page, "commentCount", nextCommentCount, false);
+                commentInput.value = "";
+                syncCommentSubmitState();
+                if (commentsList) {
+                    commentsList.scrollTop = commentsList.scrollHeight;
+                }
+            } catch (error) {
+                window.alert(error.message || "댓글 등록에 실패했습니다.");
+                syncCommentSubmitState();
+            }
+        });
+
+        syncCommentSubmitState();
     }
 
     if (pivotGalleryCover) {
@@ -845,28 +1341,50 @@ function bindPageInteractions(page, data) {
         shareModalBackdrop.style.display = "none";
         shareModalBackdrop.style.background = "rgba(15, 23, 42, 0.42)";
         shareModalBackdrop.style.padding = "16px";
+        shareModalBackdrop.style.alignItems = "center";
+        shareModalBackdrop.style.justifyContent = "center";
 
         if (shareModal) {
-            shareModal.style.position = "fixed";
+            shareModal.style.position = "relative";
+            shareModal.style.left = "auto";
+            shareModal.style.top = "auto";
+            shareModal.style.margin = "auto";
             shareModal.style.zIndex = "10000";
         }
 
         const openShareModal = () => {
             shareModalBackdrop.hidden = false;
-            shareModalBackdrop.style.display = "block";
+            shareModalBackdrop.setAttribute("aria-hidden", "false");
+            shareModalBackdrop.style.display = "flex";
         };
 
         const closeShareModal = () => {
             shareModalBackdrop.hidden = true;
+            shareModalBackdrop.setAttribute("aria-hidden", "true");
             shareModalBackdrop.style.display = "none";
         };
 
-        shareButton.addEventListener("click", (event) => {
+        shareButton.addEventListener("click", async (event) => {
             event.stopPropagation();
 
             if (!shareModalBackdrop.hidden) {
                 closeShareModal();
                 return;
+            }
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: workState.headline || document.title,
+                        text: workState.desc || "",
+                        url: workState.shareUrl || window.location.href
+                    });
+                    return;
+                } catch (error) {
+                    if (error?.name === "AbortError") {
+                        return;
+                    }
+                }
             }
 
             openShareModal();
@@ -1168,6 +1686,9 @@ function bindPageInteractions(page, data) {
     if (fullscreenButton && workdetailStage) {
         const fullscreenTarget = workdetailStage;
         let fallbackFullscreenActive = false;
+        let normalModeScrollTop = null;
+        let normalWindowScrollX = 0;
+        let normalWindowScrollY = 0;
         const closeTransientUi = () => {
             workdetailStage.querySelectorAll(".page").forEach((targetPage) => {
                 const targetMoreMenu = targetPage.querySelector('[data-role="more-menu"]');
@@ -1202,6 +1723,20 @@ function bindPageInteractions(page, data) {
                 workdetailStage.querySelectorAll(".page").forEach((targetPage) => {
                     targetPage.classList.remove("fullscreen-active-page");
                 });
+                requestAnimationFrame(() => {
+                    if (pageStack && normalModeScrollTop !== null) {
+                        pageStack.scrollTop = normalModeScrollTop;
+                    }
+                    window.scrollTo(normalWindowScrollX, normalWindowScrollY);
+                    requestAnimationFrame(() => {
+                        if (pageStack && normalModeScrollTop !== null) {
+                            pageStack.scrollTop = normalModeScrollTop;
+                        }
+                        window.scrollTo(normalWindowScrollX, normalWindowScrollY);
+                    });
+                    updateNavigationState();
+                    resetInactivePages();
+                });
             }
             workdetailStage.querySelectorAll('[data-role="fullscreen-button"]').forEach((button) => {
                 button.setAttribute("aria-label", isFullscreen ? "전체 화면 종료" : "전체 화면");
@@ -1213,7 +1748,12 @@ function bindPageInteractions(page, data) {
             const willOpen = !(getFullscreenElement() === fullscreenTarget || fallbackFullscreenActive);
             closeTransientUi();
             if (willOpen) {
-                page.scrollIntoView({ behavior: "auto", block: "start" });
+                normalModeScrollTop = pageStack ? pageStack.scrollTop : null;
+                normalWindowScrollX = window.scrollX;
+                normalWindowScrollY = window.scrollY;
+                if (pageStack) {
+                    pageStack.scrollTop = page.offsetTop;
+                }
                 setFullscreenActivePage(page);
             }
 
@@ -1253,12 +1793,14 @@ function bindPageInteractions(page, data) {
                 moreMenu.hidden = true;
                 moreButton.setAttribute("aria-expanded", "false");
             }
-            window.alert("수정 페이지 연결이 필요합니다.");
+            if (workState.id) {
+                window.location.href = `/work/work-edit/${workState.id}`;
+            }
         });
     }
 
     if (deleteButton) {
-        deleteButton.addEventListener("click", (event) => {
+        deleteButton.addEventListener("click", async (event) => {
             event.stopPropagation();
             if (moreMenu && moreButton) {
                 moreMenu.hidden = true;
@@ -1267,7 +1809,14 @@ function bindPageInteractions(page, data) {
 
             const confirmed = window.confirm("이 작품을 삭제하시겠습니까?");
             if (confirmed) {
-                window.alert("삭제 API 연결이 필요합니다.");
+                try {
+                    await apiRequest(`/api/works/${workState.id}`, {
+                        method: "DELETE"
+                    });
+                    window.location.href = "/profile";
+                } catch (error) {
+                    window.alert(error.message || "작품 삭제에 실패했습니다.");
+                }
             }
         });
     }
@@ -1426,40 +1975,56 @@ function resetInactivePages() {
     });
 }
 
-// 템플릿 복제 후 데이터/이벤트 바인딩으로 페이지 스택 구성
-if (pageStack && workPageTemplate) {
-    workDetails.forEach((data) => {
+async function initializeWorkDetailPage() {
+    if (!pageStack || !workPageTemplate) {
+        return;
+    }
+
+    const workId = getCurrentWorkId();
+    if (!workId) {
+        pageStack.innerHTML = "";
+        return;
+    }
+
+    try {
+        const detail = await apiRequest(`/api/works/${workId}`);
+        const normalized = await normalizeWorkDetail(detail);
         const fragment = workPageTemplate.content.cloneNode(true);
         const page = fragment.querySelector(".page");
 
-        bindPageData(page, data);
-        bindPageInteractions(page, data);
+        bindPageData(page, normalized);
+        bindPageInteractions(page, normalized);
+        pageStack.innerHTML = "";
         pageStack.appendChild(fragment);
-    });
 
-    if (navigationButtonUp && navigationButtonDown) {
-        navigationButtonUp.addEventListener("click", () => {
-            const currentIndex = getCurrentPageIndex();
-            if (currentIndex > 0) {
-                scrollToPage(currentIndex - 1);
-            }
-        });
+        if (navigationButtonUp && navigationButtonDown) {
+            navigationButtonUp.addEventListener("click", () => {
+                const currentIndex = getCurrentPageIndex();
+                if (currentIndex > 0) {
+                    scrollToPage(currentIndex - 1);
+                }
+            });
 
-        navigationButtonDown.addEventListener("click", () => {
-            const currentIndex = getCurrentPageIndex();
-            scrollToPage(currentIndex + 1);
-        });
+            navigationButtonDown.addEventListener("click", () => {
+                const currentIndex = getCurrentPageIndex();
+                scrollToPage(currentIndex + 1);
+            });
 
-        pageStack.addEventListener("scroll", () => {
-            updateNavigationState();
+            pageStack.addEventListener("scroll", () => {
+                updateNavigationState();
+                resetInactivePages();
+                if (document.querySelector(".workdetail-stage")?.classList.contains("stage-fullscreen")) {
+                    syncFullscreenActivePage();
+                }
+            }, { passive: true });
+            window.addEventListener("resize", updateNavigationState);
             resetInactivePages();
-            if (document.querySelector(".workdetail-stage")?.classList.contains("stage-fullscreen")) {
-                syncFullscreenActivePage();
-            }
-        }, { passive: true });
-        window.addEventListener("resize", updateNavigationState);
-        resetInactivePages();
-        updateNavigationState();
-        syncFullscreenActivePage();
+            updateNavigationState();
+            syncFullscreenActivePage();
+        }
+    } catch (error) {
+        pageStack.innerHTML = `<div style="padding: 32px; text-align: center;">${escapeHtml(error.message || "작품 정보를 불러오지 못했습니다.")}</div>`;
     }
 }
+
+initializeWorkDetailPage();

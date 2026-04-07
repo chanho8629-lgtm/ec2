@@ -26,6 +26,8 @@ public interface GalleryMapper {
 
     Long selectGalleryMemberId(@Param("id") Long id);
 
+    int increaseGalleryViewCount(@Param("galleryId") Long galleryId);
+
     int updateGallery(@Param("id") Long id, @Param("gallery") GalleryUpdateRequestDTO galleryUpdateRequestDTO);
 
     int softDeleteGallery(@Param("id") Long id);
@@ -49,6 +51,8 @@ public interface GalleryMapper {
     void insertGalleryComment(CommentVO commentVO);
 
     int increaseGalleryCommentCount(@Param("galleryId") Long galleryId);
+
+    int decreaseGalleryCommentCount(@Param("galleryId") Long galleryId);
 
     List<CommentResponseDTO> selectGalleryCommentsByGalleryId(@Param("galleryId") Long galleryId);
 

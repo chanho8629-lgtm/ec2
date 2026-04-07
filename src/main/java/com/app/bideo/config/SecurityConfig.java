@@ -33,10 +33,14 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .headers(headers -> headers
+                        .frameOptions(frameOptions -> frameOptions.sameOrigin())
+                )
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/works/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/galleries", "/api/galleries/*", "/api/galleries/*/comments").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/gallery-register", "/gallery/gallery-register").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/gallery/*").permitAll()
                         .requestMatchers(
                                 "/",

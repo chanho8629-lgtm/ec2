@@ -374,6 +374,11 @@ button[type="submit"] {
   min-width: 0;
 }
 
+.videoCard.is-selected .videoThumb {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 /* 썸네일 영역 */
 .videoThumb {
   position: relative;
@@ -381,6 +386,15 @@ button[type="submit"] {
   overflow: hidden;
   border-radius: 12px;
   aspect-ratio: 16 / 9;
+}
+
+.videoThumb img,
+.videoThumb video,
+.videoThumbMedia {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .videoThumb span {
@@ -438,6 +452,16 @@ button[type="submit"] {
   margin-top: 6px;
   color: #606060;
   font-size: 12px;
+}
+
+.videoEmpty {
+  grid-column: 1 / -1;
+  padding: 48px 16px;
+  border: 1px dashed #d9dde3;
+  border-radius: 18px;
+  color: #6b7280;
+  font-size: 14px;
+  text-align: center;
 }
 
 @media (max-width: 1280px) {

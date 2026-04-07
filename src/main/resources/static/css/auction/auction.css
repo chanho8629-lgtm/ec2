@@ -32,9 +32,14 @@ ul, ol {
    페이지 레이아웃
 ─────────────────────────────────────────── */
 .Auction-Page-Wrapper {
-    display: flex;
+    display: none;
     flex-direction: column;
     min-height: 100vh;
+}
+
+.work-auction-modal .Auction-Page-Wrapper {
+    display: flex;
+    min-height: 100%;
 }
 
 .Auction-Content-Layout {

@@ -499,11 +499,7 @@ document.addEventListener('click', async (event) => {
   const channelTab = event.target.closest('[data-channel-tab]');
 
   if (channelTab) {
-    document.querySelectorAll('[data-channel-tab]').forEach((item) => {
-      item.classList.remove('is-active');
-    });
-
-    channelTab.classList.add('is-active');
+    activateProfileTab(channelTab.dataset.channelTab || 'galleries');
     return;
   }
 
@@ -785,3 +781,18 @@ renderProfileBadges();
 if (document.querySelector('[data-profile-avatar-open]') && !document.querySelector('[data-profile-avatar-open] img')) {
   renderDefaultAvatar();
 }
+
+function activateProfileTab(tabName) {
+  const resolvedTab = tabName === 'works' ? 'works' : 'galleries';
+
+  document.querySelectorAll('[data-channel-tab]').forEach((item) => {
+    item.classList.toggle('is-active', item.dataset.channelTab === resolvedTab);
+  });
+
+  document.querySelectorAll('[data-profile-panel]').forEach((panel) => {
+    panel.hidden = panel.dataset.profilePanel !== resolvedTab;
+  });
+}
+
+const initialProfileTab = new URLSearchParams(window.location.search).get('tab');
+activateProfileTab(initialProfileTab);

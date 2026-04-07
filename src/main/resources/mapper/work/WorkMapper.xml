@@ -183,6 +183,7 @@
             m.nickname as member_nickname,
             m.profile_image as member_profile_image,
             t_file.file_url as thumbnail_url,
+            t_file.file_type as thumbnail_file_type,
             t_file.width as thumbnail_width,
             t_file.height as thumbnail_height,
             w.view_count,
@@ -193,7 +194,7 @@
         from tbl_work w
         left join tbl_member m on w.member_id = m.id
         left join lateral (
-            select wf.file_url, wf.width, wf.height
+            select wf.file_url, wf.file_type, wf.width, wf.height
             from tbl_work_file wf
             where wf.work_id = w.id
             order by wf.sort_order asc, wf.id asc
@@ -345,6 +346,19 @@
         )
     </insert>
 
+    <select id="selectTagSuggestions" resultType="TagResponseDTO">
+        select
+            id,
+            tag_name
+        from tbl_tag
+        where lower(tag_name) like concat('%', #{keyword}, '%')
+        order by
+            case when lower(tag_name) like concat(#{keyword}, '%') then 0 else 1 end,
+            length(tag_name) asc,
+            tag_name asc
+        limit #{limit}
+    </select>
+
     <select id="selectWorkTagsByWorkId" resultType="TagResponseDTO">
         select
             t.id,
@@ -367,6 +381,15 @@
         update tbl_work
         set
             comment_count = coalesce(comment_count, 0) + 1,
+            updated_datetime = now()
+        where id = #{workId}
+          and deleted_datetime is null
+    </update>
+
+    <update id="decreaseWorkCommentCount">
+        update tbl_work
+        set
+            comment_count = greatest(coalesce(comment_count, 0) - 1, 0),
             updated_datetime = now()
         where id = #{workId}
           and deleted_datetime is null

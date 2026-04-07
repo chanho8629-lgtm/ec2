@@ -60,11 +60,16 @@
                                                 <path data-role="play-toggle-path" d="M7 5.2v13.6c0 .73.8 1.18 1.43.8L19.98 13a.92.92 0 0 0 0-1.6L8.43 4.4A.92.92 0 0 0 7 5.2Z"></path>
                                             </svg>
                                         </button>
-                                        <button class="thumb-control-button thumb-control-button-dark" type="button" aria-label="음소거">
+                                        <div class="thumb-volume-wrap">
+                                        <button class="thumb-control-button thumb-control-button-dark" type="button" aria-label="음소거" data-role="volume-button" aria-expanded="false">
                                             <svg viewBox="0 0 24 24" aria-hidden="true">
-                                                <path d="M11.485 2.143 3.913 6.687A6 6 0 001 11.832v.338a6 6 0 002.913 5.144l7.572 4.543A1 1 0 0013 21V3a1.001 1.001 0 00-1.515-.857Zm6.88 2.079a1 1 0 00-.001 1.414 9 9 0 010 12.728 1 1 0 001.414 1.414 11 11 0 000-15.556 1 1 0 00-1.413 0Zm-2.83 2.828a1 1 0 000 1.415 5 5 0 010 7.07 1 1 0 001.415 1.415 6.999 6.999 0 000-9.9 1 1 0 00-1.415 0Z"></path>
+                                                <path data-role="volume-icon-path" d="M11.485 2.143 3.913 6.687A6 6 0 001 11.832v.338a6 6 0 002.913 5.144l7.572 4.543A1 1 0 0013 21V3a1.001 1.001 0 00-1.515-.857Zm6.88 2.079a1 1 0 00-.001 1.414 9 9 0 010 12.728 1 1 0 001.414 1.414 11 11 0 000-15.556 1 1 0 00-1.413 0Zm-2.83 2.828a1 1 0 000 1.415 5 5 0 010 7.07 1 1 0 001.415 1.415 6.999 6.999 0 000-9.9 1 1 0 00-1.415 0Z"></path>
                                             </svg>
                                         </button>
+                                        <div class="thumb-volume-panel" hidden data-role="volume-panel">
+                                            <input class="thumb-volume-slider" type="range" min="0" max="1" step="0.05" value="0.5" aria-label="볼륨 조절" data-role="volume-slider">
+                                        </div>
+                                        </div>
                                     </div>
                                     <div class="thumb-controls-group thumb-controls-group-right">
                                         <button class="thumb-control-button thumb-control-button-bookmark" type="button" aria-label="찜하기" aria-pressed="false" data-role="bookmark-button">
@@ -232,7 +237,10 @@
                     <div class="comments-list" data-role="comments-list"></div>
                     <div class="cp-box">
                         <div class="cp-av">@</div>
-                        <div class="cp-ph">댓글 추가...</div>
+                        <div class="cp-input-wrap">
+                            <textarea class="cp-input" data-role="comment-input" rows="1" placeholder="댓글 추가..."></textarea>
+                            <button class="cp-submit" type="button" data-role="comment-submit">등록</button>
+                        </div>
                     </div>
                 </div>
             </aside>

@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+function initializeWorkRegister() {
     var modal = document.getElementById("work-register-modal");
     var dialogContent = document.getElementById("dialog-content");
     var uploadScreen = document.getElementById("upload-screen");
@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var videoDescriptionCount = document.getElementById("video-description-count");
     var videoTagsInput = document.getElementById("video-tags-input");
     var videoTagsCount = document.getElementById("video-tags-count");
+    var videoTagsSuggestions = document.getElementById("video-tags-suggestions");
     var tradeToggle = document.getElementById("tradeToggle");
     var tradeConfig = document.getElementById("tradeConfig");
     var tradePriceInput = document.getElementById("tradePriceInput");
@@ -41,6 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var playlistDropdownMenu = document.getElementById("playlist-dropdown-menu");
     var playlistDropdownText = document.getElementById("playlist-dropdown-text");
     var playlistOptions = document.querySelectorAll(".playlist-option");
+    var submitButton = document.getElementById("work-submit-button");
     var thumbnailUploadButtons = document.querySelectorAll(".thumbnail-upload-button");
     var thumbnailFileInputs = document.querySelectorAll('input[id^="thumbnail-file-input-"]');
     var aiPromptModal = document.getElementById("ai-prompt-modal");
@@ -63,13 +65,40 @@ document.addEventListener("DOMContentLoaded", function () {
     var currentPreviewUrl = "";
     var currentAiPromptAttachmentUrl = "";
     var thumbnailPreviewUrls = {};
+    var currentMediaFile = null;
+    var selectedGalleryId = null;
+    var isSubmitting = false;
+    var tagSuggestionAbortController = null;
+    var tagSuggestionRequestSeq = 0;
+    var activeTagSuggestionIndex = -1;
 
     if (!modal || !dialogContent || !uploadScreen || !detailsScreen || !uploadPanel || !fileInput || !selectFileButton || !closeButton || !fileNameText) {
         return;
     }
 
     function closeModal() {
+        if (typeof window.closeComposeModal === "function") {
+            window.closeComposeModal();
+            return;
+        }
+
+        if (window.parent && window.parent !== window && typeof window.parent.closeComposeModal === "function") {
+            window.parent.closeComposeModal();
+            return;
+        }
+
         modal.style.display = "none";
+    }
+
+    function navigateAfterSubmit(url) {
+        var targetUrl = url || resolveProfileRedirectUrl();
+
+        if (window.top && window.top !== window) {
+            window.top.location.href = targetUrl;
+            return;
+        }
+
+        window.location.href = targetUrl;
     }
 
     function openAiPromptModal() {
@@ -390,6 +419,353 @@ document.addEventListener("DOMContentLoaded", function () {
         return numbersOnly ? Number(numbersOnly).toLocaleString("ko-KR") : "";
     }
 
+    function parseNumber(value) {
+        var numbersOnly;
+
+        if (!value) {
+            return null;
+        }
+
+        numbersOnly = String(value).replace(/,/g, "").replace(/\D/g, "");
+        return numbersOnly ? Number(numbersOnly) : null;
+    }
+
+    function getSelectedMediaFile() {
+        if (currentMediaFile) {
+            return currentMediaFile;
+        }
+
+        return fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+    }
+
+    function getSelectedThumbnailFile() {
+        var manualThumbnailInput = document.getElementById("thumbnail-file-input-1");
+
+        if (!manualThumbnailInput || !manualThumbnailInput.files || !manualThumbnailInput.files[0]) {
+            return null;
+        }
+
+        return manualThumbnailInput.files[0];
+    }
+
+    function getSelectedGalleryOption() {
+        if (!selectedGalleryId) {
+            return null;
+        }
+
+        return Array.prototype.find.call(playlistOptions, function (option) {
+            return option.getAttribute("data-gallery-id") === String(selectedGalleryId);
+        }) || null;
+    }
+
+    function selectGalleryOption(option) {
+        var galleryName;
+        var galleryId;
+
+        if (!option || !playlistDropdownText) {
+            return;
+        }
+
+        galleryName = option.getAttribute("data-playlist-name") || option.textContent.trim();
+        galleryId = option.getAttribute("data-gallery-id");
+
+        selectedGalleryId = galleryId ? Number(galleryId) : null;
+        playlistDropdownText.textContent = galleryName || "선택";
+    }
+
+    function extractTagNames(rawTags) {
+        if (!rawTags) {
+            return [];
+        }
+
+        return rawTags.split(",")
+            .map(function (tag) {
+                return tag.trim();
+            })
+            .filter(function (tag) {
+                return !!tag;
+            });
+    }
+
+    function getCurrentTagKeyword() {
+        var rawValue;
+        var parts;
+        var currentPart;
+
+        if (!videoTagsInput) {
+            return "";
+        }
+
+        rawValue = videoTagsInput.value || "";
+        parts = rawValue.split(",");
+        currentPart = parts.length ? parts[parts.length - 1] : rawValue;
+        return currentPart.trim();
+    }
+
+    function closeTagSuggestions() {
+        if (!videoTagsSuggestions) {
+            return;
+        }
+
+        activeTagSuggestionIndex = -1;
+        videoTagsSuggestions.hidden = true;
+        videoTagsSuggestions.innerHTML = "";
+    }
+
+    function getTagSuggestionButtons() {
+        if (!videoTagsSuggestions) {
+            return [];
+        }
+
+        return Array.prototype.slice.call(videoTagsSuggestions.querySelectorAll(".tags-suggestion-item"));
+    }
+
+    function highlightActiveTagSuggestion() {
+        getTagSuggestionButtons().forEach(function (button, index) {
+            button.classList.toggle("is-active", index === activeTagSuggestionIndex);
+        });
+    }
+
+    function applyTagSuggestion(tagName) {
+        var rawValue;
+        var parts;
+        var nextValue;
+
+        if (!videoTagsInput || !tagName) {
+            return;
+        }
+
+        rawValue = videoTagsInput.value || "";
+        parts = rawValue.split(",");
+
+        if (!parts.length) {
+            parts = [tagName];
+        } else {
+            parts[parts.length - 1] = " " + tagName;
+        }
+
+        nextValue = parts.join(",").replace(/^ /, "");
+        if (!nextValue.endsWith(",")) {
+            nextValue += ", ";
+        }
+
+        videoTagsInput.value = nextValue;
+        updateTextCount(videoTagsInput, videoTagsCount, 500);
+        closeTagSuggestions();
+        videoTagsInput.focus();
+    }
+
+    function escapeHtml(value) {
+        return String(value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/\"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+    function renderTagSuggestions(tags) {
+        if (!videoTagsSuggestions) {
+            return;
+        }
+
+        if (!tags || !tags.length) {
+            videoTagsSuggestions.innerHTML = '<div class="tags-suggestion-empty">일치하는 태그가 없습니다.</div>';
+            videoTagsSuggestions.hidden = false;
+            activeTagSuggestionIndex = -1;
+            return;
+        }
+
+        videoTagsSuggestions.innerHTML = tags.map(function (tag, index) {
+            var tagName = escapeHtml(tag && tag.tagName ? tag.tagName : "");
+            var activeClass = index === 0 ? " is-active" : "";
+            return '<button type="button" class="tags-suggestion-item' + activeClass + '" data-tag-name="' + tagName + '">' + tagName + '</button>';
+        }).join("");
+        videoTagsSuggestions.hidden = false;
+        activeTagSuggestionIndex = 0;
+    }
+
+    function fetchTagSuggestions() {
+        var keyword = getCurrentTagKeyword();
+        var requestSeq;
+
+        if (!videoTagsSuggestions) {
+            return;
+        }
+
+        if (tagSuggestionAbortController) {
+            tagSuggestionAbortController.abort();
+            tagSuggestionAbortController = null;
+        }
+
+        if (!keyword) {
+            closeTagSuggestions();
+            return;
+        }
+
+        requestSeq = ++tagSuggestionRequestSeq;
+        tagSuggestionAbortController = new AbortController();
+
+        fetch("/api/works/tags/suggestions?keyword=" + encodeURIComponent(keyword), {
+            signal: tagSuggestionAbortController.signal
+        })
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error("tag suggestions failed");
+                }
+
+                return response.json();
+            })
+            .then(function (tags) {
+                if (requestSeq !== tagSuggestionRequestSeq) {
+                    return;
+                }
+
+                renderTagSuggestions(Array.isArray(tags) ? tags : []);
+            })
+            .catch(function (error) {
+                if (error && error.name === "AbortError") {
+                    return;
+                }
+
+                closeTagSuggestions();
+            });
+    }
+
+    function moveActiveTagSuggestion(direction) {
+        var buttons = getTagSuggestionButtons();
+
+        if (!buttons.length) {
+            return;
+        }
+
+        activeTagSuggestionIndex += direction;
+        if (activeTagSuggestionIndex < 0) {
+            activeTagSuggestionIndex = buttons.length - 1;
+        }
+        if (activeTagSuggestionIndex >= buttons.length) {
+            activeTagSuggestionIndex = 0;
+        }
+
+        highlightActiveTagSuggestion();
+    }
+
+    function buildWorkFormData(file) {
+        var formData = new FormData();
+        var title = videoTitleInput ? videoTitleInput.value.trim() : "";
+        var description = videoDescriptionInput ? videoDescriptionInput.value.trim() : "";
+        var tradePrice = tradePriceInput ? parseNumber(tradePriceInput.value) : null;
+        var auctionStartingPrice = auctionBidPriceInput ? parseNumber(auctionBidPriceInput.value) : null;
+        var auctionDeadlineHours = auctionDeadlineHoursInput ? Number(auctionDeadlineHoursInput.value || "0") : 0;
+        var linkUrlText = videoLinkUrl ? videoLinkUrl.textContent.trim() : "";
+        var tags = extractTagNames(videoTagsInput ? videoTagsInput.value : "");
+        var thumbnailFile = getSelectedThumbnailFile();
+
+        if (!file) {
+            throw new Error("업로드할 파일을 선택해주세요.");
+        }
+
+        if (!title) {
+            throw new Error("제목을 입력해주세요.");
+        }
+
+        if (!selectedGalleryId) {
+            throw new Error("예술관을 선택해주세요.");
+        }
+
+        formData.append("galleryId", String(selectedGalleryId));
+        formData.append("title", title);
+        formData.append("category", file.type.indexOf("image/") === 0 ? "IMAGE" : "VIDEO");
+        formData.append("description", description);
+        formData.append("licenseType", "");
+        formData.append("licenseTerms", "");
+        formData.append("isTradable", String(!!(tradeToggle && tradeToggle.checked)));
+        formData.append("allowComment", "true");
+        formData.append("showSimilar", "true");
+        formData.append("linkUrl", linkUrlText);
+        formData.append("auctionEnabled", String(!!(auctionConfig && !auctionConfig.hidden)));
+        formData.append("auctionDeadlineHours", String(auctionDeadlineHours));
+        formData.append("mediaFile", file);
+
+        if (thumbnailFile) {
+            formData.append("thumbnailFile", thumbnailFile);
+        }
+
+        if (tradePrice !== null) {
+            formData.append("price", String(tradePrice));
+        }
+
+        if (auctionStartingPrice !== null) {
+            formData.append("auctionStartingPrice", String(auctionStartingPrice));
+        }
+
+        tags.forEach(function (tagName) {
+            formData.append("tagNames", tagName);
+        });
+
+        return formData;
+    }
+
+    function resolveProfileRedirectUrl() {
+        if (selectedGalleryId) {
+            return "/profile?tab=works&galleryId=" + encodeURIComponent(String(selectedGalleryId));
+        }
+
+        return "/profile?tab=works";
+    }
+
+    function setSubmittingState(submitting) {
+        if (!submitButton) {
+            return;
+        }
+
+        isSubmitting = submitting;
+        submitButton.disabled = submitting;
+        submitButton.textContent = submitting ? "등록 중..." : "등록";
+    }
+
+    function submitWork() {
+        var file;
+        var formData;
+
+        if (isSubmitting) {
+            return;
+        }
+
+        try {
+            file = getSelectedMediaFile();
+            formData = buildWorkFormData(file);
+        } catch (error) {
+            window.alert(error.message);
+            return;
+        }
+
+        setSubmittingState(true);
+
+        fetch("/api/works", {
+            method: "POST",
+            body: formData
+        })
+            .then(function (response) {
+                if (!response.ok) {
+                    return response.text().then(function (message) {
+                        throw new Error(message || "작품 등록에 실패했습니다.");
+                    });
+                }
+
+                return response.json();
+            })
+            .then(function (data) {
+                navigateAfterSubmit(data && data.redirectUrl ? data.redirectUrl : resolveProfileRedirectUrl());
+            })
+            .catch(function (error) {
+                window.alert(error.message || "작품 등록 중 오류가 발생했습니다.");
+            })
+            .finally(function () {
+                setSubmittingState(false);
+            });
+    }
+
     function copyVideoLink() {
         if (!videoLinkUrl || !navigator.clipboard || !navigator.clipboard.writeText) {
             return;
@@ -435,6 +811,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var file = files && files[0];
 
         if (!file) {
+            currentMediaFile = null;
             updateSelectedFile(null);
             updateMediaPreview(null);
             return;
@@ -444,6 +821,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        currentMediaFile = file;
         updateSelectedFile(file);
         updateMediaPreview(file);
         showDetailsScreen(file);
@@ -561,12 +939,29 @@ document.addEventListener("DOMContentLoaded", function () {
                 targetInput.click();
             }
         });
+
+        button.addEventListener("keydown", function (event) {
+            if (event.key !== "Enter" && event.key !== " ") {
+                return;
+            }
+
+            event.preventDefault();
+            button.click();
+        });
     });
 
     thumbnailFileInputs.forEach(function (input) {
         input.addEventListener("change", function () {
             var file = input.files && input.files[0];
             renderThumbnailPreview(input, file);
+        });
+
+        input.closest(".thumbnail-placeholder")?.addEventListener("click", function (event) {
+            if (event.target === input) {
+                return;
+            }
+
+            input.click();
         });
     });
 
@@ -594,7 +989,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         playlistOptions.forEach(function (option) {
             option.addEventListener("click", function () {
-                playlistDropdownText.textContent = option.getAttribute("data-playlist-name") || option.textContent.trim();
+                selectGalleryOption(option);
                 playlistDropdownMenu.hidden = true;
                 playlistDropdownButton.setAttribute("aria-expanded", "false");
             });
@@ -606,6 +1001,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 playlistDropdownButton.setAttribute("aria-expanded", "false");
             }
         });
+    }
+
+    if (submitButton) {
+        submitButton.addEventListener("click", submitWork);
     }
 
     if (videoTitleInput && videoTitleCount) {
@@ -628,6 +1027,56 @@ document.addEventListener("DOMContentLoaded", function () {
     if (videoTagsInput && videoTagsCount) {
         videoTagsInput.addEventListener("input", function () {
             updateTextCount(videoTagsInput, videoTagsCount, 500);
+            fetchTagSuggestions();
+        });
+
+        videoTagsInput.addEventListener("keydown", function (event) {
+            var buttons = getTagSuggestionButtons();
+            var activeButton;
+
+            if (videoTagsSuggestions && !videoTagsSuggestions.hidden && buttons.length) {
+                if (event.key === "ArrowDown") {
+                    event.preventDefault();
+                    moveActiveTagSuggestion(1);
+                    return;
+                }
+
+                if (event.key === "ArrowUp") {
+                    event.preventDefault();
+                    moveActiveTagSuggestion(-1);
+                    return;
+                }
+
+                if (event.key === "Enter" && activeTagSuggestionIndex >= 0) {
+                    event.preventDefault();
+                    activeButton = buttons[activeTagSuggestionIndex];
+                    if (activeButton) {
+                        applyTagSuggestion(activeButton.getAttribute("data-tag-name"));
+                    }
+                    return;
+                }
+
+                if (event.key === "Escape") {
+                    closeTagSuggestions();
+                }
+            }
+        });
+
+        videoTagsInput.addEventListener("blur", function () {
+            window.setTimeout(closeTagSuggestions, 120);
+        });
+    }
+
+    if (videoTagsSuggestions) {
+        videoTagsSuggestions.addEventListener("mousedown", function (event) {
+            var button = event.target.closest(".tags-suggestion-item");
+
+            if (!button) {
+                return;
+            }
+
+            event.preventDefault();
+            applyTagSuggestion(button.getAttribute("data-tag-name"));
         });
     }
 
@@ -733,11 +1182,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.addEventListener("click", function (event) {
         if (!aiPromptComposeMenu || !aiPromptToolButton || aiPromptComposeMenu.hidden) {
+            if (videoTagsSuggestions && !videoTagsSuggestions.hidden &&
+                videoTagsInput && !videoTagsInput.contains(event.target) &&
+                !videoTagsSuggestions.contains(event.target)) {
+                closeTagSuggestions();
+            }
             return;
         }
 
         if (!aiPromptComposeMenu.contains(event.target) && !aiPromptToolButton.contains(event.target)) {
             closeAiPromptComposeMenu();
+        }
+
+        if (videoTagsSuggestions && !videoTagsSuggestions.hidden &&
+            videoTagsInput && !videoTagsInput.contains(event.target) &&
+            !videoTagsSuggestions.contains(event.target)) {
+            closeTagSuggestions();
         }
     });
 
@@ -751,6 +1211,17 @@ document.addEventListener("DOMContentLoaded", function () {
     updateTextCount(videoTitleInput, videoTitleCount, 100);
     updateTextCount(videoDescriptionInput, videoDescriptionCount, 5000);
     updateTextCount(videoTagsInput, videoTagsCount, 500);
+    setSubmittingState(false);
+
+    if (playlistOptions.length) {
+        selectGalleryOption(playlistOptions[0]);
+    }
 
     window.addEventListener("resize", syncDialogSizeToDetailsScreen);
-});
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initializeWorkRegister);
+} else {
+    initializeWorkRegister();
+}

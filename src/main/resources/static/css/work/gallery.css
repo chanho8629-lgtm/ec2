@@ -6,8 +6,7 @@
     display: none !important;
 }
 
-html,
-body {
+body.gallery-register-page {
     margin: 0;
     min-height: 100%;
     font-family: Roboto, "Noto Sans KR", "Malgun Gothic", sans-serif;
@@ -15,13 +14,13 @@ body {
     color: #0f0f0f;
 }
 
-body {
+body.gallery-register-page {
     min-height: 100vh;
     overflow: hidden;
     position: relative;
 }
 
-body::before {
+body.gallery-register-page::before {
     content: "";
     position: fixed;
     inset: 0;
@@ -61,6 +60,14 @@ svg {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
     transform: translate(-50%, -50%);
     overflow: hidden;
+}
+
+.modal[data-compose-embedded="true"] {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    margin: 0;
 }
 
 .modal-head {
@@ -273,6 +280,7 @@ svg {
     height: 100%;
     object-fit: cover;
     background: #f1f3f4;
+    pointer-events: none;
 }
 
 .thumb-btn.is-filled .thumb-preview-image {
