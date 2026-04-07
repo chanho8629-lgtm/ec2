@@ -41,6 +41,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/main",
+                                "/results",
                                 "/error",
                                 "/error-page",
                                 "/api/search/**",
