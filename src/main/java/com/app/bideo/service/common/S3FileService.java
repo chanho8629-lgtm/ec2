@@ -24,7 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class S3FileService {
 
-    private static final Path ROOT_UPLOAD_DIR = Paths.get("uploads");
+    private static final Path LOCAL_IMAGE_UPLOAD_DIR = Paths.get("src", "main", "resources", "static", "images", "uploads");
 
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
@@ -69,6 +69,7 @@ public class S3FileService {
         String normalizedKey = key.trim();
 
         if (normalizedKey.startsWith("/uploads/")
+                || normalizedKey.startsWith("/images/uploads/")
                 || normalizedKey.startsWith("/")
                 || normalizedKey.startsWith("http://")
                 || normalizedKey.startsWith("https://")
@@ -96,15 +97,15 @@ public class S3FileService {
     }
 
     private String saveToLocal(String directory, String key, MultipartFile file, Exception cause) {
-        Path targetDirectory = ROOT_UPLOAD_DIR.resolve(directory);
-        Path targetFile = ROOT_UPLOAD_DIR.resolve(key).normalize();
+        Path targetDirectory = LOCAL_IMAGE_UPLOAD_DIR.resolve(directory);
+        Path targetFile = LOCAL_IMAGE_UPLOAD_DIR.resolve(key).normalize();
 
         try {
             Files.createDirectories(targetDirectory);
             try (InputStream inputStream = file.getInputStream()) {
                 Files.copy(inputStream, targetFile, StandardCopyOption.REPLACE_EXISTING);
             }
-            return "/uploads/" + key.replace("\\", "/");
+            return "/images/uploads/" + key.replace("\\", "/");
         } catch (IOException e) {
             throw new RuntimeException("S3 file upload failed", cause);
         }
