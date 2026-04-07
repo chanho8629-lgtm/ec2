@@ -82,7 +82,7 @@
             </svg>
           </button>
           <button class="yt-shell__icon-button" type="button" aria-label="계정 메뉴" data-yt-shell-account-toggle aria-expanded="false">
-            <img class="yt-shell__avatar" th:src="${currentUserProfileImage != null ? currentUserProfileImage : '/images/default-profile.png'}" src="/images/default-profile.png" alt="계정" />
+            <img class="yt-shell__avatar" th:src="${currentUserProfileImage != null ? currentUserProfileImage : '/images/default-profile.svg'}" src="/images/default-profile.svg" alt="계정" />
           </button>
         </div>
       </header>
@@ -128,7 +128,7 @@
             <li class="yt-shell__guide-item" th:each="artist : ${followingArtists}">
               <a class="yt-shell__guide-link" th:href="@{'/profile/' + ${artist.nickname}}" th:title="${artist.nickname}">
                 <img class="yt-shell__guide-avatar"
-                  th:src="${artist.profileImage != null ? artist.profileImage : '/images/default-avatar.png'}"
+                  th:src="${artist.profileImage != null ? artist.profileImage : '/images/default-profile.svg'}"
                   alt="" />
                 <span class="yt-shell__guide-copy" th:text="${artist.nickname}"></span>
                 <span class="yt-shell__guide-meta" th:if="${artist.creatorVerified}"><span class="yt-shell__guide-badge"></span></span>
@@ -506,8 +506,8 @@
               <span class="style-scope ytd-active-account-header-renderer no-transition"
                 style="background-color: transparent;">
                 <img draggable="false" class="style-scope yt-img-shadow" alt="" height="40" width="40"
-                  th:src="${currentUserProfileImage != null ? currentUserProfileImage : '/images/default-profile.png'}"
-                  src="/images/default-profile.png">
+                  th:src="${currentUserProfileImage != null ? currentUserProfileImage : '/images/default-profile.svg'}"
+                  src="/images/default-profile.svg">
               </span>
               <div class="style-scope ytd-active-account-header-renderer">
                 <span id="account-name" class="style-scope ytd-active-account-header-renderer" ellipsis-truncate-styling="" th:text="${currentUserNickname}"></span>
@@ -598,30 +598,6 @@
                       </svg></div></span>
                     </span>
                   </div>
-                  <!-- 설정 -->
-                  <div class="style-scope yt-multi-page-menu-section-renderer" hide-secondary-string="" compact-link-style="">
-                    <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="#">
-                      <div role="none" class="style-scope ytd-compact-link-renderer" style-target="host" tabindex="0">
-                        <div class="style-scope ytd-compact-link-renderer"><span class="style-scope ytd-compact-link-renderer">
-                          <span class="yt-icon-shape style-scope yt-icon"><div style="width:100%;height:100%;display:block;fill:currentcolor"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events:none;display:inherit;width:100%;height:100%">
-                            <path d="M12.844 1h-1.687a2 2 0 00-1.962 1.616 3 3 0 01-3.92 2.263 2 2 0 00-2.38.891l-.842 1.46a2 2 0 00.417 2.507 3 3 0 010 4.525 2 2 0 00-.417 2.507l.843 1.46a2 2 0 002.38.892 3.001 3.001 0 013.918 2.263A2 2 0 0011.157 23h1.686a2 2 0 001.963-1.615 3.002 3.002 0 013.92-2.263 2 2 0 002.38-.892l.842-1.46a2 2 0 00-.418-2.507 3 3 0 010-4.526 2 2 0 00.418-2.508l-.843-1.46a2 2 0 00-2.38-.891 3 3 0 01-3.919-2.263A2 2 0 0012.844 1ZM16 12a4 4 0 11-7.999 0 4 4 0 018 0Zm-4 2a2 2 0 100-4 2 2 0 000 4Z"></path>
-                          </svg></div></span></span></div>
-                        <div class="style-scope ytd-compact-link-renderer"><span class="style-scope ytd-compact-link-renderer">설정</span></div>
-                      </div>
-                    </a>
-                  </div>
-                  <!-- 고객센터 -->
-                  <div class="style-scope yt-multi-page-menu-section-renderer" hide-secondary-string="" compact-link-style="">
-                    <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="/customerservice">
-                      <div role="none" class="style-scope ytd-compact-link-renderer" style-target="host" tabindex="0">
-                        <div class="style-scope ytd-compact-link-renderer"><span class="style-scope ytd-compact-link-renderer">
-                          <span class="yt-icon-shape style-scope yt-icon"><div style="width:100%;height:100%;display:block;fill:currentcolor"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events:none;display:inherit;width:100%;height:100%">
-                            <path d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1Zm0 2a9 9 0 110 18.001A9 9 0 0112 3Zm.5 3h-.483a3.45 3.45 0 00-3.089 1.909l-.323.644a1 1 0 001.79.894l.322-.643a1.46 1.46 0 011.3-.804h.483a1.5 1.5 0 01.153 2.992l-.306.016A1.5 1.5 0 0011 12.5v1a1 1 0 002 0v-.535A3.5 3.5 0 0012.5 6Zm-.5 9.75a1.25 1.25 0 100 2.5 1.25 1.25 0 000-2.5Z"></path>
-                          </svg></div></span></span></div>
-                        <div class="style-scope ytd-compact-link-renderer"><span class="style-scope ytd-compact-link-renderer">고객센터</span></div>
-                      </div>
-                    </a>
-                  </div>
                 </div>
               </section>
               <!-- 섹션 4: 로그아웃 -->
@@ -653,13 +629,20 @@
           <div id="header" class="style-scope ytd-multi-page-menu-renderer">
             <div class="yt-shell__notification-header">
               <h2 class="yt-shell__notification-title">알림</h2>
-              <a href="#" class="yt-shell__notification-settings" aria-label="설정">
-                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"
+              <button type="button" class="yt-shell__notification-toggle" id="notificationToggle" aria-label="알림 설정" title="알림 켜기/끄기" onclick="toggleNotification(this)">
+                <!-- 알림 ON 아이콘 -->
+                <svg class="notification-icon-on" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"
                   focusable="false" aria-hidden="true"
                   style="pointer-events: none; display: inherit; width: 100%; height: 100%;">
-                  <path d="M12.844 1h-1.687a2 2 0 00-1.962 1.616 3 3 0 01-3.92 2.263 2 2 0 00-2.38.891l-.842 1.46a2 2 0 00.417 2.507 3 3 0 010 4.525 2 2 0 00-.417 2.507l.843 1.46a2 2 0 002.38.892 3.001 3.001 0 013.918 2.263A2 2 0 0011.157 23h1.686a2 2 0 001.963-1.615 3.002 3.002 0 013.92-2.263 2 2 0 002.38-.892l.842-1.46a2 2 0 00-.418-2.507 3 3 0 010-4.526 2 2 0 00.418-2.508l-.843-1.46a2 2 0 00-2.38-.891 3 3 0 01-3.919-2.263A2 2 0 0012.844 1Zm-1.767 2.347a6 6 0 00.08-.347h1.687a4.98 4.98 0 002.407 3.37 4.98 4.98 0 004.122.4l.843 1.46A4.98 4.98 0 0018.5 12a4.98 4.98 0 001.716 3.77l-.843 1.46a4.98 4.98 0 00-4.123.4A4.979 4.979 0 0012.843 21h-1.686a4.98 4.98 0 00-2.408-3.371 4.999 4.999 0 00-4.12-.399l-.844-1.46A4.979 4.979 0 005.5 12a4.98 4.98 0 00-1.715-3.77l.842-1.459a4.98 4.98 0 004.123-.399 4.981 4.981 0 002.327-3.025ZM16 12a4 4 0 11-7.999 0 4 4 0 018 0Zm-4 2a2 2 0 100-4 2 2 0 000 4Z"></path>
+                  <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"></path>
                 </svg>
-              </a>
+                <!-- 알림 OFF 아이콘 -->
+                <svg class="notification-icon-off" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"
+                  focusable="false" aria-hidden="true"
+                  style="pointer-events: none; display: none; width: 100%; height: 100%;">
+                  <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm0-18.5c-.83 0-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h4.5l-5.29-5.29L2 12.5l1.41-1.41L21.09 2.5 20 1.09 17.18 3.91C15.77 2.74 13.98 2 12 2c0 0 0 0 0 1.5zM18 11c0-1.7-.54-3.27-1.46-4.54L8 14.96V16h-.34L6 14.34V11c0-3.07 1.63-5.64 4.5-6.32V4c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v.68c.63.14 1.21.38 1.74.68L18 11zm-6 11c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2z"></path>
+                </svg>
+              </button>
             </div>
           </div>
           <div id="container" class="menu-container style-scope ytd-multi-page-menu-renderer">
@@ -804,6 +787,23 @@
     <script defer src="/js/layout/search-omnisearch.js"></script>
     <script defer src="/js/layout/voice-search-modal.js"></script>
     <script defer src="/js/layout/chat-fab.js"></script>
+    <script>
+      function toggleNotification(btn) {
+        const isOff = btn.classList.toggle('is-off');
+        const iconOn = btn.querySelector('.notification-icon-on');
+        const iconOff = btn.querySelector('.notification-icon-off');
+        iconOn.style.display = isOff ? 'none' : 'inherit';
+        iconOff.style.display = isOff ? 'inherit' : 'none';
+        localStorage.setItem('notificationEnabled', !isOff);
+      }
+      document.addEventListener('DOMContentLoaded', function() {
+        const enabled = localStorage.getItem('notificationEnabled');
+        if (enabled === 'false') {
+          const btn = document.getElementById('notificationToggle');
+          if (btn) toggleNotification(btn);
+        }
+      });
+    </script>
   </th:block>
 </body>
 

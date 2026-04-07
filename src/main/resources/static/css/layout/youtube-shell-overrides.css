@@ -639,25 +639,31 @@ body[data-guide-collapsed="true"] .yt-shell__page-content {
   margin: 0;
 }
 
-.yt-shell__notification-settings {
+.yt-shell__notification-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 30px;
   height: 40px;
   border-radius: 50%;
+  border: none;
+  background: none;
+  cursor: pointer;
   color: var(--yt-spec-text-primary, #0f0f0f);
-  text-decoration: none;
 }
 
-.yt-shell__notification-settings:hover {
+.yt-shell__notification-toggle:hover {
   background-color: var(--yt-spec-additive-background, rgba(0, 0, 0, 0.05));
 }
 
-.yt-shell__notification-settings svg {
+.yt-shell__notification-toggle svg {
   width: 24px;
   height: 24px;
   fill: currentColor;
+}
+
+.yt-shell__notification-toggle.is-off {
+  color: var(--yt-spec-text-secondary, #606060);
 }
 
 .yt-shell__notification-empty {
