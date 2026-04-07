@@ -6,14 +6,17 @@ import com.app.bideo.domain.interaction.CommentVO;
 import com.app.bideo.dto.common.LikeToggleResponseDTO;
 import com.app.bideo.dto.common.PageResponseDTO;
 import com.app.bideo.dto.gallery.GalleryCreateRequestDTO;
+import com.app.bideo.dto.gallery.GalleryCreateResponseDTO;
 import com.app.bideo.dto.gallery.GalleryDetailResponseDTO;
 import com.app.bideo.dto.gallery.GalleryListResponseDTO;
 import com.app.bideo.dto.gallery.GallerySearchDTO;
 import com.app.bideo.dto.gallery.GalleryUpdateRequestDTO;
 import com.app.bideo.dto.gallery.SearchGallerySuggestionDTO;
 import com.app.bideo.dto.interaction.CommentResponseDTO;
+import com.app.bideo.dto.work.WorkSearchDTO;
 import com.app.bideo.repository.gallery.GalleryDAO;
 import com.app.bideo.repository.interaction.BookmarkDAO;
+import com.app.bideo.repository.member.MemberRepository;
 import com.app.bideo.repository.work.WorkDAO;
 import com.app.bideo.service.interaction.CommentService;
 import com.app.bideo.service.common.S3FileService;
@@ -26,9 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -42,19 +43,34 @@ public class GalleryService {
     private final GalleryDAO galleryDAO;
     private final WorkDAO workDAO;
     private final BookmarkDAO bookmarkDAO;
+    private final MemberRepository memberRepository;
     private final CommentService commentService;
     private final FollowService followService;
     private final NotificationService notificationService;
     private final S3FileService s3FileService;
 
     // 예술관 등록
-    public void write(Long memberId, GalleryCreateRequestDTO requestDTO, MultipartFile coverFile) {
-        requestDTO.setMemberId(resolveMemberId(memberId));
+    public GalleryCreateResponseDTO write(Long memberId, GalleryCreateRequestDTO requestDTO, MultipartFile coverFile) {
+        Long resolvedMemberId = resolveMemberId(memberId);
+        requestDTO.setMemberId(resolvedMemberId);
         requestDTO.setCoverImage(saveCoverImage(coverFile));
         requestDTO.setAllowComment(requestDTO.getAllowComment() != null ? requestDTO.getAllowComment() : true);
         requestDTO.setShowSimilar(requestDTO.getShowSimilar() != null ? requestDTO.getShowSimilar() : true);
         galleryDAO.save(requestDTO);
+        saveWorkLinks(requestDTO.getId(), requestDTO.getWorkIds());
         saveTags(requestDTO.getId(), requestDTO.getTagIds(), requestDTO.getTagNames());
+        galleryDAO.updateWorkCount(requestDTO.getId());
+
+        String memberNickname = memberRepository.findById(resolvedMemberId)
+                .map(member -> member.getNickname())
+                .orElseThrow(() -> new IllegalStateException("member not found"));
+
+        return GalleryCreateResponseDTO.builder()
+                .galleryId(requestDTO.getId())
+                .memberId(resolvedMemberId)
+                .memberNickname(memberNickname)
+                .redirectUrl("/profile/" + memberNickname + "?galleryId=" + requestDTO.getId())
+                .build();
     }
 
     // 메인 피드용 예술관 목록 페이징 조회
@@ -103,7 +119,9 @@ public class GalleryService {
         GalleryDetailResponseDTO detail = galleryDAO.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("gallery not found"));
         detail.setCoverImage(s3FileService.getPresignedUrl(detail.getCoverImage()));
+        detail.setMemberProfileImage(s3FileService.getPresignedUrl(detail.getMemberProfileImage()));
         detail.setTags(galleryDAO.findTagsByGalleryId(id));
+        detail.setWorks(getGalleryWorks(id, detail.getMemberId()));
 
         Long memberId = resolveAuthenticatedMemberId();
         detail.setIsLiked(memberId != null && galleryDAO.existsLike(memberId, id));
@@ -114,7 +132,27 @@ public class GalleryService {
                         && !memberId.equals(detail.getMemberId())
                         && followService.isFollowing(memberId, detail.getMemberId())
         );
+        detail.setIsOwner(memberId != null && memberId.equals(detail.getMemberId()));
         return detail;
+    }
+
+    public void increaseViewCount(Long id) {
+        galleryDAO.increaseViewCount(id);
+    }
+
+    @Transactional(readOnly = true)
+    private List<com.app.bideo.dto.work.WorkListResponseDTO> getGalleryWorks(Long galleryId, Long memberId) {
+        WorkSearchDTO searchDTO = new WorkSearchDTO();
+        searchDTO.setGalleryId(galleryId);
+        searchDTO.setMemberId(memberId);
+        searchDTO.setPage(1);
+        searchDTO.setSize(50);
+        List<com.app.bideo.dto.work.WorkListResponseDTO> works = workDAO.findAll(searchDTO);
+        works.forEach(work -> {
+            work.setThumbnailUrl(s3FileService.getPresignedUrl(work.getThumbnailUrl()));
+            work.setMemberProfileImage(s3FileService.getPresignedUrl(work.getMemberProfileImage()));
+        });
+        return works;
     }
 
     // 추천 예술관 (인기순)
@@ -154,6 +192,9 @@ public class GalleryService {
         }
 
         galleryDAO.update(id, requestDTO);
+        galleryDAO.deleteWorkLinksByGalleryId(id);
+        saveWorkLinks(id, requestDTO.getWorkIds());
+        galleryDAO.updateWorkCount(id);
         galleryDAO.deleteTagsByGalleryId(id);
         saveTags(id, requestDTO.getTagIds(), requestDTO.getTagNames());
     }
@@ -180,9 +221,11 @@ public class GalleryService {
                 .orElseThrow(() -> new IllegalArgumentException("gallery not found"));
         List<CommentResponseDTO> comments = galleryDAO.findCommentsByGalleryId(id);
         Long memberId = resolveAuthenticatedMemberId();
-        comments.forEach(comment ->
-                comment.setIsLiked(memberId != null && commentService.isLikedByCurrentMember(comment.getId()))
-        );
+        comments.forEach(comment -> {
+            comment.setMemberProfileImage(s3FileService.getPresignedUrl(comment.getMemberProfileImage()));
+            comment.setIsLiked(memberId != null && commentService.isLikedByCurrentMember(comment.getId()));
+            comment.setIsOwner(memberId != null && memberId.equals(comment.getMemberId()));
+        });
         return comments;
     }
 
@@ -287,6 +330,14 @@ public class GalleryService {
         }
 
         return s3FileService.upload("galleries", coverFile);
+    }
+
+    private void saveWorkLinks(Long galleryId, List<Long> workIds) {
+        if (workIds == null || workIds.isEmpty()) {
+            return;
+        }
+
+        new LinkedHashSet<>(workIds).forEach(workId -> galleryDAO.saveWorkLink(galleryId, workId));
     }
 
     private void saveTags(Long galleryId, List<Long> tagIds, List<String> tagNames) {

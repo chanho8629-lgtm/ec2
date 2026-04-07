@@ -39,6 +39,12 @@ public class GalleryDAO {
         return Optional.ofNullable(galleryMapper.selectGalleryMemberId(id));
     }
 
+    public void increaseViewCount(Long galleryId) {
+        if (galleryMapper.increaseGalleryViewCount(galleryId) == 0) {
+            throw new IllegalArgumentException("gallery not found");
+        }
+    }
+
     public void update(Long id, GalleryUpdateRequestDTO galleryUpdateRequestDTO) {
         if (galleryMapper.updateGallery(id, galleryUpdateRequestDTO) == 0) {
             throw new IllegalArgumentException("gallery not found");
@@ -89,6 +95,12 @@ public class GalleryDAO {
 
     public void increaseCommentCount(Long galleryId) {
         galleryMapper.increaseGalleryCommentCount(galleryId);
+    }
+
+    public void decreaseCommentCount(Long galleryId) {
+        if (galleryMapper.decreaseGalleryCommentCount(galleryId) == 0) {
+            throw new IllegalArgumentException("gallery not found");
+        }
     }
 
     public List<CommentResponseDTO> findCommentsByGalleryId(Long galleryId) {

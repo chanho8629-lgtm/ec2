@@ -3,13 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>예술관 작성</title>
+    <title th:text="${isEditMode} ? '예술관 수정' : '예술관 작성'">예술관 작성</title>
     <link rel="stylesheet" href="/css/work/gallery.css" th:href="@{/css/work/gallery.css}">
 </head>
-<body>
-<div class="modal" id="galleryModal" role="dialog" aria-modal="true" aria-labelledby="galleryTitle">
+<body class="gallery-register-page">
+<div class="modal"
+     id="galleryModal"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="galleryTitle"
+     th:attr="data-mode=${isEditMode} ? 'edit' : 'create',
+              data-gallery-id=${gallery != null ? gallery.id : ''},
+              data-cover-url=${gallery != null ? gallery.coverImage : ''},
+              data-initial-title=${gallery != null ? gallery.title : ''},
+              data-initial-description=${gallery != null ? gallery.description : ''},
+              data-initial-work-ids=${gallery != null and gallery.works != null ? #strings.listJoin(gallery.works.![id], ',') : ''},
+              data-initial-tags=${gallery != null and gallery.tags != null ? #strings.listJoin(gallery.tags.![tagName], ',') : ''}">
     <div class="modal-head">
-        <h1 class="modal-title" id="galleryTitle">새 예술관 만들기</h1>
+        <h1 class="modal-title" id="galleryTitle" th:text="${isEditMode} ? '예술관 수정' : '새 예술관 만들기'">새 예술관 만들기</h1>
         <button class="icon-btn" id="closeBtn" type="button" aria-label="닫기">
             <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" aria-hidden="true">
                 <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 1 0-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 1 0 1.414 1.414L12 13.414l5.293 5.293a1 1 0 0 0 1.414-1.414L13.414 12l5.293-5.293a1 1 0 0 0-1.414-1.414Z"></path>
@@ -117,7 +128,7 @@
     </div>
 
     <div class="modal-foot">
-        <button class="main-btn" id="createBtn" type="button" disabled>만들기</button>
+        <button class="main-btn" id="createBtn" type="button" disabled th:text="${isEditMode} ? '수정하기' : '만들기'">만들기</button>
     </div>
 </div>
 
@@ -151,36 +162,24 @@
                     </div>
 
                     <div class="artwork-list" id="artworkList">
-                        <label class="artwork-row" data-link="https://bideo.kr/watch/video-1" data-thumb="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=240&q=80">
-                            <input class="artwork-checkbox" type="checkbox" value="video-1">
+                        <label class="artwork-row"
+                               th:each="work : ${works}"
+                               th:attr="data-link=@{/work/detail/{id}(id=${work.id})},data-thumb=${work.thumbnailUrl}">
+                            <input class="artwork-checkbox" type="checkbox" th:value="${work.id}">
                             <span class="artwork-thumb">
-                                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=240&q=80" alt="BIDEO showcase teaser 썸네일">
+                                <img th:if="${work.thumbnailUrl != null and !#strings.isEmpty(work.thumbnailUrl)}"
+                                     th:src="${work.thumbnailUrl}"
+                                     th:alt="|${work.title} 썸네일|">
                             </span>
                             <div class="artwork-row-main">
-                                <span class="artwork-row-title">BIDEO showcase teaser</span>
-                                <span class="artwork-row-meta">2026.03.30 업로드</span>
+                                <span class="artwork-row-title" th:text="${work.title}">작품 제목</span>
+                                <span class="artwork-row-meta"
+                                      th:text="|조회수 ${work.viewCount ?: 0}회 · 좋아요 ${work.likeCount ?: 0}개|">조회수 0회 · 좋아요 0개</span>
                             </div>
                         </label>
-                        <label class="artwork-row" data-link="https://bideo.kr/watch/video-2" data-thumb="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=240&q=80">
-                            <input class="artwork-checkbox" type="checkbox" value="video-2">
-                            <span class="artwork-thumb">
-                                <img src="https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=240&q=80" alt="media art concept film 썸네일">
-                            </span>
-                            <div class="artwork-row-main">
-                                <span class="artwork-row-title">media art concept film</span>
-                                <span class="artwork-row-meta">2026.03.28 업로드</span>
-                            </div>
-                        </label>
-                        <label class="artwork-row" data-link="https://bideo.kr/watch/video-3" data-thumb="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=240&q=80">
-                            <input class="artwork-checkbox" type="checkbox" value="video-3">
-                            <span class="artwork-thumb">
-                                <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=240&q=80" alt="artist studio interview 썸네일">
-                            </span>
-                            <div class="artwork-row-main">
-                                <span class="artwork-row-title">artist studio interview</span>
-                                <span class="artwork-row-meta">2026.03.25 업로드</span>
-                            </div>
-                        </label>
+                        <div class="artwork-selection-empty" th:if="${#lists.isEmpty(works)}">
+                            추가할 수 있는 작품이 없습니다.
+                        </div>
                     </div>
                 </div>
 

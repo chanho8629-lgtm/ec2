@@ -2,6 +2,7 @@ package com.app.bideo.controller.gallery;
 
 import com.app.bideo.dto.common.PageResponseDTO;
 import com.app.bideo.dto.gallery.GalleryCreateRequestDTO;
+import com.app.bideo.dto.gallery.GalleryCreateResponseDTO;
 import com.app.bideo.dto.gallery.GalleryDetailResponseDTO;
 import com.app.bideo.dto.gallery.GalleryListResponseDTO;
 import com.app.bideo.dto.gallery.GallerySearchDTO;
@@ -43,12 +44,12 @@ public class GalleryAPIController {
     }
 
     @PostMapping
-    public void write(
+    public ResponseEntity<GalleryCreateResponseDTO> write(
             @RequestParam(required = false) Long memberId,
             @ModelAttribute GalleryCreateRequestDTO requestDTO,
             @RequestParam("coverFile") MultipartFile coverFile
     ) {
-        galleryService.write(memberId, requestDTO, coverFile);
+        return ResponseEntity.ok(galleryService.write(memberId, requestDTO, coverFile));
     }
 
     @PostMapping("/{id}/edit")

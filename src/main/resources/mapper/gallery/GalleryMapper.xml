@@ -41,6 +41,16 @@
           and status != 'DELETED'
     </select>
 
+    <update id="increaseGalleryViewCount">
+        update tbl_gallery
+        set
+            view_count = coalesce(view_count, 0) + 1,
+            updated_datetime = now()
+        where id = #{galleryId}
+          and deleted_datetime is null
+          and status != 'DELETED'
+    </update>
+
     <update id="updateGallery">
         update tbl_gallery
         set
@@ -144,6 +154,16 @@
           and status != 'DELETED'
     </update>
 
+    <update id="decreaseGalleryCommentCount">
+        update tbl_gallery
+        set
+            comment_count = greatest(coalesce(comment_count, 0) - 1, 0),
+            updated_datetime = now()
+        where id = #{galleryId}
+          and deleted_datetime is null
+          and status != 'DELETED'
+    </update>
+
     <select id="selectGalleryCommentsByGalleryId" resultType="CommentResponseDTO">
         select
             c.id,
@@ -198,6 +218,7 @@
             g.id,
             g.member_id,
             m.nickname as member_nickname,
+            m.profile_image as member_profile_image,
             g.title,
             g.description,
             g.cover_image,

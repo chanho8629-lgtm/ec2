@@ -162,8 +162,15 @@
                                                 </span>
                                             </button>
                                             <div class="playlist-dropdown-menu" id="playlist-dropdown-menu" hidden>
-                                                <button type="button" class="playlist-option" data-playlist-name="현대 예술관">현대 예술관</button>
-                                                <button type="button" class="playlist-option" data-playlist-name="미디어 아트 전시">미디어 아트 전시</button>
+                                                <button
+                                                        type="button"
+                                                        class="playlist-option"
+                                                        th:each="gallery : ${galleries}"
+                                                        th:attr="data-gallery-id=${gallery.id},data-playlist-name=${gallery.title}"
+                                                        th:text="${gallery.title}">
+                                                    예술관
+                                                </button>
+                                                <div th:if="${#lists.isEmpty(galleries)}" class="playlist-option-empty">등록 가능한 예술관이 없습니다.</div>
                                             </div>
                                         </div>
                                         <div class="compact-col"></div>
@@ -175,6 +182,7 @@
                                     <p class="tags-description">태그는 동영상의 콘텐츠에 일반적으로 맞춤법이 틀리는 단어가 있을 경우 유용합니다. 그 외에 시청자가 동영상을 찾는 데 있어 태그가 하는 역할은 제한적입니다. <a href="https://support.google.com/youtube/answer/146402?hl=ko" target="_blank">자세히 알아보기</a></p>
                                     <div class="tags-field">
                                         <input type="text" id="video-tags-input" class="tags-input" maxlength="500" placeholder="태그 추가">
+                                        <div class="tags-suggestions" id="video-tags-suggestions" hidden></div>
                                     </div>
                                     <div class="tags-meta">
                                         <span>각 태그의 뒤에 쉼표를 입력하세요.</span>
@@ -296,7 +304,7 @@
                     </div>
                     <div class="details-buttons">
                         <button type="button" class="tonal-button" id="details-back-button">뒤로</button>
-                        <button type="button" class="filled-button">다음</button>
+                        <button type="button" class="filled-button" id="work-submit-button">등록</button>
                     </div>
                 </div>
             </div>

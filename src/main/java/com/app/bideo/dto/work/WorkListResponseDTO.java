@@ -19,6 +19,7 @@ public class WorkListResponseDTO {
     private String memberNickname;
     private String memberProfileImage;
     private String thumbnailUrl;
+    private String thumbnailFileType;
     private Integer thumbnailWidth;
     private Integer thumbnailHeight;
     private Integer viewCount;

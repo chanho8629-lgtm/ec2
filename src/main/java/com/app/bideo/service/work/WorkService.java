@@ -7,8 +7,10 @@ import com.app.bideo.domain.work.WorkFileVO;
 import com.app.bideo.domain.work.WorkTagVO;
 import com.app.bideo.dto.common.LikeToggleResponseDTO;
 import com.app.bideo.dto.common.PageResponseDTO;
+import com.app.bideo.dto.common.TagResponseDTO;
 import com.app.bideo.dto.interaction.CommentResponseDTO;
 import com.app.bideo.dto.work.WorkCreateRequestDTO;
+import com.app.bideo.dto.work.WorkCreateResponseDTO;
 import com.app.bideo.dto.work.WorkDTO;
 import com.app.bideo.dto.work.WorkDetailResponseDTO;
 import com.app.bideo.dto.work.WorkFileRequestDTO;
@@ -18,6 +20,7 @@ import com.app.bideo.dto.work.WorkUpdateRequestDTO;
 import com.app.bideo.repository.auction.AuctionDAO;
 import com.app.bideo.repository.interaction.BookmarkDAO;
 import com.app.bideo.service.interaction.CommentService;
+import com.app.bideo.service.common.S3FileService;
 import com.app.bideo.service.notification.NotificationService;
 import com.app.bideo.repository.gallery.GalleryDAO;
 import com.app.bideo.repository.work.WorkDAO;
@@ -28,12 +31,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.time.LocalDateTime;
 
@@ -48,9 +50,10 @@ public class WorkService {
     private final BookmarkDAO bookmarkDAO;
     private final CommentService commentService;
     private final NotificationService notificationService;
+    private final S3FileService s3FileService;
 
     // 작품 등록 후 파일/태그까지 함께 저장한다.
-    public WorkDetailResponseDTO write(Long memberId, WorkCreateRequestDTO requestDTO, MultipartFile mediaFile) {
+    public WorkCreateResponseDTO write(Long memberId, WorkCreateRequestDTO requestDTO, MultipartFile mediaFile, MultipartFile thumbnailFile) {
         Long resolvedMemberId = resolveMemberId(memberId);
         Long galleryId = requireGalleryId(requestDTO.getGalleryId());
         String category = resolveCategory(requestDTO.getCategory(), mediaFile);
@@ -71,12 +74,17 @@ public class WorkService {
                 .build();
 
         workDAO.save(workDTO);
-        saveMediaFile(workDTO.getId(), mediaFile);
+        saveThumbnailFile(workDTO.getId(), thumbnailFile);
+        saveMediaFile(workDTO.getId(), mediaFile, thumbnailFile != null && !thumbnailFile.isEmpty() ? 1 : 0);
         saveTags(workDTO.getId(), requestDTO.getTagIds(), requestDTO.getTagNames());
         saveGalleryLink(galleryId, workDTO.getId());
         saveAuctionIfRequested(workDTO.getId(), resolvedMemberId, requestDTO.getPrice(), requestDTO.getAuctionEnabled(), requestDTO.getAuctionStartingPrice(), requestDTO.getAuctionDeadlineHours());
 
-        return getWorkDetail(workDTO.getId());
+        return WorkCreateResponseDTO.builder()
+                .id(workDTO.getId())
+                .galleryId(galleryId)
+                .redirectUrl("/profile?tab=works&galleryId=" + galleryId)
+                .build();
     }
 
     // 검색 조건을 기준으로 작품 목록을 페이지 형태로 반환한다.
@@ -88,6 +96,7 @@ public class WorkService {
         searchDTO.setSize(size);
 
         List<WorkListResponseDTO> list = workDAO.findAll(searchDTO);
+        applyThumbnailUrls(list);
         int total = workDAO.findTotal(searchDTO);
         int totalPages = (int) Math.ceil((double) total / size);
 
@@ -100,18 +109,33 @@ public class WorkService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
+    public List<TagResponseDTO> getTagSuggestions(String keyword) {
+        String normalizedKeyword = normalizeTagKeyword(keyword);
+        if (normalizedKeyword.isBlank()) {
+            return Collections.emptyList();
+        }
+
+        return workDAO.findTagSuggestions(normalizedKeyword, 8);
+    }
+
     // 작품 상세 화면에 필요한 정보를 한 번에 조회한다.
     @Transactional(readOnly = true)
     public WorkDetailResponseDTO getWorkDetail(Long id) {
         WorkDetailResponseDTO detail = workDAO.findDetailById(id)
                 .orElseThrow(() -> new IllegalArgumentException("work not found"));
+        applyFileUrls(detail);
         Long memberId = resolveAuthenticatedMemberId();
         detail.setIsLiked(memberId != null && workDAO.existsLike(memberId, id));
         detail.setIsBookmarked(memberId != null && bookmarkDAO.exists(memberId, "WORK", id));
+        detail.setIsOwner(memberId != null && memberId.equals(detail.getMemberId()));
         detail.setHasActiveAuction(workDAO.existsActiveAuctionByWorkId(id));
         if (detail.getComments() != null) {
             detail.getComments().forEach(comment ->
-                    comment.setIsLiked(memberId != null && commentService.isLikedByCurrentMember(comment.getId()))
+                    {
+                        comment.setIsLiked(memberId != null && commentService.isLikedByCurrentMember(comment.getId()));
+                        comment.setIsOwner(memberId != null && memberId.equals(comment.getMemberId()));
+                    }
             );
         }
         return detail;
@@ -138,16 +162,22 @@ public class WorkService {
         searchDTO.setGalleryId(galleryId);
         searchDTO.setPage(1);
         searchDTO.setSize(50);
-        return workDAO.findAll(searchDTO);
+        List<WorkListResponseDTO> works = workDAO.findAll(searchDTO);
+        applyThumbnailUrls(works);
+        return works;
     }
 
     // 기존 파일/태그를 정리한 뒤 요청 데이터 기준으로 다시 구성한다.
     public WorkDetailResponseDTO update(Long id, Long memberId, WorkUpdateRequestDTO requestDTO) {
-        return update(id, memberId, requestDTO, null);
+        return update(id, memberId, requestDTO, null, null);
     }
 
     // 수정 폼 요청 기준으로 작품과 연결 정보를 다시 구성한다.
     public WorkDetailResponseDTO update(Long id, Long memberId, WorkUpdateRequestDTO requestDTO, MultipartFile mediaFile) {
+        return update(id, memberId, requestDTO, mediaFile, null);
+    }
+
+    public WorkDetailResponseDTO update(Long id, Long memberId, WorkUpdateRequestDTO requestDTO, MultipartFile mediaFile, MultipartFile thumbnailFile) {
         Long resolvedMemberId = resolveMemberId(memberId);
         validateWorkOwner(id, resolvedMemberId);
         Long galleryId = requireGalleryId(requestDTO.getGalleryId());
@@ -171,9 +201,12 @@ public class WorkService {
 
         workDAO.setWork(workDTO);
 
-        if (mediaFile != null && !mediaFile.isEmpty()) {
+        if ((mediaFile != null && !mediaFile.isEmpty()) || (thumbnailFile != null && !thumbnailFile.isEmpty())) {
             workDAO.deleteFilesByWorkId(id);
-            saveMediaFile(id, mediaFile);
+            saveThumbnailFile(id, thumbnailFile);
+            if (mediaFile != null && !mediaFile.isEmpty()) {
+                saveMediaFile(id, mediaFile, thumbnailFile != null && !thumbnailFile.isEmpty() ? 1 : 0);
+            }
         } else if (requestDTO.getFiles() != null) {
             workDAO.deleteFilesByWorkId(id);
             saveFiles(id, requestDTO.getFiles());
@@ -340,6 +373,14 @@ public class WorkService {
                 });
     }
 
+    private String normalizeTagKeyword(String keyword) {
+        if (keyword == null) {
+            return "";
+        }
+
+        return keyword.trim().toLowerCase(Locale.ROOT);
+    }
+
     private void saveAuctionIfRequested(Long workId, Long sellerId, Integer askingPrice, Boolean auctionEnabled, Integer startingPrice, Integer deadlineHours) {
         if (!Boolean.TRUE.equals(auctionEnabled)) {
             return;
@@ -423,28 +464,46 @@ public class WorkService {
         return null;
     }
 
-    // 업로드한 파일을 data URL 형태로 DB에 직접 저장한다.
-    private void saveMediaFile(Long workId, MultipartFile mediaFile) {
+    // 업로드한 파일을 S3(실패 시 로컬 uploads) 경로로 저장한다.
+    private void saveMediaFile(Long workId, MultipartFile mediaFile, int sortOrder) {
         if (mediaFile == null || mediaFile.isEmpty()) {
             return;
         }
 
-        try {
-            String contentType = mediaFile.getContentType() != null ? mediaFile.getContentType() : "application/octet-stream";
-            String base64 = Base64.getEncoder().encodeToString(mediaFile.getBytes());
+        String contentType = mediaFile.getContentType() != null ? mediaFile.getContentType() : "application/octet-stream";
+        String uploadedFileKey = s3FileService.upload("works", mediaFile);
 
-            workDAO.saveFile(
-                    WorkFileVO.builder()
-                            .workId(workId)
-                            .fileUrl("data:" + contentType + ";base64," + base64)
-                            .fileType(contentType)
-                            .fileSize((int) mediaFile.getSize())
-                            .sortOrder(0)
-                            .build()
-            );
-        } catch (IOException e) {
-            throw new RuntimeException("media upload failed", e);
+        workDAO.saveFile(
+                WorkFileVO.builder()
+                        .workId(workId)
+                        .fileUrl(uploadedFileKey)
+                        .fileType(contentType)
+                        .fileSize((int) mediaFile.getSize())
+                        .sortOrder(sortOrder)
+                        .build()
+        );
+    }
+
+    private void saveThumbnailFile(Long workId, MultipartFile thumbnailFile) {
+        if (thumbnailFile == null || thumbnailFile.isEmpty()) {
+            return;
         }
+
+        String contentType = thumbnailFile.getContentType() != null ? thumbnailFile.getContentType() : "application/octet-stream";
+        if (!contentType.startsWith("image/")) {
+            throw new IllegalArgumentException("thumbnail image only");
+        }
+
+        String uploadedFileKey = s3FileService.upload("works", thumbnailFile);
+        workDAO.saveFile(
+                WorkFileVO.builder()
+                        .workId(workId)
+                        .fileUrl(uploadedFileKey)
+                        .fileType(contentType)
+                        .fileSize((int) thumbnailFile.getSize())
+                        .sortOrder(0)
+                        .build()
+        );
     }
 
     private String resolveCategory(String category, MultipartFile mediaFile) {
@@ -459,5 +518,34 @@ public class WorkService {
         }
 
         return category != null ? category : "VIDEO";
+    }
+
+    private void applyFileUrls(WorkDetailResponseDTO detail) {
+        if (detail == null) {
+            return;
+        }
+
+        detail.setMemberProfileImage(s3FileService.getPresignedUrl(detail.getMemberProfileImage()));
+
+        if (detail.getFiles() != null) {
+            detail.getFiles().forEach(file -> file.setFileUrl(s3FileService.getPresignedUrl(file.getFileUrl())));
+        }
+
+        if (detail.getComments() != null) {
+            detail.getComments().forEach(comment ->
+                    comment.setMemberProfileImage(s3FileService.getPresignedUrl(comment.getMemberProfileImage()))
+            );
+        }
+    }
+
+    private void applyThumbnailUrls(List<WorkListResponseDTO> works) {
+        if (works == null) {
+            return;
+        }
+
+        works.forEach(work -> {
+            work.setThumbnailUrl(s3FileService.getPresignedUrl(work.getThumbnailUrl()));
+            work.setMemberProfileImage(s3FileService.getPresignedUrl(work.getMemberProfileImage()));
+        });
     }
 }

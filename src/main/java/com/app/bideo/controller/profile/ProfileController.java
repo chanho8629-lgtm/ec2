@@ -28,6 +28,7 @@ public class ProfileController {
     @GetMapping
     public String redirectProfile(@AuthenticationPrincipal CustomUserDetails userDetails,
                                   @RequestParam(required = false) Long galleryId,
+                                  @RequestParam(required = false) String tab,
                                   Model model) { // 이승민| 프로필 닉네임 경로 적용으로 인한 추가
         if (userDetails == null || userDetails.getId() == null) {
             return "redirect:/";
@@ -38,29 +39,33 @@ public class ProfileController {
             return "redirect:/";
         }
 
-        return renderProfilePage(profileMember, galleryId, userDetails, model);
+        return renderProfilePage(profileMember, galleryId, tab, userDetails, model);
     }
 
     @GetMapping("/{nickname}")
-    public String profile(@PathVariable String nickname, @RequestParam(required = false) Long galleryId, // 이승민| 프로필 닉네임 경로 적용으로 인한 수정
+    public String profile(@PathVariable String nickname,
+                          @RequestParam(required = false) Long galleryId,
+                          @RequestParam(required = false) String tab, // 이승민| 프로필 닉네임 경로 적용으로 인한 수정
                           @AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
         MemberVO profileMember = memberRepository.findByNickname(nickname).orElse(null);
         if (profileMember == null) {
             return "redirect:/error-page";
         }
 
-        return renderProfilePage(profileMember, galleryId, userDetails, model);
+        return renderProfilePage(profileMember, galleryId, tab, userDetails, model);
     }
 
-    private String renderProfilePage(MemberVO profileMember, Long galleryId,
+    private String renderProfilePage(MemberVO profileMember, Long galleryId, String tab,
                                      CustomUserDetails userDetails, Model model) {
         boolean isOwner = userDetails != null && profileMember.getId().equals(userDetails.getId());
         boolean isFollowing = userDetails != null
                 && !isOwner
                 && followService.isFollowing(userDetails.getId(), profileMember.getId());
+        String resolvedTab = "works".equalsIgnoreCase(tab) ? "works" : "galleries";
         model.addAttribute("works", workService.getProfileWorks(profileMember.getId(), galleryId));
         model.addAttribute("galleries", galleryService.getProfileGalleries(profileMember.getId()));
         model.addAttribute("selectedGalleryId", galleryId);
+        model.addAttribute("selectedTab", resolvedTab);
         model.addAttribute("profilePath", "/profile/" + profileMember.getNickname()); // 이승민| 프로필 닉네임 경로 유지로 인한 추가
         model.addAttribute("profileMember", profileMember); // 이승민| 프로필 상단 실데이터 노출로 인한 추가
         model.addAttribute("profileNickname", profileMember.getNickname()); // 이승민| 프로필 닉네임 경로 적용으로 인한 수정

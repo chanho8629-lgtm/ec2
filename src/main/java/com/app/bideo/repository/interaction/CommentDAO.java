@@ -1,5 +1,6 @@
 package com.app.bideo.repository.interaction;
 
+import com.app.bideo.dto.interaction.CommentResponseDTO;
 import com.app.bideo.mapper.interaction.CommentMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -14,6 +15,10 @@ public class CommentDAO {
 
     public Optional<Long> findId(Long commentId) {
         return Optional.ofNullable(commentMapper.selectCommentId(commentId));
+    }
+
+    public Optional<CommentResponseDTO> findById(Long commentId) {
+        return Optional.ofNullable(commentMapper.selectComment(commentId));
     }
 
     public boolean existsLike(Long memberId, Long commentId) {
@@ -38,5 +43,17 @@ public class CommentDAO {
 
     public int findLikeCount(Long commentId) {
         return Optional.ofNullable(commentMapper.selectCommentLikeCount(commentId)).orElse(0);
+    }
+
+    public void updateContent(Long commentId, String content) {
+        if (commentMapper.updateCommentContent(commentId, content) == 0) {
+            throw new IllegalArgumentException("comment not found");
+        }
+    }
+
+    public void delete(Long commentId) {
+        if (commentMapper.softDeleteComment(commentId) == 0) {
+            throw new IllegalArgumentException("comment not found");
+        }
     }
 }

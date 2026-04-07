@@ -21,6 +21,7 @@ public class CommentResponseDTO {
     private Boolean isPinned;
     private Integer likeCount;
     private Boolean isLiked;
+    private Boolean isOwner;
     private List<CommentResponseDTO> replies;
     private LocalDateTime createdDatetime;
     private LocalDateTime updatedDatetime;

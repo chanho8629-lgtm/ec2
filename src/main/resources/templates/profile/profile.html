@@ -47,8 +47,14 @@
 
           <!-- 프로필 탭 영역 -->
           <nav class="tabRow">
-            <a href="javascript:void(0)" class="tabBtn is-active" data-channel-tab>예술관</a>
-            <a href="javascript:void(0)" class="tabBtn" data-channel-tab>작품</a>
+            <a href="javascript:void(0)"
+               class="tabBtn"
+               th:classappend="${selectedTab != 'works'} ? ' is-active' : ''"
+               data-channel-tab="galleries">예술관</a>
+            <a href="javascript:void(0)"
+               class="tabBtn"
+               th:classappend="${selectedTab == 'works'} ? ' is-active' : ''"
+               data-channel-tab="works">작품</a>
           </nav>
         </div>
 
@@ -62,207 +68,54 @@
           </div>
 
           <!-- 작품 / 영상 카드 그리드 -->
-          <div class="videoGrid">
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-01"><span>REAL ESTATE</span></a>
-              <h2 class="videoTitle">무주택자가 반드시 알아야 할 부동산 시장 흐름 정리</h2>
-              <p class="videoMeta">조회수 17만회 · 3주 전</p>
+          <div class="videoGrid" data-profile-panel="galleries" th:hidden="${selectedTab == 'works'}">
+            <article class="videoCard"
+                     th:if="${!#lists.isEmpty(galleries)}"
+                     th:each="gallery : ${galleries}"
+                     th:classappend="${selectedGalleryId == gallery.id} ? ' is-selected' : ''">
+              <a th:href="@{/gallery/{id}(id=${gallery.id})}"
+                 class="videoThumb"
+                 th:classappend="${gallery.coverImage == null or #strings.isEmpty(gallery.coverImage)} ? ' thumb-01' : ''">
+                <img th:if="${gallery.coverImage != null and !#strings.isEmpty(gallery.coverImage)}"
+                     th:src="${gallery.coverImage}"
+                     th:alt="${gallery.title}">
+                <span th:text="${selectedGalleryId == gallery.id} ? '선택됨' : 'GALLERY'">GALLERY</span>
+              </a>
+              <h2 class="videoTitle" th:text="${gallery.title}">예술관 제목</h2>
+              <p class="videoMeta"
+                 th:text="|작품 ${gallery.workCount == null ? 0 : gallery.workCount}개 · 좋아요 ${gallery.likeCount == null ? 0 : gallery.likeCount}개|">작품 0개 · 좋아요 0개</p>
             </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-02"><span>AI PRODUCT</span></a>
-              <h2 class="videoTitle">개발자가 바로 써먹는 AI 프로덕트 설계 방법</h2>
-              <p class="videoMeta">조회수 8.7만회 · 1개월 전</p>
+            <div class="videoEmpty" th:if="${#lists.isEmpty(galleries)}">
+              아직 등록된 예술관이 없습니다.
+            </div>
+          </div>
+
+          <div class="videoGrid" data-profile-panel="works" th:hidden="${selectedTab != 'works'}">
+            <article class="videoCard"
+                     th:if="${!#lists.isEmpty(works)}"
+                     th:each="work : ${works}">
+              <a th:href="@{/work/detail/{id}(id=${work.id})}"
+                 class="videoThumb"
+                 th:classappend="${work.thumbnailUrl == null or #strings.isEmpty(work.thumbnailUrl)} ? ' thumb-02' : ''">
+                <video th:if="${work.thumbnailUrl != null and !#strings.isEmpty(work.thumbnailUrl) and work.thumbnailFileType != null and #strings.startsWith(work.thumbnailFileType, 'video/')}"
+                       class="videoThumbMedia"
+                       th:src="${work.thumbnailUrl}"
+                       muted
+                       playsinline
+                       preload="metadata"></video>
+                <img th:if="${work.thumbnailUrl != null and !#strings.isEmpty(work.thumbnailUrl) and (work.thumbnailFileType == null or !#strings.startsWith(work.thumbnailFileType, 'video/'))}"
+                     class="videoThumbMedia"
+                     th:src="${work.thumbnailUrl}"
+                     th:alt="${work.title}">
+                <span th:text="${work.category == null ? 'WORK' : work.category}">WORK</span>
+              </a>
+              <h2 class="videoTitle" th:text="${work.title}">작품 제목</h2>
+              <p class="videoMeta"
+                 th:text="|조회수 ${work.viewCount == null ? 0 : work.viewCount}회 · 좋아요 ${work.likeCount == null ? 0 : work.likeCount}개|">조회수 0회 · 좋아요 0개</p>
             </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-03"><span>DATA VIS</span></a>
-              <h2 class="videoTitle">초보도 이해하는 데이터 시각화와 대시보드 구조</h2>
-              <p class="videoMeta">조회수 5.3만회 · 1개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-04"><span>MARKET</span></a>
-              <h2 class="videoTitle">요즘 시장에서 유의해야 할 포인트 5가지</h2>
-              <p class="videoMeta">조회수 11만회 · 2개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-05"><span>REVIEW</span></a>
-              <h2 class="videoTitle">실무자가 말하는 코드 리뷰와 제품 완성도</h2>
-              <p class="videoMeta">조회수 3.6만회 · 2개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-06"><span>CLONE</span></a>
-              <h2 class="videoTitle">유튜브 화면을 기준으로 한 프론트 클론코딩 방식</h2>
-              <p class="videoMeta">조회수 9.8만회 · 2개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-07"><span>APP FLOW</span></a>
-              <h2 class="videoTitle">처음부터 끝까지 제품 한 페이지를 완성하는 흐름</h2>
-              <p class="videoMeta">조회수 4.1만회 · 3개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-08"><span>DESIGN</span></a>
-              <h2 class="videoTitle">서비스 화면이 투박해 보이지 않게 만드는 구조 정리</h2>
-              <p class="videoMeta">조회수 6.5만회 · 3개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-09"><span>CAREER</span></a>
-              <h2 class="videoTitle">주니어 개발자가 실무 문서를 읽는 방법</h2>
-              <p class="videoMeta">조회수 2.1만회 · 4개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-10"><span>START</span></a>
-              <h2 class="videoTitle">지금 시작해도 늦지 않은 웹 서비스 제작 루틴</h2>
-              <p class="videoMeta">조회수 12만회 · 4개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-01"><span>REAL ESTATE</span></a>
-              <h2 class="videoTitle">무주택자가 반드시 알아야 할 부동산 시장 흐름 정리</h2>
-              <p class="videoMeta">조회수 17만회 · 3주 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-02"><span>AI PRODUCT</span></a>
-              <h2 class="videoTitle">개발자가 바로 써먹는 AI 프로덕트 설계 방법</h2>
-              <p class="videoMeta">조회수 8.7만회 · 1개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-03"><span>DATA VIS</span></a>
-              <h2 class="videoTitle">초보도 이해하는 데이터 시각화와 대시보드 구조</h2>
-              <p class="videoMeta">조회수 5.3만회 · 1개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-04"><span>MARKET</span></a>
-              <h2 class="videoTitle">요즘 시장에서 유의해야 할 포인트 5가지</h2>
-              <p class="videoMeta">조회수 11만회 · 2개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-05"><span>REVIEW</span></a>
-              <h2 class="videoTitle">실무자가 말하는 코드 리뷰와 제품 완성도</h2>
-              <p class="videoMeta">조회수 3.6만회 · 2개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-06"><span>CLONE</span></a>
-              <h2 class="videoTitle">유튜브 화면을 기준으로 한 프론트 클론코딩 방식</h2>
-              <p class="videoMeta">조회수 9.8만회 · 2개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-07"><span>APP FLOW</span></a>
-              <h2 class="videoTitle">처음부터 끝까지 제품 한 페이지를 완성하는 흐름</h2>
-              <p class="videoMeta">조회수 4.1만회 · 3개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-08"><span>DESIGN</span></a>
-              <h2 class="videoTitle">서비스 화면이 투박해 보이지 않게 만드는 구조 정리</h2>
-              <p class="videoMeta">조회수 6.5만회 · 3개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-09"><span>CAREER</span></a>
-              <h2 class="videoTitle">주니어 개발자가 실무 문서를 읽는 방법</h2>
-              <p class="videoMeta">조회수 2.1만회 · 4개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-10"><span>START</span></a>
-              <h2 class="videoTitle">지금 시작해도 늦지 않은 웹 서비스 제작 루틴</h2>
-              <p class="videoMeta">조회수 12만회 · 4개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-01"><span>REAL ESTATE</span></a>
-              <h2 class="videoTitle">무주택자가 반드시 알아야 할 부동산 시장 흐름 정리</h2>
-              <p class="videoMeta">조회수 17만회 · 3주 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-02"><span>AI PRODUCT</span></a>
-              <h2 class="videoTitle">개발자가 바로 써먹는 AI 프로덕트 설계 방법</h2>
-              <p class="videoMeta">조회수 8.7만회 · 1개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-03"><span>DATA VIS</span></a>
-              <h2 class="videoTitle">초보도 이해하는 데이터 시각화와 대시보드 구조</h2>
-              <p class="videoMeta">조회수 5.3만회 · 1개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-04"><span>MARKET</span></a>
-              <h2 class="videoTitle">요즘 시장에서 유의해야 할 포인트 5가지</h2>
-              <p class="videoMeta">조회수 11만회 · 2개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-05"><span>REVIEW</span></a>
-              <h2 class="videoTitle">실무자가 말하는 코드 리뷰와 제품 완성도</h2>
-              <p class="videoMeta">조회수 3.6만회 · 2개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-06"><span>CLONE</span></a>
-              <h2 class="videoTitle">유튜브 화면을 기준으로 한 프론트 클론코딩 방식</h2>
-              <p class="videoMeta">조회수 9.8만회 · 2개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-07"><span>APP FLOW</span></a>
-              <h2 class="videoTitle">처음부터 끝까지 제품 한 페이지를 완성하는 흐름</h2>
-              <p class="videoMeta">조회수 4.1만회 · 3개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-08"><span>DESIGN</span></a>
-              <h2 class="videoTitle">서비스 화면이 투박해 보이지 않게 만드는 구조 정리</h2>
-              <p class="videoMeta">조회수 6.5만회 · 3개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-09"><span>CAREER</span></a>
-              <h2 class="videoTitle">주니어 개발자가 실무 문서를 읽는 방법</h2>
-              <p class="videoMeta">조회수 2.1만회 · 4개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-10"><span>START</span></a>
-              <h2 class="videoTitle">지금 시작해도 늦지 않은 웹 서비스 제작 루틴</h2>
-              <p class="videoMeta">조회수 12만회 · 4개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-01"><span>REAL ESTATE</span></a>
-              <h2 class="videoTitle">무주택자가 반드시 알아야 할 부동산 시장 흐름 정리</h2>
-              <p class="videoMeta">조회수 17만회 · 3주 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-02"><span>AI PRODUCT</span></a>
-              <h2 class="videoTitle">개발자가 바로 써먹는 AI 프로덕트 설계 방법</h2>
-              <p class="videoMeta">조회수 8.7만회 · 1개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-03"><span>DATA VIS</span></a>
-              <h2 class="videoTitle">초보도 이해하는 데이터 시각화와 대시보드 구조</h2>
-              <p class="videoMeta">조회수 5.3만회 · 1개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-04"><span>MARKET</span></a>
-              <h2 class="videoTitle">요즘 시장에서 유의해야 할 포인트 5가지</h2>
-              <p class="videoMeta">조회수 11만회 · 2개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-05"><span>REVIEW</span></a>
-              <h2 class="videoTitle">실무자가 말하는 코드 리뷰와 제품 완성도</h2>
-              <p class="videoMeta">조회수 3.6만회 · 2개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-06"><span>CLONE</span></a>
-              <h2 class="videoTitle">유튜브 화면을 기준으로 한 프론트 클론코딩 방식</h2>
-              <p class="videoMeta">조회수 9.8만회 · 2개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-07"><span>APP FLOW</span></a>
-              <h2 class="videoTitle">처음부터 끝까지 제품 한 페이지를 완성하는 흐름</h2>
-              <p class="videoMeta">조회수 4.1만회 · 3개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-08"><span>DESIGN</span></a>
-              <h2 class="videoTitle">서비스 화면이 투박해 보이지 않게 만드는 구조 정리</h2>
-              <p class="videoMeta">조회수 6.5만회 · 3개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-09"><span>CAREER</span></a>
-              <h2 class="videoTitle">주니어 개발자가 실무 문서를 읽는 방법</h2>
-              <p class="videoMeta">조회수 2.1만회 · 4개월 전</p>
-            </article>
-            <article class="videoCard">
-              <a href="javascript:void(0)" class="videoThumb thumb-10"><span>START</span></a>
-              <h2 class="videoTitle">지금 시작해도 늦지 않은 웹 서비스 제작 루틴</h2>
-              <p class="videoMeta">조회수 12만회 · 4개월 전</p>
-            </article>
+            <div class="videoEmpty" th:if="${#lists.isEmpty(works)}">
+              아직 등록된 작품이 없습니다.
+            </div>
           </div>
         </div>
       </div>
