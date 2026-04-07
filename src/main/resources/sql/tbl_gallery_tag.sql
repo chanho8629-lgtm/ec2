@@ -19,3 +19,5 @@ comment on table  tbl_gallery_tag                is '예술관 태그';
 comment on column tbl_gallery_tag.id             is 'PK';
 
 create index idx_gt_tag on tbl_gallery_tag (tag_id);
+
+select * from tbl_gallery_tag;

@@ -25,6 +25,12 @@ create table tbl_gallery (
 );
 
 select  * from tbl_gallery;
+DROP DATABASE IF EXISTS tbl_gallery;
+
+
+
+
+
 
 -- alter table tbl_gallery alter column  cover_image type text;
 
