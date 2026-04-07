@@ -1,20 +1,20 @@
 document.addEventListener("DOMContentLoaded", function () {
-  var modal = document.querySelector("[data-yt-shell-voice-modal]");
-  var scrim = document.querySelector("[data-yt-shell-voice-scrim]");
-  var closeButton = document.querySelector("[data-yt-shell-voice-close]");
-  var prompt = document.querySelector("[data-yt-shell-voice-prompt]");
+  var modal = document.querySelector("[data-bd-shell-voice-modal]");
+  var scrim = document.querySelector("[data-bd-shell-voice-scrim]");
+  var closeButton = document.querySelector("[data-bd-shell-voice-close]");
+  var prompt = document.querySelector("[data-bd-shell-voice-prompt]");
   var transcriptionHigh = document.querySelector(
-    "[data-yt-shell-voice-transcription-high]"
+    "[data-bd-shell-voice-transcription-high]"
   );
   var transcriptionLow = document.querySelector(
-    "[data-yt-shell-voice-transcription-low]"
+    "[data-bd-shell-voice-transcription-low]"
   );
-  var body = document.querySelector("[data-yt-shell-voice-body]");
-  var micButton = document.querySelector("[data-yt-shell-voice-mic]");
-  var micLabel = document.querySelector("[data-yt-shell-voice-label]");
-  var levelSurface = document.querySelector("[data-yt-shell-voice-levels]");
+  var body = document.querySelector("[data-bd-shell-voice-body]");
+  var micButton = document.querySelector("[data-bd-shell-voice-mic]");
+  var micLabel = document.querySelector("[data-bd-shell-voice-label]");
+  var levelSurface = document.querySelector("[data-bd-shell-voice-levels]");
   var toggles = Array.from(
-    document.querySelectorAll("[data-yt-shell-voice-toggle]")
+    document.querySelectorAll("[data-bd-shell-voice-toggle]")
   );
 
   if (
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function buildBody(lines) {
     return lines
       .map(function (line) {
-        return '<div class="yt-voice-search-modal__body-line">' + line + "</div>";
+        return '<div class="bd-voice-modal__body-line">' + line + "</div>";
       })
       .join("");
   }
@@ -286,12 +286,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function openFromTrigger(trigger) {
-    var mode = trigger.getAttribute("data-yt-shell-voice-toggle");
+    var mode = trigger.getAttribute("data-bd-shell-voice-toggle");
     var form = document.querySelector(
-      '[data-yt-shell-search-form="' + mode + '"]'
+      '[data-bd-search-form="' + mode + '"]'
     );
     var input = form
-      ? form.querySelector('[data-yt-shell-search-input="' + mode + '"]')
+      ? form.querySelector('[data-bd-search-input="' + mode + '"]')
       : null;
 
     if (!form || !input) {
@@ -304,7 +304,7 @@ document.addEventListener("DOMContentLoaded", function () {
       input: input
     };
 
-    document.dispatchEvent(new CustomEvent("yt-shell:close-search-portal"));
+    document.dispatchEvent(new CustomEvent("bd-shell:close-search-portal"));
     modal.hidden = false;
     setState("permission");
     startRecognition();

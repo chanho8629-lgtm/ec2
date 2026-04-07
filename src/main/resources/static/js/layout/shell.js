@@ -1,25 +1,25 @@
 document.addEventListener("DOMContentLoaded", function () {
-  var root = document.querySelector("[data-yt-shell-root]");
+  var root = document.querySelector("[data-bd-shell-root]");
   if (!root) {
     return;
   }
 
   var desktopQuery = window.matchMedia("(min-width: 901px)");
-  var menuToggle = root.querySelector("[data-yt-shell-menu-toggle]");
+  var menuToggle = root.querySelector("[data-bd-shell-menu-toggle]");
   var searchToggles = Array.from(
-    root.querySelectorAll("[data-yt-shell-search-toggle]")
+    root.querySelectorAll("[data-bd-search-toggle]")
   );
-  var overlay = root.querySelector("[data-yt-shell-overlay]");
-  var drawer = root.querySelector("[data-yt-shell-drawer]");
-  var mobileSearch = root.querySelector("[data-yt-shell-mobile-search]");
+  var overlay = root.querySelector("[data-bd-shell-overlay]");
+  var drawer = root.querySelector("[data-bd-shell-drawer]");
+  var mobileSearch = root.querySelector("[data-bd-shell-mobile-search]");
 
-  // Popup elements (popups are outside [data-yt-shell-root], so query from document)
-  var createToggle = root.querySelector("[data-yt-shell-create-toggle]");
-  var accountToggle = root.querySelector("[data-yt-shell-account-toggle]");
-  var notificationToggle = root.querySelector("[data-yt-shell-notification-toggle]");
-  var createPopup = document.querySelector("[data-yt-shell-create-popup]");
-  var accountPopup = document.querySelector("[data-yt-shell-account-popup]");
-  var notificationPopup = document.querySelector("[data-yt-shell-notification-popup]");
+  // Popup elements (popups are outside [data-bd-shell-root], so query from document)
+  var createToggle = root.querySelector("[data-bd-shell-create-toggle]");
+  var accountToggle = root.querySelector("[data-bd-shell-account-toggle]");
+  var notificationToggle = root.querySelector("[data-bd-shell-notification-toggle]");
+  var createPopup = document.querySelector("[data-bd-shell-create-popup]");
+  var accountPopup = document.querySelector("[data-bd-shell-account-popup]");
+  var notificationPopup = document.querySelector("[data-bd-shell-notification-popup]");
 
   function syncBodyState() {
     document.body.dataset.guideCollapsed = root.dataset.guideCollapsed || "false";
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function lockBody(locked) {
-    document.body.classList.toggle("yt-shell-lock", locked);
+    document.body.classList.toggle("bd-shell-lock", locked);
   }
 
   function closeDrawer() {
