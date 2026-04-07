@@ -150,7 +150,7 @@ create index idx_faq_category on tbl_faq (category, is_active, sort_order);
 drop table if exists tbl_oauth cascade;
 drop type if exists oauth_provider cascade;
 
-create type oauth_provider as enum('kakao', 'naver');
+create type oauth_provider as enum('kakao', 'naver', 'google');
 
 create table tbl_oauth
 (
@@ -160,7 +160,7 @@ create table tbl_oauth
     provider_id         varchar(255) not null,
     connected_at        timestamp not null default now(),
     created_datetime    timestamp not null default now(),
-    updated_datetime    timestamp not null default now(),
+    updated_datetime    timestamp not null default   now(),
     deleted_datetime    timestamp null,
 
     constraint uk_oauth_provider unique (provider, provider_id),
