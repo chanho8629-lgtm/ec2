@@ -6,13 +6,19 @@
     <title th:text="${isEditMode} ? '예술관 수정' : '예술관 작성'">예술관 작성</title>
     <link rel="stylesheet" href="/css/work/gallery.css" th:href="@{/css/work/gallery.css}">
 </head>
-<body>
+<body class="gallery-register-page">
 <div class="modal"
      id="galleryModal"
      role="dialog"
      aria-modal="true"
      aria-labelledby="galleryTitle"
-     th:attr="data-mode=${isEditMode} ? 'edit' : 'create',data-gallery-id=${gallery != null ? gallery.id : ''},data-cover-url=${gallery != null ? gallery.coverImage : ''}">
+     th:attr="data-mode=${isEditMode} ? 'edit' : 'create',
+              data-gallery-id=${gallery != null ? gallery.id : ''},
+              data-cover-url=${gallery != null ? gallery.coverImage : ''},
+              data-initial-title=${gallery != null ? gallery.title : ''},
+              data-initial-description=${gallery != null ? gallery.description : ''},
+              data-initial-work-ids=${gallery != null and gallery.works != null ? #strings.listJoin(gallery.works.![id], ',') : ''},
+              data-initial-tags=${gallery != null and gallery.tags != null ? #strings.listJoin(gallery.tags.![tagName], ',') : ''}">
     <div class="modal-head">
         <h1 class="modal-title" id="galleryTitle" th:text="${isEditMode} ? '예술관 수정' : '새 예술관 만들기'">새 예술관 만들기</h1>
         <button class="icon-btn" id="closeBtn" type="button" aria-label="닫기">
@@ -194,16 +200,6 @@
 </div>
 
 <script src="/js/work/gallery-register.js" th:src="@{/js/work/gallery-register.js}"></script>
-<script th:inline="javascript">
-    window.initialGalleryData = {
-        id: [[${gallery != null ? gallery.id : null}]],
-        title: [[${gallery != null ? gallery.title : ''}]],
-        description: [[${gallery != null ? gallery.description : ''}]],
-        coverImage: [[${gallery != null ? gallery.coverImage : ''}]],
-        workIds: [[${gallery != null and gallery.works != null ? gallery.works.![id] : T(java.util.Collections).emptyList()}]],
-        tagNames: [[${gallery != null and gallery.tags != null ? gallery.tags.![tagName] : T(java.util.Collections).emptyList()}]]
-    };
-</script>
 </body>
 </html>
 <!--  -->

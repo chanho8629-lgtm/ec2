@@ -34,6 +34,11 @@ a:hover {
     overflow: hidden;
 }
 
+.page-shell[data-compose-embedded="true"] {
+    min-height: auto;
+    overflow: visible;
+}
+
 .page-background {
     position: absolute;
     inset: 0;
@@ -92,6 +97,21 @@ a:hover {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.page-shell[data-compose-embedded="true"] .page-background,
+.page-shell[data-compose-embedded="true"] .top-search-bar {
+    display: none;
+}
+
+.page-shell[data-compose-embedded="true"] .upload-dialog {
+    min-height: auto;
+    padding: 0;
+    background: transparent;
+}
+
+.page-shell[data-compose-embedded="true"] .dialog-content {
+    max-height: calc(100vh - 32px);
 }
 
 .dialog-content {

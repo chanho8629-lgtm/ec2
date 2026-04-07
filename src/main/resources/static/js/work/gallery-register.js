@@ -1,5 +1,12 @@
 function initializeGalleryRegister() {
     var modal = document.getElementById("galleryModal");
+
+    if (!modal || modal.dataset.initialized === "true") {
+        return;
+    }
+
+    modal.dataset.initialized = "true";
+
     var closeBtn = document.getElementById("closeBtn");
     var titleBox = document.getElementById("titleBox");
     var descBox = document.getElementById("descBox");
@@ -8,7 +15,7 @@ function initializeGalleryRegister() {
     var titleError = document.getElementById("titleError");
     var thumbInput = document.getElementById("thumbInput");
     var thumbBtn = document.getElementById("thumbBtn");
-    var thumbShell = document.querySelector(".thumb-btn");
+    var thumbShell = modal.querySelector(".thumb-btn");
     var thumbPreviewImage = document.getElementById("thumbPreviewImage");
     var thumbError = document.getElementById("thumbError");
     var tagList = document.getElementById("tagList");
@@ -26,7 +33,20 @@ function initializeGalleryRegister() {
     var selectedArtworkLinks = document.getElementById("selectedArtworkLinks");
     var artworkSearchInput = document.getElementById("artworkSearchInput");
     var createBtn = document.getElementById("createBtn");
-    var initialGalleryData = window.initialGalleryData || {};
+    var initialGalleryData = {
+        id: modal.getAttribute("data-gallery-id") || null,
+        title: modal.getAttribute("data-initial-title") || "",
+        description: modal.getAttribute("data-initial-description") || "",
+        coverImage: modal.getAttribute("data-cover-url") || "",
+        workIds: (modal.getAttribute("data-initial-work-ids") || "")
+            .split(",")
+            .map(function (value) { return Number(value.trim()); })
+            .filter(function (value) { return !Number.isNaN(value) && value > 0; }),
+        tagNames: (modal.getAttribute("data-initial-tags") || "")
+            .split(",")
+            .map(function (value) { return value.trim(); })
+            .filter(function (value) { return !!value; })
+    };
     var isEditMode = modal.getAttribute("data-mode") === "edit";
     var galleryId = modal.getAttribute("data-gallery-id");
     var isSubmitting = false;
@@ -35,16 +55,19 @@ function initializeGalleryRegister() {
     var tags = Array.isArray(initialGalleryData.tagNames) ? initialGalleryData.tagNames.slice() : [];
     var committedArtworkLinks = [];
 
-    if (!modal || !titleBox || !descBox || !createBtn) {
+    if (!titleBox || !descBox || !createBtn || !thumbInput) {
+        modal.dataset.initialized = "false";
         return;
     }
 
-    function closeModal() {
-        if (isEditMode) {
-            navigateAfterSubmit("/profile");
-            return;
-        }
+    modal.hidden = false;
+    modal.style.display = "flex";
+    modal.style.position = "fixed";
+    modal.style.left = "50%";
+    modal.style.top = "50%";
+    modal.style.transform = "translate(-50%, -50%)";
 
+    function closeModal() {
         if (typeof window.closeComposeModal === "function") {
             window.closeComposeModal();
             return;
@@ -55,7 +78,18 @@ function initializeGalleryRegister() {
             return;
         }
 
-        modal.style.display = "none";
+        navigateAfterSubmit("/profile");
+    }
+
+    function openThumbPicker(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        if (thumbInput) {
+            thumbInput.click();
+        }
     }
 
     function navigateAfterSubmit(url) {
@@ -444,9 +478,13 @@ function initializeGalleryRegister() {
         setCount(descBox, descCount, 500);
     });
 
-    thumbBtn.addEventListener("click", function () {
-        thumbInput.click();
-    });
+    if (thumbBtn) {
+        thumbBtn.addEventListener("click", openThumbPicker);
+    }
+
+    if (thumbShell) {
+        thumbShell.addEventListener("click", openThumbPicker);
+    }
 
     if (galleryLinkUrl) {
         galleryLinkUrl.addEventListener("click", function (event) {
@@ -600,3 +638,5 @@ if (document.readyState === "loading") {
 } else {
     initializeGalleryRegister();
 }
+
+window.initializeGalleryRegister = initializeGalleryRegister;

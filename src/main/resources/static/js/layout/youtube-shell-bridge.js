@@ -63,6 +63,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     composeModal.hidden = true;
     document.body.classList.remove("yt-compose-open");
+    if (composeContent) {
+      composeContent.removeAttribute("data-compose-view");
+    }
 
     if (composeContent) {
       composeContent.innerHTML = "";
@@ -93,22 +96,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function loadComposeScripts(parsedDocument) {
     var scriptNodes = Array.from(parsedDocument.querySelectorAll("script[src]"));
-
-    scriptNodes.forEach(function (scriptNode) {
+    var loaders = scriptNodes.map(function (scriptNode) {
       var src = scriptNode.getAttribute("src");
       var newScript;
 
       if (!src) {
-        return;
+        return Promise.resolve();
       }
 
-      newScript = document.createElement("script");
-      newScript.src = src;
-      newScript.async = false;
-      newScript.setAttribute("data-compose-script", src);
-      document.body.appendChild(newScript);
-      composeState.scripts.push(newScript);
+      return new Promise(function (resolve, reject) {
+        newScript = document.createElement("script");
+        newScript.src = src;
+        newScript.async = false;
+        newScript.setAttribute("data-compose-script", src);
+        newScript.onload = resolve;
+        newScript.onerror = function () {
+          reject(new Error("작성 스크립트를 불러오지 못했습니다."));
+        };
+        document.body.appendChild(newScript);
+        composeState.scripts.push(newScript);
+      });
     });
+
+    return Promise.all(loaders);
   }
 
   function extractComposeNodes(parsedDocument) {
@@ -172,17 +182,37 @@ document.addEventListener("DOMContentLoaded", function () {
           composeContent.appendChild(document.importNode(node, true));
         });
 
-        loadComposeScripts(parsedDocument);
+        if (composeContent) {
+          if (url.indexOf("/gallery-register") > -1) {
+            composeContent.setAttribute("data-compose-view", "gallery-register");
+          } else if (url.indexOf("/work/work-register") > -1) {
+            composeContent.setAttribute("data-compose-view", "work-register");
+          } else {
+            composeContent.removeAttribute("data-compose-view");
+          }
+        }
 
-        composeState.url = url;
+        Array.from(composeContent.children).forEach(function (childNode) {
+          childNode.setAttribute("data-compose-embedded", "true");
+        });
+
+        return loadComposeScripts(parsedDocument).then(function () {
+          if (url.indexOf("/gallery-register") > -1 && typeof window.initializeGalleryRegister === "function") {
+            window.initializeGalleryRegister();
+          }
+
+          composeState.url = url;
+        });
       })
       .catch(function (error) {
-        closeComposeModal();
-        window.location.href = url;
+        if (composeContent) {
+          composeContent.innerHTML = '<div class="yt-compose-modal__error">' + (error.message || "작성 화면을 불러오지 못했습니다.") + "</div>";
+        }
       });
   }
 
   window.closeComposeModal = closeComposeModal;
+  window.openComposeModal = openComposeModal;
 
   function closeDrawer() {
     root.dataset.mobileDrawerOpen = "false";
