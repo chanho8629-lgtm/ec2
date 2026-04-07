@@ -464,7 +464,7 @@ public class WorkService {
         return null;
     }
 
-    // 업로드한 파일을 S3(실패 시 로컬 uploads) 경로로 저장한다.
+    // 업로드한 파일을 S3 경로로 저장한다.
     private void saveMediaFile(Long workId, MultipartFile mediaFile, int sortOrder) {
         if (mediaFile == null || mediaFile.isEmpty()) {
             return;

@@ -21,13 +21,25 @@ public class ApiExceptionHandler {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<String> handleIllegalState(IllegalStateException exception) {
         String message = resolveMessage(exception, "request failed");
-        HttpStatus status = switch (message) {
-            case "login required" -> HttpStatus.UNAUTHORIZED;
-            case "forbidden" -> HttpStatus.FORBIDDEN;
-            case "comment not allowed" -> HttpStatus.CONFLICT;
-            default -> HttpStatus.CONFLICT;
-        };
+        HttpStatus status;
+        if ("login required".equals(message)) {
+            status = HttpStatus.UNAUTHORIZED;
+        } else if ("forbidden".equals(message)) {
+            status = HttpStatus.FORBIDDEN;
+        } else if ("comment not allowed".equals(message)) {
+            status = HttpStatus.CONFLICT;
+        } else if (message.startsWith("S3 file upload failed")) {
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        } else {
+            status = HttpStatus.CONFLICT;
+        }
         return ResponseEntity.status(status).body(message);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntime(RuntimeException exception) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(resolveMessage(exception, "internal server error"));
     }
 
     private String resolveMessage(RuntimeException exception, String fallback) {

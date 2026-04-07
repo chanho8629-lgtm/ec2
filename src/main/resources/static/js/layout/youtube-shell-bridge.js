@@ -24,7 +24,8 @@ document.addEventListener("DOMContentLoaded", function () {
     url: "",
     styles: [],
     scripts: [],
-    cache: {}
+    cache: {},
+    rootStyles: null
   };
 
   function syncBodyState() {
@@ -56,6 +57,42 @@ document.addEventListener("DOMContentLoaded", function () {
     composeState.url = "";
   }
 
+  function lockRootTypography() {
+    var html = document.documentElement;
+    var body = document.body;
+    var htmlStyle = window.getComputedStyle(html);
+    var bodyStyle = window.getComputedStyle(body);
+
+    if (!composeState.rootStyles) {
+      composeState.rootStyles = {
+        htmlFontSize: html.style.fontSize || "",
+        htmlFontFamily: html.style.fontFamily || "",
+        bodyFontSize: body.style.fontSize || "",
+        bodyFontFamily: body.style.fontFamily || ""
+      };
+    }
+
+    html.style.fontSize = htmlStyle.fontSize;
+    html.style.fontFamily = htmlStyle.fontFamily;
+    body.style.fontSize = bodyStyle.fontSize;
+    body.style.fontFamily = bodyStyle.fontFamily;
+  }
+
+  function restoreRootTypography() {
+    var html = document.documentElement;
+    var body = document.body;
+
+    if (!composeState.rootStyles) {
+      return;
+    }
+
+    html.style.fontSize = composeState.rootStyles.htmlFontSize;
+    html.style.fontFamily = composeState.rootStyles.htmlFontFamily;
+    body.style.fontSize = composeState.rootStyles.bodyFontSize;
+    body.style.fontFamily = composeState.rootStyles.bodyFontFamily;
+    composeState.rootStyles = null;
+  }
+
   function closeComposeModal() {
     if (!composeModal) {
       return;
@@ -72,6 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     removeComposeAssets();
+    restoreRootTypography();
   }
 
   function loadComposeStyles(parsedDocument) {
@@ -176,6 +214,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         removeComposeAssets();
+        lockRootTypography();
         loadComposeStyles(parsedDocument);
 
         nodes.forEach(function (node) {

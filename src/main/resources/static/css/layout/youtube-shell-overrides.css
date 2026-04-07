@@ -92,7 +92,12 @@
 }
 
 .yt-compose-modal__backdrop {
-  display: none;
+  position: fixed;
+  inset: 0;
+  display: block;
+  border: 0;
+  background: rgba(15, 15, 15, 0.56);
+  pointer-events: auto;
 }
 
 .yt-compose-modal__content {
@@ -107,6 +112,28 @@
 
 .yt-compose-modal__content > * {
   pointer-events: auto;
+}
+
+.yt-compose-modal__content[data-compose-view] {
+  font-size: 16px;
+  color: #0f0f0f;
+}
+
+.yt-compose-modal__content[data-compose-view] > .modal[data-compose-embedded="true"] {
+  margin: 0 auto;
+}
+
+.yt-compose-modal__content[data-compose-view] > .page-shell[data-compose-embedded="true"] {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.yt-compose-modal__content[data-compose-view] > .page-shell[data-compose-embedded="true"] .upload-dialog {
+  padding: 0;
+  min-height: auto;
+  background: transparent;
 }
 
 body.yt-compose-open {
