@@ -6,62 +6,131 @@
 
     <select id="selectMemberList" resultType="com.app.bideo.dto.admin.AdminMemberListResponseDTO">
         select
-            id,
-            email,
-            nickname,
-            real_name as real_name,
-            role,
-            status,
-            creator_verified as creator_verified,
-            creator_tier as creator_tier,
-            follower_count as follower_count,
-            created_datetime as created_datetime
-        from tbl_member
+            m.id,
+            m.email,
+            m.nickname,
+            m.real_name as real_name,
+            m.role,
+            m.status,
+            m.creator_verified as creator_verified,
+            m.creator_tier as creator_tier,
+            m.follower_count as follower_count,
+            m.created_datetime as created_datetime,
+            case
+                when m.creator_verified = true then '작가'
+                else '컬렉터'
+            end as member_type,
+            (
+                select count(*)
+                from tbl_report r
+                where r.target_type = 'MEMBER'
+                  and r.target_id = m.id
+            ) as report_count,
+            (
+                select count(*)
+                from tbl_order o
+                where o.buyer_id = m.id
+                   or o.seller_id = m.id
+            ) as trade_count
+        from tbl_member m
         <where>
             <if test="keyword != null and keyword != ''">
                 and (
-                    email ilike '%' || #{keyword} || '%'
-                    or nickname ilike '%' || #{keyword} || '%'
-                    or real_name ilike '%' || #{keyword} || '%'
+                    m.email ilike '%' || #{keyword} || '%'
+                    or m.nickname ilike '%' || #{keyword} || '%'
+                    or m.real_name ilike '%' || #{keyword} || '%'
                 )
             </if>
             <if test="role != null and role != ''">
-                and role = #{role}
+                and m.role = #{role}
             </if>
             <if test="status != null and status != ''">
-                and status = #{status}
+                and m.status = #{status}
             </if>
             <if test="creatorVerified != null">
-                and creator_verified = #{creatorVerified}
+                and m.creator_verified = #{creatorVerified}
             </if>
         </where>
-        order by created_datetime desc
-        limit #{size} offset (#{page} - 1) * #{size}
+        order by m.created_datetime desc
+        limit #{size} offset #{offset}
     </select>
 
     <select id="selectMemberDetail" resultType="com.app.bideo.dto.admin.AdminMemberDetailResponseDTO">
         select
-            id,
-            email,
-            nickname,
-            real_name as real_name,
-            birth_date as birth_date,
-            bio,
-            profile_image as profile_image,
-            role,
-            status,
-            creator_verified as creator_verified,
-            seller_verified as seller_verified,
-            creator_tier as creator_tier,
-            follower_count as follower_count,
-            following_count as following_count,
-            gallery_count as gallery_count,
-            phone_number as phone_number,
-            last_login_datetime as last_login_datetime,
-            created_datetime as created_datetime,
-            updated_datetime as updated_datetime
-        from tbl_member
-        where id = #{id}
+            m.id,
+            m.email,
+            m.nickname,
+            m.real_name as real_name,
+            m.birth_date as birth_date,
+            m.bio,
+            m.profile_image as profile_image,
+            m.role,
+            m.status,
+            m.creator_verified as creator_verified,
+            m.seller_verified as seller_verified,
+            m.creator_tier as creator_tier,
+            m.follower_count as follower_count,
+            m.following_count as following_count,
+            m.gallery_count as gallery_count,
+            m.phone_number as phone_number,
+            m.last_login_datetime as last_login_datetime,
+            m.created_datetime as created_datetime,
+            m.updated_datetime as updated_datetime,
+            (
+                select o.provider
+                from tbl_oauth o
+                where o.member_id = m.id
+                limit 1
+            ) as oauth_provider,
+            (
+                select count(*)
+                from tbl_work w
+                where w.member_id = m.id
+                  and w.deleted_datetime is null
+            ) as work_count,
+            (
+                select count(distinct b.auction_id)
+                from tbl_bid b
+                where b.member_id = m.id
+            ) as auction_participate_count,
+            (
+                select count(*)
+                from tbl_order o2
+                where o2.seller_id = m.id
+                  and o2.status = 'COMPLETED'
+            ) as sold_count,
+            coalesce((
+                select sum(o3.total_price)
+                from tbl_order o3
+                where o3.seller_id = m.id
+                  and o3.status = 'COMPLETED'
+            ), 0) as total_trade_amount,
+            (
+                select count(*)
+                from tbl_withdrawal_request wr
+                where wr.member_id = m.id
+                  and wr.status = 'PENDING'
+            ) as pending_withdrawal_count,
+            (
+                select to_char(max(o4.completed_at), 'YY.MM.DD')
+                from tbl_order o4
+                where o4.buyer_id = m.id
+                   or o4.seller_id = m.id
+            ) as last_transaction_date,
+            (
+                select count(*)
+                from tbl_payment p
+                where p.buyer_id = m.id
+                  and p.status = 'REFUNDED'
+            ) as refund_count,
+            (
+                select count(*)
+                from tbl_member_restriction mr
+                where mr.member_id = m.id
+            ) as restriction_history_count
+
+        from tbl_member m
+        where m.id = #{id}
     </select>
 
     <update id="updateMemberStatus">
@@ -73,23 +142,23 @@
 
     <select id="countMembers" resultType="int">
         select count(*)
-        from tbl_member
+        from tbl_member m
         <where>
             <if test="keyword != null and keyword != ''">
                 and (
-                    email ilike '%' || #{keyword} || '%'
-                    or nickname ilike '%' || #{keyword} || '%'
-                    or real_name ilike '%' || #{keyword} || '%'
+                    m.email ilike '%' || #{keyword} || '%'
+                    or m.nickname ilike '%' || #{keyword} || '%'
+                    or m.real_name ilike '%' || #{keyword} || '%'
                 )
             </if>
             <if test="role != null and role != ''">
-                and role = #{role}
+                and m.role = #{role}
             </if>
             <if test="status != null and status != ''">
-                and status = #{status}
+                and m.status = #{status}
             </if>
             <if test="creatorVerified != null">
-                and creator_verified = #{creatorVerified}
+                and m.creator_verified = #{creatorVerified}
             </if>
         </where>
     </select>

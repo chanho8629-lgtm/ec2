@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.bideo.mapper.admin.AdminWorkMapper">
+
+    <select id="selectWorkList" resultType="com.app.bideo.dto.admin.AdminWorkListResponseDTO">
+        select
+            w.id,
+            w.title,
+            m.nickname as artist_name,
+            w.category,
+            case
+                when exists (
+                    select 1 from tbl_auction a where a.work_id = w.id
+                ) then '경매'
+                else '거래'
+            end as sale_type,
+            w.status,
+            to_char(w.created_datetime, 'YY.MM.DD') as created_datetime,
+            w.view_count,
+            (
+                select count(*)
+                from tbl_report r
+                where r.target_type = 'WORK'
+                  and r.target_id = w.id
+            ) as report_count
+        from tbl_work w
+        join tbl_member m on w.member_id = m.id
+        <where>
+            w.deleted_datetime is null
+            <if test="keyword != null and keyword != ''">
+                and (
+                    w.title ilike '%' || #{keyword} || '%'
+                    or m.nickname ilike '%' || #{keyword} || '%'
+                )
+            </if>
+            <if test="status != null and status != ''">
+                and w.status = #{status}
+            </if>
+        </where>
+        order by w.id desc
+        limit #{size} offset #{offset}
+    </select>
+
+    <select id="selectWorkDetail" resultType="com.app.bideo.dto.admin.AdminWorkDetailResponseDTO">
+        select
+            w.id,
+            w.title,
+            m.nickname as artist_name,
+            m.id as artist_id,
+            w.category,
+            case
+                when exists (
+                    select 1 from tbl_auction a where a.work_id = w.id
+                ) then '경매'
+                else '거래'
+            end as sale_type,
+            w.status,
+            to_char(w.created_datetime, 'YY.MM.DD') as created_datetime,
+            w.view_count,
+            w.save_count,
+            wf.file_url as thumbnail_url,
+            vf.file_url as video_url,
+            coalesce(vf.file_type, wf.file_type) as file_type,
+            coalesce(vf.width, wf.width) as file_width,
+            coalesce(vf.height, wf.height) as file_height,
+            coalesce(vf.file_size, wf.file_size) as file_size,
+            a.status as auction_status,
+            a.current_price as current_high_bid,
+            a.bid_count as bid_count,
+            (
+                select count(*)
+                from tbl_report r
+                where r.target_type = 'WORK'
+                  and r.target_id = w.id
+            ) as report_count,
+            (
+                select to_char(max(r2.created_datetime), 'YY.MM.DD')
+                from tbl_report r2
+                where r2.target_type = 'WORK'
+                  and r2.target_id = w.id
+            ) as last_report_date
+        from tbl_work w
+        join tbl_member m on w.member_id = m.id
+        left join tbl_work_file wf on wf.work_id = w.id and wf.file_type = 'THUMBNAIL'
+        left join tbl_work_file vf on vf.work_id = w.id and vf.file_type = 'VIDEO'
+        left join lateral (
+            select *
+            from tbl_auction a2
+            where a2.work_id = w.id
+            order by a2.id desc
+            limit 1
+        ) a on true
+        where w.id = #{id}
+    </select>
+
+    <update id="updateWorkStatus">
+        update tbl_work
+        set status = #{status},
+            updated_datetime = now()
+        where id = #{id}
+    </update>
+
+    <select id="countWorks" resultType="int">
+        select count(*)
+        from tbl_work w
+        join tbl_member m on w.member_id = m.id
+        <where>
+            w.deleted_datetime is null
+            <if test="keyword != null and keyword != ''">
+                and (
+                    w.title ilike '%' || #{keyword} || '%'
+                    or m.nickname ilike '%' || #{keyword} || '%'
+                )
+            </if>
+            <if test="status != null and status != ''">
+                and w.status = #{status}
+            </if>
+        </where>
+    </select>
+
+</mapper>

@@ -15,10 +15,31 @@
             r.detail,
             r.status,
             r.resolved_at as resolved_at,
-            r.created_datetime as created_datetime
+            r.created_datetime as created_datetime,
+            case
+                when r.target_type = 'WORK' then (
+                    select w.title from tbl_work w where w.id = r.target_id
+                )
+                when r.target_type = 'MEMBER' then (
+                    select m2.nickname from tbl_member m2 where m2.id = r.target_id
+                )
+                else 'unknown'
+            end as target_name,
+            (
+                select count(*)
+                from tbl_report r2
+                where r2.target_type = r.target_type
+                  and r2.target_id = r.target_id
+            ) as target_report_count
         from tbl_report r
         join tbl_member m on r.reporter_id = m.id
         <where>
+            <if test="keyword != null and keyword != ''">
+                and (
+                    m.nickname ilike '%' || #{keyword} || '%'
+                    or r.detail ilike '%' || #{keyword} || '%'
+                )
+            </if>
             <if test="targetType != null and targetType != ''">
                 and r.target_type = #{targetType}
             </if>
@@ -44,7 +65,43 @@
             r.detail,
             r.status,
             r.resolved_at as resolved_at,
-            r.created_datetime as created_datetime
+            r.created_datetime as created_datetime,
+            r.resolved_memo as resolved_memo,
+            case
+                when r.target_type = 'WORK' then (
+                    select w.title from tbl_work w where w.id = r.target_id
+                )
+                when r.target_type = 'MEMBER' then (
+                    select m2.nickname from tbl_member m2 where m2.id = r.target_id
+                )
+                else 'unknown'
+            end as target_name,
+            case
+                when r.target_type = 'WORK' then (
+                    select w2.status from tbl_work w2 where w2.id = r.target_id
+                )
+                when r.target_type = 'MEMBER' then (
+                    select m3.status from tbl_member m3 where m3.id = r.target_id
+                )
+                else null
+            end as target_status,
+            case
+                when r.target_type = 'WORK' then (
+                    select tm.nickname from tbl_work w3 join tbl_member tm on w3.member_id = tm.id where w3.id = r.target_id
+                )
+                else null
+            end as target_author_name,
+            case
+                when r.target_type = 'WORK' then (
+                    select tm2.status from tbl_work w4 join tbl_member tm2 on w4.member_id = tm2.id where w4.id = r.target_id
+                )
+                else null
+            end as target_author_status,
+            (
+                select count(*)
+                from tbl_report r3
+                where r3.reporter_id = r.reporter_id
+            ) as reporter_history_count
         from tbl_report r
         join tbl_member m on r.reporter_id = m.id
         where r.id = #{id}
@@ -53,6 +110,7 @@
     <update id="updateReportStatus">
         update tbl_report
         set status = #{status},
+            resolved_memo = #{memo},
             resolved_at = case when #{status} = 'RESOLVED' then now() else resolved_at end,
             updated_datetime = now()
         where id = #{id}
@@ -61,7 +119,14 @@
     <select id="countReports" resultType="int">
         select count(*)
         from tbl_report r
+        join tbl_member m on r.reporter_id = m.id
         <where>
+            <if test="keyword != null and keyword != ''">
+                and (
+                    m.nickname ilike '%' || #{keyword} || '%'
+                    or r.detail ilike '%' || #{keyword} || '%'
+                )
+            </if>
             <if test="targetType != null and targetType != ''">
                 and r.target_type = #{targetType}
             </if>

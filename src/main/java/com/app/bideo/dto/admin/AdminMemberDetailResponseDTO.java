@@ -34,4 +34,13 @@ public class AdminMemberDetailResponseDTO {
     private LocalDateTime lastLoginDatetime;
     private LocalDateTime createdDatetime;
     private LocalDateTime updatedDatetime;
+    private String oauthProvider;
+    private Integer workCount;
+    private Integer auctionParticipateCount;
+    private Integer soldCount;
+    private Integer totalTradeAmount;
+    private Integer pendingWithdrawalCount;
+    private String lastTransactionDate;
+    private Integer refundCount;
+    private Integer restrictionHistoryCount;
 }

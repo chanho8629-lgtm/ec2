@@ -8,7 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/admin/admin-override.css">
+    <link rel="stylesheet" href="/static/css/admin/admin-override.css">
+    <script src="/static/js/admin/service.js"></script>
+    <script src="/static/js/admin/layout.js"></script>
+    <script src="/static/js/admin/event.js"></script>
 </head>
 <body id="html-body">
 
@@ -236,10 +239,7 @@
                                     <div class="page-nav">
                                         <button class="page-nav-btn" disabled title="첫 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.293 4.293 10.586 12l7.707 7.707a1 1 0 101.414-1.414L13.414 12l6.293-6.293a1 1 0 10-1.414-1.414ZM6 4a1 1 0 00-1 1v14a1 1 0 102 0V5a1 1 0 00-1-1Z"/></svg></button>
                                         <button class="page-nav-btn" disabled title="이전 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.793 5.293 7.086 12l6.707 6.707a1 1 0 101.414-1.414L9.914 12l5.293-5.293a1 1 0 10-1.414-1.414Z"/></svg></button>
-                                        <!-- 페이지 번호 버튼 (active = 현재 페이지) -->
-                                        <!--<button class="page-num-btn active">1</button>-->
-                                        <!--<button class="page-num-btn">2</button>-->
-                                        <!--<button class="page-num-btn">3</button>-->
+
                                         <button class="page-nav-btn" disabled title="다음 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.793 5.293a1 1 0 000 1.414L14.086 12l-5.293 5.293a1 1 0 101.414 1.414L16.914 12l-6.707-6.707a1 1 0 00-1.414 0Z"/></svg></button>
                                     </div>
                                 </div>
@@ -351,10 +351,7 @@
                                     <div class="page-nav">
                                         <button class="page-nav-btn" disabled title="첫 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.293 4.293 10.586 12l7.707 7.707a1 1 0 101.414-1.414L13.414 12l6.293-6.293a1 1 0 10-1.414-1.414ZM6 4a1 1 0 00-1 1v14a1 1 0 102 0V5a1 1 0 00-1-1Z"/></svg></button>
                                         <button class="page-nav-btn" disabled title="이전 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.793 5.293 7.086 12l6.707 6.707a1 1 0 101.414-1.414L9.914 12l5.293-5.293a1 1 0 10-1.414-1.414Z"/></svg></button>
-                                        <!-- 페이지 번호 버튼 (active = 현재 페이지) -->
-                                        <!--<button class="page-num-btn active">1</button>-->
-                                        <!--<button class="page-num-btn">2</button>-->
-                                        <!--<button class="page-num-btn">3</button>-->
+
                                         <button class="page-nav-btn" disabled title="다음 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.793 5.293a1 1 0 000 1.414L14.086 12l-5.293 5.293a1 1 0 101.414 1.414L16.914 12l-6.707-6.707a1 1 0 00-1.414 0Z"/></svg></button>
                                     </div>
                                 </div>
@@ -462,10 +459,7 @@
                                     <div class="page-nav">
                                         <button class="page-nav-btn" disabled title="첫 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.293 4.293 10.586 12l7.707 7.707a1 1 0 101.414-1.414L13.414 12l6.293-6.293a1 1 0 10-1.414-1.414ZM6 4a1 1 0 00-1 1v14a1 1 0 102 0V5a1 1 0 00-1-1Z"/></svg></button>
                                         <button class="page-nav-btn" disabled title="이전 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.793 5.293 7.086 12l6.707 6.707a1 1 0 101.414-1.414L9.914 12l5.293-5.293a1 1 0 10-1.414-1.414Z"/></svg></button>
-                                        <!-- 페이지 번호 버튼 (active = 현재 페이지) -->
-                                        <!--<button class="page-num-btn active">1</button>-->
-                                        <!--<button class="page-num-btn">2</button>-->
-                                        <!--<button class="page-num-btn">3</button>-->
+
                                         <button class="page-nav-btn" disabled title="다음 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.793 5.293a1 1 0 000 1.414L14.086 12l-5.293 5.293a1 1 0 101.414 1.414L16.914 12l-6.707-6.707a1 1 0 00-1.414 0Z"/></svg></button>
                                     </div>
                                 </div>
@@ -535,8 +529,13 @@
                                 <div class="filter-bar">
                                     <div class="filter-search">
                                         <svg class="filter-search-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                                        <input type="text" placeholder="작품명, 경매번호로 검색..." data-search="auctions">
+                                        <input type="text" placeholder="작품명, 아티스트로 검색..." data-search="auctions">
                                     </div>
+                                    <div class="tabs-wrapper"><div class="tabs-container"><div class="selection-bar"></div>
+                                        <button class="filter-tab active" data-filter="all">전체</button>
+                                        <button class="filter-tab" data-filter="낙찰">낙찰</button>
+                                        <button class="filter-tab" data-filter="유찰">유찰</button>
+                                    </div></div>
                                 </div>
                                 <div class="data-table-wrapper">
                                     <table class="data-table" id="table-auctions">
@@ -575,10 +574,7 @@
                                     <div class="page-nav">
                                         <button class="page-nav-btn" disabled title="첫 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.293 4.293 10.586 12l7.707 7.707a1 1 0 101.414-1.414L13.414 12l6.293-6.293a1 1 0 10-1.414-1.414ZM6 4a1 1 0 00-1 1v14a1 1 0 102 0V5a1 1 0 00-1-1Z"/></svg></button>
                                         <button class="page-nav-btn" disabled title="이전 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.793 5.293 7.086 12l6.707 6.707a1 1 0 101.414-1.414L9.914 12l5.293-5.293a1 1 0 10-1.414-1.414Z"/></svg></button>
-                                        <!-- 페이지 번호 버튼 (active = 현재 페이지) -->
-                                        <!--<button class="page-num-btn active">1</button>-->
-                                        <!--<button class="page-num-btn">2</button>-->
-                                        <!--<button class="page-num-btn">3</button>-->
+
                                         <button class="page-nav-btn" disabled title="다음 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.793 5.293a1 1 0 000 1.414L14.086 12l-5.293 5.293a1 1 0 101.414 1.414L16.914 12l-6.707-6.707a1 1 0 00-1.414 0Z"/></svg></button>
                                     </div>
                                 </div>
@@ -683,10 +679,7 @@
                                     <div class="page-nav">
                                         <button class="page-nav-btn" disabled title="첫 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.293 4.293 10.586 12l7.707 7.707a1 1 0 101.414-1.414L13.414 12l6.293-6.293a1 1 0 10-1.414-1.414ZM6 4a1 1 0 00-1 1v14a1 1 0 102 0V5a1 1 0 00-1-1Z"/></svg></button>
                                         <button class="page-nav-btn" disabled title="이전 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.793 5.293 7.086 12l6.707 6.707a1 1 0 101.414-1.414L9.914 12l5.293-5.293a1 1 0 10-1.414-1.414Z"/></svg></button>
-                                        <!-- 페이지 번호 버튼 (active = 현재 페이지) -->
-                                        <!--<button class="page-num-btn active">1</button>-->
-                                        <!--<button class="page-num-btn">2</button>-->
-                                        <!--<button class="page-num-btn">3</button>-->
+
                                         <button class="page-nav-btn" disabled title="다음 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.793 5.293a1 1 0 000 1.414L14.086 12l-5.293 5.293a1 1 0 101.414 1.414L16.914 12l-6.707-6.707a1 1 0 00-1.414 0Z"/></svg></button>
                                     </div>
                                 </div>
@@ -797,10 +790,7 @@
                                     <div class="page-nav">
                                         <button class="page-nav-btn" disabled title="첫 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.293 4.293 10.586 12l7.707 7.707a1 1 0 101.414-1.414L13.414 12l6.293-6.293a1 1 0 10-1.414-1.414ZM6 4a1 1 0 00-1 1v14a1 1 0 102 0V5a1 1 0 00-1-1Z"/></svg></button>
                                         <button class="page-nav-btn" disabled title="이전 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.793 5.293 7.086 12l6.707 6.707a1 1 0 101.414-1.414L9.914 12l5.293-5.293a1 1 0 10-1.414-1.414Z"/></svg></button>
-                                        <!-- 페이지 번호 버튼 (active = 현재 페이지) -->
-                                        <!--<button class="page-num-btn active">1</button>-->
-                                        <!--<button class="page-num-btn">2</button>-->
-                                        <!--<button class="page-num-btn">3</button>-->
+
                                         <button class="page-nav-btn" disabled title="다음 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.793 5.293a1 1 0 000 1.414L14.086 12l-5.293 5.293a1 1 0 101.414 1.414L16.914 12l-6.707-6.707a1 1 0 00-1.414 0Z"/></svg></button>
                                     </div>
                                 </div>
@@ -1016,8 +1006,5 @@
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
-
-<script src="/js/admin/event.js"></script>
-
 </body>
 </html>

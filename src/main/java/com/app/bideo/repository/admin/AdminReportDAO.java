@@ -23,8 +23,8 @@ public class AdminReportDAO {
         return Optional.ofNullable(adminReportMapper.selectReportDetail(id));
     }
 
-    public void updateStatus(Long id, String status) {
-        if (adminReportMapper.updateReportStatus(id, status) == 0) {
+    public void updateStatus(Long id, String status, String memo) {
+        if (adminReportMapper.updateReportStatus(id, status, memo) == 0) {
             throw new IllegalArgumentException("report not found");
         }
     }

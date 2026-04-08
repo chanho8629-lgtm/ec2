@@ -4,7 +4,7 @@
 
 <mapper namespace="com.app.bideo.mapper.admin.AdminRestrictionMapper">
 
-    <select id="selectRestrictionList" resultType="com.app.bideo.dto.admin.AdminRestrictionResponseDTO">
+    <select id="selectRestrictionList" resultType="AdminRestrictionResponseDTO">
         select
             r.id,
             r.member_id as member_id,
@@ -39,7 +39,7 @@
         limit #{size} offset (#{page} - 1) * #{size}
     </select>
 
-    <select id="selectRestrictionDetail" resultType="com.app.bideo.dto.admin.AdminRestrictionResponseDTO">
+    <select id="selectRestrictionDetail" resultType="AdminRestrictionResponseDTO">
         select
             r.id,
             r.member_id as member_id,
@@ -59,7 +59,7 @@
         where r.id = #{id}
     </select>
 
-    <select id="selectActiveRestrictionByMemberId" resultType="com.app.bideo.dto.admin.AdminRestrictionResponseDTO">
+    <select id="selectActiveRestrictionByMemberId" resultType="AdminRestrictionResponseDTO">
         select
             r.id,
             r.member_id as member_id,
@@ -82,7 +82,7 @@
         limit 1
     </select>
 
-    <select id="selectExpirableRestrictions" resultType="com.app.bideo.dto.admin.AdminRestrictionResponseDTO">
+    <select id="selectExpirableRestrictions" resultType="AdminRestrictionResponseDTO">
         select
             r.id,
             r.member_id as member_id,
@@ -106,7 +106,7 @@
         order by r.created_datetime desc
     </select>
 
-    <insert id="insertRestriction" parameterType="com.app.bideo.dto.admin.AdminRestrictionUpsertRequestDTO" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertRestriction" parameterType="AdminRestrictionUpsertRequestDTO" useGeneratedKeys="true" keyProperty="id">
         insert into tbl_member_restriction (
             member_id,
             report_id,

@@ -34,6 +34,13 @@ public class AdminRestrictionAPIController {
         return adminRestrictionService.getRestriction(id);
     }
 
+    @GetMapping("/active/member/{memberId}")
+    public ResponseEntity<AdminRestrictionResponseDTO> activeByMember(@PathVariable Long memberId) {
+        return adminRestrictionService.getActiveRestrictionByMemberId(memberId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
+
     @PostMapping
     public ResponseEntity<Map<String, Long>> create(@RequestBody AdminRestrictionUpsertRequestDTO requestDTO) {
         Long id = adminRestrictionService.createRestriction(requestDTO);
