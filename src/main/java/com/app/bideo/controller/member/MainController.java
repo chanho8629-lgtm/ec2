@@ -44,10 +44,14 @@ public class MainController {
     }
 
     private void addGalleryData(Model model) {
-        GallerySearchDTO searchDTO = new GallerySearchDTO();
-        searchDTO.setPage(1);
-        searchDTO.setSize(20);
-        List<GalleryListResponseDTO> galleries = galleryService.getGalleryList(searchDTO).getContent();
-        model.addAttribute("galleries", galleries);
+        try {
+            GallerySearchDTO searchDTO = new GallerySearchDTO();
+            searchDTO.setPage(1);
+            searchDTO.setSize(20);
+            List<GalleryListResponseDTO> galleries = galleryService.getGalleryList(searchDTO).getContent();
+            model.addAttribute("galleries", galleries);
+        } catch (Exception e) {
+            model.addAttribute("galleries", List.of());
+        }
     }
 }

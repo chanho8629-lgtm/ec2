@@ -30,6 +30,8 @@ document.addEventListener("DOMContentLoaded", function () {
   let rooms = [];
   let activeRoomId = null;
   let composeOpen = false;
+  let stompClient = null;
+  let currentSubscription = null;
   let backButton = document.querySelector("[data-bd-chat-back]");
   let panelBody = document.querySelector(".bd-chat-panel__body");
 
@@ -45,6 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function showListMobile() {
     if (panelBody) panelBody.classList.remove("is-thread-open");
+    if (currentSubscription) { currentSubscription.unsubscribe(); currentSubscription = null; }
     activeRoomId = null;
     emptyState.hidden = false;
     detail.hidden = true;
@@ -103,6 +106,7 @@ document.addEventListener("DOMContentLoaded", function () {
     toggle.setAttribute("aria-expanded", "true");
     document.body.dataset.bdChatOpen = "true";
     loadRooms();
+    if (!stompClient || !stompClient.connected) connectWebSocket();
   }
 
   function closeLayer() {
@@ -168,6 +172,42 @@ document.addEventListener("DOMContentLoaded", function () {
       .catch(function () {});
   }
 
+  function connectWebSocket() {
+    if (typeof SockJS === "undefined" || typeof Stomp === "undefined") return;
+    let socket = new SockJS('/ws');
+    stompClient = Stomp.over(socket);
+    stompClient.debug = null;
+    stompClient.connect({}, function () {
+      if (activeRoomId) subscribeToRoom(activeRoomId);
+    }, function () {
+      stompClient = null;
+      setTimeout(connectWebSocket, 3000);
+    });
+  }
+
+  function subscribeToRoom(roomId) {
+    if (currentSubscription) {
+      currentSubscription.unsubscribe();
+      currentSubscription = null;
+    }
+    if (!stompClient || !stompClient.connected || !roomId) return;
+    currentSubscription = stompClient.subscribe('/topic/room.' + roomId, function (frame) {
+      handleRealtimeEvent(JSON.parse(frame.body));
+    });
+  }
+
+  function isChatPanelOpen() {
+    return layer.classList.contains("is-open");
+  }
+
+  function handleRealtimeEvent(event) {
+    if (isChatPanelOpen() && String(event.roomId) === String(activeRoomId)) {
+      loadMessages(activeRoomId);
+    }
+    if (isChatPanelOpen()) loadRooms();
+    updateBadge();
+  }
+
   function loadMessages(roomId) {
     fetch("/api/messages/rooms/" + roomId + "/messages", { credentials: "same-origin" })
       .then(function (res) { return res.ok ? res.json() : []; })
@@ -177,7 +217,9 @@ document.addEventListener("DOMContentLoaded", function () {
         room.messages = messages;
         renderMessages(room);
         messagesNode.scrollTop = messagesNode.scrollHeight;
-        fetch("/api/messages/rooms/" + roomId + "/read", { method: "PATCH", credentials: "same-origin" }).catch(function () {});
+        fetch("/api/messages/rooms/" + roomId + "/read", { method: "PATCH", credentials: "same-origin" })
+          .then(function () { loadRooms(); updateBadge(); })
+          .catch(function () {});
       })
       .catch(function () {});
   }
@@ -185,11 +227,12 @@ document.addEventListener("DOMContentLoaded", function () {
   function renderMessages(room) {
     messagesNode.innerHTML = room.messages
       .map(function (msg) {
-        let isSelf = msg.canEdit || msg.canDelete;
+        let isSelf = msg.isSelf || msg.canEdit || msg.canDelete;
         let klass = isSelf ? "bd-chat-bubble bd-chat-bubble--self" : "bd-chat-bubble";
         let body = msg.deleted ? "<em>삭제된 메시지</em>" : escapeHtml(msg.content || "");
-        let likedClass = msg.isLiked ? " is-liked" : "";
-        let actionsClass = "bd-chat-bubble__actions" + (msg.isLiked ? " has-liked" : "");
+        let hasAnyLike = msg.isLiked || msg.likeCount > 0;
+        let likedClass = hasAnyLike ? " is-liked" : "";
+        let actionsClass = "bd-chat-bubble__actions" + (hasAnyLike ? " has-liked" : "");
 
         let actionsHtml = '';
         if (!msg.deleted) {
@@ -203,7 +246,7 @@ document.addEventListener("DOMContentLoaded", function () {
             '<span class="' + actionsClass + '">' +
             deleteBtn +
             '<button class="bd-chat-bubble__action bd-chat-bubble__action--like' + likedClass + '" data-msg-id="' + msg.id + '" type="button" title="좋아요">' +
-            '<svg width="14" height="14" viewBox="0 0 24 24" fill="' + (msg.isLiked ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="' + (hasAnyLike ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>' +
             (likeLabel ? '<span class="bd-chat-bubble__action-count">' + likeLabel + '</span>' : '') +
             '</button>' +
             '</span>';
@@ -246,13 +289,45 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function handleDelete(msgId) {
-    fetch("/api/messages/rooms/" + activeRoomId + "/messages/" + msgId, {
-      method: "DELETE",
-      credentials: "same-origin"
-    })
-      .then(function (res) { return res.ok ? res.json() : null; })
-      .then(function () { loadMessages(activeRoomId); })
-      .catch(function () {});
+    showDeleteConfirm(function () {
+      fetch("/api/messages/rooms/" + activeRoomId + "/messages/" + msgId, {
+        method: "DELETE",
+        credentials: "same-origin"
+      })
+        .then(function (res) { return res.ok ? res.json() : null; })
+        .then(function () { loadMessages(activeRoomId); })
+        .catch(function () {});
+    });
+  }
+
+  function showDeleteConfirm(onConfirm) {
+    let existing = panel.querySelector(".bd-chat-delete-confirm");
+    if (existing) existing.remove();
+
+    let overlay = document.createElement("div");
+    overlay.className = "bd-chat-delete-confirm";
+
+    let dialog = document.createElement("div");
+    dialog.className = "bd-chat-delete-confirm__dialog";
+    dialog.innerHTML =
+      '<p class="bd-chat-delete-confirm__text">삭제하시겠습니까?</p>' +
+      '<div class="bd-chat-delete-confirm__actions">' +
+      '<button class="bd-chat-delete-confirm__btn bd-chat-delete-confirm__btn--cancel" type="button">취소</button>' +
+      '<button class="bd-chat-delete-confirm__btn bd-chat-delete-confirm__btn--confirm" type="button">삭제</button>' +
+      '</div>';
+
+    overlay.appendChild(dialog);
+    panel.appendChild(overlay);
+    requestAnimationFrame(function () { overlay.classList.add("is-open"); });
+
+    function close() { overlay.remove(); }
+
+    overlay.addEventListener("click", function (e) { if (e.target === overlay) close(); });
+    dialog.querySelector(".bd-chat-delete-confirm__btn--cancel").addEventListener("click", close);
+    dialog.querySelector(".bd-chat-delete-confirm__btn--confirm").addEventListener("click", function () {
+      close();
+      onConfirm();
+    });
   }
 
   /* ── long-press → bottom-sheet (mobile) ── */
@@ -388,6 +463,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setComposerPlaceholder(room);
     showThreadMobile();
     loadMessages(roomId);
+    subscribeToRoom(roomId);
     window.setTimeout(function () { composerInput.focus(); }, 0);
     Array.from(roomList.querySelectorAll(".bd-chat-room")).forEach(function (btn) {
       btn.classList.toggle("is-active", String(btn.dataset.roomId) === String(roomId));
@@ -403,9 +479,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     roomList.innerHTML = filtered
       .map(function (room) {
-        let unreadHtml = '';
+        let unreadHtml = room.unreadCount > 0
+          ? '<span class="bd-chat-room__unread">' + room.unreadCount + '</span>'
+          : '';
         return (
-          '<button class="bd-chat-room" type="button" data-room-id="' + room.id + '">' +
+          '<button class="bd-chat-room' + (room.unreadCount > 0 ? ' has-unread' : '') + '" type="button" data-room-id="' + room.id + '">' +
           (room.profileImage
             ? '<span class="bd-chat-room__avatar" aria-hidden="true"><img src="' + escapeHtml(room.profileImage) + '" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" /></span>'
             : '<span class="bd-chat-room__avatar" aria-hidden="true">' + escapeHtml(room.avatar) + "</span>") +

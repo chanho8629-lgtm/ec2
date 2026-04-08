@@ -24,8 +24,6 @@ create table tbl_gallery (
         references tbl_member (id)
 );
 
-select  * from tbl_gallery;
-DROP DATABASE IF EXISTS tbl_gallery;
 
 
 
