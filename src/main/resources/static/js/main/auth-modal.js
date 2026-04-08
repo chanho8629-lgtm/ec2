@@ -176,6 +176,9 @@ window.addEventListener('load', () => {
         '<div class="auth-modal__terms-text">' +
         '계속하면 BIDEO의 <a href="#" onclick="event.preventDefault(); showLegalModal(\'terms\')">서비스 약관</a>에 동의하고 <a href="#" onclick="event.preventDefault(); showLegalModal(\'privacy\')">개인정보 보호정책</a>을 읽었음을 인정한 것으로 간주합니다.' +
         '</div>' +
+        '<div class="auth-modal__divider-text" style="margin-top:10px">' +
+        '관리자이신가요? <a href="#" class="auth-modal__bold-link" onclick="closeAuthModal(); showAdminAuthModal();">관리자 로그인</a>' +
+        '</div>' +
         '</div>' +
         '<img class="auth-modal__qr-image" src="/images/logo.png" alt="BIDEO">' +
         '</div>' +

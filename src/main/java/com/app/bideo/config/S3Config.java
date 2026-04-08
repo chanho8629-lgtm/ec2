@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProviderChain;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -41,9 +42,15 @@ public class S3Config {
     }
 
     private AwsCredentialsProvider credentialsProvider() {
-        if (StringUtils.hasText(accessKey) && StringUtils.hasText(secretKey)) {
-            return StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey));
+        if (!StringUtils.hasText(accessKey) || !StringUtils.hasText(secretKey)) {
+            return DefaultCredentialsProvider.create();
         }
-        return DefaultCredentialsProvider.create();
+
+        return AwsCredentialsProviderChain.builder()
+                .credentialsProviders(
+                        DefaultCredentialsProvider.create(),
+                        StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey))
+                )
+                .build();
     }
 }

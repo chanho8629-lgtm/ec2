@@ -1,0 +1,23 @@
+/* ─── 관리자 인증 모달 전용 스타일 ───
+   공통 스타일은 modal-shared.css + auth-modal.css에서 로드
+   ─────────────────────────────────── */
+
+.admin-auth-modal__badge {
+    display: inline-block;
+    padding: 4px 12px;
+    margin-bottom: 8px;
+    background: #1a1a2e;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+}
+
+.admin-auth-modal__submit-btn {
+    background: #1a1a2e;
+}
+
+.admin-auth-modal__submit-btn:hover {
+    background: #16213e;
+}

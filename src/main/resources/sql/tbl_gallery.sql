@@ -24,14 +24,15 @@ create table tbl_gallery (
         references tbl_member (id)
 );
 
-select  * from tbl_gallery;
-DROP DATABASE IF EXISTS tbl_gallery;
+
+DROP DATABASE tbl_gallery;
 
 
 
-
-
-
+DROP TABLE tbl_gallery_tag;
+DROP TABLE tbl_gallery;
+DROP TABLE tbl_gallery_like;
+DROP TABLE tbl_gallery_work;
 -- alter table tbl_gallery alter column  cover_image type text;
 
 comment on table tbl_gallery is '예술관';

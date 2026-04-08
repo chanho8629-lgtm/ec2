@@ -9,24 +9,36 @@ function getMediaFiles(detail) {
     return Array.isArray(detail?.files) ? detail.files : [];
 }
 
+function isThumbnailFile(file) {
+    return Number(file?.sortOrder) === 0;
+}
+
+function isMediaFile(file) {
+    return Number(file?.sortOrder) > 0;
+}
+
 function getThumbnailSource(detail) {
     const files = getMediaFiles(detail);
+    const thumbnailFile = files.find((file) => isThumbnailFile(file) && String(file?.fileType || "").startsWith("image/"));
     const imageFile = files.find((file) => String(file?.fileType || "").startsWith("image/"));
     const firstFile = files[0];
 
-    return imageFile?.fileUrl || firstFile?.fileUrl || "";
+    return thumbnailFile?.fileUrl || imageFile?.fileUrl || firstFile?.fileUrl || "";
 }
 
 function getMediaSource(detail) {
     const files = getMediaFiles(detail);
 
     if (detail?.category === "VIDEO") {
-        const videoFile = files.find((file) => String(file?.fileType || "").startsWith("video/"));
+        const videoFile = files.find((file) => isMediaFile(file) && String(file?.fileType || "").startsWith("video/"))
+            || files.find((file) => String(file?.fileType || "").startsWith("video/"));
         return videoFile?.fileUrl || "";
     }
 
-    const firstFile = files[0];
-    return firstFile?.fileUrl || "";
+    const imageFile = files.find((file) => isMediaFile(file) && String(file?.fileType || "").startsWith("image/"))
+        || files.find((file) => !isThumbnailFile(file) && String(file?.fileType || "").startsWith("image/"))
+        || files.find((file) => String(file?.fileType || "").startsWith("image/"));
+    return imageFile?.fileUrl || "";
 }
 
 function getAvatarText(nickname) {
@@ -131,6 +143,7 @@ async function normalizeWorkDetail(detail) {
     const mediaSource = getMediaSource(detail);
     const thumbnailSource = getThumbnailSource(detail) || mediaSource;
     const isVideo = detail.category === "VIDEO" && Boolean(mediaSource);
+    const primaryVisualSource = isVideo ? thumbnailSource : (mediaSource || thumbnailSource);
     const createdDate = detail.createdDatetime || detail.updatedDatetime;
     let pivotData = {
         pivotThumb: "",
@@ -159,7 +172,7 @@ async function normalizeWorkDetail(detail) {
 
     return {
         id: detail.id,
-        thumb: thumbnailSource,
+        thumb: primaryVisualSource,
         videoSrc: isVideo ? mediaSource : "",
         thumbAlt: detail.title || "작품",
         caption: detail.title || "",
@@ -183,6 +196,37 @@ async function normalizeWorkDetail(detail) {
         comments: Array.isArray(detail.comments) ? detail.comments.map(normalizeComment) : [],
         ...pivotData
     };
+}
+
+async function loadScrollableWorkDetails(detail) {
+    if (!detail) {
+        return [];
+    }
+
+    if (!detail.galleryId) {
+        return [detail];
+    }
+
+    try {
+        const galleryDetail = await apiRequest(`/api/galleries/${detail.galleryId}`);
+        const relatedWorkIds = Array.isArray(galleryDetail?.works)
+            ? galleryDetail.works
+                .map((work) => work && work.id)
+                .filter((id) => Number.isFinite(id) && id > 0)
+            : [];
+        const orderedWorkIds = [detail.id].concat(relatedWorkIds.filter((id) => id !== detail.id));
+        const resolvedDetails = await Promise.all(orderedWorkIds.map((id) => {
+            if (id === detail.id) {
+                return Promise.resolve(detail);
+            }
+
+            return apiRequest(`/api/works/${id}`).catch(() => null);
+        }));
+
+        return resolvedDetails.filter(Boolean);
+    } catch (_) {
+        return [detail];
+    }
 }
 
 async function apiRequest(url, options = {}) {
@@ -1794,6 +1838,11 @@ function bindPageInteractions(page, data) {
                 moreButton.setAttribute("aria-expanded", "false");
             }
             if (workState.id) {
+                if (typeof window.openComposeModal === "function") {
+                    window.openComposeModal(`/work/work-edit/${workState.id}`);
+                    return;
+                }
+
                 window.location.href = `/work/work-edit/${workState.id}`;
             }
         });
@@ -1988,14 +2037,21 @@ async function initializeWorkDetailPage() {
 
     try {
         const detail = await apiRequest(`/api/works/${workId}`);
-        const normalized = await normalizeWorkDetail(detail);
-        const fragment = workPageTemplate.content.cloneNode(true);
-        const page = fragment.querySelector(".page");
+        const detailPages = await loadScrollableWorkDetails(detail);
 
-        bindPageData(page, normalized);
-        bindPageInteractions(page, normalized);
         pageStack.innerHTML = "";
-        pageStack.appendChild(fragment);
+        workDetails.length = 0;
+
+        for (const item of detailPages) {
+            const normalized = await normalizeWorkDetail(item);
+            const fragment = workPageTemplate.content.cloneNode(true);
+            const page = fragment.querySelector(".page");
+
+            bindPageData(page, normalized);
+            bindPageInteractions(page, normalized);
+            pageStack.appendChild(fragment);
+            workDetails.push(normalized);
+        }
 
         if (navigationButtonUp && navigationButtonDown) {
             navigationButtonUp.addEventListener("click", () => {

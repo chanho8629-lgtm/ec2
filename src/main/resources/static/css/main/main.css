@@ -79,8 +79,6 @@
 
 /* 레이아웃 헤더/사이드바 영역 확보 */
 .main-page {
-  padding-top: calc(var(--bd-shell-header-height) + 16px);
-  padding-left: calc(var(--bd-shell-guide-width) + 16px);
   padding-right: 16px;
   padding-bottom: 40px;
   min-height: 100vh;

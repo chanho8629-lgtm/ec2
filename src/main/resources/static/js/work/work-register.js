@@ -62,10 +62,13 @@ function initializeWorkRegister() {
     var aiPromptFileName = document.getElementById("ai-prompt-file-name");
     var aiPromptRemoveFileAttachment = document.getElementById("ai-prompt-remove-file-attachment");
     var aiPromptCloseTargets = document.querySelectorAll('[data-role="ai-prompt-close"]');
+    var registerState = document.getElementById("work-register-state");
     var currentPreviewUrl = "";
     var currentAiPromptAttachmentUrl = "";
     var thumbnailPreviewUrls = {};
     var currentMediaFile = null;
+    var currentExistingMediaUrl = registerState ? (registerState.getAttribute("data-media-url") || "").trim() : "";
+    var currentExistingMediaType = registerState ? (registerState.getAttribute("data-media-type") || "").trim() : "";
     var selectedGalleryId = null;
     var isSubmitting = false;
     var tagSuggestionAbortController = null;
@@ -75,6 +78,12 @@ function initializeWorkRegister() {
     if (!modal || !dialogContent || !uploadScreen || !detailsScreen || !uploadPanel || !fileInput || !selectFileButton || !closeButton || !fileNameText) {
         return;
     }
+
+    if (modal.dataset.workRegisterInitialized === "true") {
+        return;
+    }
+
+    modal.dataset.workRegisterInitialized = "true";
 
     function closeModal() {
         if (typeof window.closeComposeModal === "function") {
@@ -90,6 +99,21 @@ function initializeWorkRegister() {
         modal.style.display = "none";
     }
 
+    function updateVideoLink(url, label) {
+        if (!videoLinkUrl) {
+            return;
+        }
+
+        if (!url) {
+            videoLinkUrl.removeAttribute("href");
+            videoLinkUrl.textContent = "";
+            return;
+        }
+
+        videoLinkUrl.href = url;
+        videoLinkUrl.textContent = label || url;
+    }
+
     function navigateAfterSubmit(url) {
         var targetUrl = url || resolveProfileRedirectUrl();
 
@@ -99,6 +123,10 @@ function initializeWorkRegister() {
         }
 
         window.location.href = targetUrl;
+    }
+
+    function isEditMode() {
+        return !!registerState && registerState.getAttribute("data-edit-mode") === "true";
     }
 
     function openAiPromptModal() {
@@ -261,7 +289,7 @@ function initializeWorkRegister() {
             return;
         }
 
-        if (currentPreviewUrl) {
+        if (currentPreviewUrl && currentPreviewUrl.indexOf("blob:") === 0) {
             URL.revokeObjectURL(currentPreviewUrl);
             currentPreviewUrl = "";
         }
@@ -288,6 +316,38 @@ function initializeWorkRegister() {
 
         imagePreviewPlayer.removeAttribute("src");
         videoPreviewPlayer.src = currentPreviewUrl;
+        videoPreviewPlayer.load();
+        videoPreviewShell.classList.remove("has-image");
+        videoPreviewShell.classList.add("has-video");
+    }
+
+    function renderExistingMediaPreview(url, fileType) {
+        if (!videoPreviewShell || !videoPreviewPlayer || !imagePreviewPlayer) {
+            return;
+        }
+
+        if (currentPreviewUrl && currentPreviewUrl.indexOf("blob:") === 0) {
+            URL.revokeObjectURL(currentPreviewUrl);
+        }
+
+        currentPreviewUrl = url || "";
+
+        if (!url) {
+            updateMediaPreview(null);
+            return;
+        }
+
+        if (String(fileType || "").indexOf("image/") === 0) {
+            videoPreviewPlayer.removeAttribute("src");
+            videoPreviewPlayer.load();
+            imagePreviewPlayer.src = url;
+            videoPreviewShell.classList.remove("has-video");
+            videoPreviewShell.classList.add("has-image");
+            return;
+        }
+
+        imagePreviewPlayer.removeAttribute("src");
+        videoPreviewPlayer.src = url;
         videoPreviewPlayer.load();
         videoPreviewShell.classList.remove("has-image");
         videoPreviewShell.classList.add("has-video");
@@ -436,6 +496,24 @@ function initializeWorkRegister() {
         }
 
         return fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+    }
+
+    function getCurrentMediaCategory(file) {
+        var category = registerState ? (registerState.getAttribute("data-category") || "").trim() : "";
+
+        if (file && file.type) {
+            return file.type.indexOf("image/") === 0 ? "IMAGE" : "VIDEO";
+        }
+
+        if (currentExistingMediaType.indexOf("image/") === 0) {
+            return "IMAGE";
+        }
+
+        if (currentExistingMediaType.indexOf("video/") === 0) {
+            return "VIDEO";
+        }
+
+        return category || "VIDEO";
     }
 
     function getSelectedThumbnailFile() {
@@ -657,11 +735,11 @@ function initializeWorkRegister() {
         var tradePrice = tradePriceInput ? parseNumber(tradePriceInput.value) : null;
         var auctionStartingPrice = auctionBidPriceInput ? parseNumber(auctionBidPriceInput.value) : null;
         var auctionDeadlineHours = auctionDeadlineHoursInput ? Number(auctionDeadlineHoursInput.value || "0") : 0;
-        var linkUrlText = videoLinkUrl ? videoLinkUrl.textContent.trim() : "";
+        var linkUrlText = videoLinkUrl ? (videoLinkUrl.getAttribute("href") || "").trim() : "";
         var tags = extractTagNames(videoTagsInput ? videoTagsInput.value : "");
         var thumbnailFile = getSelectedThumbnailFile();
 
-        if (!file) {
+        if (!file && !currentExistingMediaUrl) {
             throw new Error("업로드할 파일을 선택해주세요.");
         }
 
@@ -675,17 +753,19 @@ function initializeWorkRegister() {
 
         formData.append("galleryId", String(selectedGalleryId));
         formData.append("title", title);
-        formData.append("category", file.type.indexOf("image/") === 0 ? "IMAGE" : "VIDEO");
+        formData.append("category", getCurrentMediaCategory(file));
         formData.append("description", description);
         formData.append("licenseType", "");
         formData.append("licenseTerms", "");
         formData.append("isTradable", String(!!(tradeToggle && tradeToggle.checked)));
         formData.append("allowComment", "true");
         formData.append("showSimilar", "true");
-        formData.append("linkUrl", linkUrlText);
+        formData.append("linkUrl", linkUrlText.indexOf("blob:") === 0 ? "" : linkUrlText);
         formData.append("auctionEnabled", String(!!(auctionConfig && !auctionConfig.hidden)));
         formData.append("auctionDeadlineHours", String(auctionDeadlineHours));
-        formData.append("mediaFile", file);
+        if (file) {
+            formData.append("mediaFile", file);
+        }
 
         if (thumbnailFile) {
             formData.append("thumbnailFile", thumbnailFile);
@@ -721,7 +801,9 @@ function initializeWorkRegister() {
 
         isSubmitting = submitting;
         submitButton.disabled = submitting;
-        submitButton.textContent = submitting ? "등록 중..." : "등록";
+        submitButton.textContent = submitting
+            ? (isEditMode() ? "수정 중..." : "등록 중...")
+            : (registerState ? registerState.getAttribute("data-submit-label") || "등록" : "등록");
     }
 
     function submitWork() {
@@ -742,7 +824,9 @@ function initializeWorkRegister() {
 
         setSubmittingState(true);
 
-        fetch("/api/works", {
+        fetch(isEditMode() && registerState && registerState.getAttribute("data-work-id")
+            ? "/api/works/" + registerState.getAttribute("data-work-id") + "/edit"
+            : "/api/works", {
             method: "POST",
             body: formData
         })
@@ -771,7 +855,7 @@ function initializeWorkRegister() {
             return;
         }
 
-        navigator.clipboard.writeText(videoLinkUrl.textContent.trim()).catch(function () {
+        navigator.clipboard.writeText((videoLinkUrl.getAttribute("href") || videoLinkUrl.textContent || "").trim()).catch(function () {
         });
     }
 
@@ -814,6 +898,7 @@ function initializeWorkRegister() {
             currentMediaFile = null;
             updateSelectedFile(null);
             updateMediaPreview(null);
+            updateVideoLink("", "");
             return;
         }
 
@@ -822,8 +907,11 @@ function initializeWorkRegister() {
         }
 
         currentMediaFile = file;
+        currentExistingMediaUrl = "";
+        currentExistingMediaType = "";
         updateSelectedFile(file);
         updateMediaPreview(file);
+        updateVideoLink(currentPreviewUrl, file.name);
         showDetailsScreen(file);
     }
 
@@ -931,7 +1019,8 @@ function initializeWorkRegister() {
     }
 
     thumbnailUploadButtons.forEach(function (button) {
-        button.addEventListener("click", function () {
+        button.addEventListener("click", function (event) {
+            event.stopPropagation();
             var inputId = button.getAttribute("data-target-input");
             var targetInput = inputId ? document.getElementById(inputId) : null;
 
@@ -957,6 +1046,10 @@ function initializeWorkRegister() {
         });
 
         input.closest(".thumbnail-placeholder")?.addEventListener("click", function (event) {
+            if (event.target.closest(".thumbnail-upload-button")) {
+                return;
+            }
+
             if (event.target === input) {
                 return;
             }
@@ -1206,6 +1299,7 @@ function initializeWorkRegister() {
 
     updateSelectedFile(null);
     updateMediaPreview(null);
+    updateVideoLink("", "");
     syncDialogSizeToDetailsScreen();
     autoResizeTextarea(videoTitleInput);
     updateTextCount(videoTitleInput, videoTitleCount, 100);
@@ -1215,6 +1309,40 @@ function initializeWorkRegister() {
 
     if (playlistOptions.length) {
         selectGalleryOption(playlistOptions[0]);
+    }
+
+    if (isEditMode() && registerState) {
+        if (videoTitleInput) {
+            videoTitleInput.value = registerState.getAttribute("data-title") || "";
+            autoResizeTextarea(videoTitleInput);
+            updateTextCount(videoTitleInput, videoTitleCount, 100);
+        }
+
+        if (videoDescriptionInput) {
+            videoDescriptionInput.value = registerState.getAttribute("data-description") || "";
+            updateTextCount(videoDescriptionInput, videoDescriptionCount, 5000);
+        }
+
+        if (registerState.getAttribute("data-gallery-id")) {
+            selectedGalleryId = Number(registerState.getAttribute("data-gallery-id"));
+            Array.prototype.forEach.call(playlistOptions, function (option) {
+                if (option.getAttribute("data-gallery-id") === String(selectedGalleryId)) {
+                    selectGalleryOption(option);
+                }
+            });
+        }
+
+        if (detailsVideoTitle) {
+            detailsVideoTitle.textContent = registerState.getAttribute("data-title") || "업로드 파일";
+        }
+
+        if (videoFileLabel) {
+            videoFileLabel.textContent = registerState.getAttribute("data-title") || "업로드 파일";
+        }
+
+        renderExistingMediaPreview(currentExistingMediaUrl, currentExistingMediaType);
+        updateVideoLink(registerState.getAttribute("data-link-url") || currentExistingMediaUrl, registerState.getAttribute("data-link-url") || currentExistingMediaUrl);
+        showDetailsScreen({ name: registerState.getAttribute("data-title") || "업로드 파일" });
     }
 
     window.addEventListener("resize", syncDialogSizeToDetailsScreen);
