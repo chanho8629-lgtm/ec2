@@ -22,7 +22,7 @@ body {
     overflow-x: hidden;
 }
 
-.yt-shell__page-content.workdetail-shell {
+.bd-shell__page-content.workdetail-shell {
     position: relative;
     height: calc(100vh - 56px);
     margin-top: 56px;
@@ -1760,7 +1760,7 @@ svg {
 }
 
 @media (max-width: 980px) {
-    .yt-shell__page-content.workdetail-shell {
+    .bd-shell__page-content.workdetail-shell {
         margin-left: 72px;
     }
 
@@ -1779,7 +1779,7 @@ svg {
 }
 
 @media (max-width: 760px) {
-    .yt-shell__page-content.workdetail-shell {
+    .bd-shell__page-content.workdetail-shell {
         margin-left: 0;
     }
 
