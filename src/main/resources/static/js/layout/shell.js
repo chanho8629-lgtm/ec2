@@ -27,11 +27,8 @@ document.addEventListener("DOMContentLoaded", function () {
   let composeContent = document.querySelector("[data-yt-compose-content]");
   let composeDismissButtons = Array.from(document.querySelectorAll("[data-yt-compose-dismiss]"));
   let composeLinks = Array.from(document.querySelectorAll("[data-compose-modal-link]"));
-  let WORK_REGISTER_COMPOSE_URL = "/work/work-register";
   let composeState = {
     url: "",
-    pendingUrl: "",
-    requestToken: 0,
     styles: [],
     scripts: [],
     cache: {},
@@ -108,8 +105,6 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    composeState.requestToken += 1;
-    composeState.pendingUrl = "";
     composeModal.hidden = true;
     document.body.classList.remove("yt-compose-open");
     if (composeContent) {
@@ -185,15 +180,6 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    if (!composeModal.hidden && composeState.url === url && composeState.pendingUrl !== url) {
-      return;
-    }
-
-    composeState.requestToken += 1;
-    composeState.pendingUrl = url;
-
-    let requestToken = composeState.requestToken;
-
     closeAllPopups();
     composeModal.hidden = false;
     document.body.classList.add("yt-compose-open");
@@ -222,10 +208,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     })
       .then(function (html) {
-        if (requestToken !== composeState.requestToken) {
-          return;
-        }
-
         let parser = new DOMParser();
         let parsedDocument = parser.parseFromString(html, "text/html");
         let nodes = extractComposeNodes(parsedDocument);
@@ -261,10 +243,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         return loadComposeScripts(parsedDocument).then(function () {
-          if (requestToken !== composeState.requestToken) {
-            return;
-          }
-
           if (url.indexOf("/gallery-register") > -1 && typeof window.initializeGalleryRegister === "function") {
             window.initializeGalleryRegister();
           }
@@ -274,15 +252,9 @@ document.addEventListener("DOMContentLoaded", function () {
           }
 
           composeState.url = url;
-          composeState.pendingUrl = "";
         });
       })
       .catch(function (error) {
-        if (requestToken !== composeState.requestToken) {
-          return;
-        }
-
-        composeState.pendingUrl = "";
         if (composeContent) {
           composeContent.innerHTML = '<div class="yt-compose-modal__error">' + (error.message || "작성 화면을 불러오지 못했습니다.") + "</div>";
         }
@@ -291,9 +263,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   window.closeComposeModal = closeComposeModal;
   window.openComposeModal = openComposeModal;
-  window.openWorkRegisterModal = function () {
-    openComposeModal(WORK_REGISTER_COMPOSE_URL);
-  };
 
   function closeDrawer() {
     root.dataset.mobileDrawerOpen = "false";
@@ -549,17 +518,6 @@ document.addEventListener("DOMContentLoaded", function () {
       event.preventDefault();
       openComposeModal(url);
     });
-  });
-
-  document.addEventListener("click", function (event) {
-    let trigger = event.target.closest("[data-open-work-register], a[href='/work/work-register']");
-
-    if (!trigger || (composeContent && composeContent.contains(trigger))) {
-      return;
-    }
-
-    event.preventDefault();
-    openComposeModal(trigger.getAttribute("data-work-register-url") || WORK_REGISTER_COMPOSE_URL);
   });
 
   if (desktopQuery.addEventListener) {
