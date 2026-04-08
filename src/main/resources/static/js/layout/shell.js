@@ -4,18 +4,10 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
-  let desktopQuery = window.matchMedia("(min-width: 901px)");
-  let menuToggle = root.querySelector("[data-bd-shell-menu-toggle]");
   let searchToggles = Array.from(
     root.querySelectorAll("[data-bd-search-toggle]")
   );
 
-
-  // Popup elements (popups are outside [data-bd-shell-root], so query from document)
-
-
-  let overlay = root.querySelector("[data-bd-shell-overlay]");
-  let drawer = root.querySelector("[data-bd-shell-drawer]");
   let mobileSearch = root.querySelector("[data-bd-shell-mobile-search]");
   let createToggle = root.querySelector("[data-bd-shell-create-toggle]");
   let accountToggle = root.querySelector("[data-bd-shell-account-toggle]");
@@ -34,23 +26,6 @@ document.addEventListener("DOMContentLoaded", function () {
     cache: {},
     rootStyles: null
   };
-
-  function syncBodyState() {
-    document.body.dataset.guideCollapsed = root.dataset.guideCollapsed || "false";
-    document.body.dataset.mobileDrawerOpen = root.dataset.mobileDrawerOpen || "false";
-    document.body.dataset.searchOpen = root.dataset.searchOpen || "false";
-  }
-
-  function syncOverlay() {
-    let open = root.dataset.mobileDrawerOpen === "true" || root.dataset.searchOpen === "true";
-    if (overlay) {
-      overlay.hidden = !open;
-    }
-  }
-
-  function lockBody(locked) {
-    document.body.classList.toggle("bd-shell-lock", locked);
-  }
 
   function removeComposeAssets() {
     composeState.styles.forEach(function (node) {
@@ -264,19 +239,6 @@ document.addEventListener("DOMContentLoaded", function () {
   window.closeComposeModal = closeComposeModal;
   window.openComposeModal = openComposeModal;
 
-  function closeDrawer() {
-    root.dataset.mobileDrawerOpen = "false";
-    if (drawer) {
-      drawer.hidden = true;
-    }
-    if (menuToggle) {
-      menuToggle.setAttribute("aria-expanded", "false");
-    }
-    lockBody(root.dataset.searchOpen === "true");
-    syncOverlay();
-    syncBodyState();
-  }
-
   function closeSearch() {
     root.dataset.searchOpen = "false";
     if (mobileSearch) {
@@ -285,36 +247,6 @@ document.addEventListener("DOMContentLoaded", function () {
     searchToggles.forEach(function (toggle) {
       toggle.setAttribute("aria-expanded", "false");
     });
-    lockBody(root.dataset.mobileDrawerOpen === "true");
-    syncOverlay();
-    syncBodyState();
-  }
-
-  function toggleGuide() {
-    let collapsed = root.dataset.guideCollapsed === "true";
-    root.dataset.guideCollapsed = collapsed ? "false" : "true";
-    syncBodyState();
-  }
-
-  function toggleDrawer() {
-    let nextState = root.dataset.mobileDrawerOpen !== "true";
-    root.dataset.mobileDrawerOpen = String(nextState);
-    if (drawer) {
-      drawer.hidden = !nextState;
-    }
-    if (menuToggle) {
-      menuToggle.setAttribute("aria-expanded", String(nextState));
-    }
-    if (nextState) {
-      closeSearch();
-      root.dataset.mobileDrawerOpen = "true";
-      if (drawer) {
-        drawer.hidden = false;
-      }
-    }
-    lockBody(nextState);
-    syncOverlay();
-    syncBodyState();
   }
 
   function toggleSearch() {
@@ -326,16 +258,6 @@ document.addEventListener("DOMContentLoaded", function () {
     searchToggles.forEach(function (toggle) {
       toggle.setAttribute("aria-expanded", String(nextState));
     });
-    if (nextState) {
-      closeDrawer();
-      root.dataset.searchOpen = "true";
-      if (mobileSearch) {
-        mobileSearch.hidden = false;
-      }
-    }
-    lockBody(nextState);
-    syncOverlay();
-    syncBodyState();
   }
 
   // ── Popup dropdown functions ──
@@ -412,12 +334,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // ── Initialization ──
 
-  root.dataset.guideCollapsed = "false";
-  root.dataset.mobileDrawerOpen = "false";
   root.dataset.searchOpen = "false";
-  if (drawer) {
-    drawer.hidden = true;
-  }
   if (mobileSearch) {
     mobileSearch.hidden = true;
   }
@@ -430,21 +347,8 @@ document.addEventListener("DOMContentLoaded", function () {
   if (notificationPopup) {
     notificationPopup.hidden = true;
   }
-  syncOverlay();
-  syncBodyState();
 
   // ── Event listeners ──
-
-  if (menuToggle) {
-    menuToggle.addEventListener("click", function () {
-      closeAllPopups();
-      if (desktopQuery.matches) {
-        toggleGuide();
-        return;
-      }
-      toggleDrawer();
-    });
-  }
 
   searchToggles.forEach(function (toggle) {
     toggle.addEventListener("click", function () {
@@ -474,14 +378,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  if (overlay) {
-    overlay.addEventListener("click", function () {
-      closeAllPopups();
-      closeDrawer();
-      closeSearch();
-    });
-  }
-
   document.addEventListener("click", function (event) {
     let anyPopupOpen = (createPopup && !createPopup.hidden) || (accountPopup && !accountPopup.hidden) || (notificationPopup && !notificationPopup.hidden);
     if (!anyPopupOpen) {
@@ -503,7 +399,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     closeComposeModal();
     closeAllPopups();
-    closeDrawer();
     closeSearch();
   });
 
@@ -519,26 +414,4 @@ document.addEventListener("DOMContentLoaded", function () {
       openComposeModal(url);
     });
   });
-
-  if (desktopQuery.addEventListener) {
-    desktopQuery.addEventListener("change", function (event) {
-      closeAllPopups();
-      if (event.matches) {
-        closeDrawer();
-        closeSearch();
-      } else {
-        root.dataset.guideCollapsed = "false";
-      }
-    });
-  } else if (desktopQuery.addListener) {
-    desktopQuery.addListener(function (event) {
-      closeAllPopups();
-      if (event.matches) {
-        closeDrawer();
-        closeSearch();
-      } else {
-        root.dataset.guideCollapsed = "false";
-      }
-    });
-  }
 });

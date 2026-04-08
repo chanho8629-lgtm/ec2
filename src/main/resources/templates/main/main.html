@@ -40,7 +40,7 @@
 
 <body class="bg-white dark:bg-[#0f0f0f]">
     <div th:replace="~{layout/layout :: ytShellChrome('home')}"></div>
-    <main class="yt-shell__page-content">
+    <main class="bd-shell__page-content">
     <div class="main-page">
         <div class="shelf-grid" th:if="${galleries != null and !galleries.isEmpty()}">
             <div class="shelf-card" th:each="gallery : ${galleries}">
