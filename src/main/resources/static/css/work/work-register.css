@@ -137,8 +137,11 @@ body.work-register-page a:hover,
 
 .work-register-embedded-root .dialog-content {
     width: 100%;
-    min-height: 540px;
-    max-height: calc(100vh - 40px);
+    min-height: auto;
+    max-height: none;
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
 }
 
 .page-shell[data-compose-embedded="true"] .dialog-content {
