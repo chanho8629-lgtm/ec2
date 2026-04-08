@@ -1,5 +1,6 @@
 package com.app.bideo.mapper.work;
 
+import com.app.bideo.common.pagination.Criteria;
 import com.app.bideo.domain.interaction.CommentVO;
 import com.app.bideo.domain.work.WorkFileVO;
 import com.app.bideo.domain.work.WorkTagVO;
@@ -38,6 +39,10 @@ public interface WorkMapper {
     WorkDetailResponseDTO selectWorkDetail(@Param("id") Long id);
 
     List<WorkListResponseDTO> selectWorkList(WorkSearchDTO searchDTO);
+
+    List<WorkListResponseDTO> selectSearchWorkList(@Param("criteria") Criteria criteria,
+                                                    @Param("keyword") String keyword,
+                                                    @Param("sort") String sort);
 
     int selectWorkCount(WorkSearchDTO searchDTO);
 

@@ -1,5 +1,6 @@
 package com.app.bideo.repository.member;
 
+import com.app.bideo.common.pagination.Criteria;
 import com.app.bideo.domain.member.MemberVO;
 import com.app.bideo.dto.member.MemberListResponseDTO;
 import com.app.bideo.mapper.member.MemberMapper;
@@ -48,5 +49,9 @@ public class MemberRepository {
 
     public List<MemberListResponseDTO> searchByKeyword(String keyword, Long currentMemberId, int limit) {
         return memberMapper.searchByKeyword(keyword, currentMemberId, limit);
+    }
+
+    public List<MemberListResponseDTO> searchByKeywordPaged(Criteria criteria, String keyword, Long currentMemberId) {
+        return memberMapper.searchByKeywordPaged(criteria, keyword, currentMemberId);
     }
 }

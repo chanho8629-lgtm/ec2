@@ -1,5 +1,6 @@
 package com.app.bideo.mapper.member;
 
+import com.app.bideo.common.pagination.Criteria;
 import com.app.bideo.domain.member.MemberVO;
 import com.app.bideo.dto.member.MemberListResponseDTO;
 import org.apache.ibatis.annotations.Mapper;
@@ -29,4 +30,8 @@ public interface MemberMapper {
     List<MemberListResponseDTO> searchByKeyword(@Param("keyword") String keyword,
                                                 @Param("currentMemberId") Long currentMemberId,
                                                 @Param("limit") int limit);
+
+    List<MemberListResponseDTO> searchByKeywordPaged(@Param("criteria") Criteria criteria,
+                                                      @Param("keyword") String keyword,
+                                                      @Param("currentMemberId") Long currentMemberId);
 }
