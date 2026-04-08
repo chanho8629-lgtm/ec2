@@ -76,8 +76,8 @@
   height: 24px;
   padding: 0 6px;
   border-radius: 999px;
-  background: #ffffff;
-  color: var(--bd-chat-accent);
+  background: #e53935;
+  color: #ffffff;
   font-size: 1.1rem;
   font-weight: 700;
 }
@@ -411,8 +411,36 @@
 
 .bd-chat-room__time {
   align-self: start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
   color: #888888;
   font-size: 1rem;
+  font-weight: 600;
+}
+
+.bd-chat-room__unread {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #e53935;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.bd-chat-room.has-unread .bd-chat-room__name {
+  font-weight: 800;
+}
+
+.bd-chat-room.has-unread .bd-chat-room__preview {
+  color: #222;
   font-weight: 600;
 }
 
@@ -702,6 +730,80 @@
   margin-top: 4px;
   color: #888;
   font-weight: 500;
+}
+
+/* ── 삭제 확인 모달 ── */
+.bd-chat-delete-confirm {
+  position: absolute;
+  inset: 0;
+  z-index: 110;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  transition: background 0.2s;
+}
+
+.bd-chat-delete-confirm.is-open {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.bd-chat-delete-confirm__dialog {
+  background: #fff;
+  border-radius: 14px;
+  padding: 22px 24px 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  min-width: 220px;
+  transform: scale(0.9);
+  opacity: 0;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.bd-chat-delete-confirm.is-open .bd-chat-delete-confirm__dialog {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.bd-chat-delete-confirm__text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #222;
+  margin: 0 0 18px;
+}
+
+.bd-chat-delete-confirm__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.bd-chat-delete-confirm__btn {
+  flex: 1;
+  padding: 9px 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.bd-chat-delete-confirm__btn--cancel {
+  background: #f0f0f0;
+  color: #555;
+}
+
+.bd-chat-delete-confirm__btn--cancel:hover {
+  background: #e4e4e4;
+}
+
+.bd-chat-delete-confirm__btn--confirm {
+  background: #e53935;
+  color: #fff;
+}
+
+.bd-chat-delete-confirm__btn--confirm:hover {
+  background: #c62828;
 }
 
 /* touch device: hide inline hover actions */

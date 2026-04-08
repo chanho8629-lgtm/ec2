@@ -624,6 +624,32 @@ body[data-guide-collapsed="true"] .yt-shell__page-content {
   overflow-y: auto;
 }
 
+.bd-shell__notification-badge {
+  position: absolute;
+  top: 4px;
+  right: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #e53935;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.bd-shell__notification-empty {
+  padding: 40px 16px;
+  text-align: center;
+  color: #888;
+  font-size: 0.9rem;
+}
+
 .bd-shell__notification-header {
   display: flex;
   align-items: center;
@@ -664,6 +690,39 @@ body[data-guide-collapsed="true"] .yt-shell__page-content {
 
 .bd-shell__notification-toggle.is-off {
   color: var(--yt-spec-text-secondary, #606060);
+}
+
+.bd-shell__notification-toggle .notification-icon-on,
+.bd-shell__notification-toggle .notification-icon-off {
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+/* ── 스낵바 ── */
+.bd-snackbar {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: #323232;
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 99999;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.bd-snackbar.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 .bd-shell__notification-empty {

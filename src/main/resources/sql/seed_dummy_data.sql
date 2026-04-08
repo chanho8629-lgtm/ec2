@@ -159,6 +159,3 @@ WHERE m.email IN ('demo01@bideo.kr', 'demo02@bideo.kr', 'demo03@bideo.kr', 'demo
 -- SELECT count(*) AS member_count FROM tbl_member WHERE email LIKE 'demo%@bideo.kr';
 -- SELECT count(*) AS work_count FROM tbl_work WHERE member_id IN (SELECT id FROM tbl_member WHERE email LIKE 'demo%@bideo.kr');
 -- SELECT count(*) AS gallery_count FROM tbl_gallery WHERE member_id IN (SELECT id FROM tbl_member WHERE email LIKE 'demo%@bideo.kr');
-
-
-drop table tbl_gallery
