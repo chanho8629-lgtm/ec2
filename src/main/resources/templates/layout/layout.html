@@ -75,12 +75,12 @@
           </svg>
           <span>만들기</span>
         </button>
-        <button class="bd-shell__icon-button" type="button" aria-label="알림" data-bd-shell-notification-toggle aria-expanded="false">
+        <button class="bd-shell__icon-button" type="button" aria-label="알림" data-bd-shell-notification-toggle="" aria-expanded="false" style="position:relative">
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true">
-            <path d="M12 3a6 6 0 0 0-6 6v3.586l-1.707 1.707A1 1 0 0 0 5 16h14a1 1 0 0 0 .707-1.707L18 12.586V9a6 6 0 0 0-6-6Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-            <path d="M9.5 17v.5a2.5 2.5 0 0 0 5 0V17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            <circle cx="18" cy="5" r="3.5" fill="#6800EA" stroke="#fff" stroke-width="1.2"/>
+            <path d="M12 3a6 6 0 0 0-6 6v3.586l-1.707 1.707A1 1 0 0 0 5 16h14a1 1 0 0 0 .707-1.707L18 12.586V9a6 6 0 0 0-6-6Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+            <path d="M9.5 17v.5a2.5 2.5 0 0 0 5 0V17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
           </svg>
+          <span class="bd-shell__notification-badge" data-bd-notification-badge="" style="">3</span>
         </button>
         <button class="bd-shell__icon-button" type="button" aria-label="계정 메뉴" data-bd-shell-account-toggle aria-expanded="false">
           <img class="bd-shell__avatar" th:src="${currentUserProfileImage != null ? currentUserProfileImage : '/images/default-profile.svg'}" src="/images/default-profile.svg" alt="계정" />
