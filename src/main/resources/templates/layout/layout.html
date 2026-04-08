@@ -56,7 +56,6 @@
                       d="M12 3a3 3 0 0 0-3 3v5a3 3 0 1 0 6 0V6a3 3 0 0 0-3-3Zm-7 8a1 1 0 0 1 1 1a6 6 0 0 0 12 0a1 1 0 1 1 2 0a8 8 0 0 1-7 7.94V22h-2v-2.06A8 8 0 0 1 4 12a1 1 0 0 1 1-1Z"
                       fill="currentColor" />
             </svg>
-            <span class="bd-shell__notification-badge" data-bd-notification-badge style="display:none"></span>
           </button>
         </form>
       </div>
@@ -80,7 +79,7 @@
             <path d="M12 3a6 6 0 0 0-6 6v3.586l-1.707 1.707A1 1 0 0 0 5 16h14a1 1 0 0 0 .707-1.707L18 12.586V9a6 6 0 0 0-6-6Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
             <path d="M9.5 17v.5a2.5 2.5 0 0 0 5 0V17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
           </svg>
-          <span class="bd-shell__notification-badge" data-bd-notification-badge="" style="">3</span>
+          <span class="bd-shell__notification-badge" data-bd-notification-badge style="display:none"></span>
         </button>
         <button class="bd-shell__icon-button" type="button" aria-label="계정 메뉴" data-bd-shell-account-toggle aria-expanded="false">
           <img class="bd-shell__avatar" th:src="${currentUserProfileImage != null ? currentUserProfileImage : '/images/default-profile.svg'}" src="/images/default-profile.svg" alt="계정" />
@@ -763,23 +762,7 @@
   <script defer src="/js/layout/search.js"></script>
   <script defer src="/js/layout/voice-search.js"></script>
   <script defer src="/js/layout/chat.js"></script>
-  <script>
-    function toggleNotification(btn) {
-      const isOff = btn.classList.toggle('is-off');
-      const iconOn = btn.querySelector('.notification-icon-on');
-      const iconOff = btn.querySelector('.notification-icon-off');
-      iconOn.style.display = isOff ? 'none' : 'inherit';
-      iconOff.style.display = isOff ? 'inherit' : 'none';
-      localStorage.setItem('notificationEnabled', !isOff);
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-      const enabled = localStorage.getItem('notificationEnabled');
-      if (enabled === 'false') {
-        const btn = document.getElementById('notificationToggle');
-        if (btn) toggleNotification(btn);
-      }
-    });
-  </script>
+  <script defer src="/js/layout/notification.js"></script>
 </th:block>
 </body>
 
