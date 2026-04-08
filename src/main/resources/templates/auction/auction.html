@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=1440" />
-    <title>경매</title>
+    <th:block th:replace="~{layout/layout :: ytShellHead('경매')}"></th:block>
+    <link rel="stylesheet" href="/css/common/reset.css" th:href="@{/css/common/reset.css}" />
+    <link rel="stylesheet" href="/css/common/global.css" th:href="@{/css/common/global.css}" />
+    <link rel="stylesheet" href="/css/common/util.css" th:href="@{/css/common/util.css}" />
+    <link rel="stylesheet" href="/css/common/common.css" th:href="@{/css/common/common.css}" />
     <link rel="stylesheet" href="/css/auction/auction.css" />
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <script src="/js/auction/event.js"></script>
@@ -11,6 +13,8 @@
     <script src="/js/auction/layout.js"></script>
 </head>
 <body>
+<div th:replace="~{layout/layout :: ytShellChrome('auction')}"></div>
+<main class="yt-shell__page-content">
 
 <div class="Auction-Page-Wrapper">
     <div class="Auction-Content-Layout">
@@ -164,5 +168,7 @@
         </div>
     </div>
 </div>
+</main>
+<th:block th:replace="~{layout/layout :: ytShellScripts()}"></th:block>
 </body>
 </html>

@@ -75,7 +75,7 @@ function initializeWorkRegister() {
     var tagSuggestionRequestSeq = 0;
     var activeTagSuggestionIndex = -1;
 
-    if (!modal || !dialogContent || !uploadScreen || !detailsScreen || !uploadPanel || !fileInput || !selectFileButton || !closeButton || !fileNameText) {
+    if (!modal || !dialogContent || !uploadScreen || !detailsScreen || !uploadPanel || !fileInput || !selectFileButton || !fileNameText) {
         return;
     }
 
@@ -945,7 +945,9 @@ function initializeWorkRegister() {
         handleFiles(event.dataTransfer.files);
     });
 
-    closeButton.addEventListener("click", closeModal);
+    if (closeButton) {
+        closeButton.addEventListener("click", closeModal);
+    }
 
     if (uploadCloseButton) {
         uploadCloseButton.addEventListener("click", closeModal);

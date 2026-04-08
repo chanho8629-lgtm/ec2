@@ -3,6 +3,7 @@ package com.app.bideo.controller.gallery;
 import com.app.bideo.dto.gallery.GalleryDetailResponseDTO;
 import com.app.bideo.service.gallery.GalleryService;
 import com.app.bideo.service.work.WorkService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,14 +20,16 @@ public class GalleryController {
     private final GalleryService galleryService;
 
     @GetMapping("/gallery-register")
-    public String goToGalleryRegisterDirect(Model model) {
+    public String goToGalleryRegisterDirect(HttpServletRequest request, Model model) {
         model.addAttribute("works", getGalleryRegisterWorks());
+        model.addAttribute("embeddedMode", isEmbeddedRequest(request));
         return "work/gallery-register";
     }
 
     @GetMapping("/gallery/gallery-register")
-    public String goToGalleryRegister(Model model) {
+    public String goToGalleryRegister(HttpServletRequest request, Model model) {
         model.addAttribute("works", getGalleryRegisterWorks());
+        model.addAttribute("embeddedMode", isEmbeddedRequest(request));
         return "work/gallery-register";
     }
 
@@ -39,11 +42,12 @@ public class GalleryController {
     }
 
     @GetMapping("/gallery/{id}/edit")
-    public String galleryEdit(@PathVariable Long id, Model model) {
+    public String galleryEdit(@PathVariable Long id, HttpServletRequest request, Model model) {
         GalleryDetailResponseDTO gallery = galleryService.getGalleryDetail(id);
         model.addAttribute("gallery", gallery);
         model.addAttribute("works", workService.getProfileWorks(gallery.getMemberId(), null));
         model.addAttribute("isEditMode", true);
+        model.addAttribute("embeddedMode", isEmbeddedRequest(request));
         return "work/gallery-register";
     }
 
@@ -53,5 +57,9 @@ public class GalleryController {
         } catch (IllegalStateException exception) {
             return Collections.emptyList();
         }
+    }
+
+    private boolean isEmbeddedRequest(HttpServletRequest request) {
+        return request != null && "XMLHttpRequest".equalsIgnoreCase(request.getHeader("X-Requested-With"));
     }
 }

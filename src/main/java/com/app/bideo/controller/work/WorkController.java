@@ -3,6 +3,7 @@ package com.app.bideo.controller.work;
 import com.app.bideo.dto.work.WorkDetailResponseDTO;
 import com.app.bideo.service.gallery.GalleryService;
 import com.app.bideo.service.work.WorkService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,19 +21,21 @@ public class WorkController {
 
     // 작품 등록 페이지 이동
     @GetMapping("/work-register")
-    public String goToWorkRegister(Model model) {
+    public String goToWorkRegister(HttpServletRequest request, Model model) {
         model.addAttribute("editMode", false);
         model.addAttribute("galleries", galleryService.getProfileGalleries());
+        model.addAttribute("embeddedMode", isEmbeddedRequest(request));
         return "work/work-register";
     }
 
     // 작품 수정 페이지 이동
     @GetMapping("/work-edit/{id}")
-    public String goToWorkEdit(@PathVariable Long id, Model model) {
+    public String goToWorkEdit(@PathVariable Long id, HttpServletRequest request, Model model) {
         WorkDetailResponseDTO work = workService.getWorkDetail(id);
         model.addAttribute("editMode", true);
         model.addAttribute("work", work);
         model.addAttribute("galleries", galleryService.getProfileGalleries());
+        model.addAttribute("embeddedMode", isEmbeddedRequest(request));
         return "work/work-register";
     }
 
@@ -42,5 +45,9 @@ public class WorkController {
         WorkDetailResponseDTO work = workService.getWorkDetail(id);
         model.addAttribute("work", work);
         return "work/workdetail";
+    }
+
+    private boolean isEmbeddedRequest(HttpServletRequest request) {
+        return request != null && "XMLHttpRequest".equalsIgnoreCase(request.getHeader("X-Requested-With"));
     }
 }

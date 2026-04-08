@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${isEditMode} ? '예술관 수정' : '예술관 작성'">예술관 작성</title>
+    <th:block th:replace="~{layout/layout :: ytShellHead(${isEditMode} ? '예술관 수정' : '예술관 작성')}"></th:block>
+    <link rel="stylesheet" href="/css/common/reset.css" th:href="@{/css/common/reset.css}">
+    <link rel="stylesheet" href="/css/common/global.css" th:href="@{/css/common/global.css}">
+    <link rel="stylesheet" href="/css/common/util.css" th:href="@{/css/common/util.css}">
+    <link rel="stylesheet" href="/css/common/common.css" th:href="@{/css/common/common.css}">
     <link rel="stylesheet" href="/css/work/gallery.css" th:href="@{/css/work/gallery.css}">
 </head>
 <body class="gallery-register-page">
+<div th:if="${!embeddedMode}" th:replace="~{layout/layout :: ytShellChrome('gallery')}"></div>
+<main th:classappend="${!embeddedMode} ? ' yt-shell__page-content'">
 <div class="modal"
      id="galleryModal"
      role="dialog"
@@ -198,8 +202,10 @@
         </div>
     </section>
 </div>
+</main>
 
 <script src="/js/work/gallery-register.js" th:src="@{/js/work/gallery-register.js}"></script>
+<th:block th:if="${!embeddedMode}" th:replace="~{layout/layout :: ytShellScripts()}"></th:block>
 </body>
 </html>
 <!--  -->
