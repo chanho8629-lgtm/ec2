@@ -1683,12 +1683,22 @@ svg {
 .workdetail-stage.stage-fullscreen .page.fullscreen-active-page .media-cluster {
     position: absolute;
     left: 50%;
-    top: 54%;
+    top: 50%;
     display: grid;
     grid-template-columns: auto 72px;
     align-items: end;
     gap: 24px;
     transform: translate(-50%, -50%);
+}
+
+.workdetail-stage.stage-fullscreen .page.fullscreen-active-page.panel-open .media-cluster {
+    transform: translate(calc(-50% - var(--anchored-panel-media-shift)), -50%);
+}
+
+.workdetail-stage.stage-fullscreen .page.fullscreen-active-page.panel-open .anchored-panel,
+.workdetail-stage.stage-fullscreen .page.fullscreen-active-page.panel-comments .comments-panel,
+.workdetail-stage.stage-fullscreen .page.fullscreen-active-page.panel-pivot .pivot-panel {
+    right: var(--anchored-panel-open-right);
 }
 
 .workdetail-stage.stage-fullscreen .page.fullscreen-active-page .media {
@@ -1702,7 +1712,7 @@ svg {
 }
 
 .workdetail-stage.stage-fullscreen .page.fullscreen-active-page .thumb {
-    height: min(92vh, 940px);
+    height: min(96vh, 980px);
     aspect-ratio: var(--player-ratio-w) / var(--player-ratio-h);
     border-radius: 12px;
 }

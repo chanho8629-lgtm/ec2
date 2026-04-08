@@ -286,9 +286,16 @@ public class WorkService {
     public void delete(Long id) {
         Long resolvedMemberId = resolveMemberId(null);
         validateWorkOwner(id, resolvedMemberId);
+        Long galleryId = galleryDAO.findGalleryIdByWorkId(id).orElse(null);
         workDAO.deleteFilesByWorkId(id);
         workDAO.deleteTagsByWorkId(id);
+        if (galleryId != null) {
+            galleryDAO.deleteWorkLinkByWorkId(id);
+        }
         workDAO.delete(id);
+        if (galleryId != null) {
+            galleryDAO.updateWorkCount(galleryId);
+        }
     }
 
     private void validateWorkOwner(Long workId, Long memberId) {

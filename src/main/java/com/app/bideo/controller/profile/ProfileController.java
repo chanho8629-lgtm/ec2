@@ -2,6 +2,8 @@ package com.app.bideo.controller.profile;
 
 import com.app.bideo.auth.member.CustomUserDetails;
 import com.app.bideo.domain.member.MemberVO;
+import com.app.bideo.dto.gallery.GalleryListResponseDTO;
+import com.app.bideo.dto.work.WorkListResponseDTO;
 import com.app.bideo.repository.member.MemberRepository;
 import com.app.bideo.service.gallery.GalleryService;
 import com.app.bideo.service.member.FollowService;
@@ -62,8 +64,13 @@ public class ProfileController {
                 && !isOwner
                 && followService.isFollowing(userDetails.getId(), profileMember.getId());
         String resolvedTab = "works".equalsIgnoreCase(tab) ? "works" : "galleries";
-        model.addAttribute("works", workService.getProfileWorks(profileMember.getId(), galleryId));
-        model.addAttribute("galleries", galleryService.getProfileGalleries(profileMember.getId()));
+        java.util.List<WorkListResponseDTO> works = workService.getProfileWorks(profileMember.getId(), galleryId);
+        java.util.List<GalleryListResponseDTO> galleries = galleryService.getProfileGalleries(profileMember.getId());
+
+        model.addAttribute("works", works);
+        model.addAttribute("galleries", galleries);
+        model.addAttribute("workCount", works.size());
+        model.addAttribute("galleryCount", galleries.size());
         model.addAttribute("selectedGalleryId", galleryId);
         model.addAttribute("selectedTab", resolvedTab);
         model.addAttribute("profilePath", "/profile/" + profileMember.getNickname()); // 이승민| 프로필 닉네임 경로 유지로 인한 추가

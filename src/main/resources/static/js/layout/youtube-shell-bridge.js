@@ -224,7 +224,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (composeContent) {
           if (url.indexOf("/gallery-register") > -1) {
             composeContent.setAttribute("data-compose-view", "gallery-register");
-          } else if (url.indexOf("/work/work-register") > -1) {
+          } else if (url.indexOf("/work/work-register") > -1 || url.indexOf("/work/work-edit/") > -1) {
             composeContent.setAttribute("data-compose-view", "work-register");
           } else {
             composeContent.removeAttribute("data-compose-view");
@@ -238,6 +238,10 @@ document.addEventListener("DOMContentLoaded", function () {
         return loadComposeScripts(parsedDocument).then(function () {
           if (url.indexOf("/gallery-register") > -1 && typeof window.initializeGalleryRegister === "function") {
             window.initializeGalleryRegister();
+          }
+
+          if ((url.indexOf("/work/work-register") > -1 || url.indexOf("/work/work-edit/") > -1) && typeof window.initializeWorkRegister === "function") {
+            window.initializeWorkRegister();
           }
 
           composeState.url = url;
