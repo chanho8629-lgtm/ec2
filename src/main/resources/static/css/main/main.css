@@ -73,14 +73,14 @@
 #sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 .carousel-scroll { scroll-behavior: smooth; }
  :root {
-   --yt-shell-header-height: 56px;
-   --yt-shell-guide-width: 240px;
+   --bd-shell-header-height: 56px;
+   --bd-shell-guide-width: 240px;
  }
 
 /* 레이아웃 헤더/사이드바 영역 확보 */
 .main-page {
-  padding-top: calc(var(--yt-shell-header-height) + 16px);
-  padding-left: calc(var(--yt-shell-guide-width) + 16px);
+  padding-top: calc(var(--bd-shell-header-height) + 16px);
+  padding-left: calc(var(--bd-shell-guide-width) + 16px);
   padding-right: 16px;
   padding-bottom: 40px;
   min-height: 100vh;
@@ -244,7 +244,7 @@
 @media (max-width: 900px) {
   .main-page {
     padding-left: 16px;
-    padding-top: calc(var(--yt-shell-header-height) + 12px);
+    padding-top: calc(var(--bd-shell-header-height) + 12px);
   }
   .shelf-grid {
     grid-template-columns: repeat(3, 1fr);
