@@ -26,5 +26,6 @@ public class MessageResponseDTO {
     private Boolean isLiked;
     private Boolean canEdit;
     private Boolean canDelete;
+    private Boolean isSelf;
     private LocalDateTime createdDatetime;
 }

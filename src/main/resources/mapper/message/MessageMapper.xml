@@ -49,7 +49,8 @@
             AND msg.deleted_datetime IS NULL
             AND msg.created_datetime &gt;= now() - interval '5 minutes') AS can_edit,
         (msg.sender_id = #{memberId}
-            AND msg.deleted_datetime IS NULL) AS can_delete
+            AND msg.deleted_datetime IS NULL) AS can_delete,
+        (msg.sender_id = #{memberId}) AS is_self
     </sql>
 
     <select id="selectByRoomId" resultType="com.app.bideo.dto.message.MessageResponseDTO">
