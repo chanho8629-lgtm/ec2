@@ -79,6 +79,73 @@
             updated_datetime = now()
         where id = #{memberId}
     </update>
+
+    <update id="updateProfile">
+        update tbl_member
+        set nickname = #{nickname},
+            real_name = #{realName},
+            bio = #{bio},
+            profile_image = #{profileImage},
+            phone_number = #{phoneNumber},
+            updated_datetime = now()
+        where id = #{memberId}
+    </update>
+
+    <select id="countActiveWorksByMemberId" resultType="int">
+        select count(*)
+        from tbl_work
+        where member_id = #{memberId}
+          and deleted_datetime is null
+          and status != 'DELETED'
+    </select>
+
+    <select id="findOwnedBadgesByMemberId" resultType="com.app.bideo.dto.member.MemberBadgeResponseDTO">
+        select
+            mb.id,
+            mb.badge_id,
+            b.badge_key,
+            b.badge_name,
+            b.image_file,
+            mb.is_displayed,
+            mb.earned_at
+        from tbl_member_badge mb
+        join tbl_badge b on mb.badge_id = b.id
+        where mb.member_id = #{memberId}
+        order by mb.is_displayed desc, mb.earned_at desc
+    </select>
+
+    <select id="findDisplayedBadgesByMemberId" resultType="com.app.bideo.dto.member.MemberBadgeResponseDTO">
+        select
+            mb.id,
+            mb.badge_id,
+            b.badge_key,
+            b.badge_name,
+            b.image_file,
+            mb.is_displayed,
+            mb.earned_at
+        from tbl_member_badge mb
+        join tbl_badge b on mb.badge_id = b.id
+        where mb.member_id = #{memberId}
+          and mb.is_displayed = true
+        order by mb.earned_at desc
+    </select>
+
+    <update id="clearDisplayedBadges">
+        update tbl_member_badge
+        set is_displayed = false
+        where member_id = #{memberId}
+    </update>
+
+    <update id="displayBadges">
+        update tbl_member_badge
+        set is_displayed = true
+        where member_id = #{memberId}
+          and badge_id in
+        <foreach collection="badgeIds" item="badgeId" open="(" separator="," close=")">
+            #{badgeId}
+        </foreach>
+    </update>
+
     <select id="searchByKeyword" resultType="com.app.bideo.dto.member.MemberListResponseDTO">
         SELECT
             m.id,
@@ -99,5 +166,4 @@
         ORDER BY m.follower_count DESC NULLS LAST
         LIMIT #{limit}
     </select>
-
 </mapper>

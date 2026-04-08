@@ -9,11 +9,12 @@
     <link rel="stylesheet" href="/css/profile/profile.css" th:href="@{/css/profile/profile.css}" />
     <script src="https://unpkg.com/lucide@latest"></script>
     <script defer src="/js/modal/event.js" th:src="@{/js/modal/event.js}"></script>
+    <script defer src="/js/share/share.js" th:src="@{/js/share/share.js}"></script>
     <script defer src="/js/profile/event.js" th:src="@{/js/profile/event.js}"></script>
   </head>
   <body>
     <div th:replace="~{layout/layout :: ytShellChrome('profile')}"></div>
-    <main class="bd-shell__page-content">
+    <main class="yt-shell__page-content">
     <!-- 프로필 메인 영역 -->
     <div id="section" class="profilePage section">
       <div class="content">
@@ -22,30 +23,50 @@
           <!-- 배너 영역 -->
           <div class="banner">
             <div class="bannerArt">
-              <span class="bannerBadge">배너 뱃지</span>
-              <strong>배너 타이틀</strong>
-              <p>배너 내용</p>
+              <span class="bannerBadge" th:text="${profile.creatorVerified} ? 'CREATOR' : 'PROFILE'">PROFILE</span>
+              <strong th:text="${profile.nickname}">닉네임</strong>
+              <p th:text="${profile.bio != null and !#strings.isEmpty(profile.bio) ? profile.bio : '프로필 소개가 아직 없습니다.'}">프로필 소개가 아직 없습니다.</p>
             </div>
           </div>
 
           <!-- 프로필 메타 영역 -->
           <div class="channelMeta">
             <!-- 프로필 사진 영역 -->
-            <div class="avatar" th:text="${profileMember.nickname != null and !#strings.isEmpty(profileMember.nickname) ? profileMember.nickname.substring(profileMember.nickname.length() > 1 ? profileMember.nickname.length() - 1 : 0) : '이름'}">이름</div>
+            <div class="avatar">
+              <img th:if="${profile.profileImage != null and !#strings.isEmpty(profile.profileImage)}"
+                   th:src="${profile.profileImage}"
+                   th:alt="|${profile.nickname} 프로필 이미지|">
+              <span th:unless="${profile.profileImage != null and !#strings.isEmpty(profile.profileImage)}"
+                    th:text="${profile.nickname != null and #strings.length(profile.nickname) > 0 ? #strings.substring(profile.nickname,0,1) : 'N'}">이</span>
+            </div>
+
             <!-- 프로필 정보 영역 -->
             <div class="metaInfo">
               <h1 class="channelTitle">
-                <span th:text="${profileMember.nickname}">이름 영역</span>
+                <span data-profile-nickname th:text="${profile.nickname}">닉네임</span>
                 <a class="more" href="javascript:void(0)"></a>
               </h1>
-              <p class="channelText"
-                 th:text="|@${profileMember.nickname} · 팔로워 ${profileMember.followerCount == null ? 0 : profileMember.followerCount}명 · 작품 ${workCount == null ? 0 : workCount}개 · 예술관 ${galleryCount == null ? 0 : galleryCount}개|">닉네임 · 팔로워 0명 · 작품 0개 · 예술관 0개</p>
-              <p class="channelText"
-                 th:text="${profileMember.bio == null or #strings.isEmpty(profileMember.bio) ? '소개가 아직 없습니다.' : profileMember.bio}">설명글입니다. 설명글입니다. 설명글입니다. 설명글입니다.</p>
+              <p class="channelText">
+                <span data-profile-name th:text="${profile.realName != null and !#strings.isEmpty(profile.realName) ? profile.realName : '-'}">이름</span>
+                <span th:text="| · 팔로워 ${profile.followerCount}명 · 팔로잉 ${profile.followingCount}명 · 작품 ${profile.workCount}개|"> · 팔로워 0명 · 팔로잉 0명 · 작품 0개</span>
+              </p>
+              <div class="profileBadgeRow" data-profile-badges>
+                <span class="profileBadgeChip" data-server-badge="true" th:each="badge : ${profileBadges}">
+                  <img th:src="@{/images/badge/{file}(file=${badge.imageFile})}" th:alt="${badge.badgeName}">
+                  <span th:text="${badge.badgeName}">뱃지명</span>
+                </span>
+              </div>
+              <p class="channelText" th:text="${profile.bio != null and !#strings.isEmpty(profile.bio) ? profile.bio : '아직 등록된 소개글이 없습니다.'}">설명글입니다.</p>
               <div class="channelActionRow">
-                <button type="button" class="subscribeBtn" data-subscribe-button data-subscribe-default="팔로우" data-subscribe-active="팔로잉">팔로우</button>
+                <button type="button"
+                        th:class="${profile.isFollowing} ? 'subscribeBtn is-subscribed' : 'subscribeBtn'"
+                        data-subscribe-button data-subscribe-default="팔로우" data-subscribe-active="팔로잉"
+                        th:text="${profile.isFollowing} ? '팔로잉' : '팔로우'">팔로우</button>
                 <button type="button" class="shareBtn" data-share-button>공유하기</button>
-                <button type="button" class="blackBtn" data-black-button>차단하기</button>
+                <button type="button"
+                        th:class="${profile.isBlocked} ? 'blackBtn is-blackBtn is-blocked' : 'blackBtn'"
+                        data-black-button
+                        th:text="${profile.isBlocked} ? '차단 해제' : '차단하기'">차단하기</button>
               </div>
             </div>
           </div>
@@ -77,6 +98,8 @@
             <article class="videoCard"
                      th:if="${!#lists.isEmpty(galleries)}"
                      th:each="gallery : ${galleries}"
+                     th:data-created-at="${gallery.createdDatetime}"
+                     th:data-popularity="${(gallery.viewCount == null ? 0 : gallery.viewCount) + (gallery.likeCount == null ? 0 : gallery.likeCount)}"
                      th:classappend="${selectedGalleryId == gallery.id} ? ' is-selected' : ''">
               <a th:href="@{/gallery/{id}(id=${gallery.id})}"
                  class="videoThumb"
@@ -98,7 +121,9 @@
           <div class="videoGrid" data-profile-panel="works" th:hidden="${selectedTab != 'works'}">
             <article class="videoCard"
                      th:if="${!#lists.isEmpty(works)}"
-                     th:each="work : ${works}">
+                     th:each="work : ${works}"
+                     th:data-created-at="${work.createdDatetime}"
+                     th:data-popularity="${(work.viewCount == null ? 0 : work.viewCount) + (work.likeCount == null ? 0 : work.likeCount) + (work.saveCount == null ? 0 : work.saveCount)}">
               <a th:href="@{/work/detail/{id}(id=${work.id})}"
                  class="videoThumb"
                  th:classappend="${work.thumbnailUrl == null or #strings.isEmpty(work.thumbnailUrl)} ? ' thumb-02' : ''">
@@ -127,7 +152,7 @@
     </div>
 
     <!-- 공유 모달 -->
-    <div id="share-modal" class="modal none workShareModalWrap">
+    <div id="share-modal" class="modal profile none workShareModalWrap">
       <div class="work-share-modal">
         <div class="work-share-modal__header">
           <div class="work-share-modal__spacer"></div>
@@ -140,7 +165,7 @@
           </button>
         </div>
         <div class="work-share-modal__link-row">
-          <input class="work-share-modal__link-input" type="text" readonly value="https://localhost:10000/profile/test?galleryId=1" data-share-link-input>
+          <input class="work-share-modal__link-input" type="text" readonly th:value="${profilePath}" data-share-link-input>
           <button class="work-share-modal__link-copy" type="button" data-share-copy>복사</button>
         </div>
         <div class="work-share-modal__receiver">
@@ -151,27 +176,7 @@
           </div>
         </div>
         <div class="work-share-modal__list" data-share-list>
-          <button type="button" class="work-share-user" data-share-user="김민수">
-            <span class="work-share-user__avatar">김</span>
-            <span class="work-share-user__meta">
-              <strong>김민수</strong>
-              <small>@minsuu</small>
-            </span>
-          </button>
-          <button type="button" class="work-share-user" data-share-user="이지은">
-            <span class="work-share-user__avatar">이</span>
-            <span class="work-share-user__meta">
-              <strong>이지은</strong>
-              <small>@jieun</small>
-            </span>
-          </button>
-          <button type="button" class="work-share-user" data-share-user="박서준">
-            <span class="work-share-user__avatar">박</span>
-            <span class="work-share-user__meta">
-              <strong>박서준</strong>
-              <small>@seojun</small>
-            </span>
-          </button>
+          <div class="followManageEmpty">공유 대상을 불러오는 중입니다.</div>
         </div>
         <div class="work-share-modal__footer">
           <input class="work-share-modal__message" type="text" placeholder="메시지 쓰기..." autocomplete="off" data-share-message>
@@ -181,7 +186,7 @@
     </div>
 
     <!-- 팔로우 취소 모달 -->
-    <div id="unsubscribe-modal" class="modal none">
+    <div id="unsubscribe-modal" class="modal profile none">
       <div class="unsubscribeModalPanel">
         <div class="unsubscribeModalHeader">
           <h2 class="unsubscribeModalTitle">팔로우를 취소하시겠습니까?</h2>
@@ -197,7 +202,7 @@
     </div>
 
     <!-- 차단 모달 -->
-    <div id="black-modal" class="modal none">
+    <div id="black-modal" class="modal profile none">
       <div class="unsubscribeModalPanel">
         <div class="unsubscribeModalHeader">
           <h2 class="unsubscribeModalTitle">이 사용자를 차단하시겠습니까?</h2>
@@ -213,7 +218,7 @@
     </div>
     
     <!-- 차단 해제 모달 -->
-    <div id="unblack-modal" class="modal none">
+    <div id="unblack-modal" class="modal profile none">
       <div class="unsubscribeModalPanel">
         <div class="unsubscribeModalHeader">
           <h2 class="unsubscribeModalTitle">차단을 해제하시겠습니까?</h2>
