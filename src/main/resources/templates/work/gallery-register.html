@@ -11,6 +11,7 @@
 <body class="gallery-register-page">
 <div th:if="${!embeddedMode}" th:replace="~{layout/layout :: ytShellChrome('gallery')}"></div>
 <main th:classappend="${!embeddedMode} ? ' yt-shell__page-content'">
+<div id="gallery-register-root">
 <div class="modal"
      id="galleryModal"
      role="dialog"
@@ -201,6 +202,7 @@
             <button class="main-btn" id="confirmArtworkModalBtn" type="button" disabled>완료</button>
         </div>
     </section>
+</div>
 </div>
 </main>
 

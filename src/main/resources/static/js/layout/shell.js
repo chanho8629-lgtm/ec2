@@ -166,7 +166,19 @@ document.addEventListener("DOMContentLoaded", function () {
     return Promise.all(loaders);
   }
 
-  function extractComposeNodes(parsedDocument) {
+  function extractComposeNodes(parsedDocument, url) {
+    let specificRoot = null;
+
+    if (url.indexOf("/work/work-register") > -1 || url.indexOf("/work/work-edit/") > -1) {
+      specificRoot = parsedDocument.getElementById("work-register-root");
+    } else if (url.indexOf("/gallery-register") > -1) {
+      specificRoot = parsedDocument.getElementById("gallery-register-root");
+    }
+
+    if (specificRoot) {
+      return [specificRoot];
+    }
+
     return Array.from(parsedDocument.body.children).filter(function (node) {
       return node.tagName !== "SCRIPT";
     });
@@ -210,7 +222,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .then(function (html) {
         let parser = new DOMParser();
         let parsedDocument = parser.parseFromString(html, "text/html");
-        let nodes = extractComposeNodes(parsedDocument);
+        let nodes = extractComposeNodes(parsedDocument, url);
 
         if (!nodes.length) {
           throw new Error("작성 모달 내용을 찾지 못했습니다.");

@@ -18,62 +18,63 @@
 <th:block th:if="${embeddedMode}" th:replace="~{this :: workRegisterPanel(standalone=false)}"></th:block>
 
 <th:block th:fragment="workRegisterPanel(standalone)">
-    <div id="work-register-state"
-         th:attr="data-edit-mode=${editMode},
-                  data-work-id=${editMode and work != null ? work.id : ''},
-                  data-title=${editMode and work != null ? work.title : ''},
-                  data-description=${editMode and work != null ? work.description : ''},
-                  data-gallery-id=${editMode and work != null ? work.galleryId : ''},
-                  data-category=${editMode and work != null ? work.category : ''},
-                  data-media-url=${editMode and work != null and work.files != null and !#lists.isEmpty(work.files) ? work.files[0].fileUrl : ''},
-                  data-media-type=${editMode and work != null and work.files != null and !#lists.isEmpty(work.files) ? work.files[0].fileType : ''},
-                  data-link-url=${editMode and work != null ? '/work/detail/' + work.id : ''},
-                  data-submit-label=${editMode ? '수정' : '등록'}"
-         hidden></div>
-
     <div id="work-register-root"
          th:class="${standalone} ? 'page-shell' : 'work-register-embedded-root'">
+        <div id="work-register-state"
+             th:attr="data-edit-mode=${editMode},
+                      data-work-id=${editMode and work != null ? work.id : ''},
+                      data-title=${editMode and work != null ? work.title : ''},
+                      data-description=${editMode and work != null ? work.description : ''},
+                      data-gallery-id=${editMode and work != null ? work.galleryId : ''},
+                      data-category=${editMode and work != null ? work.category : ''},
+                      data-media-url=${editMode and work != null and work.files != null and !#lists.isEmpty(work.files) ? work.files[0].fileUrl : ''},
+                      data-media-type=${editMode and work != null and work.files != null and !#lists.isEmpty(work.files) ? work.files[0].fileType : ''},
+                      data-link-url=${editMode and work != null ? '/work/detail/' + work.id : ''},
+                      data-submit-label=${editMode ? '수정' : '등록'}"
+             hidden></div>
+
         <div th:class="${standalone} ? 'upload-dialog' : 'work-register-panel'">
             <div class="dialog-content" id="dialog-content" role="dialog" aria-modal="true" aria-labelledby="work-register-title">
                 <th:block th:replace="~{this :: workRegisterDialogBody}"></th:block>
             </div>
         </div>
-    </div>
 
-    <div class="ai-prompt-modal" id="ai-prompt-modal" hidden>
-        <div class="ai-prompt-modal__backdrop" data-role="ai-prompt-close"></div>
-        <div class="ai-prompt-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="ai-prompt-title">
-            <div class="ai-prompt-modal__header">
-                <div class="ai-prompt-modal__title" id="ai-prompt-title">AI 생성</div>
-                <button type="button" class="ai-prompt-modal__close" id="ai-prompt-close-button" aria-label="닫기">닫기</button>
-            </div>
-            <div class="ai-prompt-modal__body">
-                <div class="ai-prompt-thread">
-                    <div class="ai-prompt-thread__bubble" id="ai-prompt-bubble">작품을 생성해줘</div>
+        <div class="ai-prompt-modal" id="ai-prompt-modal" hidden>
+            <div class="ai-prompt-modal__backdrop" data-role="ai-prompt-close"></div>
+            <div class="ai-prompt-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="ai-prompt-title">
+                <div class="ai-prompt-modal__header">
+                    <div class="ai-prompt-modal__title" id="ai-prompt-title">AI 생성</div>
+                    <button type="button" class="ai-prompt-modal__close" id="ai-prompt-close-button" aria-label="닫기">닫기</button>
                 </div>
-                <div class="ai-prompt-compose-wrap">
-                    <div class="ai-prompt-compose-menu" id="ai-prompt-compose-menu" hidden>
-                        <button type="button" class="ai-prompt-compose-menu__item" id="ai-prompt-attach-button">사진 및 파일 추가</button>
+                <div class="ai-prompt-modal__body">
+                    <div class="ai-prompt-thread">
+                        <div class="ai-prompt-thread__bubble" id="ai-prompt-bubble">작품을 생성해줘</div>
                     </div>
-                    <input type="file" id="ai-prompt-file-input" accept="image/*,*" hidden>
-                    <div class="ai-prompt-compose">
-                        <div class="ai-prompt-compose__attachments" id="ai-prompt-attachments" hidden>
-                            <div class="ai-prompt-attachment ai-prompt-attachment--image" id="ai-prompt-image-attachment" hidden>
-                                <img id="ai-prompt-image-preview" alt="첨부 이미지 미리보기">
-                                <button type="button" class="ai-prompt-attachment__remove" id="ai-prompt-remove-attachment" aria-label="첨부 삭제">삭제</button>
-                            </div>
-                            <div class="ai-prompt-attachment ai-prompt-attachment--file" id="ai-prompt-file-attachment" hidden>
-                                <span class="ai-prompt-attachment__file-name" id="ai-prompt-file-name"></span>
-                                <button type="button" class="ai-prompt-attachment__remove" id="ai-prompt-remove-file-attachment" aria-label="첨부 삭제">삭제</button>
-                            </div>
+                    <div class="ai-prompt-compose-wrap">
+                        <div class="ai-prompt-compose-menu" id="ai-prompt-compose-menu" hidden>
+                            <button type="button" class="ai-prompt-compose-menu__item" id="ai-prompt-attach-button">사진 및 파일 추가</button>
                         </div>
-                        <button type="button" class="ai-prompt-compose__tool" id="ai-prompt-tool-button" aria-label="추가" aria-expanded="false">+</button>
-                        <input type="text" class="ai-prompt-compose__input" id="ai-prompt-input" placeholder="무엇이든 물어보세요" autocomplete="off">
-                        <button type="button" class="ai-prompt-compose__send" id="ai-prompt-send-button" aria-label="전송">전송</button>
+                        <input type="file" id="ai-prompt-file-input" accept="image/*,*" hidden>
+                        <div class="ai-prompt-compose">
+                            <div class="ai-prompt-compose__attachments" id="ai-prompt-attachments" hidden>
+                                <div class="ai-prompt-attachment ai-prompt-attachment--image" id="ai-prompt-image-attachment" hidden>
+                                    <img id="ai-prompt-image-preview" alt="첨부 이미지 미리보기">
+                                    <button type="button" class="ai-prompt-attachment__remove" id="ai-prompt-remove-attachment" aria-label="첨부 삭제">삭제</button>
+                                </div>
+                                <div class="ai-prompt-attachment ai-prompt-attachment--file" id="ai-prompt-file-attachment" hidden>
+                                    <span class="ai-prompt-attachment__file-name" id="ai-prompt-file-name"></span>
+                                    <button type="button" class="ai-prompt-attachment__remove" id="ai-prompt-remove-file-attachment" aria-label="첨부 삭제">삭제</button>
+                                </div>
+                            </div>
+                            <button type="button" class="ai-prompt-compose__tool" id="ai-prompt-tool-button" aria-label="추가" aria-expanded="false">+</button>
+                            <input type="text" class="ai-prompt-compose__input" id="ai-prompt-input" placeholder="무엇이든 물어보세요" autocomplete="off">
+                            <button type="button" class="ai-prompt-compose__send" id="ai-prompt-send-button" aria-label="전송">전송</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 
     <script src="/js/work/work-register.js" th:src="@{/js/work/work-register.js}"></script>
