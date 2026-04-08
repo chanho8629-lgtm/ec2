@@ -31,7 +31,7 @@
                   data-submit-label=${editMode ? '수정' : '등록'}"
          hidden></div>
 
-    <div id="work-register-modal"
+    <div id="work-register-root"
          th:class="${standalone} ? 'page-shell' : 'work-register-embedded-root'">
         <div th:class="${standalone} ? 'upload-dialog' : 'work-register-panel'">
             <div class="dialog-content" id="dialog-content" role="dialog" aria-modal="true" aria-labelledby="work-register-title">
@@ -80,7 +80,7 @@
 </th:block>
 
 <th:block th:fragment="workRegisterDialogBody">
-    <div class="dialog-screen is-active" id="upload-screen">
+    <div class="work-register-view work-register-view-current" id="upload-screen">
         <div class="upload-header-block">
             <div class="upload-header-row">
                 <div id="work-register-title" class="upload-header-title">작품 업로드</div>
@@ -104,7 +104,7 @@
         </div>
     </div>
 
-    <div class="dialog-screen details-screen" id="details-screen" hidden>
+    <div class="work-register-view details-screen" id="details-screen" hidden>
         <div class="details-header-block">
             <div class="details-title-row">
                 <div class="details-file-title" id="details-video-title">업로드한 작품</div>
@@ -116,7 +116,7 @@
             </div>
         </div>
 
-        <div class="details-content">
+        <div class="work-register-details-layout">
             <div class="details-main">
                 <div class="section-head"><h1>세부정보</h1></div>
 

@@ -62,10 +62,18 @@ function initializeGalleryRegister() {
 
     modal.hidden = false;
     modal.style.display = "flex";
-    modal.style.position = "fixed";
-    modal.style.left = "50%";
-    modal.style.top = "50%";
-    modal.style.transform = "translate(-50%, -50%)";
+
+    if (modal.getAttribute("data-compose-embedded") === "true") {
+        modal.style.position = "relative";
+        modal.style.left = "auto";
+        modal.style.top = "auto";
+        modal.style.transform = "none";
+    } else {
+        modal.style.position = "fixed";
+        modal.style.left = "50%";
+        modal.style.top = "50%";
+        modal.style.transform = "translate(-50%, -50%)";
+    }
 
     function closeModal() {
         if (typeof window.closeComposeModal === "function") {

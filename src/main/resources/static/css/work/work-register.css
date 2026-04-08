@@ -221,18 +221,18 @@ body.work-register-page a:hover,
     fill: currentColor;
 }
 
-.dialog-screen {
+.work-register-view {
     display: none;
     flex: 1;
 }
 
-.dialog-screen.is-active {
+.work-register-view.work-register-view-current {
     display: flex;
     flex-direction: column;
     min-height: 0;
 }
 
-.dialog-screen#upload-screen {
+.work-register-view#upload-screen {
     min-height: 0;
     flex: 1;
 }
@@ -951,7 +951,7 @@ body.work-register-page a:hover,
     display: none;
 }
 
-.step.is-active {
+.step.step-current {
     color: #0f0f0f;
 }
 
@@ -973,12 +973,12 @@ body.work-register-page a:hover,
     margin-top: 4px;
 }
 
-.step.is-active .step-dot {
+.step.step-current .step-dot {
     border-color: #0f0f0f;
     background: #0f0f0f;
 }
 
-.details-content {
+.work-register-details-layout {
     flex: 1;
     min-height: 0;
     display: grid;
@@ -1091,7 +1091,7 @@ body.work-register-page a:hover,
     background: #fff;
 }
 
-.field-control.is-active .field-count {
+.field-control.field-focused .field-count {
     display: block;
 }
 
@@ -1355,7 +1355,7 @@ body.work-register-page a:hover,
 }
 
 .tags-suggestion-item:hover,
-.tags-suggestion-item.is-active {
+.tags-suggestion-item.tags-suggestion-current {
     background: #f2f2f2;
 }
 
@@ -1910,7 +1910,7 @@ body.work-register-page a:hover,
         width: calc(100vw - 56px);
     }
 
-    .details-content {
+    .work-register-details-layout {
         grid-template-columns: 1fr;
     }
 
@@ -1926,7 +1926,7 @@ body.work-register-page a:hover,
 
     .dialog-header,
     .details-header-block,
-    .details-content,
+    .work-register-details-layout,
     .details-footer {
         padding-left: 16px;
         padding-right: 16px;
