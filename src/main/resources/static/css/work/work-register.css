@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 body.work-register-page *,
-.work-register-embedded-host *,
+.work-register-embedded-root *,
 .ai-prompt-modal * {
     box-sizing: border-box;
     margin: 0;
@@ -18,9 +18,9 @@ body.work-register-page {
 body.work-register-page button,
 body.work-register-page input,
 body.work-register-page textarea,
-.work-register-embedded-host button,
-.work-register-embedded-host input,
-.work-register-embedded-host textarea,
+.work-register-embedded-root button,
+.work-register-embedded-root input,
+.work-register-embedded-root textarea,
 .ai-prompt-modal button,
 .ai-prompt-modal input,
 .ai-prompt-modal textarea {
@@ -28,14 +28,14 @@ body.work-register-page textarea,
 }
 
 body.work-register-page a,
-.work-register-embedded-host a,
+.work-register-embedded-root a,
 .ai-prompt-modal a {
     color: #065fd4;
     text-decoration: none;
 }
 
 body.work-register-page a:hover,
-.work-register-embedded-host a:hover,
+.work-register-embedded-root a:hover,
 .ai-prompt-modal a:hover {
     text-decoration: underline;
 }
@@ -126,23 +126,19 @@ body.work-register-page a:hover,
     display: block;
 }
 
-.work-register-embedded-host {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    min-height: 540px;
-    max-height: calc(100vh - 32px);
-    overflow: hidden;
+.work-register-embedded-root {
+    width: min(960px, calc(100vw - 48px));
+    margin: 0 auto;
 }
 
-.work-register-embedded-dialog {
+.work-register-panel {
     width: 100%;
-    min-height: 0;
-    flex: 1;
-    background: transparent;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+}
+
+.work-register-embedded-root .dialog-content {
+    width: 100%;
+    min-height: 540px;
+    max-height: calc(100vh - 40px);
 }
 
 .page-shell[data-compose-embedded="true"] .dialog-content {

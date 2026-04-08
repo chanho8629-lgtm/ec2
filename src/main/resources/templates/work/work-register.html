@@ -31,17 +31,12 @@
                   data-submit-label=${editMode ? '수정' : '등록'}"
          hidden></div>
 
-    <div class="page-shell" th:if="${standalone}">
-        <div class="upload-dialog" id="work-register-modal">
+    <div id="work-register-modal"
+         th:class="${standalone} ? 'page-shell' : 'work-register-embedded-root'">
+        <div th:class="${standalone} ? 'upload-dialog' : 'work-register-panel'">
             <div class="dialog-content" id="dialog-content" role="dialog" aria-modal="true" aria-labelledby="work-register-title">
                 <th:block th:replace="~{this :: workRegisterDialogBody}"></th:block>
             </div>
-        </div>
-    </div>
-
-    <div class="work-register-embedded-host" id="work-register-modal" th:unless="${standalone}">
-        <div class="work-register-embedded-dialog" id="dialog-content" role="dialog" aria-modal="true" aria-labelledby="work-register-title">
-            <th:block th:replace="~{this :: workRegisterDialogBody}"></th:block>
         </div>
     </div>
 

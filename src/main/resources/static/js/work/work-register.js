@@ -1,6 +1,6 @@
 function initializeWorkRegister() {
     var modal = document.getElementById("work-register-modal");
-    var dialogContent = document.getElementById("dialog-content");
+    var dialogContent = document.getElementById("dialog-content") || modal;
     var uploadScreen = document.getElementById("upload-screen");
     var detailsScreen = document.getElementById("details-screen");
     var uploadPanel = document.getElementById("drop-zone");
