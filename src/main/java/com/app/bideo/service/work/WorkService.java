@@ -270,7 +270,7 @@ public class WorkService {
             workDAO.increaseLikeCount(workId);
             notificationService.createNotification(
                     workDetail.getMemberId(), resolvedMemberId, "LIKE", "WORK", workId,
-                    "작품에 좋아요를 눌렀습니다."
+                    "'" + workDetail.getTitle() + "' 작품에 좋아요를 눌렀습니다."
             );
         }
 

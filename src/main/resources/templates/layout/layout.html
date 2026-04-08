@@ -56,7 +56,6 @@
                       d="M12 3a3 3 0 0 0-3 3v5a3 3 0 1 0 6 0V6a3 3 0 0 0-3-3Zm-7 8a1 1 0 0 1 1 1a6 6 0 0 0 12 0a1 1 0 1 1 2 0a8 8 0 0 1-7 7.94V22h-2v-2.06A8 8 0 0 1 4 12a1 1 0 0 1 1-1Z"
                       fill="currentColor" />
             </svg>
-            <span class="bd-shell__notification-badge" data-bd-notification-badge style="display:none"></span>
           </button>
         </form>
       </div>
@@ -75,12 +74,12 @@
           </svg>
           <span>만들기</span>
         </button>
-        <button class="bd-shell__icon-button" type="button" aria-label="알림" data-bd-shell-notification-toggle aria-expanded="false">
+        <button class="bd-shell__icon-button" type="button" aria-label="알림" data-bd-shell-notification-toggle="" aria-expanded="false" style="position:relative">
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true">
-            <path d="M12 3a6 6 0 0 0-6 6v3.586l-1.707 1.707A1 1 0 0 0 5 16h14a1 1 0 0 0 .707-1.707L18 12.586V9a6 6 0 0 0-6-6Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-            <path d="M9.5 17v.5a2.5 2.5 0 0 0 5 0V17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-            <circle cx="18" cy="5" r="3.5" fill="#6800EA" stroke="#fff" stroke-width="1.2"/>
+            <path d="M12 3a6 6 0 0 0-6 6v3.586l-1.707 1.707A1 1 0 0 0 5 16h14a1 1 0 0 0 .707-1.707L18 12.586V9a6 6 0 0 0-6-6Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+            <path d="M9.5 17v.5a2.5 2.5 0 0 0 5 0V17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
           </svg>
+          <span class="bd-shell__notification-badge" data-bd-notification-badge style="display:none"></span>
         </button>
         <button class="bd-shell__icon-button" type="button" aria-label="계정 메뉴" data-bd-shell-account-toggle aria-expanded="false">
           <img class="bd-shell__avatar" th:src="${currentUserProfileImage != null ? currentUserProfileImage : '/images/default-profile.svg'}" src="/images/default-profile.svg" alt="계정" />
@@ -630,18 +629,12 @@
         <div id="header" class="style-scope ytd-multi-page-menu-renderer">
           <div class="bd-shell__notification-header">
             <h2 class="bd-shell__notification-title">알림</h2>
-            <button type="button" class="bd-shell__notification-toggle" id="notificationToggle" aria-label="알림 설정" title="알림 켜기/끄기" onclick="toggleNotification(this)">
-              <!-- 알림 ON 아이콘 -->
-              <svg class="notification-icon-on" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"
-                   focusable="false" aria-hidden="true"
-                   style="pointer-events: none; display: inherit; width: 100%; height: 100%;">
-                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"></path>
+            <button type="button" class="bd-shell__notification-toggle" id="notificationToggle" aria-label="알림 설정" title="알림 켜기/끄기" data-bd-notification-toggle-btn>
+              <svg class="notification-icon-on" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
+                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
               </svg>
-              <!-- 알림 OFF 아이콘 -->
-              <svg class="notification-icon-off" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"
-                   focusable="false" aria-hidden="true"
-                   style="pointer-events: none; display: none; width: 100%; height: 100%;">
-                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm0-18.5c-.83 0-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h4.5l-5.29-5.29L2 12.5l1.41-1.41L21.09 2.5 20 1.09 17.18 3.91C15.77 2.74 13.98 2 12 2c0 0 0 0 0 1.5zM18 11c0-1.7-.54-3.27-1.46-4.54L8 14.96V16h-.34L6 14.34V11c0-3.07 1.63-5.64 4.5-6.32V4c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v.68c.63.14 1.21.38 1.74.68L18 11zm-6 11c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2z"></path>
+              <svg class="notification-icon-off" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
+                <path d="M20 18.69L7.84 6.14 5.27 3.49 4 4.76l2.8 2.8v.01c-.52.99-.8 2.16-.8 3.43v5l-2 2v1h13.73l2 2L21 19.72l-1-1.03zM12 22c1.11 0 2-.89 2-2h-4c0 1.11.89 2 2 2zm6-7.32V11c0-3.08-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68c-.15.03-.29.08-.42.12-.1.03-.2.07-.3.11h-.01c-.01 0-.01 0-.02.01-.23.09-.46.2-.68.31 0 0 0 0-.01.01L18 14.68z"/>
               </svg>
             </button>
           </div>
@@ -649,16 +642,7 @@
         <div id="container" class="menu-container style-scope ytd-multi-page-menu-renderer">
           <div id="sections" class="style-scope ytd-multi-page-menu-renderer">
             <section class="style-scope ytd-multi-page-menu-renderer">
-              <div class="bd-shell__notification-list">
-                <a class="bd-shell__notification-item is-unread" href="#">
-                  <img class="bd-shell__notification-avatar" src="https://yt3.ggpht.com/5fHEIs3KKq0CrpuF-IpHCTBon6kgd-7lt5CEYzQYrZoCl3L4fhKpaLtWRJ_j-eLXpl9F2ev1bg=s108-c-k-c0x00ffffff-no-rj" alt="" />
-                  <div class="bd-shell__notification-body">
-                    <p class="bd-shell__notification-text"><strong>Studio Clid</strong>님이 회원님의 작품에 댓글을 남겼습니다: "이번 작품 색감이 정말 좋네요!"</p>
-                    <span class="bd-shell__notification-time">3시간 전</span>
-                  </div>
-                  <div class="bd-shell__notification-dot"></div>
-                </a>
-              </div>
+              <div class="bd-shell__notification-list" data-bd-notification-list></div>
             </section>
           </div>
           <div id="footer" class="style-scope ytd-multi-page-menu-renderer"></div>
@@ -778,23 +762,7 @@
   <script defer src="/js/layout/search.js"></script>
   <script defer src="/js/layout/voice-search.js"></script>
   <script defer src="/js/layout/chat.js"></script>
-  <script>
-    function toggleNotification(btn) {
-      const isOff = btn.classList.toggle('is-off');
-      const iconOn = btn.querySelector('.notification-icon-on');
-      const iconOff = btn.querySelector('.notification-icon-off');
-      iconOn.style.display = isOff ? 'none' : 'inherit';
-      iconOff.style.display = isOff ? 'inherit' : 'none';
-      localStorage.setItem('notificationEnabled', !isOff);
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-      const enabled = localStorage.getItem('notificationEnabled');
-      if (enabled === 'false') {
-        const btn = document.getElementById('notificationToggle');
-        if (btn) toggleNotification(btn);
-      }
-    });
-  </script>
+  <script defer src="/js/layout/notification.js"></script>
 </th:block>
 </body>
 

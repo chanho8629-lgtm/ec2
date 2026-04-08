@@ -37,3 +37,5 @@ comment on column tbl_message.deleted_datetime is '삭제 일시 (soft delete)';
 create index idx_msg_room on tbl_message (message_room_id, created_datetime);
 create index idx_msg_sender on tbl_message (sender_id);
 create index idx_msg_reply on tbl_message (reply_to_message_id);
+
+select * from tbl_message;

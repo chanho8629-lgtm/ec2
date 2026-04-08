@@ -4,8 +4,10 @@ import com.app.bideo.auth.member.CustomUserDetails;
 import com.app.bideo.dto.common.SearchHistoryResponseDTO;
 import com.app.bideo.dto.common.TrendingKeywordDTO;
 import com.app.bideo.dto.gallery.SearchGallerySuggestionDTO;
+import com.app.bideo.dto.search.SearchResultResponseDTO;
 import com.app.bideo.service.common.SearchHistoryService;
 import com.app.bideo.service.gallery.GalleryService;
+import com.app.bideo.service.search.SearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,6 +24,7 @@ public class SearchAPIController {
 
     private final SearchHistoryService searchHistoryService;
     private final GalleryService galleryService;
+    private final SearchService searchService;
 
     @GetMapping("/recent")
     public List<SearchHistoryResponseDTO> recentSearches(
@@ -48,7 +51,6 @@ public class SearchAPIController {
         return ResponseEntity.ok().build();
     }
 
-
     @GetMapping("/trending")
     public List<TrendingKeywordDTO> trendingKeywords() {
         return searchHistoryService.getTrendingKeywords();
@@ -57,5 +59,13 @@ public class SearchAPIController {
     @GetMapping("/suggestions")
     public List<SearchGallerySuggestionDTO> gallerySuggestions() {
         return galleryService.getSearchSuggestions();
+    }
+
+    @GetMapping
+    public SearchResultResponseDTO search(
+            @RequestParam String keyword,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long currentMemberId = userDetails != null ? userDetails.getId() : 0L;
+        return searchService.search(keyword, currentMemberId);
     }
 }

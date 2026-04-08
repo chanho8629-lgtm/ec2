@@ -145,9 +145,12 @@ public class MessageService {
         } else {
             messageDAO.saveLike(memberId, messageId);
             messageDAO.increaseLikeCount(messageId);
+            String preview = message.getContent().length() > 30
+                    ? message.getContent().substring(0, 30) + "..."
+                    : message.getContent();
             notificationService.createNotification(
                     message.getSenderId(), memberId, "LIKE", MESSAGE_TARGET_TYPE, messageId,
-                    "메시지에 좋아요를 눌렀습니다."
+                    "'" + preview + "' 메시지에 좋아요를 눌렀습니다."
             );
         }
 
