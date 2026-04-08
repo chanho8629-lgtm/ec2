@@ -256,7 +256,8 @@
           and g.status != 'DELETED'
         <if test="keyword != null and keyword != ''">
             and (g.title ilike '%' || #{keyword} || '%'
-              or g.description ilike '%' || #{keyword} || '%')
+              or g.description ilike '%' || #{keyword} || '%'
+              or m.nickname ilike '%' || #{keyword} || '%')
         </if>
         <if test="memberId != null">
             and g.member_id = #{memberId}
@@ -271,11 +272,13 @@
     <select id="selectGalleryCount" resultType="int">
         select count(*)
         from tbl_gallery g
+        left join tbl_member m on g.member_id = m.id
         where g.deleted_datetime is null
           and g.status != 'DELETED'
         <if test="keyword != null and keyword != ''">
             and (g.title ilike '%' || #{keyword} || '%'
-              or g.description ilike '%' || #{keyword} || '%')
+              or g.description ilike '%' || #{keyword} || '%'
+              or m.nickname ilike '%' || #{keyword} || '%')
         </if>
         <if test="memberId != null">
             and g.member_id = #{memberId}

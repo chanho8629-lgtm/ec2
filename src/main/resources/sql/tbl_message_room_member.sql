@@ -21,3 +21,5 @@ comment on table tbl_message_room_member is '메시지 방 참여자';
 comment on column tbl_message_room_member.id is 'PK';
 
 create index idx_mrm_member on tbl_message_room_member (member_id);
+
+select * from tbl_message_room_member;

@@ -1,4 +1,6 @@
-const searchEvent = (() => {
+window.onload = () => {
+  let isBound = false;
+
   // 모든 드롭다운 닫기
   const closeAllDropdowns = () => {
     document.querySelectorAll(".gallery-dropdown, .work-dropdown, .sort-filter-dropdown").forEach((dropdown) => {
@@ -28,6 +30,7 @@ const searchEvent = (() => {
   let toastTimer = null;
 
   const showToast = (message, actionText = null, actionCallback = null) => {
+    console.log("들어옴1 - showToast", message);
     if (toastTimer) {
       clearTimeout(toastTimer);
       toast.classList.add("off");
@@ -56,9 +59,12 @@ const searchEvent = (() => {
 
   // 동적 요소 인터랙션 바인딩 (검색 결과 렌더링 후 호출)
   const bindDynamic = () => {
+    console.log("들어옴1 - bindDynamic");
+
     // 구독 버튼 토글
     document.querySelectorAll(".subscribe-btn").forEach((btn) => {
       btn.addEventListener("click", (e) => {
+        console.log("들어옴1 - 구독 버튼 클릭");
         const isSubscribed = btn.textContent === "구독중";
         if (isSubscribed) {
           btn.textContent = "구독";
@@ -89,6 +95,7 @@ const searchEvent = (() => {
     document.querySelectorAll(".gallery-dropdown-item[data-action], .work-dropdown-item[data-action]").forEach((item) => {
       item.addEventListener("click", (e) => {
         const action = item.dataset.action;
+        console.log("들어옴1 - 드롭다운 액션", action);
         closeAllDropdowns();
 
         switch (action) {
@@ -101,27 +108,21 @@ const searchEvent = (() => {
           case "wishlist":
             const dropdown = item.closest(".gallery-dropdown, .work-dropdown");
             const targetType = dropdown.dataset.targetType;
-            const targetId = dropdown.dataset.targetId;
+            const targetId = Number(dropdown.dataset.targetId);
 
-            fetch("/api/bookmarks", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ targetType, targetId: Number(targetId) })
-            })
-              .then(r => r.json())
-              .then(result => {
-                const wishlistText = item.querySelector(".wishlist-text");
-                if (result.bookmarked) {
-                  item.dataset.wished = "true";
-                  wishlistText.textContent = "찜 목록 제거";
-                  showToast("찜목록에 추가 되었습니다.");
-                } else {
-                  item.dataset.wished = "";
-                  wishlistText.textContent = "찜 목록 추가";
-                  showToast("찜목록에서 제거되었습니다.");
-                }
-              })
-              .catch(() => showToast("로그인이 필요합니다."));
+            searchService.toggleBookmark(targetType, targetId, (result) => {
+              console.log("들어옴2 - 북마크 콜백", result);
+              const wishlistText = item.querySelector(".wishlist-text");
+              if (result.bookmarked) {
+                item.dataset.wished = "true";
+                wishlistText.textContent = "찜 목록 제거";
+                showToast("찜목록에 추가 되었습니다.");
+              } else {
+                item.dataset.wished = "";
+                wishlistText.textContent = "찜 목록 추가";
+                showToast("찜목록에서 제거되었습니다.");
+              }
+            }).catch(() => showToast("로그인이 필요합니다."));
             break;
 
           case "no-recommend":
@@ -157,8 +158,12 @@ const searchEvent = (() => {
     });
   };
 
-  // 정적 요소 이벤트 (페이지 로드 시 1회)
+  // 정적 요소 이벤트 (페이지 로드 시 1회, guard로 중복 방지)
   const init = () => {
+    if (isBound) return;
+    isBound = true;
+    console.log("들어옴1 - init");
+
     // 필터 클릭
     const chips = document.querySelectorAll(".chip");
     chips.forEach((chip) => {
@@ -194,7 +199,7 @@ const searchEvent = (() => {
       closeAllDropdowns();
     });
 
-    // 공유 모달
+    // 공유 모달 - 링크 복사
     const shareLinkCopyBtn = shareOverlay.querySelector(".work-share-modal__link-copy");
     const shareCloseBtn = shareOverlay.querySelector(".work-share-modal__close");
     const shareLinkInput = shareOverlay.querySelector(".work-share-modal__link-input");
@@ -222,16 +227,103 @@ const searchEvent = (() => {
       }
     });
 
-    // 공유 모달 검색 드롭다운
+    // 공유 모달 - 받는 사람 검색
     const shareSearchInput = shareOverlay.querySelector(".work-share-modal__search");
     const shareList = shareOverlay.querySelector(".work-share-modal__list");
+    const shareChips = shareOverlay.querySelector(".work-share-modal__chips");
+    const shareSendBtn = shareOverlay.querySelector(".work-share-modal__send");
+    const shareMessageInput = shareOverlay.querySelector(".work-share-modal__message");
+    let shareSelectedMembers = [];
+    let shareSearchTimer = null;
 
     shareSearchInput.addEventListener("input", (e) => {
-      if (shareSearchInput.value.trim().length > 0) {
-        shareList.classList.remove("off");
-      } else {
+      const keyword = shareSearchInput.value.trim();
+      if (shareSearchTimer) clearTimeout(shareSearchTimer);
+
+      if (keyword.length === 0) {
         shareList.classList.add("off");
+        return;
       }
+
+      shareSearchTimer = setTimeout(() => {
+        searchService.searchMembers(keyword, (members) => {
+          console.log("들어옴1 - 멤버검색 콜백", members);
+          shareList.innerHTML = "";
+          members.forEach((m) => {
+            const btn = document.createElement("button");
+            btn.className = "work-share-recipient";
+            btn.dataset.memberId = m.id;
+            btn.dataset.nickname = m.nickname;
+            btn.innerHTML = `
+              <div class="work-share-recipient__main">
+                <div class="work-share-recipient__avatar"><img src="${m.profileImage || '/images/default-profile.png'}" alt=""></div>
+                <div class="work-share-recipient__copy">
+                  <span class="work-share-recipient__username">${m.nickname}</span>
+                </div>
+              </div>
+              <div class="work-share-recipient__check"></div>
+            `;
+            btn.addEventListener("click", () => {
+              const id = Number(m.id);
+              if (shareSelectedMembers.find((s) => s.id === id)) return;
+              shareSelectedMembers.push({ id: id, nickname: m.nickname });
+              renderShareChips();
+              shareSearchInput.value = "";
+              shareList.classList.add("off");
+            });
+            shareList.appendChild(btn);
+          });
+          shareList.classList.remove("off");
+        }).catch(() => shareList.classList.add("off"));
+      }, 300);
+    });
+
+    const renderShareChips = () => {
+      shareChips.innerHTML = "";
+      shareSelectedMembers.forEach((m, idx) => {
+        const chip = document.createElement("span");
+        chip.className = "work-share-chip";
+        chip.textContent = m.nickname;
+        chip.style.cssText = "display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;background:#e0e0e0;font-size:13px;margin-right:4px;";
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "×";
+        removeBtn.style.cssText = "border:none;background:none;cursor:pointer;font-size:14px;padding:0 2px;";
+        removeBtn.addEventListener("click", () => {
+          shareSelectedMembers.splice(idx, 1);
+          renderShareChips();
+        });
+        chip.appendChild(removeBtn);
+        shareChips.appendChild(chip);
+      });
+    };
+
+    // 공유 모달 - 보내기
+    shareSendBtn.addEventListener("click", async () => {
+      console.log("들어옴1 - 공유 보내기 클릭");
+      if (shareSelectedMembers.length === 0) {
+        showToast("받는 사람을 선택해주세요.");
+        return;
+      }
+
+      const messageText = shareMessageInput.value.trim();
+      const linkText = shareLinkInput.value;
+      const content = messageText ? `${messageText}\n${linkText}` : linkText;
+
+      try {
+        for (const member of shareSelectedMembers) {
+          await searchService.shareToMember(member.id, content, (data) => {
+            console.log("들어옴2 - 공유 전송 콜백", data);
+          });
+        }
+        showToast("공유되었습니다.");
+      } catch (error) {
+        showToast("로그인이 필요합니다.");
+      }
+
+      shareOverlay.classList.add("off");
+      shareSelectedMembers = [];
+      shareChips.innerHTML = "";
+      shareMessageInput.value = "";
     });
 
     // 신고 모달
@@ -257,24 +349,16 @@ const searchEvent = (() => {
       const selectedReason = document.querySelector("input[name='report-reason']:checked");
       if (!selectedReason) return;
 
-      fetch("/api/reports", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          targetType: reportTarget.targetType,
-          targetId: reportTarget.targetId,
-          reason: selectedReason.value,
-          detail: ""
-        })
-      })
-        .then(r => {
-          reportOverlay.classList.add("off");
-          showToast("신고해 주셔서 감사합니다.");
-        })
-        .catch(() => {
-          reportOverlay.classList.add("off");
-          showToast("로그인이 필요합니다.");
-        });
+      console.log("들어옴1 신고 제출", reportTarget.targetType, reportTarget.targetId, selectedReason.value);
+
+      searchService.report(reportTarget.targetType, reportTarget.targetId, selectedReason.value, () => {
+        console.log("들어옴2 신고 콜백댐");
+        reportOverlay.classList.add("off");
+        showToast("신고해 주셔서 감사합니다.");
+      }).catch(() => {
+        reportOverlay.classList.add("off");
+        showToast("로그인이 필요합니다.");
+      });
     });
 
     // ESC 키로 모달 닫기
@@ -286,5 +370,19 @@ const searchEvent = (() => {
     });
   };
 
-  return { init, bindDynamic };
-})();
+  // 페이지 초기화
+  const keyword = new URLSearchParams(location.search).get("search_query") || "";
+  console.log("들어옴2 keyword", keyword);
+
+  init();
+
+  if (keyword.trim()) {
+    const searchResults = document.getElementById("searchResults");
+    searchService.search(keyword, (data) => {
+      console.log("들어옴3 search 콜백댐");
+      const criteria = searchLayout.render(searchResults, data);
+      console.log("들어옴4 결과", criteria);
+      bindDynamic();
+    });
+  }
+};

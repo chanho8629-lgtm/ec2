@@ -119,6 +119,7 @@ const searchLayout = (() => {
   };
 
   const render = (container, data) => {
+    console.log("들어옴1 레이아웃", data);
     container.innerHTML = "";
 
     if (data.profiles) data.profiles.forEach(m => container.appendChild(createProfileEl(m)));
@@ -128,7 +129,16 @@ const searchLayout = (() => {
     if (container.children.length === 0) {
       container.innerHTML = `<div class="no-results">검색 결과가 없습니다.</div>`;
     }
+
+    console.log("들어옴2 레이아웃완료, profiles:", (data.profiles || []).length, "galleries:", (data.galleries || []).length, "works:", (data.works || []).length);
+
+    return {
+      profileCount: (data.profiles || []).length,
+      galleryCount: (data.galleries || []).length,
+      workCount: (data.works || []).length,
+      totalCount: (data.profiles || []).length + (data.galleries || []).length + (data.works || []).length
+    };
   };
 
-  return { render };
+  return { render: render };
 })();

@@ -26,7 +26,7 @@ public class ReportService {
         }
 
         String targetType = normalize(requestDTO.getTargetType());
-        String reason = normalize(requestDTO.getReason());
+        String reason = requestDTO.getReason() != null ? requestDTO.getReason().getValue() : "";
 
         reportRepository.save(
                 ReportVO.builder()
