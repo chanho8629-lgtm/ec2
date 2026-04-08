@@ -11,6 +11,7 @@ public class MemberListResponseDTO {
     private Long id;
     private String nickname;
     private String profileImage;
+    private String bio;
     private Boolean creatorVerified;
     private String creatorTier;
     private Integer followerCount;

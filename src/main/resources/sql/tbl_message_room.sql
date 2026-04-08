@@ -12,3 +12,5 @@ create table tbl_message_room (
 comment on table tbl_message_room is '메시지 방';
 comment on column tbl_message_room.id is 'PK';
 
+select * from tbl_message_room;
+

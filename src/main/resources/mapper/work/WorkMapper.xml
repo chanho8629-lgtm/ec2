@@ -214,6 +214,7 @@
             and (
                 w.title ilike '%' || #{keyword} || '%'
                 or w.description ilike '%' || #{keyword} || '%'
+                or m.nickname ilike '%' || #{keyword} || '%'
             )
         </if>
         <if test="category != null and category != ''">
@@ -244,6 +245,7 @@
     <select id="selectWorkCount" resultType="int">
         select count(*)
         from tbl_work w
+        left join tbl_member m on w.member_id = m.id
         where w.deleted_datetime is null
           and w.status != 'DELETED'
         <if test="galleryId != null">
@@ -258,6 +260,7 @@
             and (
                 w.title ilike '%' || #{keyword} || '%'
                 or w.description ilike '%' || #{keyword} || '%'
+                or m.nickname ilike '%' || #{keyword} || '%'
             )
         </if>
         <if test="category != null and category != ''">

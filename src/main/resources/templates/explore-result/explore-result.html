@@ -5,7 +5,9 @@
     <link rel="stylesheet" href="/css/explore-result/explore-result.css" th:href="@{/css/explore-result/explore-result.css}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    <script defer src="/js/explore-result/explore-result.js" th:src="@{/js/explore-result/explore-result.js}"></script>
+    <script defer src="/js/explore-result/service.js" th:src="@{/js/explore-result/service.js}"></script>
+    <script defer src="/js/explore-result/layout.js" th:src="@{/js/explore-result/layout.js}"></script>
+    <script defer src="/js/explore-result/event.js" th:src="@{/js/explore-result/event.js}"></script>
 </head>
 <body>
     <div th:replace="~{layout/layout :: ytShellChrome('search')}"></div>
@@ -16,502 +18,23 @@
         <main class="main-content" id="section">
             <!-- 필터 -->
             <div class="filter-chips">
-                <button class="chip active">전체</button>
-                <button class="chip">프로필</button>
-                <button class="chip">예술관</button>
-                <button class="chip">작품</button>
+                <button class="chip active" data-filter="all">전체</button>
+                <button class="chip" data-filter="profile">프로필</button>
+                <button class="chip" data-filter="gallery">예술관</button>
+                <button class="chip" data-filter="work">작품</button>
                 <div class="sort-filter">
                     <button class="sort-filter-btn"><span class="sort-filter-text">최신순</span>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M9 3a4 4 0 00-3.874 3H3a1 1 0 000 2h2.126a4.002 4.002 0 007.748 0H21a1 1 0 100-2h-8.126A4 4 0 009 3Zm0 2a2 2 0 110 4 2 2 0 010-4Zm6 8a4 4 0 00-3.874 3H3a1 1 0 000 2h8.126a4.002 4.002 0 007.748 0H21a1 1 0 000-2h-2.126A4 4 0 0015 13Zm0 2a2 2 0 110 4 2 2 0 010-4Z"></path></svg>
                     </button>
                     <div class="sort-filter-dropdown off">
-                        <div class="sort-filter-dropdown-item active">최신순</div>
-                        <div class="sort-filter-dropdown-item">인기순</div>
+                        <div class="sort-filter-dropdown-item active" data-sort="latest">최신순</div>
+                        <div class="sort-filter-dropdown-item" data-sort="popular">인기순</div>
                     </div>
                 </div>
             </div>
 
             <!-- 검색 결과 섹션 -->
-            <div class="item-section-renderer">
-
-                <!-- 프로필 -->
-                <div class="item-section-content profile-renderer">
-                    <div class="channel-avatar">
-                        <img class="avatar-circle" src="/images/logo.png" alt="하이픽션">
-                    </div>
-                    <div class="channel-info">
-                        <div class="channel-header">
-                            <h3 class="channel-name">
-                                망고비디오
-                                <svg class="verified-badge" viewBox="0 0 24 24" width="14" height="14" fill="#606060"> <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                            </h3>
-                            <button class="subscribe-btn">구독</button>
-                        </div>
-                        <p class="channel-handle">@Mango.official - 팔로워 2.1만명</p>
-                        <p class="channel-desc">안녕하세요.</p>
-                    </div>
-                </div>
-
-                <!-- 예술관 -->
-                <div class="item-section-content gallery-renderer">
-                    <div class="gallery-thumbnail">
-                        <img class="thumbnail-img" src="/images/logo.png">
-                    </div>
-                    <div class="gallery-info">
-                        <h3 class="gallery-title">예술관자리</h3>
-                        <div class="gallery-metadata">
-                            <span>방문수 8.1만회</span>
-                            <span>·</span>
-                            <span>21시간 전</span>
-                        </div>
-                        <div class="gallery-channel">
-                            <div class="gallery-channel-icon">
-                                <img class="gallery-icon-circle" src="/images/logo.png">
-                            </div>
-                            <span class="gallery-channel-name">망고비디오</span>
-                            <svg class="verified-badge-small" viewBox="0 0 24 24" width="12" height="12" fill="#606060"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                        </div>
-                        <p class="gallery-description">망고비디오 #망고 #비디오 #글로벌게이츠 #햇살장터 </p>
-                        <span class="gallery-badge">새 동영상</span>
-                    </div>
-                    <button class="gallery-more-btn" aria-label="예술관더보기버튼">⋮</button>
-                    <div class="gallery-dropdown off">
-                        <!-- <div class="gallery-dropdown-item" data-action="watch-later">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1Zm0 2a9 9 0 110 18.001A9 9 0 0112 3Zm0 3a1 1 0 00-1 1v5.565l.485.292 3.33 2a1 1 0 001.03-1.714L13 11.435V7a1 1 0 00-1-1Z"></path></svg>
-                            나중에 볼 동영상에 저장
-                        </div>
-                        <div class="gallery-dropdown-item" data-action="save-playlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z"></path></svg>
-                            재생목록에 저장
-                        </div> -->
-                        <div class="gallery-dropdown-item" data-action="share">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M10 3.158V7.51c-5.428.223-8.27 3.75-8.875 11.199-.04.487-.07.975-.09 1.464l-.014.395c-.014.473.578.684.88.32.302-.368.61-.73.925-1.086l.244-.273c1.79-1.967 3-2.677 4.93-2.917a18.011 18.011 0 012-.112v4.346a1 1 0 001.646.763l9.805-8.297 1.55-1.31-1.55-1.31-9.805-8.297A1 1 0 0010 3.158Zm2 6.27v.002-4.116l7.904 6.688L12 18.689v-4.212l-2.023.024c-1.935.022-3.587.17-5.197 1.024a9 9 0 00-1.348.893c.355-1.947.916-3.39 1.63-4.425 1.062-1.541 2.607-2.385 5.02-2.485L12 9.428Z"></path></svg>
-                            공유
-                        </div>
-                        <div class="gallery-dropdown-item" data-action="wishlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z"></path></svg>
-                            <span class="wishlist-text">찜 목록 추가</span>
-                        </div>
-                        <div class="gallery-dropdown-item" data-action="no-recommend">
-                            <img src="/images/Icon=minus-circle.png">
-                            채널 추천 안함
-                        </div>
-                        <div class="gallery-dropdown-item" data-action="report">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="m4 2.999-.146.073A1.55 1.55 0 003 4.454v16.545a1 1 0 102 0v-6.491a7.26 7.26 0 016.248.115l.752.376a8.94 8.94 0 008 0l.145-.073c.524-.262.855-.797.855-1.382V4.458a1.21 1.21 0 00-1.752-1.083 7.26 7.26 0 01-6.496 0L12 2.999a8.94 8.94 0 00-8 0Zm7.105 1.79v-.002l.752.376A9.26 9.26 0 0019 5.641v7.62a6.95 6.95 0 01-6.105-.052l-.752-.376A9.261 9.261 0 005 12.355v-7.62a6.94 6.94 0 016.105.054Z"></path></svg>
-                            신고
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 작품영상 -->
-                <div class="item-section-content work-renderer">
-                    <div class="work-thumbnail">
-                        <img class="thumbnail-img" src="/images/logo.png">
-                        <span class="work-duration">2:59</span>
-                    </div>
-                    <div class="work-info">
-                        <h3 class="work-title">작품영상자리</h3>
-                        <div class="work-metadata">
-                            <span>조회수 8만회</span>
-                            <span>·</span>
-                            <span>하루 전</span>
-                        </div>
-                        <div class="work-channel">
-                            <div class="work-channel-icon">
-                                <img class="work-icon-circle" src="/images/logo.png">
-                            </div>
-                            <span class="work-channel-name">망고비디오</span>
-                            <svg class="verified-badge-small" viewBox="0 0 24 24" width="12" height="12" fill="#606060"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                        </div>
-                        <p class="work-description">안녕하세요 반갑습니다. 안녕하세요 반갑습니다. 안녕하세요 반갑습니다. 안녕하세요 반갑습니다. 안녕하세요 반갑습니다. 안녕하세요 반갑습니다.</p>
-                    </div>
-                    <button class="work-more-btn" aria-label="작품더보기버튼">⋮</button>
-                    <div class="work-dropdown off">
-                        <!-- <div class="work-dropdown-item" data-action="watch-later">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1Zm0 2a9 9 0 110 18.001A9 9 0 0112 3Zm0 3a1 1 0 00-1 1v5.565l.485.292 3.33 2a1 1 0 001.03-1.714L13 11.435V7a1 1 0 00-1-1Z"></path></svg>
-                            나중에 볼 동영상에 저장
-                        </div>
-                        <div class="work-dropdown-item" data-action="save-playlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z"></path></svg>
-                            재생목록에 저장
-                        </div> -->
-                        <div class="work-dropdown-item" data-action="share">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M10 3.158V7.51c-5.428.223-8.27 3.75-8.875 11.199-.04.487-.07.975-.09 1.464l-.014.395c-.014.473.578.684.88.32.302-.368.61-.73.925-1.086l.244-.273c1.79-1.967 3-2.677 4.93-2.917a18.011 18.011 0 012-.112v4.346a1 1 0 001.646.763l9.805-8.297 1.55-1.31-1.55-1.31-9.805-8.297A1 1 0 0010 3.158Zm2 6.27v.002-4.116l7.904 6.688L12 18.689v-4.212l-2.023.024c-1.935.022-3.587.17-5.197 1.024a9 9 0 00-1.348.893c.355-1.947.916-3.39 1.63-4.425 1.062-1.541 2.607-2.385 5.02-2.485L12 9.428Z"></path></svg>
-                            공유
-                        </div>
-                        <div class="work-dropdown-item" data-action="wishlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z"></path></svg>
-                            <span class="wishlist-text">찜 목록 추가</span>
-                        </div>
-                        <div class="work-dropdown-item" data-action="no-recommend">
-                            <img src="/images/Icon=minus-circle.png">
-                            채널 추천 안함
-                        </div>
-                        <div class="work-dropdown-item" data-action="report">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="m4 2.999-.146.073A1.55 1.55 0 003 4.454v16.545a1 1 0 102 0v-6.491a7.26 7.26 0 016.248.115l.752.376a8.94 8.94 0 008 0l.145-.073c.524-.262.855-.797.855-1.382V4.458a1.21 1.21 0 00-1.752-1.083 7.26 7.26 0 01-6.496 0L12 2.999a8.94 8.94 0 00-8 0Zm7.105 1.79v-.002l.752.376A9.26 9.26 0 0019 5.641v7.62a6.95 6.95 0 01-6.105-.052l-.752-.376A9.261 9.261 0 005 12.355v-7.62a6.94 6.94 0 016.105.054Z"></path></svg>
-                            신고
-                        </div>
-                    </div>
-                </div>
-
-                                <!-- 프로필 -->
-                <div class="item-section-content profile-renderer">
-                    <div class="channel-avatar">
-                        <img class="avatar-circle" src="/images/logo.png" alt="하이픽션">
-                    </div>
-                    <div class="channel-info">
-                        <div class="channel-header">
-                            <h3 class="channel-name">
-                                망고비디오
-                                <svg class="verified-badge" viewBox="0 0 24 24" width="14" height="14" fill="#606060"> <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                            </h3>
-                            <button class="subscribe-btn">구독</button>
-                        </div>
-                        <p class="channel-handle">@Mango.official - 팔로워 2.1만명</p>
-                        <p class="channel-desc">안녕하세요.</p>
-                    </div>
-                </div>
-
-                <!-- 예술관 -->
-                <div class="item-section-content gallery-renderer">
-                    <div class="gallery-thumbnail">
-                        <img class="thumbnail-img" src="/images/logo.png">
-                    </div>
-                    <div class="gallery-info">
-                        <h3 class="gallery-title">예술관자리</h3>
-                        <div class="gallery-metadata">
-                            <span>방문수 8.1만회</span>
-                            <span>·</span>
-                            <span>21시간 전</span>
-                        </div>
-                        <div class="gallery-channel">
-                            <div class="gallery-channel-icon">
-                                <img class="gallery-icon-circle" src="/images/logo.png">
-                            </div>
-                            <span class="gallery-channel-name">망고비디오</span>
-                            <svg class="verified-badge-small" viewBox="0 0 24 24" width="12" height="12" fill="#606060"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                        </div>
-                        <p class="gallery-description">망고비디오 #망고 #비디오 #글로벌게이츠 #햇살장터 </p>
-                        <span class="gallery-badge">새 동영상</span>
-                    </div>
-                    <button class="gallery-more-btn" aria-label="예술관더보기버튼">⋮</button>
-                    <div class="gallery-dropdown off">
-                        <!-- <div class="gallery-dropdown-item" data-action="watch-later">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1Zm0 2a9 9 0 110 18.001A9 9 0 0112 3Zm0 3a1 1 0 00-1 1v5.565l.485.292 3.33 2a1 1 0 001.03-1.714L13 11.435V7a1 1 0 00-1-1Z"></path></svg>
-                            나중에 볼 동영상에 저장
-                        </div>
-                        <div class="gallery-dropdown-item" data-action="save-playlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z"></path></svg>
-                            재생목록에 저장
-                        </div> -->
-                        <div class="gallery-dropdown-item" data-action="share">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M10 3.158V7.51c-5.428.223-8.27 3.75-8.875 11.199-.04.487-.07.975-.09 1.464l-.014.395c-.014.473.578.684.88.32.302-.368.61-.73.925-1.086l.244-.273c1.79-1.967 3-2.677 4.93-2.917a18.011 18.011 0 012-.112v4.346a1 1 0 001.646.763l9.805-8.297 1.55-1.31-1.55-1.31-9.805-8.297A1 1 0 0010 3.158Zm2 6.27v.002-4.116l7.904 6.688L12 18.689v-4.212l-2.023.024c-1.935.022-3.587.17-5.197 1.024a9 9 0 00-1.348.893c.355-1.947.916-3.39 1.63-4.425 1.062-1.541 2.607-2.385 5.02-2.485L12 9.428Z"></path></svg>
-                            공유
-                        </div>
-                        <div class="gallery-dropdown-item" data-action="wishlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z"></path></svg>
-                            <span class="wishlist-text">찜 목록 추가</span>
-                        </div>
-                        <div class="gallery-dropdown-item" data-action="no-recommend">
-                            <img src="/images/Icon=minus-circle.png">
-                            채널 추천 안함
-                        </div>
-                        <div class="gallery-dropdown-item" data-action="report">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="m4 2.999-.146.073A1.55 1.55 0 003 4.454v16.545a1 1 0 102 0v-6.491a7.26 7.26 0 016.248.115l.752.376a8.94 8.94 0 008 0l.145-.073c.524-.262.855-.797.855-1.382V4.458a1.21 1.21 0 00-1.752-1.083 7.26 7.26 0 01-6.496 0L12 2.999a8.94 8.94 0 00-8 0Zm7.105 1.79v-.002l.752.376A9.26 9.26 0 0019 5.641v7.62a6.95 6.95 0 01-6.105-.052l-.752-.376A9.261 9.261 0 005 12.355v-7.62a6.94 6.94 0 016.105.054Z"></path></svg>
-                            신고
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 작품영상 -->
-                <div class="item-section-content work-renderer">
-                    <div class="work-thumbnail">
-                        <img class="thumbnail-img" src="/images/logo.png">
-                        <span class="work-duration">2:59</span>
-                    </div>
-                    <div class="work-info">
-                        <h3 class="work-title">작품영상자리</h3>
-                        <div class="work-metadata">
-                            <span>조회수 8만회</span>
-                            <span>·</span>
-                            <span>하루 전</span>
-                        </div>
-                        <div class="work-channel">
-                            <div class="work-channel-icon">
-                                <img class="work-icon-circle" src="/images/logo.png">
-                            </div>
-                            <span class="work-channel-name">망고비디오</span>
-                            <svg class="verified-badge-small" viewBox="0 0 24 24" width="12" height="12" fill="#606060"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                        </div>
-                        <p class="work-description">안녕하세요 반갑습니다. 안녕하세요 반갑습니다. 안녕하세요 반갑습니다. 안녕하세요 반갑습니다. 안녕하세요 반갑습니다. 안녕하세요 반갑습니다.</p>
-                    </div>
-                    <button class="work-more-btn" aria-label="작품더보기버튼">⋮</button>
-                    <div class="work-dropdown off">
-                        <!-- <div class="work-dropdown-item" data-action="watch-later">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1Zm0 2a9 9 0 110 18.001A9 9 0 0112 3Zm0 3a1 1 0 00-1 1v5.565l.485.292 3.33 2a1 1 0 001.03-1.714L13 11.435V7a1 1 0 00-1-1Z"></path></svg>
-                            나중에 볼 동영상에 저장
-                        </div>
-                        <div class="work-dropdown-item" data-action="save-playlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z"></path></svg>
-                            재생목록에 저장
-                        </div> -->
-                        <div class="work-dropdown-item" data-action="share">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M10 3.158V7.51c-5.428.223-8.27 3.75-8.875 11.199-.04.487-.07.975-.09 1.464l-.014.395c-.014.473.578.684.88.32.302-.368.61-.73.925-1.086l.244-.273c1.79-1.967 3-2.677 4.93-2.917a18.011 18.011 0 012-.112v4.346a1 1 0 001.646.763l9.805-8.297 1.55-1.31-1.55-1.31-9.805-8.297A1 1 0 0010 3.158Zm2 6.27v.002-4.116l7.904 6.688L12 18.689v-4.212l-2.023.024c-1.935.022-3.587.17-5.197 1.024a9 9 0 00-1.348.893c.355-1.947.916-3.39 1.63-4.425 1.062-1.541 2.607-2.385 5.02-2.485L12 9.428Z"></path></svg>
-                            공유
-                        </div>
-                        <div class="work-dropdown-item" data-action="wishlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z"></path></svg>
-                            <span class="wishlist-text">찜 목록 추가</span>
-                        </div>
-                        <div class="work-dropdown-item" data-action="no-recommend">
-                            <img src="/images/Icon=minus-circle.png">
-                            채널 추천 안함
-                        </div>
-                        <div class="work-dropdown-item" data-action="report">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="m4 2.999-.146.073A1.55 1.55 0 003 4.454v16.545a1 1 0 102 0v-6.491a7.26 7.26 0 016.248.115l.752.376a8.94 8.94 0 008 0l.145-.073c.524-.262.855-.797.855-1.382V4.458a1.21 1.21 0 00-1.752-1.083 7.26 7.26 0 01-6.496 0L12 2.999a8.94 8.94 0 00-8 0Zm7.105 1.79v-.002l.752.376A9.26 9.26 0 0019 5.641v7.62a6.95 6.95 0 01-6.105-.052l-.752-.376A9.261 9.261 0 005 12.355v-7.62a6.94 6.94 0 016.105.054Z"></path></svg>
-                            신고
-                        </div>
-                    </div>
-                </div>
-                                <!-- 프로필 -->
-                <div class="item-section-content profile-renderer">
-                    <div class="channel-avatar">
-                        <img class="avatar-circle" src="/images/logo.png" alt="하이픽션">
-                    </div>
-                    <div class="channel-info">
-                        <div class="channel-header">
-                            <h3 class="channel-name">
-                                망고비디오
-                                <svg class="verified-badge" viewBox="0 0 24 24" width="14" height="14" fill="#606060"> <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                            </h3>
-                            <button class="subscribe-btn">구독</button>
-                        </div>
-                        <p class="channel-handle">@Mango.official - 팔로워 2.1만명</p>
-                        <p class="channel-desc">안녕하세요.</p>
-                    </div>
-                </div>
-
-                <!-- 예술관 -->
-                <div class="item-section-content gallery-renderer">
-                    <div class="gallery-thumbnail">
-                        <img class="thumbnail-img" src="/images/logo.png">
-                    </div>
-                    <div class="gallery-info">
-                        <h3 class="gallery-title">예술관자리</h3>
-                        <div class="gallery-metadata">
-                            <span>방문수 8.1만회</span>
-                            <span>·</span>
-                            <span>21시간 전</span>
-                        </div>
-                        <div class="gallery-channel">
-                            <div class="gallery-channel-icon">
-                                <img class="gallery-icon-circle" src="/images/logo.png">
-                            </div>
-                            <span class="gallery-channel-name">망고비디오</span>
-                            <svg class="verified-badge-small" viewBox="0 0 24 24" width="12" height="12" fill="#606060"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                        </div>
-                        <p class="gallery-description">망고비디오 #망고 #비디오 #글로벌게이츠 #햇살장터 </p>
-                        <span class="gallery-badge">새 동영상</span>
-                    </div>
-                    <button class="gallery-more-btn" aria-label="예술관더보기버튼">⋮</button>
-                    <div class="gallery-dropdown off">
-                        <!-- <div class="gallery-dropdown-item" data-action="watch-later">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1Zm0 2a9 9 0 110 18.001A9 9 0 0112 3Zm0 3a1 1 0 00-1 1v5.565l.485.292 3.33 2a1 1 0 001.03-1.714L13 11.435V7a1 1 0 00-1-1Z"></path></svg>
-                            나중에 볼 동영상에 저장
-                        </div>
-                        <div class="gallery-dropdown-item" data-action="save-playlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z"></path></svg>
-                            재생목록에 저장
-                        </div> -->
-                        <div class="gallery-dropdown-item" data-action="share">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M10 3.158V7.51c-5.428.223-8.27 3.75-8.875 11.199-.04.487-.07.975-.09 1.464l-.014.395c-.014.473.578.684.88.32.302-.368.61-.73.925-1.086l.244-.273c1.79-1.967 3-2.677 4.93-2.917a18.011 18.011 0 012-.112v4.346a1 1 0 001.646.763l9.805-8.297 1.55-1.31-1.55-1.31-9.805-8.297A1 1 0 0010 3.158Zm2 6.27v.002-4.116l7.904 6.688L12 18.689v-4.212l-2.023.024c-1.935.022-3.587.17-5.197 1.024a9 9 0 00-1.348.893c.355-1.947.916-3.39 1.63-4.425 1.062-1.541 2.607-2.385 5.02-2.485L12 9.428Z"></path></svg>
-                            공유
-                        </div>
-                        <div class="gallery-dropdown-item" data-action="wishlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z"></path></svg>
-                            <span class="wishlist-text">찜 목록 추가</span>
-                        </div>
-                        <div class="gallery-dropdown-item" data-action="no-recommend">
-                            <img src="/images/Icon=minus-circle.png">
-                            채널 추천 안함
-                        </div>
-                        <div class="gallery-dropdown-item" data-action="report">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="m4 2.999-.146.073A1.55 1.55 0 003 4.454v16.545a1 1 0 102 0v-6.491a7.26 7.26 0 016.248.115l.752.376a8.94 8.94 0 008 0l.145-.073c.524-.262.855-.797.855-1.382V4.458a1.21 1.21 0 00-1.752-1.083 7.26 7.26 0 01-6.496 0L12 2.999a8.94 8.94 0 00-8 0Zm7.105 1.79v-.002l.752.376A9.26 9.26 0 0019 5.641v7.62a6.95 6.95 0 01-6.105-.052l-.752-.376A9.261 9.261 0 005 12.355v-7.62a6.94 6.94 0 016.105.054Z"></path></svg>
-                            신고
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 작품영상 -->
-                <div class="item-section-content work-renderer">
-                    <div class="work-thumbnail">
-                        <img class="thumbnail-img" src="/images/logo.png">
-                        <span class="work-duration">2:59</span>
-                    </div>
-                    <div class="work-info">
-                        <h3 class="work-title">작품영상자리</h3>
-                        <div class="work-metadata">
-                            <span>조회수 8만회</span>
-                            <span>·</span>
-                            <span>하루 전</span>
-                        </div>
-                        <div class="work-channel">
-                            <div class="work-channel-icon">
-                                <img class="work-icon-circle" src="/images/logo.png">
-                            </div>
-                            <span class="work-channel-name">망고비디오</span>
-                            <svg class="verified-badge-small" viewBox="0 0 24 24" width="12" height="12" fill="#606060"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                        </div>
-                        <p class="work-description">안녕하세요 반갑습니다. 안녕하세요 반갑습니다. 안녕하세요 반갑습니다. 안녕하세요 반갑습니다. 안녕하세요 반갑습니다. 안녕하세요 반갑습니다.</p>
-                    </div>
-                    <button class="work-more-btn" aria-label="작품더보기버튼">⋮</button>
-                    <div class="work-dropdown off">
-                        <!-- <div class="work-dropdown-item" data-action="watch-later">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1Zm0 2a9 9 0 110 18.001A9 9 0 0112 3Zm0 3a1 1 0 00-1 1v5.565l.485.292 3.33 2a1 1 0 001.03-1.714L13 11.435V7a1 1 0 00-1-1Z"></path></svg>
-                            나중에 볼 동영상에 저장
-                        </div>
-                        <div class="work-dropdown-item" data-action="save-playlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z"></path></svg>
-                            재생목록에 저장
-                        </div> -->
-                        <div class="work-dropdown-item" data-action="share">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M10 3.158V7.51c-5.428.223-8.27 3.75-8.875 11.199-.04.487-.07.975-.09 1.464l-.014.395c-.014.473.578.684.88.32.302-.368.61-.73.925-1.086l.244-.273c1.79-1.967 3-2.677 4.93-2.917a18.011 18.011 0 012-.112v4.346a1 1 0 001.646.763l9.805-8.297 1.55-1.31-1.55-1.31-9.805-8.297A1 1 0 0010 3.158Zm2 6.27v.002-4.116l7.904 6.688L12 18.689v-4.212l-2.023.024c-1.935.022-3.587.17-5.197 1.024a9 9 0 00-1.348.893c.355-1.947.916-3.39 1.63-4.425 1.062-1.541 2.607-2.385 5.02-2.485L12 9.428Z"></path></svg>
-                            공유
-                        </div>
-                        <div class="work-dropdown-item" data-action="wishlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z"></path></svg>
-                            <span class="wishlist-text">찜 목록 추가</span>
-                        </div>
-                        <div class="work-dropdown-item" data-action="no-recommend">
-                            <img src="/images/Icon=minus-circle.png">
-                            채널 추천 안함
-                        </div>
-                        <div class="work-dropdown-item" data-action="report">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="m4 2.999-.146.073A1.55 1.55 0 003 4.454v16.545a1 1 0 102 0v-6.491a7.26 7.26 0 016.248.115l.752.376a8.94 8.94 0 008 0l.145-.073c.524-.262.855-.797.855-1.382V4.458a1.21 1.21 0 00-1.752-1.083 7.26 7.26 0 01-6.496 0L12 2.999a8.94 8.94 0 00-8 0Zm7.105 1.79v-.002l.752.376A9.26 9.26 0 0019 5.641v7.62a6.95 6.95 0 01-6.105-.052l-.752-.376A9.261 9.261 0 005 12.355v-7.62a6.94 6.94 0 016.105.054Z"></path></svg>
-                            신고
-                        </div>
-                    </div>
-                </div>
-                                <!-- 프로필 -->
-                <div class="item-section-content profile-renderer">
-                    <div class="channel-avatar">
-                        <img class="avatar-circle" src="/images/logo.png" alt="하이픽션">
-                    </div>
-                    <div class="channel-info">
-                        <div class="channel-header">
-                            <h3 class="channel-name">
-                                망고비디오
-                                <svg class="verified-badge" viewBox="0 0 24 24" width="14" height="14" fill="#606060"> <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                            </h3>
-                            <button class="subscribe-btn">구독</button>
-                        </div>
-                        <p class="channel-handle">@Mango.official - 팔로워 2.1만명</p>
-                        <p class="channel-desc">안녕하세요.</p>
-                    </div>
-                </div>
-
-                <!-- 예술관 -->
-                <div class="item-section-content gallery-renderer">
-                    <div class="gallery-thumbnail">
-                        <img class="thumbnail-img" src="/images/logo.png">
-                    </div>
-                    <div class="gallery-info">
-                        <h3 class="gallery-title">예술관자리</h3>
-                        <div class="gallery-metadata">
-                            <span>방문수 8.1만회</span>
-                            <span>·</span>
-                            <span>21시간 전</span>
-                        </div>
-                        <div class="gallery-channel">
-                            <div class="gallery-channel-icon">
-                                <img class="gallery-icon-circle" src="/images/logo.png">
-                            </div>
-                            <span class="gallery-channel-name">망고비디오</span>
-                            <svg class="verified-badge-small" viewBox="0 0 24 24" width="12" height="12" fill="#606060"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                        </div>
-                        <p class="gallery-description">망고비디오 #망고 #비디오 #글로벌게이츠 #햇살장터 </p>
-                        <span class="gallery-badge">새 동영상</span>
-                    </div>
-                    <button class="gallery-more-btn" aria-label="예술관더보기버튼">⋮</button>
-                    <div class="gallery-dropdown off">
-                        <!-- <div class="gallery-dropdown-item" data-action="watch-later">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1Zm0 2a9 9 0 110 18.001A9 9 0 0112 3Zm0 3a1 1 0 00-1 1v5.565l.485.292 3.33 2a1 1 0 001.03-1.714L13 11.435V7a1 1 0 00-1-1Z"></path></svg>
-                            나중에 볼 동영상에 저장
-                        </div>
-                        <div class="gallery-dropdown-item" data-action="save-playlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z"></path></svg>
-                            재생목록에 저장
-                        </div> -->
-                        <div class="gallery-dropdown-item" data-action="share">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M10 3.158V7.51c-5.428.223-8.27 3.75-8.875 11.199-.04.487-.07.975-.09 1.464l-.014.395c-.014.473.578.684.88.32.302-.368.61-.73.925-1.086l.244-.273c1.79-1.967 3-2.677 4.93-2.917a18.011 18.011 0 012-.112v4.346a1 1 0 001.646.763l9.805-8.297 1.55-1.31-1.55-1.31-9.805-8.297A1 1 0 0010 3.158Zm2 6.27v.002-4.116l7.904 6.688L12 18.689v-4.212l-2.023.024c-1.935.022-3.587.17-5.197 1.024a9 9 0 00-1.348.893c.355-1.947.916-3.39 1.63-4.425 1.062-1.541 2.607-2.385 5.02-2.485L12 9.428Z"></path></svg>
-                            공유
-                        </div>
-                        <div class="gallery-dropdown-item" data-action="wishlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z"></path></svg>
-                            <span class="wishlist-text">찜 목록 추가</span>
-                        </div>
-                        <div class="gallery-dropdown-item" data-action="no-recommend">
-                            <img src="/images/Icon=minus-circle.png">
-                            채널 추천 안함
-                        </div>
-                        <div class="gallery-dropdown-item" data-action="report">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="m4 2.999-.146.073A1.55 1.55 0 003 4.454v16.545a1 1 0 102 0v-6.491a7.26 7.26 0 016.248.115l.752.376a8.94 8.94 0 008 0l.145-.073c.524-.262.855-.797.855-1.382V4.458a1.21 1.21 0 00-1.752-1.083 7.26 7.26 0 01-6.496 0L12 2.999a8.94 8.94 0 00-8 0Zm7.105 1.79v-.002l.752.376A9.26 9.26 0 0019 5.641v7.62a6.95 6.95 0 01-6.105-.052l-.752-.376A9.261 9.261 0 005 12.355v-7.62a6.94 6.94 0 016.105.054Z"></path></svg>
-                            신고
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 작품영상 -->
-                <div class="item-section-content work-renderer">
-                    <div class="work-thumbnail">
-                        <img class="thumbnail-img" src="/images/logo.png">
-                        <span class="work-duration">2:59</span>
-                    </div>
-                    <div class="work-info">
-                        <h3 class="work-title">작품영상자리</h3>
-                        <div class="work-metadata">
-                            <span>조회수 8만회</span>
-                            <span>·</span>
-                            <span>하루 전</span>
-                        </div>
-                        <div class="work-channel">
-                            <div class="work-channel-icon">
-                                <img class="work-icon-circle" src="/images/logo.png">
-                            </div>
-                            <span class="work-channel-name">망고비디오</span>
-                            <svg class="verified-badge-small" viewBox="0 0 24 24" width="12" height="12" fill="#606060"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                        </div>
-                        <p class="work-description">안녕하세요 반갑습니다. 안녕하세요 반갑습니다. 안녕하세요 반갑습니다. 안녕하세요 반갑습니다. 안녕하세요 반갑습니다. 안녕하세요 반갑습니다.</p>
-                    </div>
-                    <button class="work-more-btn" aria-label="작품더보기버튼">⋮</button>
-                    <div class="work-dropdown off">
-                        <!-- <div class="work-dropdown-item" data-action="watch-later">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1Zm0 2a9 9 0 110 18.001A9 9 0 0112 3Zm0 3a1 1 0 00-1 1v5.565l.485.292 3.33 2a1 1 0 001.03-1.714L13 11.435V7a1 1 0 00-1-1Z"></path></svg>
-                            나중에 볼 동영상에 저장
-                        </div>
-                        <div class="work-dropdown-item" data-action="save-playlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z"></path></svg>
-                            재생목록에 저장
-                        </div> -->
-                        <div class="work-dropdown-item" data-action="share">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M10 3.158V7.51c-5.428.223-8.27 3.75-8.875 11.199-.04.487-.07.975-.09 1.464l-.014.395c-.014.473.578.684.88.32.302-.368.61-.73.925-1.086l.244-.273c1.79-1.967 3-2.677 4.93-2.917a18.011 18.011 0 012-.112v4.346a1 1 0 001.646.763l9.805-8.297 1.55-1.31-1.55-1.31-9.805-8.297A1 1 0 0010 3.158Zm2 6.27v.002-4.116l7.904 6.688L12 18.689v-4.212l-2.023.024c-1.935.022-3.587.17-5.197 1.024a9 9 0 00-1.348.893c.355-1.947.916-3.39 1.63-4.425 1.062-1.541 2.607-2.385 5.02-2.485L12 9.428Z"></path></svg>
-                            공유
-                        </div>
-                        <div class="work-dropdown-item" data-action="wishlist">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z"></path></svg>
-                            <span class="wishlist-text">찜 목록 추가</span>
-                        </div>
-                        <div class="work-dropdown-item" data-action="no-recommend">
-                            <img src="/images/Icon=minus-circle.png">
-                            채널 추천 안함
-                        </div>
-                        <div class="work-dropdown-item" data-action="report">
-                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="m4 2.999-.146.073A1.55 1.55 0 003 4.454v16.545a1 1 0 102 0v-6.491a7.26 7.26 0 016.248.115l.752.376a8.94 8.94 0 008 0l.145-.073c.524-.262.855-.797.855-1.382V4.458a1.21 1.21 0 00-1.752-1.083 7.26 7.26 0 01-6.496 0L12 2.999a8.94 8.94 0 00-8 0Zm7.105 1.79v-.002l.752.376A9.26 9.26 0 0019 5.641v7.62a6.95 6.95 0 01-6.105-.052l-.752-.376A9.261 9.261 0 005 12.355v-7.62a6.94 6.94 0 016.105.054Z"></path></svg>
-                            신고
-                        </div>
-                    </div>
-                </div>
-
+            <div class="item-section-renderer" id="searchResults">
             </div>
         </main>
 
@@ -523,83 +46,30 @@
         <button class="toast-action off" id="toastAction"></button>
     </div>
 
-    <!-- 모달 - 재생목록에 저장 - 빠져서 일단 주석 -->
-    <!-- <div class="modal-overlay off" id="playlistOverlay">
-        <div class="modal playlist-modal">
-            <div class="playlist-header">
-                <h2 class="playlist-title">저장 위치</h2>
-            </div>
-            <div class="playlist-content">
-                <ul class="playlist-list">
-                    <li class="playlist-item" data-saved="true">
-                        <div class="playlist-thumb">WL</div>
-                        <div class="playlist-info">
-                            <span class="playlist-name">Watch later</span>
-                            <span class="playlist-privacy">비공개</span>
-                        </div>
-                        <svg class="bookmark-icon saved" viewBox="0 0 24 24" width="24" height="24"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2Z" fill="currentColor"/></svg>
-                    </li>
-                    <li class="playlist-item">
-                        <div class="playlist-thumb"></div>
-                        <div class="playlist-info">
-                            <span class="playlist-name">음악</span>
-                            <span class="playlist-privacy">비공개</span>
-                        </div>
-                        <svg class="bookmark-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z" fill="currentColor"/></svg>
-                    </li>
-                    <li class="playlist-item">
-                        <div class="playlist-thumb"></div>
-                        <div class="playlist-info">
-                            <span class="playlist-name">요리</span>
-                            <span class="playlist-privacy">비공개</span>
-                        </div>
-                        <svg class="bookmark-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M19 2H5a2 2 0 00-2 2v16.887c0 1.266 1.382 2.048 2.469 1.399L12 18.366l6.531 3.919c1.087.652 2.469-.131 2.469-1.397V4a2 2 0 00-2-2ZM5 20.233V4h14v16.233l-6.485-3.89-.515-.309-.515.309L5 20.233Z" fill="currentColor"/></svg>
-                    </li>
-                </ul>
-            </div>
-            <div class="playlist-footer">
-                <button class="new-playlist-btn">
-                    <svg viewBox="0 0 24 24" width="24" height="24"><path d="M20 12h-8v8h-1v-8H3v-1h8V3h1v8h8v1z" fill="currentColor"/></svg>
-                    <span>새 재생목록</span>
-                </button>
-            </div>
-        </div>
-    </div> -->
-
     <!-- 모달 - 신고 -->
     <div class="modal-overlay off" id="reportOverlay">
         <div class="modal report-modal">
             <h2 class="report-title">이미지 또는 제목 신고</h2>
             <div class="report-options">
                 <label class="radio-label">
-                    <input type="radio" name="report-reason" value="sexual">
+                    <input type="radio" name="report-reason" value="SENSITIVE">
                     <span class="custom-radio"></span>
-                    <span>성적인 콘텐츠</span>
+                    <span>민감한 콘텐츠</span>
                 </label>
                 <label class="radio-label">
-                    <input type="radio" name="report-reason" value="violent">
+                    <input type="radio" name="report-reason" value="IMPERSONATION">
                     <span class="custom-radio"></span>
-                    <span>폭력적 또는 혐오스러운 콘텐츠</span>
+                    <span>사칭</span>
                 </label>
                 <label class="radio-label">
-                    <input type="radio" name="report-reason" value="hateful">
+                    <input type="radio" name="report-reason" value="HARASSMENT">
                     <span class="custom-radio"></span>
-                    <span>증오 또는 학대하는 콘텐츠</span>
+                    <span>괴롭힘 또는 악의적 행위</span>
                 </label>
                 <label class="radio-label">
-                    <input type="radio" name="report-reason" value="harmful">
+                    <input type="radio" name="report-reason" value="COPYRIGHT">
                     <span class="custom-radio"></span>
-                    <span>유해하거나 위험한 행위</span>
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="report-reason" value="spam">
-                    <span class="custom-radio"></span>
-                    <span>스팸 또는 혼동을 야기하는 콘텐츠</span>
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="report-reason" value="child-abuse">
-                    <span class="custom-radio"></span>
-                    <span>아동 학대</span>
+                    <span>저작권 침해</span>
                 </label>
             </div>
             <div class="report-actions">
@@ -609,20 +79,18 @@
         </div>
     </div>
 
-    <!-- 공유를 눌렀을때 나오는 모달 -->
+    <!-- 공유 모달 -->
     <div class="modal-overlay work-share-modal-overlay off" role="dialog" aria-modal="true" aria-label="공유">
         <div class="work-share-modal">
             <div class="work-share-modal__header">
-                <div class="work-share-modal__spacer">
-
-                </div>
+                <div class="work-share-modal__spacer"></div>
                 <h2 class="work-share-modal__title">공유</h2>
                 <button class="work-share-modal__close" type="button" aria-label="닫기">
                     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><polyline fill="none" points="20.643 3.357 12 12 3.353 20.647" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></polyline><line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" x1="20.649" x2="3.354" y1="20.649" y2="3.354"></line></svg>
                 </button>
             </div>
             <div class="work-share-modal__link-row">
-                <input class="work-share-modal__link-input" type="text" readonly="" value="https://localhost:10000/profile/ttt?galleryId=9">
+                <input class="work-share-modal__link-input" type="text" readonly="" value="">
                 <button class="work-share-modal__link-copy" type="button">복사</button>
             </div>
             <div class="work-share-modal__receiver">
@@ -632,38 +100,7 @@
                     <input class="work-share-modal__search" type="text" placeholder="검색..." autocomplete="off">
                 </div>
             </div>
-            <div class="work-share-modal__list off">
-                <button class="work-share-recipient" data-username="mango_art">
-                    <div class="work-share-recipient__main">
-                        <div class="work-share-recipient__avatar"><img src="/images/logo.png" alt=""></div>
-                        <div class="work-share-recipient__copy">
-                            <span class="work-share-recipient__username">mango_art</span>
-                            <span class="work-share-recipient__realname">망고아트</span>
-                        </div>
-                    </div>
-                    <div class="work-share-recipient__check"></div>
-                </button>
-                <button class="work-share-recipient" data-username="blue_wave">
-                    <div class="work-share-recipient__main">
-                        <div class="work-share-recipient__avatar"><img src="/images/logo.png" alt=""></div>
-                        <div class="work-share-recipient__copy">
-                            <span class="work-share-recipient__username">blue_wave</span>
-                            <span class="work-share-recipient__realname">블루웨이브</span>
-                        </div>
-                    </div>
-                    <div class="work-share-recipient__check"></div>
-                </button>
-                <button class="work-share-recipient" data-username="pixel_studio">
-                    <div class="work-share-recipient__main">
-                        <div class="work-share-recipient__avatar"><img src="/images/logo.png" alt=""></div>
-                        <div class="work-share-recipient__copy">
-                            <span class="work-share-recipient__username">pixel_studio</span>
-                            <span class="work-share-recipient__realname">픽셀스튜디오</span>
-                        </div>
-                    </div>
-                    <div class="work-share-recipient__check"></div>
-                </button>
-            </div>
+            <div class="work-share-modal__list off"></div>
             <div class="work-share-modal__footer">
                 <input class="work-share-modal__message" type="text" placeholder="메시지 쓰기..." autocomplete="off">
                 <button class="work-share-modal__send" type="button">보내기</button>

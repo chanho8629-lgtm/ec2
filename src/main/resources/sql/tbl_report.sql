@@ -43,3 +43,5 @@ create index idx_report_status on tbl_report (status, created_datetime desc);
 alter table tbl_report add constraint chk_report_target_type check (target_type in ('WORK', 'MEMBER', 'COMMENT', 'GALLERY'));
 alter table tbl_report add constraint chk_report_reason check (reason in ('SENSITIVE', 'IMPERSONATION', 'HARASSMENT', 'COPYRIGHT'));
 alter table tbl_report add constraint chk_report_status check (status in ('PENDING', 'REVIEWING', 'RESOLVED', 'CANCELLED'));
+
+select * from tbl_report;
