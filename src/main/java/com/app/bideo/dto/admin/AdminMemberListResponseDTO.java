@@ -24,4 +24,7 @@ public class AdminMemberListResponseDTO {
     private String creatorTier;
     private Integer followerCount;
     private LocalDateTime createdDatetime;
+    private String memberType;
+    private Integer reportCount;
+    private Integer tradeCount;
 }

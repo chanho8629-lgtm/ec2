@@ -8,6 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReportSearchDTO extends PageRequestDTO {
+    private String keyword;
     private String targetType;
     private String status;
     private Long reporterId;

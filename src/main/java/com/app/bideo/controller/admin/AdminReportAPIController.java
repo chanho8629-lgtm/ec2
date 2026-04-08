@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -23,8 +22,11 @@ public class AdminReportAPIController {
     private final AdminReportService adminReportService;
 
     @GetMapping
-    public List<ReportResponseDTO> list(ReportSearchDTO searchDTO) {
-        return adminReportService.getReports(searchDTO);
+    public Map<String, Object> list(ReportSearchDTO searchDTO) {
+        return Map.of(
+                "content", adminReportService.getReports(searchDTO),
+                "totalElements", adminReportService.getReportCount(searchDTO)
+        );
     }
 
     @GetMapping("/{id}")
@@ -34,7 +36,7 @@ public class AdminReportAPIController {
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        adminReportService.updateReportStatus(id, body.get("status"));
+        adminReportService.updateReportStatus(id, body.get("status"), body.get("memo"));
         return ResponseEntity.ok().build();
     }
 }

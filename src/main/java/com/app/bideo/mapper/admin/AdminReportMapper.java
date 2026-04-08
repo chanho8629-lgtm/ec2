@@ -14,7 +14,7 @@ public interface AdminReportMapper {
 
     ReportResponseDTO selectReportDetail(@Param("id") Long id);
 
-    int updateReportStatus(@Param("id") Long id, @Param("status") String status);
+    int updateReportStatus(@Param("id") Long id, @Param("status") String status, @Param("memo") String memo);
 
     int countReports(ReportSearchDTO searchDTO);
 }

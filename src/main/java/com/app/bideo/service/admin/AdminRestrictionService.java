@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -34,6 +35,12 @@ public class AdminRestrictionService {
     public AdminRestrictionResponseDTO getRestriction(Long id) {
         syncExpiredRestrictions();
         return getRestrictionOrThrow(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<AdminRestrictionResponseDTO> getActiveRestrictionByMemberId(Long memberId) {
+        syncExpiredRestrictions();
+        return adminRestrictionDAO.findActiveByMemberId(memberId);
     }
 
     public Long createRestriction(AdminRestrictionUpsertRequestDTO requestDTO) {

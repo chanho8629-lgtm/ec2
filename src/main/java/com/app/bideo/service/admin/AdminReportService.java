@@ -30,11 +30,11 @@ public class AdminReportService {
                 .orElseThrow(() -> new IllegalArgumentException("report not found"));
     }
 
-    public void updateReportStatus(Long id, String status) {
+    public void updateReportStatus(Long id, String status, String memo) {
         if (status == null || !VALID_REPORT_STATUSES.contains(status)) {
             throw new IllegalArgumentException("invalid report status: " + status);
         }
-        adminReportDAO.updateStatus(id, status);
+        adminReportDAO.updateStatus(id, status, memo);
     }
 
     @Transactional(readOnly = true)

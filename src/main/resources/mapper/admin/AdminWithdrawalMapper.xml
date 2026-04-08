@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.bideo.mapper.admin.AdminWithdrawalMapper">
+
+    <select id="selectWithdrawalList" resultType="com.app.bideo.dto.admin.AdminWithdrawalListResponseDTO">
+        select
+            wr.id,
+            wr.withdrawal_code,
+            m.nickname as artist_name,
+            wr.requested_amount,
+            wr.net_amount,
+            wr.bank_name,
+            to_char(wr.requested_at, 'MM.DD') as requested_at,
+            coalesce((
+                select sum(s.net_amount)
+                from tbl_settlement s
+                where s.member_id = wr.member_id
+                  and s.status = 'PAID'
+            ), 0)
+            - coalesce((
+                select sum(wr2.net_amount)
+                from tbl_withdrawal_request wr2
+                where wr2.member_id = wr.member_id
+                  and wr2.status in ('APPROVED', 'PAID')
+            ), 0) as remaining_balance,
+            wr.status
+        from tbl_withdrawal_request wr
+        join tbl_member m on wr.member_id = m.id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and (
+                    m.nickname ilike '%' || #{keyword} || '%'
+                    or wr.withdrawal_code ilike '%' || #{keyword} || '%'
+                )
+            </if>
+            <if test="status != null and status != ''">
+                and wr.status = #{status}
+            </if>
+        </where>
+        order by wr.id desc
+        limit #{size} offset #{offset}
+    </select>
+
+    <select id="selectWithdrawalDetail" resultType="com.app.bideo.dto.admin.AdminWithdrawalDetailResponseDTO">
+        select
+            wr.id,
+            wr.withdrawal_code,
+            m.nickname as artist_name,
+            m.email as artist_email,
+            m.id as artist_id,
+            m.status as member_status,
+            coalesce((
+                select sum(o.total_price)
+                from tbl_order o
+                where o.seller_id = m.id
+                  and o.status = 'COMPLETED'
+            ), 0) as total_sales_amount,
+            (
+                select count(*)
+                from tbl_withdrawal_request wr2
+                where wr2.member_id = m.id
+            ) as withdrawal_history_count,
+            coalesce((
+                select sum(wr3.net_amount)
+                from tbl_withdrawal_request wr3
+                where wr3.member_id = m.id
+                  and wr3.status in ('APPROVED', 'PAID')
+            ), 0) as withdrawal_history_total,
+            wr.bank_name,
+            wr.account_number,
+            wr.account_holder,
+            wr.requested_amount,
+            wr.fee,
+            wr.net_amount,
+            coalesce((
+                select sum(s.net_amount)
+                from tbl_settlement s
+                where s.member_id = m.id
+                  and s.status = 'PAID'
+            ), 0)
+            - coalesce((
+                select sum(wr4.net_amount)
+                from tbl_withdrawal_request wr4
+                where wr4.member_id = m.id
+                  and wr4.status in ('APPROVED', 'PAID')
+            ), 0) as current_balance,
+            coalesce((
+                select sum(s2.net_amount)
+                from tbl_settlement s2
+                where s2.member_id = m.id
+                  and s2.status = 'PAID'
+            ), 0)
+            - coalesce((
+                select sum(wr5.net_amount)
+                from tbl_withdrawal_request wr5
+                where wr5.member_id = m.id
+                  and wr5.status in ('APPROVED', 'PAID')
+            ), 0)
+            - wr.net_amount as after_balance,
+            to_char(wr.requested_at, 'YY.MM.DD HH24:MI') as requested_at,
+            am.nickname as approver_name,
+            to_char(wr.approved_at, 'YY.MM.DD HH24:MI') as approved_at,
+            wr.rejected_reason,
+            wr.status
+        from tbl_withdrawal_request wr
+        join tbl_member m on wr.member_id = m.id
+        left join tbl_member am on wr.admin_id = am.id
+        where wr.id = #{id}
+    </select>
+
+    <update id="updateWithdrawalApprove">
+        update tbl_withdrawal_request
+        set status = 'APPROVED',
+            approved_at = now(),
+            admin_id = #{adminId},
+            updated_datetime = now()
+        where id = #{id}
+          and status = 'PENDING'
+    </update>
+
+    <update id="updateWithdrawalReject">
+        update tbl_withdrawal_request
+        set status = 'REJECTED',
+            rejected_reason = #{reason},
+            admin_id = #{adminId},
+            updated_datetime = now()
+        where id = #{id}
+          and status = 'PENDING'
+    </update>
+
+    <select id="countWithdrawals" resultType="int">
+        select count(*)
+        from tbl_withdrawal_request wr
+        join tbl_member m on wr.member_id = m.id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and (
+                    m.nickname ilike '%' || #{keyword} || '%'
+                    or wr.withdrawal_code ilike '%' || #{keyword} || '%'
+                )
+            </if>
+            <if test="status != null and status != ''">
+                and wr.status = #{status}
+            </if>
+        </where>
+    </select>
+
+</mapper>
