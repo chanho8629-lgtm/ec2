@@ -80,6 +80,88 @@
       </div>
     </header>
 
+    <aside class="bd-shell__guide" aria-label="BIDEO 탐색">
+      <section class="bd-shell__guide-section">
+        <ul class="bd-shell__guide-list">
+          <li class="bd-shell__guide-item">
+            <a class="bd-shell__guide-link" th:classappend="${activeItemKey == 'home'} ? ' is-active'" href="/"
+               title="홈">
+              <svg class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m12 3 8 6v11h-5v-6H9v6H4V9l8-6Z" fill="currentColor" />
+              </svg>
+              <span class="bd-shell__guide-copy">홈</span>
+            </a>
+          </li>
+          <li class="bd-shell__guide-item">
+            <a class="bd-shell__guide-link" href="/" title="작품">
+              <svg class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                        d="M21 3H3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2ZM3 19V5h18v14H3Zm3.5-8.5 3 3.5 4-5 5.5 7H5l1.5-5.5Z"
+                        fill="currentColor" />
+              </svg>
+              <span class="bd-shell__guide-copy">작품</span>
+            </a>
+          </li>
+          <li class="bd-shell__guide-item">
+            <a class="bd-shell__guide-link" href="/contest/list" title="공모전">
+              <svg class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                        d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2Zm0 3.34L9.92 9.53l-4.56.66 3.3 3.22-.78 4.54L12 15.77l4.12 2.17-.78-4.54 3.3-3.22-4.56-.66L12 5.34Z"
+                        fill="currentColor" />
+              </svg>
+              <span class="bd-shell__guide-copy">공모전</span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section class="bd-shell__guide-section" th:if="${followingArtists != null and !followingArtists.isEmpty()}">
+        <h2 class="bd-shell__section-title">팔로우 한 아티스트</h2>
+        <ul class="bd-shell__guide-list">
+          <li class="bd-shell__guide-item" th:each="artist : ${followingArtists}">
+            <a class="bd-shell__guide-link" th:href="@{'/profile/' + ${artist.nickname}}" th:title="${artist.nickname}">
+              <img class="bd-shell__guide-avatar"
+                   th:src="${artist.profileImage != null ? artist.profileImage : '/images/default-profile.svg'}"
+                   alt="" />
+              <span class="bd-shell__guide-copy" th:text="${artist.nickname}"></span>
+              <span class="bd-shell__guide-meta" th:if="${artist.creatorVerified}"><span class="bd-shell__guide-badge"></span></span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <section class="bd-shell__guide-section">
+        <h2 class="bd-shell__section-title">보관함</h2>
+        <ul class="bd-shell__guide-list">
+          <li class="bd-shell__guide-item"><a class="bd-shell__guide-link" href="/profile" title="내 페이지"><svg
+                  class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 12a4 4 0 1 0-4-4a4 4 0 0 0 4 4Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"
+                  fill="currentColor" />
+          </svg><span class="bd-shell__guide-copy">내 페이지</span></a></li>
+          <li class="bd-shell__guide-item"><a class="bd-shell__guide-link" href="/profile" title="찜한 작품"><svg
+                  class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+                    d="M12 21.35 10.55 20C5.4 15.36 2 12.28 2 8.5A4.5 4.5 0 0 1 6.5 4A5.22 5.22 0 0 1 12 7.09A5.22 5.22 0 0 1 17.5 4A4.5 4.5 0 0 1 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35Z"
+                    fill="currentColor" />
+          </svg><span class="bd-shell__guide-copy">찜한 작품</span></a></li>
+        </ul>
+      </section>
+
+      <section class="bd-shell__guide-section" th:if="${popularTags != null and !popularTags.isEmpty()}">
+        <h2 class="bd-shell__section-title">인기 태그</h2>
+        <ul class="bd-shell__guide-list">
+          <li class="bd-shell__guide-item" th:each="tag : ${popularTags}">
+            <a class="bd-shell__guide-link" th:href="@{'/?tag=' + ${tag.tagName}}" th:title="'#' + ${tag.tagName}">
+              <svg class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5.41 21 1.71 17.29a1 1 0 0 1 0-1.41L13.29 4.29a1 1 0 0 1 1.41 0L18.41 8a1 1 0 0 1 0 1.41L6.83 21H5.41ZM20 7l2-2-3-3-2 2 3 3ZM2 20h4v2H2v-2Z" fill="currentColor" />
+              </svg>
+              <span class="bd-shell__guide-copy" th:text="'#' + ${tag.tagName}"></span>
+            </a>
+          </li>
+        </ul>
+      </section>
+    </aside>
+
     <div class="bd-shell__mobile-search" hidden data-bd-shell-mobile-search>
       <form class="bd-shell__search-form" action="/results" role="search" data-bd-search-form="mobile">
         <label class="bd-shell__search-field">
