@@ -265,8 +265,9 @@ public class GalleryService {
 
     public LikeToggleResponseDTO toggleLike(Long galleryId, Long memberId) {
         Long resolvedMemberId = resolveMemberId(memberId);
-        Long galleryOwnerId = galleryDAO.findMemberIdById(galleryId)
+        GalleryDetailResponseDTO galleryDetail = galleryDAO.findById(galleryId)
                 .orElseThrow(() -> new IllegalArgumentException("gallery not found"));
+        Long galleryOwnerId = galleryDetail.getMemberId();
 
         boolean liked = galleryDAO.existsLike(resolvedMemberId, galleryId);
         if (liked) {
@@ -277,7 +278,7 @@ public class GalleryService {
             galleryDAO.increaseLikeCount(galleryId);
             notificationService.createNotification(
                     galleryOwnerId, resolvedMemberId, "LIKE", "GALLERY", galleryId,
-                    "예술관에 좋아요를 눌렀습니다."
+                    "'" + galleryDetail.getTitle() + "' 예술관에 좋아요를 눌렀습니다."
             );
         }
 
