@@ -27,6 +27,12 @@ body.gallery-register-page::before {
     background: rgba(15, 15, 15, 0.56);
 }
 
+#galleryModal.modal[data-compose-embedded="true"] {
+    font-family: Roboto, "Noto Sans KR", "Malgun Gothic", sans-serif;
+    font-size: 16px;
+    color: #0f0f0f;
+}
+
 a {
     color: #065fd4;
     text-decoration: none;
@@ -46,23 +52,24 @@ svg {
     fill: currentColor;
 }
 
-.modal {
+#galleryModal.modal {
     position: fixed;
     top: 50%;
     left: 50%;
     z-index: 2202;
-    width: min(576px, calc(100vw - 32px));
-    max-height: min(849px, calc(100vh - 32px));
+    width: 600px;
+    max-width: calc(100vw - 48px);
+    max-height: calc(100vh - 48px);
     display: flex;
     flex-direction: column;
     background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+    border-radius: 16px;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28);
     transform: translate(-50%, -50%);
     overflow: hidden;
 }
 
-.modal[data-compose-embedded="true"] {
+#galleryModal.modal[data-compose-embedded="true"] {
     position: relative;
     top: auto;
     left: auto;
@@ -70,7 +77,7 @@ svg {
     margin: 0;
 }
 
-.modal-head {
+#galleryModal .modal-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -79,14 +86,15 @@ svg {
     border-bottom: 1px solid #dadce0;
 }
 
-.modal-title {
+#galleryModal .modal-title {
     margin: 0;
     font-size: 20px;
     font-weight: 400;
     line-height: 1.4;
 }
 
-.icon-btn {
+#galleryModal .icon-btn,
+#galleryModal .artwork-dialog .icon-btn {
     width: 40px;
     height: 40px;
     border: none;
@@ -99,7 +107,8 @@ svg {
     cursor: pointer;
 }
 
-.icon-btn:hover {
+#galleryModal .icon-btn:hover,
+#galleryModal .artwork-dialog .icon-btn:hover {
     background: rgba(15, 15, 15, 0.08);
 }
 
@@ -114,7 +123,7 @@ svg {
     background: #065fd4;
 }
 
-.modal-body {
+#galleryModal .modal-body {
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
@@ -618,7 +627,7 @@ svg {
     cursor: default;
 }
 
-.modal-foot {
+#galleryModal .modal-foot {
     display: flex;
     justify-content: flex-end;
     padding: 16px 24px 24px;

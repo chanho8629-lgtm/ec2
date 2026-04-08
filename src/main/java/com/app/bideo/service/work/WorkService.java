@@ -286,9 +286,16 @@ public class WorkService {
     public void delete(Long id) {
         Long resolvedMemberId = resolveMemberId(null);
         validateWorkOwner(id, resolvedMemberId);
+        Long galleryId = galleryDAO.findGalleryIdByWorkId(id).orElse(null);
         workDAO.deleteFilesByWorkId(id);
         workDAO.deleteTagsByWorkId(id);
+        if (galleryId != null) {
+            galleryDAO.deleteWorkLinkByWorkId(id);
+        }
         workDAO.delete(id);
+        if (galleryId != null) {
+            galleryDAO.updateWorkCount(galleryId);
+        }
     }
 
     private void validateWorkOwner(Long workId, Long memberId) {
@@ -464,7 +471,7 @@ public class WorkService {
         return null;
     }
 
-    // 업로드한 파일을 S3(실패 시 로컬 uploads) 경로로 저장한다.
+    // 업로드한 파일을 S3 경로로 저장한다.
     private void saveMediaFile(Long workId, MultipartFile mediaFile, int sortOrder) {
         if (mediaFile == null || mediaFile.isEmpty()) {
             return;

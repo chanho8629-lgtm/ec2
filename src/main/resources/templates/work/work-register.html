@@ -7,6 +7,18 @@
     <link rel="stylesheet" href="/css/work/work-register.css" th:href="@{/css/work/work-register.css}">
 </head>
 <body>
+<div id="work-register-state"
+     th:attr="data-edit-mode=${editMode},
+              data-work-id=${editMode and work != null ? work.id : ''},
+              data-title=${editMode and work != null ? work.title : ''},
+              data-description=${editMode and work != null ? work.description : ''},
+              data-gallery-id=${editMode and work != null ? work.galleryId : ''},
+              data-category=${editMode and work != null ? work.category : ''},
+              data-media-url=${editMode and work != null and work.files != null and !#lists.isEmpty(work.files) ? work.files[0].fileUrl : ''},
+              data-media-type=${editMode and work != null and work.files != null and !#lists.isEmpty(work.files) ? work.files[0].fileType : ''},
+              data-link-url=${editMode and work != null ? '/work/detail/' + work.id : ''},
+              data-submit-label=${editMode ? '수정' : '등록'}"
+     hidden></div>
 <div class="page-shell">
 
     <div class="upload-dialog" id="work-register-modal">

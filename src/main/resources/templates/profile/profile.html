@@ -31,12 +31,17 @@
           <!-- 프로필 메타 영역 -->
           <div class="channelMeta">
             <!-- 프로필 사진 영역 -->
-            <div class="avatar">이름</div>
+            <div class="avatar" th:text="${profileMember.nickname != null and !#strings.isEmpty(profileMember.nickname) ? profileMember.nickname.substring(profileMember.nickname.length() > 1 ? profileMember.nickname.length() - 1 : 0) : '이름'}">이름</div>
             <!-- 프로필 정보 영역 -->
             <div class="metaInfo">
-              <h1 class="channelTitle">이름 영역 <a class="more" href="javascript:void(0)"></a></h1>
-              <p class="channelText">닉네임 · 팔로우 16.6만명 · 작품 1.56천개</p>
-              <p class="channelText">설명글입니다. 설명글입니다. 설명글입니다. 설명글입니다.</p>
+              <h1 class="channelTitle">
+                <span th:text="${profileMember.nickname}">이름 영역</span>
+                <a class="more" href="javascript:void(0)"></a>
+              </h1>
+              <p class="channelText"
+                 th:text="|@${profileMember.nickname} · 팔로워 ${profileMember.followerCount == null ? 0 : profileMember.followerCount}명 · 작품 ${workCount == null ? 0 : workCount}개 · 예술관 ${galleryCount == null ? 0 : galleryCount}개|">닉네임 · 팔로워 0명 · 작품 0개 · 예술관 0개</p>
+              <p class="channelText"
+                 th:text="${profileMember.bio == null or #strings.isEmpty(profileMember.bio) ? '소개가 아직 없습니다.' : profileMember.bio}">설명글입니다. 설명글입니다. 설명글입니다. 설명글입니다.</p>
               <div class="channelActionRow">
                 <button type="button" class="subscribeBtn" data-subscribe-button data-subscribe-default="팔로우" data-subscribe-active="팔로잉">팔로우</button>
                 <button type="button" class="shareBtn" data-share-button>공유하기</button>
@@ -83,7 +88,7 @@
               </a>
               <h2 class="videoTitle" th:text="${gallery.title}">예술관 제목</h2>
               <p class="videoMeta"
-                 th:text="|작품 ${gallery.workCount == null ? 0 : gallery.workCount}개 · 좋아요 ${gallery.likeCount == null ? 0 : gallery.likeCount}개|">작품 0개 · 좋아요 0개</p>
+                 th:text="|작품 ${gallery.workCount == null ? 0 : gallery.workCount}개 · 조회수 ${gallery.viewCount == null ? 0 : gallery.viewCount}회|">작품 0개 · 조회수 0회</p>
             </article>
             <div class="videoEmpty" th:if="${#lists.isEmpty(galleries)}">
               아직 등록된 예술관이 없습니다.

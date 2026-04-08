@@ -61,15 +61,13 @@ public class GalleryService {
         saveTags(requestDTO.getId(), requestDTO.getTagIds(), requestDTO.getTagNames());
         galleryDAO.updateWorkCount(requestDTO.getId());
 
-        String memberNickname = memberRepository.findById(resolvedMemberId)
-                .map(member -> member.getNickname())
-                .orElseThrow(() -> new IllegalStateException("member not found"));
-
         return GalleryCreateResponseDTO.builder()
                 .galleryId(requestDTO.getId())
                 .memberId(resolvedMemberId)
-                .memberNickname(memberNickname)
-                .redirectUrl("/profile/" + memberNickname + "?galleryId=" + requestDTO.getId())
+                .memberNickname(memberRepository.findById(resolvedMemberId)
+                        .map(member -> member.getNickname())
+                        .orElseThrow(() -> new IllegalStateException("member not found")))
+                .redirectUrl("/profile?galleryId=" + requestDTO.getId())
                 .build();
     }
 
