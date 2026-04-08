@@ -1,442 +1,281 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>작품 작성</title>
+    <th:block th:if="${!embeddedMode}" th:replace="~{layout/layout :: ytShellHead('작품 작성')}"></th:block>
+    <link th:if="${!embeddedMode}" rel="stylesheet" href="/css/common/reset.css" th:href="@{/css/common/reset.css}">
+    <link th:if="${!embeddedMode}" rel="stylesheet" href="/css/common/global.css" th:href="@{/css/common/global.css}">
+    <link th:if="${!embeddedMode}" rel="stylesheet" href="/css/common/util.css" th:href="@{/css/common/util.css}">
+    <link th:if="${!embeddedMode}" rel="stylesheet" href="/css/common/common.css" th:href="@{/css/common/common.css}">
     <link rel="stylesheet" href="/css/work/work-register.css" th:href="@{/css/work/work-register.css}">
 </head>
-<body>
-<div id="work-register-state"
-     th:attr="data-edit-mode=${editMode},
-              data-work-id=${editMode and work != null ? work.id : ''},
-              data-title=${editMode and work != null ? work.title : ''},
-              data-description=${editMode and work != null ? work.description : ''},
-              data-gallery-id=${editMode and work != null ? work.galleryId : ''},
-              data-category=${editMode and work != null ? work.category : ''},
-              data-media-url=${editMode and work != null and work.files != null and !#lists.isEmpty(work.files) ? work.files[0].fileUrl : ''},
-              data-media-type=${editMode and work != null and work.files != null and !#lists.isEmpty(work.files) ? work.files[0].fileType : ''},
-              data-link-url=${editMode and work != null ? '/work/detail/' + work.id : ''},
-              data-submit-label=${editMode ? '수정' : '등록'}"
-     hidden></div>
-<div class="page-shell">
+<body class="work-register-page" id="section">
+<div th:if="${!embeddedMode}" th:replace="~{layout/layout :: ytShellChrome('work-register')}"></div>
 
-    <div class="upload-dialog" id="work-register-modal">
-        <div class="dialog-content" id="dialog-content" role="dialog" aria-modal="true" aria-labelledby="work-register-title">
-            <div class="dialog-header">
-                <div id="work-register-title" class="dialog-title">동영상 업로드</div>
-                <div class="header-actions">
-                    <button type="button" class="header-icon-button close-button" id="close-modal-button" aria-label="닫기">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 1 0-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 1 0 1.414 1.414L12 13.414l5.293 5.293a1 1 0 0 0 1.414-1.414L13.414 12l5.293-5.293a1 1 0 0 0-1.414-1.414Z"/>
-                        </svg>
-                    </button>
+<main th:if="${!embeddedMode}" class="yt-shell__page-content">
+    <th:block th:replace="~{this :: workRegisterPanel(standalone=true)}"></th:block>
+</main>
+
+<th:block th:if="${embeddedMode}" th:replace="~{this :: workRegisterPanel(standalone=false)}"></th:block>
+
+<th:block th:fragment="workRegisterPanel(standalone)">
+    <div id="work-register-root"
+         th:class="${standalone} ? 'page-shell' : 'work-register-embedded-root'">
+        <div id="work-register-state"
+             th:attr="data-edit-mode=${editMode},
+                      data-work-id=${editMode and work != null ? work.id : ''},
+                      data-title=${editMode and work != null ? work.title : ''},
+                      data-description=${editMode and work != null ? work.description : ''},
+                      data-gallery-id=${editMode and work != null ? work.galleryId : ''},
+                      data-category=${editMode and work != null ? work.category : ''},
+                      data-media-url=${editMode and work != null and work.files != null and !#lists.isEmpty(work.files) ? work.files[0].fileUrl : ''},
+                      data-media-type=${editMode and work != null and work.files != null and !#lists.isEmpty(work.files) ? work.files[0].fileType : ''},
+                      data-link-url=${editMode and work != null ? '/work/detail/' + work.id : ''},
+                      data-submit-label=${editMode ? '수정' : '등록'}"
+             hidden></div>
+
+        <div th:class="${standalone} ? 'upload-dialog' : 'work-register-panel'">
+            <div class="dialog-content" id="dialog-content" role="dialog" aria-modal="true" aria-labelledby="work-register-title">
+                <th:block th:replace="~{this :: workRegisterDialogBody}"></th:block>
+            </div>
+        </div>
+
+        <div class="ai-prompt-modal" id="ai-prompt-modal" hidden>
+            <div class="ai-prompt-modal__backdrop" data-role="ai-prompt-close"></div>
+            <div class="ai-prompt-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="ai-prompt-title">
+                <div class="ai-prompt-modal__header">
+                    <div class="ai-prompt-modal__title" id="ai-prompt-title">AI 생성</div>
+                    <button type="button" class="ai-prompt-modal__close" id="ai-prompt-close-button" aria-label="닫기">닫기</button>
+                </div>
+                <div class="ai-prompt-modal__body">
+                    <div class="ai-prompt-thread">
+                        <div class="ai-prompt-thread__bubble" id="ai-prompt-bubble">작품을 생성해줘</div>
+                    </div>
+                    <div class="ai-prompt-compose-wrap">
+                        <div class="ai-prompt-compose-menu" id="ai-prompt-compose-menu" hidden>
+                            <button type="button" class="ai-prompt-compose-menu__item" id="ai-prompt-attach-button">사진 및 파일 추가</button>
+                        </div>
+                        <input type="file" id="ai-prompt-file-input" accept="image/*,*" hidden>
+                        <div class="ai-prompt-compose">
+                            <div class="ai-prompt-compose__attachments" id="ai-prompt-attachments" hidden>
+                                <div class="ai-prompt-attachment ai-prompt-attachment--image" id="ai-prompt-image-attachment" hidden>
+                                    <img id="ai-prompt-image-preview" alt="첨부 이미지 미리보기">
+                                    <button type="button" class="ai-prompt-attachment__remove" id="ai-prompt-remove-attachment" aria-label="첨부 삭제">삭제</button>
+                                </div>
+                                <div class="ai-prompt-attachment ai-prompt-attachment--file" id="ai-prompt-file-attachment" hidden>
+                                    <span class="ai-prompt-attachment__file-name" id="ai-prompt-file-name"></span>
+                                    <button type="button" class="ai-prompt-attachment__remove" id="ai-prompt-remove-file-attachment" aria-label="첨부 삭제">삭제</button>
+                                </div>
+                            </div>
+                            <button type="button" class="ai-prompt-compose__tool" id="ai-prompt-tool-button" aria-label="추가" aria-expanded="false">+</button>
+                            <input type="text" class="ai-prompt-compose__input" id="ai-prompt-input" placeholder="무엇이든 물어보세요" autocomplete="off">
+                            <button type="button" class="ai-prompt-compose__send" id="ai-prompt-send-button" aria-label="전송">전송</button>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div class="dialog-screen is-active" id="upload-screen">
-                <div class="upload-header-block">
-                    <div class="upload-header-row">
-                        <div class="upload-header-title">동영상 업로드</div>
-                        <button type="button" class="details-close-button" id="upload-close-button" aria-label="닫기">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 1 0-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 1 0 1.414 1.414L12 13.414l5.293 5.293a1 1 0 0 0 1.414-1.414L13.414 12l5.293-5.293a1 1 0 0 0-1.414-1.414Z"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
+    </div>
 
-                <div class="upload-content">
-                    <div class="upload-panel" id="drop-zone">
-                        <div class="upload-graphic" aria-hidden="true">
-                            <div class="upload-circle">
-                                <svg viewBox="0 0 72 72" class="upload-icon">
-                                    <circle cx="36" cy="36" r="36" fill="#f7f7f7"/>
-                                    <path d="M36 16l14 14h-9v18H31V30h-9l14-14Z" fill="#7d7d7d"/>
-                                    <rect x="22" y="52" width="28" height="5.2" rx="2.6" fill="#7d7d7d"/>
-                                </svg>
-                            </div>
-                        </div>
+    <script src="/js/work/work-register.js" th:src="@{/js/work/work-register.js}"></script>
+</th:block>
 
-                        <p class="upload-title">동영상 또는 사진 파일을 드래그 앤 드롭하여 업로드</p>
-                        <p class="upload-subtitle">콘텐츠를 게시하기 전에는 비공개로 설정됩니다.</p>
-
-                        <input type="file" id="video-file-input" accept="video/*,image/*" hidden>
-                        <div class="upload-action-row">
-                            <button type="button" class="select-file-button" id="select-file-button">파일 선택</button>
-                            <button type="button" class="upload-ai-button" id="upload-ai-button">AI 생성하기</button>
-                        </div>
-                        <p class="selected-file-name" id="selected-file-name" hidden></p>
-                    </div>
-                </div>
-
-                <div class="upload-footer">
-                    <p class="footer-policy">
-                        Bideo에 동영상을 제출하면 Bideo <a href="#">서비스 약관</a> 및 <a href="#">커뮤니티 가이드</a>에 동의하게 됩니다.
-                    </p>
-                    <p class="footer-warning">
-                        불법촬영물 게재시 삭제 조치되고 관련 법에 따라 처벌 받을 수 있습니다. 타인의 저작권 또는 개인정보 보호 권리를 침해해서는 안됩니다. <a href="#">자세히 알아보기</a>
-                    </p>
-                </div>
+<th:block th:fragment="workRegisterDialogBody">
+    <div class="work-register-view work-register-view-current" id="upload-screen">
+        <div class="upload-header-block">
+            <div class="upload-header-row">
+                <div id="work-register-title" class="upload-header-title">작품 업로드</div>
+                <button type="button" class="details-close-button" id="upload-close-button" aria-label="닫기">
+                    <svg viewBox="0 0 24 24"><path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 1 0-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 1 0 1.414 1.414L12 13.414l5.293 5.293a1 1 0 0 0 1.414-1.414L13.414 12l5.293-5.293a1 1 0 0 0-1.414-1.414Z"/></svg>
+                </button>
             </div>
+        </div>
 
-            <div class="dialog-screen details-screen" id="details-screen" hidden>
-                <div class="details-header-block">
-                    <div class="details-title-row">
-                        <div class="details-file-title" id="details-video-title">업로드한 동영상</div>
-                        <div class="details-title-actions">
-                            <button type="button" class="details-close-button" id="details-close-button" aria-label="닫기">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 1 0-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 1 0 1.414 1.414L12 13.414l5.293 5.293a1 1 0 0 0 1.414-1.414L13.414 12l5.293-5.293a1 1 0 0 0-1.414-1.414Z"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <!-- <div class="stepper" aria-label="업로드 단계">
-                        <button type="button" class="step is-active">
-                            <span class="step-name">세부정보</span>
-                            <span class="step-dot"></span>
-                        </button>
-                        <button type="button" class="step">
-                            <span class="step-name">동영상 요소</span>
-                            <span class="step-dot"></span>
-                        </button>
-                        <button type="button" class="step">
-                            <span class="step-name">검토</span>
-                            <span class="step-dot"></span>
-                        </button>
-                        <button type="button" class="step">
-                            <span class="step-name">공개 상태</span>
-                            <span class="step-dot"></span>
-                        </button>
-                    </div> -->
+        <div class="upload-content">
+            <div class="upload-panel" id="drop-zone">
+                <p class="upload-title">동영상 또는 사진 파일을 드래그 앤 드롭하여 업로드</p>
+                <p class="upload-subtitle">콘텐츠를 게시하기 전에는 비공개로 설정됩니다.</p>
+                <input type="file" id="video-file-input" accept="video/*,image/*" hidden>
+                <div class="upload-action-row">
+                    <button type="button" class="select-file-button" id="select-file-button">파일 선택</button>
+                    <button type="button" class="upload-ai-button" id="upload-ai-button">AI 생성하기</button>
                 </div>
-
-                <div class="details-content">
-                    <div class="details-main">
-                        <div class="section-head">
-                            <h1>세부정보</h1>
-                        </div>
-
-                        <div class="form-card">
-                            <label class="field">
-                                <span class="field-control field-control-title">
-                                    <span class="field-inline-label">제목(필수 항목)</span>
-                                    <textarea id="video-title-input" class="text-area text-area-title has-count" rows="1" maxlength="100">업로드한 동영상</textarea>
-                                    <span class="field-count" id="video-title-count">7/100</span>
-                                </span>
-                            </label>
-
-                            <label class="field">
-                                <span class="field-control field-control-textarea">
-                                    <span class="field-inline-label">설명</span>
-                                    <textarea id="video-description-input" class="text-area has-count" rows="8" maxlength="5000"></textarea>
-                                    <span class="field-count" id="video-description-count">0/5000</span>
-                                </span>
-                            </label>
-                        </div>
-
-                        <div class="details-grid">
-                            <section class="info-card">
-                                <h2>썸네일</h2>
-                                <p>눈에 띄고 시청자의 관심을 끄는 썸네일을 설정하세요.</p>
-                                <div class="thumbnail-grid">
-                                    <div class="thumbnail-placeholder">
-                                        <input type="file" id="thumbnail-file-input-1" accept="image/*" hidden>
-                                        <span class="thumbnail-upload-icon" aria-hidden="true">
-                                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
-                                                <path d="M20 0a1 1 0 0 0-1 1v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 0 0 2 0V5h2a1 1 0 1 0 0-2h-2V1a1 1 0 0 0-1-1Zm-6 4V2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V10h-2v3.233l-2.456-1.473a3 3 0 0 0-3.088 0L4 18.033V4h10ZM9 6a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm0 2a1 1 0 1 1 0 2 1 1 0 0 1 0-2Zm7.515 5.475L20 15.565V20H4.61l10.875-6.525a1 1 0 0 1 1.03 0Z"></path>
-                                            </svg>
-                                        </span>
-                                        <span class="thumbnail-upload-text thumbnail-upload-button" data-target-input="thumbnail-file-input-1" role="button" tabindex="0">파일 업로드</span>
-                                    </div>
-                                    <div class="thumbnail-placeholder">
-                                        <input type="file" id="thumbnail-file-input-2" accept="image/*" hidden>
-                                        <span class="thumbnail-upload-icon" aria-hidden="true">
-                                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
-                                                <path d="M13.91 2.586a1 1 0 0 0-1.82 0L9.9 7.403a1 1 0 0 1-.497.497l-4.817 2.19a1 1 0 0 0 0 1.82l4.817 2.19a1 1 0 0 1 .497.497l2.19 4.817a1 1 0 0 0 1.82 0l2.19-4.817a1 1 0 0 1 .497-.497l4.817-2.19a1 1 0 0 0 0-1.82L16.597 7.9a1 1 0 0 1-.497-.497l-2.19-4.817ZM11.72 8.23 13 5.417l1.28 2.814a3 3 0 0 0 1.489 1.49L18.583 11l-2.814 1.28a3 3 0 0 0-1.49 1.489L13 16.583l-1.28-2.814a3 3 0 0 0-1.489-1.49l-2.814-1.28 2.814-1.28A3 3 0 0 0 11.72 8.23m-5.215 8.523L5.5 15l-1.005 1.754a2 2 0 0 1-.741.74L2 18.5l1.754 1.005a2 2 0 0 1 .741.74L5.5 22l1.005-1.754a2 2 0 0 1 .741-.741L9 18.5l-1.754-1.005a2 2 0 0 1-.741-.741Z"></path>
-                                            </svg>
-                                        </span>
-                                        <span class="thumbnail-upload-text thumbnail-upload-button" data-target-input="thumbnail-file-input-2" role="button" tabindex="0">자동 생성됨</span>
-                                    </div>
-                                </div>
-                                <div class="art-list-section">
-                                    <div class="playlist-label">예술관 목록</div>
-                                    <p class="playlist-description">동영상을 하나 이상의 예술관 목록에 추가하여 시청자를 위해 콘텐츠를 정리하세요.</p>
-                                    <div class="compact-row">
-                                        <div class="compact-col">
-                                            <button type="button" class="playlist-dropdown" id="playlist-dropdown-button" aria-label="예술관 목록 선택" aria-expanded="false">
-                                                <span class="playlist-dropdown-text" id="playlist-dropdown-text">선택</span>
-                                                <span class="playlist-dropdown-icon" aria-hidden="true">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
-                                                        <path d="M18.707 8.793a1 1 0 0 0-1.414 0L12 14.086 6.707 8.793a1 1 0 1 0-1.414 1.414L12 16.914l6.707-6.707a1 1 0 0 0 0-1.414Z"></path>
-                                                    </svg>
-                                                </span>
-                                            </button>
-                                            <div class="playlist-dropdown-menu" id="playlist-dropdown-menu" hidden>
-                                                <button
-                                                        type="button"
-                                                        class="playlist-option"
-                                                        th:each="gallery : ${galleries}"
-                                                        th:attr="data-gallery-id=${gallery.id},data-playlist-name=${gallery.title}"
-                                                        th:text="${gallery.title}">
-                                                    예술관
-                                                </button>
-                                                <div th:if="${#lists.isEmpty(galleries)}" class="playlist-option-empty">등록 가능한 예술관이 없습니다.</div>
-                                            </div>
-                                        </div>
-                                        <div class="compact-col"></div>
-                                    </div>
-                                </div>
-
-                                <div class="tags-section">
-                                    <div class="tags-label">태그</div>
-                                    <p class="tags-description">태그는 동영상의 콘텐츠에 일반적으로 맞춤법이 틀리는 단어가 있을 경우 유용합니다. 그 외에 시청자가 동영상을 찾는 데 있어 태그가 하는 역할은 제한적입니다. <a href="https://support.google.com/youtube/answer/146402?hl=ko" target="_blank">자세히 알아보기</a></p>
-                                    <div class="tags-field">
-                                        <input type="text" id="video-tags-input" class="tags-input" maxlength="500" placeholder="태그 추가">
-                                        <div class="tags-suggestions" id="video-tags-suggestions" hidden></div>
-                                    </div>
-                                    <div class="tags-meta">
-                                        <span>각 태그의 뒤에 쉼표를 입력하세요.</span>
-                                        <span id="video-tags-count">0/500</span>
-                                    </div>
-                                </div>
-
-                                <div class="toggle-row work-trade-toggle-row">
-                                    <div class="toggle-row-text">
-                                        <span>거래 등록</span>
-                                        <span>거래 작품으로 등록할 수 있습니다.</span>
-                                    </div>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="tradeToggle">
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                                <div class="work-trade-config" id="tradeConfig" hidden>
-                                    <div class="work-trade-config__row">
-                                        <span class="work-trade-config__label">거래 가격</span>
-                                        <div class="work-trade-config__price-wrap">
-                                            <input class="work-trade-config__price-input" type="text" id="tradePriceInput" placeholder="입력해주세요">
-                                            <span class="work-trade-config__price-unit">원</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <button type="button" class="auction-expand-button" aria-label="경매 등록">
-                                    <span class="auction-expand-icon auction-expand-icon-collapse" hidden aria-hidden="true">
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
-                                            <path d="M5.293 15.207a1 1 0 0 0 1.414 0L12 9.914l5.293 5.293a1 1 0 1 0 1.414-1.414L12 7.086l-6.707 6.707a1 1 0 0 0 0 1.414Z"></path>
-                                        </svg>
-                                    </span>
-                                    <span class="auction-expand-icon" aria-hidden="true">
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
-                                            <path d="M18.707 8.793a1 1 0 0 0-1.414 0L12 14.086 6.707 8.793a1 1 0 1 0-1.414 1.414L12 16.914l6.707-6.707a1 1 0 0 0 0-1.414Z"></path>
-                                        </svg>
-                                    </span>
-                                    <h3 class="auction-expand-label">경매 등록</h3>
-                                </button>
-                                <div class="work-auction-config" id="auctionConfig" hidden>
-                                    <div class="work-auction-config__section">
-                                        <div class="work-auction-config__row">
-                                            <span class="work-auction-config__label">경매 가격</span>
-                                            <div class="work-auction-config__price-wrap">
-                                                <input class="work-auction-config__price-input" type="text" id="auctionBidPriceInput" placeholder="입력해주세요">
-                                                <span class="work-auction-config__price-unit">원</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="work-auction-config__section work-auction-config__section--deadline">
-                                        <div class="work-auction-config__header">
-                                            <span class="work-auction-config__title">입찰시간</span>
-                                            <div class="work-auction-config__selected-wrap">
-                                                <span class="work-auction-config__selected" id="auctionDeadlineSelected">0시간</span>
-                                                <button class="work-auction-config__reset" type="button" id="auctionDeadlineReset">초기화</button>
-                                            </div>
-                                        </div>
-                                        <input type="hidden" id="auctionDeadlineHoursInput" value="0">
-                                        <div class="work-auction-config__deadline-btns">
-                                            <button class="work-auction-config__deadline-btn" type="button" data-hours="1">1시간</button>
-                                            <button class="work-auction-config__deadline-btn" type="button" data-hours="3">3시간</button>
-                                            <button class="work-auction-config__deadline-btn" type="button" data-hours="6">6시간</button>
-                                            <button class="work-auction-config__deadline-btn" type="button" data-hours="12">12시간</button>
-                                            <button class="work-auction-config__deadline-btn" type="button" data-hours="24">1일</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
-                        </div>
-                    </div>
-
-                    <aside class="details-side">
-                        <div class="video-side-card">
-                            <div class="video-preview" id="video-preview-shell">
-                                <video id="video-preview-player" class="video-preview-player" controls muted playsinline></video>
-                                <img id="image-preview-player" class="image-preview-player" alt="업로드 미리보기">
-                                <div class="video-preview-empty" id="video-preview-empty">
-                                    <div class="video-preview-icon">
-                                        <svg viewBox="0 0 24 24">
-                                            <path d="M18.707 8.293 12 1.586 5.293 8.293a1 1 0 1 0 1.414 1.414L11 5.414V17a1 1 0 0 0 2 0V5.414l4.293 4.293a1 1 0 1 0 1.414-1.414ZM19 20H5a1 1 0 0 0 0 2h14a1 1 0 0 0 0-2Z"/>
-                                        </svg>
-                                    </div>
-                                    <div class="video-progress-copy">
-                                        <div class="video-progress-title">동영상 처리 중</div>
-                                        <div class="video-progress-subtitle">표준 화질 처리 중입니다.</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="side-meta">
-                                <div class="side-meta-row">
-                                    <span>링크</span>
-                                    <div class="side-meta-link-row">
-                                        <a href="#" id="video-link-url">https://bideo.kr/watch/demo</a>
-                                        <button type="button" class="side-meta-copy-button" id="video-link-copy-button" aria-label="복사 하기">
-                                            <span class="side-meta-copy-tooltip">링크 복사</span>
-                                            <span class="side-meta-copy-icon" aria-hidden="true">
-                                            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
-                                                <path d="M19 1H9a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2ZM9 17V3h10v14H9Zm-4 4V5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2H5Z"></path>
-                                            </svg>
-                                            </span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="side-meta-row">
-                                    <span>파일 이름</span>
-                                    <strong id="video-file-label">sample.mp4</strong>
-                                </div>
-                            </div>
-                        </div>
-                    </aside>
-                </div>
-
-                <div class="details-footer">
-                    <div class="details-status">
-                        <span class="status-icon">
-                        </span>
-                    </div>
-                    <div class="details-buttons">
-                        <button type="button" class="tonal-button" id="details-back-button">뒤로</button>
-                        <button type="button" class="filled-button" id="work-submit-button">등록</button>
-                    </div>
-                </div>
+                <p class="selected-file-name" id="selected-file-name" hidden></p>
             </div>
         </div>
     </div>
-</div>
 
-<div class="ai-prompt-modal" id="ai-prompt-modal" hidden>
-    <div class="ai-prompt-modal__backdrop" data-role="ai-prompt-close"></div>
-    <div class="ai-prompt-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="ai-prompt-title">
-        <div class="ai-prompt-modal__header">
-            <div class="ai-prompt-modal__title" id="ai-prompt-title">AI 생성</div>
-            <button type="button" class="ai-prompt-modal__close" id="ai-prompt-close-button" aria-label="닫기">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 1 0-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 1 0 1.414 1.414L12 13.414l5.293 5.293a1 1 0 0 0 1.414-1.414L13.414 12l5.293-5.293a1 1 0 0 0-1.414-1.414Z"/>
-                </svg>
-            </button>
-        </div>
-        <div class="ai-prompt-modal__divider"></div>
-        <div class="ai-prompt-modal__body">
-            <div class="ai-prompt-thread">
-                <div class="ai-prompt-thread__bubble" id="ai-prompt-bubble">동영상 아무거나 하나 만들어줘 사진도</div>
-                <div class="ai-prompt-thread__result">
-                    <div class="ai-prompt-thread__label">이미지 생성됨 · 해질 무렵 산 정상의 여인</div>
-                    <div class="ai-prompt-preview-card">
-                        <div class="ai-prompt-preview-card__split">
-                            <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80" alt="AI 생성 이미지 예시">
-                        </div>
-                        <div class="ai-prompt-preview-card__split">
-                            <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80" alt="AI 생성 동영상 예시">
-                            <span class="ai-prompt-preview-card__play" aria-hidden="true">
-                                <svg viewBox="0 0 24 24">
-                                    <path d="M8 5.14v13.72c0 .72.78 1.17 1.4.8l10.77-6.86a.94.94 0 0 0 0-1.6L9.4 4.34A.94.94 0 0 0 8 5.14Z"/>
-                                </svg>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="ai-prompt-preview-actions" aria-label="생성 결과 작업">
-                        <button type="button" class="ai-prompt-preview-actions__button" aria-label="복사">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M19 1H9a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2ZM9 17V3h10v14H9Zm-4 4V5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2H5Z"/>
-                            </svg>
-                        </button>
-                        <button type="button" class="ai-prompt-preview-actions__button" aria-label="다운로드">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M12 3a1 1 0 0 1 1 1v9.586l2.293-2.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 1 1 1.414-1.414L11 13.586V4a1 1 0 0 1 1-1Zm-7 14a1 1 0 0 1 1 1v1h12v-1a1 1 0 1 1 2 0v2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1Z"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="ai-prompt-thread__message ai-prompt-thread__message--user">
-                    방금 만든 결과에서 원하는 분위기나 색감이 있으면 이어서 수정할 수 있어요.
+    <div class="work-register-view details-screen" id="details-screen" hidden>
+        <div class="details-header-block">
+            <div class="details-title-row">
+                <div class="details-file-title" id="details-video-title">업로드한 작품</div>
+                <div class="details-title-actions">
+                    <button type="button" class="details-close-button" id="details-close-button" aria-label="닫기">
+                        <svg viewBox="0 0 24 24"><path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 1 0-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 1 0 1.414 1.414L12 13.414l5.293 5.293a1 1 0 0 0 1.414-1.414L13.414 12l5.293-5.293a1 1 0 0 0-1.414-1.414Z"/></svg>
+                    </button>
                 </div>
             </div>
-            <div class="ai-prompt-compose-wrap">
-                <div class="ai-prompt-compose-menu" id="ai-prompt-compose-menu" hidden>
-                    <button type="button" class="ai-prompt-compose-menu__item" id="ai-prompt-attach-button">
-                        <span class="ai-prompt-compose-menu__icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" aria-hidden="true" class="icon">
-                                <path d="M16.5 6.5v8.75a4.25 4.25 0 1 1-8.5 0V5.75a2.75 2.75 0 1 1 5.5 0V14a1.25 1.25 0 1 1-2.5 0V7.5a1 1 0 1 0-2 0V14a3.25 3.25 0 1 0 6.5 0V5.75a4.75 4.75 0 1 0-9.5 0v9.5a6.25 6.25 0 1 0 12.5 0V6.5a1 1 0 1 0-2 0Z"/>
-                            </svg>
+        </div>
+
+        <div class="work-register-details-layout">
+            <div class="details-main">
+                <div class="section-head"><h1>세부정보</h1></div>
+
+                <div class="form-card">
+                    <label class="field">
+                        <span class="field-control field-control-title">
+                            <span class="field-inline-label">제목(필수 항목)</span>
+                            <textarea id="video-title-input" class="text-area text-area-title has-count" rows="1" maxlength="100">업로드한 작품</textarea>
+                            <span class="field-count" id="video-title-count">7/100</span>
                         </span>
-                        <span>사진 및 파일 추가</span>
-                    </button>
-                    <button type="button" class="ai-prompt-compose-menu__item">
-                        <span class="ai-prompt-compose-menu__icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" aria-hidden="true" class="icon">
-                                <path d="M9 4a2 2 0 0 0-2 2v1H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H9Zm0 2h9v7h-1V9a2 2 0 0 0-2-2H9V6Zm-3 3h9v7H6V9Zm2 1.25A1.75 1.75 0 1 0 8 13.75a1.75 1.75 0 0 0 0-3.5Zm6 4.75H7.5l2.1-2.52a1 1 0 0 1 1.54-.02l1.2 1.34.88-1.02A1 1 0 0 1 14 13.46V15Z"/>
-                            </svg>
+                    </label>
+                    <label class="field">
+                        <span class="field-control field-control-textarea">
+                            <span class="field-inline-label">설명</span>
+                            <textarea id="video-description-input" class="text-area has-count" rows="8" maxlength="5000"></textarea>
+                            <span class="field-count" id="video-description-count">0/5000</span>
                         </span>
-                        <span>이미지 만들기</span>
-                    </button>
+                    </label>
                 </div>
-                <input type="file" id="ai-prompt-file-input" accept="image/*,*" hidden>
-                <div class="ai-prompt-compose">
-                <div class="ai-prompt-compose__attachments" id="ai-prompt-attachments" hidden>
-                    <div class="ai-prompt-attachment ai-prompt-attachment--image" id="ai-prompt-image-attachment" hidden>
-                        <img id="ai-prompt-image-preview" alt="첨부 이미지 미리보기">
-                        <button type="button" class="ai-prompt-attachment__remove" id="ai-prompt-remove-attachment" aria-label="첨부 삭제">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 1 0-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 1 0 1.414 1.414L12 13.414l5.293 5.293a1 1 0 0 0 1.414-1.414L13.414 12l5.293-5.293a1 1 0 0 0-1.414-1.414Z"/>
-                            </svg>
+
+                <div class="details-grid">
+                    <section class="info-card">
+                        <h2>썸네일</h2>
+                        <p>눈에 띄고 시청자의 관심을 끄는 썸네일을 설정하세요.</p>
+                        <div class="thumbnail-grid">
+                            <div class="thumbnail-placeholder">
+                                <input type="file" id="thumbnail-file-input-1" accept="image/*" hidden>
+                                <span class="thumbnail-upload-text thumbnail-upload-button" data-target-input="thumbnail-file-input-1" role="button" tabindex="0">파일 업로드</span>
+                            </div>
+                            <div class="thumbnail-placeholder">
+                                <input type="file" id="thumbnail-file-input-2" accept="image/*" hidden>
+                                <span class="thumbnail-upload-text thumbnail-upload-button" data-target-input="thumbnail-file-input-2" role="button" tabindex="0">자동 생성됨</span>
+                            </div>
+                        </div>
+
+                        <div class="art-list-section">
+                            <div class="playlist-label">예술관 목록</div>
+                            <p class="playlist-description">작품을 하나의 예술관에 연결하세요.</p>
+                            <div class="compact-row">
+                                <div class="compact-col">
+                                    <button type="button" class="playlist-dropdown" id="playlist-dropdown-button" aria-label="예술관 목록 선택" aria-expanded="false">
+                                        <span class="playlist-dropdown-text" id="playlist-dropdown-text">선택</span>
+                                    </button>
+                                    <div class="playlist-dropdown-menu" id="playlist-dropdown-menu" hidden>
+                                        <button type="button" class="playlist-option"
+                                                th:each="gallery : ${galleries}"
+                                                th:attr="data-gallery-id=${gallery.id},data-playlist-name=${gallery.title}"
+                                                th:text="${gallery.title}">예술관</button>
+                                        <div th:if="${#lists.isEmpty(galleries)}" class="playlist-option-empty">등록 가능한 예술관이 없습니다.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tags-section">
+                            <div class="tags-label">태그</div>
+                            <div class="tags-field">
+                                <input type="text" id="video-tags-input" class="tags-input" maxlength="500" placeholder="태그 추가">
+                                <div class="tags-suggestions" id="video-tags-suggestions" hidden></div>
+                            </div>
+                            <div class="tags-meta">
+                                <span>각 태그의 뒤에 쉼표를 입력하세요.</span>
+                                <span id="video-tags-count">0/500</span>
+                            </div>
+                        </div>
+
+                        <div class="toggle-row work-trade-toggle-row">
+                            <div class="toggle-row-text">
+                                <span>거래 등록</span>
+                                <span>거래 작품으로 등록할 수 있습니다.</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="tradeToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="work-trade-config" id="tradeConfig" hidden>
+                            <div class="work-trade-config__row">
+                                <span class="work-trade-config__label">거래 가격</span>
+                                <div class="work-trade-config__price-wrap">
+                                    <input class="work-trade-config__price-input" type="text" id="tradePriceInput" placeholder="입력해주세요">
+                                    <span class="work-trade-config__price-unit">원</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" class="auction-expand-button" aria-label="경매 등록">
+                            <span class="auction-expand-icon auction-expand-icon-collapse" hidden aria-hidden="true"></span>
+                            <span class="auction-expand-icon" aria-hidden="true"></span>
+                            <h3 class="auction-expand-label">경매 등록</h3>
                         </button>
+
+                        <div class="work-auction-config" id="auctionConfig" hidden>
+                            <div class="work-auction-config__section">
+                                <div class="work-auction-config__row">
+                                    <span class="work-auction-config__label">경매 가격</span>
+                                    <div class="work-auction-config__price-wrap">
+                                        <input class="work-auction-config__price-input" type="text" id="auctionBidPriceInput" placeholder="입력해주세요">
+                                        <span class="work-auction-config__price-unit">원</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="work-auction-config__section work-auction-config__section--deadline">
+                                <div class="work-auction-config__header">
+                                    <span class="work-auction-config__title">입찰시간</span>
+                                    <div class="work-auction-config__selected-wrap">
+                                        <span class="work-auction-config__selected" id="auctionDeadlineSelected">0시간</span>
+                                        <button class="work-auction-config__reset" type="button" id="auctionDeadlineReset">초기화</button>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="auctionDeadlineHoursInput" value="0">
+                                <div class="work-auction-config__deadline-btns">
+                                    <button class="work-auction-config__deadline-btn" type="button" data-hours="1">1시간</button>
+                                    <button class="work-auction-config__deadline-btn" type="button" data-hours="3">3시간</button>
+                                    <button class="work-auction-config__deadline-btn" type="button" data-hours="6">6시간</button>
+                                    <button class="work-auction-config__deadline-btn" type="button" data-hours="12">12시간</button>
+                                    <button class="work-auction-config__deadline-btn" type="button" data-hours="24">1일</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <aside class="details-side">
+                <div class="video-side-card">
+                    <div class="video-preview" id="video-preview-shell">
+                        <video id="video-preview-player" class="video-preview-player" controls muted playsinline></video>
+                        <img id="image-preview-player" class="image-preview-player" alt="업로드 미리보기">
+                        <div class="video-preview-empty" id="video-preview-empty"></div>
                     </div>
-                    <div class="ai-prompt-attachment ai-prompt-attachment--file" id="ai-prompt-file-attachment" hidden>
-                        <span class="ai-prompt-attachment__file-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M7 2a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.828a2 2 0 0 0-.586-1.414l-3.828-3.828A2 2 0 0 0 13.172 3H7Zm0 2h6v4a2 2 0 0 0 2 2h4v10H7V4Zm8 .414L18.586 8H15V4.414Z"/>
-                            </svg>
-                        </span>
-                        <span class="ai-prompt-attachment__file-name" id="ai-prompt-file-name"></span>
-                        <button type="button" class="ai-prompt-attachment__remove" id="ai-prompt-remove-file-attachment" aria-label="첨부 삭제">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 1 0-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 1 0 1.414 1.414L12 13.414l5.293 5.293a1 1 0 0 0 1.414-1.414L13.414 12l5.293-5.293a1 1 0 0 0-1.414-1.414Z"/>
-                            </svg>
-                        </button>
+                    <div class="side-meta">
+                        <div class="side-meta-row">
+                            <span>링크</span>
+                            <div class="side-meta-link-row">
+                                <a href="#" id="video-link-url"></a>
+                                <button type="button" class="side-meta-copy-button" id="video-link-copy-button" aria-label="복사 하기">복사</button>
+                            </div>
+                        </div>
+                        <div class="side-meta-row">
+                            <span>파일 이름</span>
+                            <strong id="video-file-label">sample.mp4</strong>
+                        </div>
                     </div>
                 </div>
-                <button type="button" class="ai-prompt-compose__tool" id="ai-prompt-tool-button" aria-label="추가" aria-expanded="false">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M19 11H13V5a1 1 0 1 0-2 0v6H5a1 1 0 0 0 0 2h6v6a1 1 0 1 0 2 0v-6h6a1 1 0 1 0 0-2Z"/>
-                    </svg>
-                </button>
-                <input type="text" class="ai-prompt-compose__input" id="ai-prompt-input" placeholder="무엇이든 물어보세요" autocomplete="off">
-                <button type="button" class="ai-prompt-compose__icon-button" aria-label="마이크">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M12 15a3 3 0 0 0 3-3V7a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Zm5-3a1 1 0 1 1 2 0 7 7 0 0 1-6 6.93V21h3a1 1 0 1 1 0 2H8a1 1 0 0 1 0-2h3v-2.07A7 7 0 0 1 5 12a1 1 0 1 1 2 0 5 5 0 1 0 10 0Z"/>
-                    </svg>
-                </button>
-                <button type="button" class="ai-prompt-compose__send" id="ai-prompt-send-button" aria-label="전송">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M12 3a1 1 0 0 1 1 1v12.59l3.3-3.3a1 1 0 1 1 1.4 1.42l-5 5a1 1 0 0 1-1.4 0l-5-5a1 1 0 1 1 1.4-1.42l3.3 3.3V4a1 1 0 0 1 1-1Z"/>
-                    </svg>
-                </button>
-                </div>
+            </aside>
+        </div>
+
+        <div class="details-footer">
+            <div class="details-buttons">
+                <button type="button" class="tonal-button" id="details-back-button">뒤로</button>
+                <button type="button" class="filled-button" id="work-submit-button">등록</button>
             </div>
         </div>
     </div>
-</div>
+</th:block>
 
-<script src="/js/work/work-register.js" th:src="@{/js/work/work-register.js}"></script>
+<th:block th:if="${!embeddedMode}" th:replace="~{layout/layout :: ytShellScripts()}"></th:block>
 </body>
 </html>

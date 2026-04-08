@@ -1,6 +1,6 @@
 function initializeWorkRegister() {
-    var modal = document.getElementById("work-register-modal");
-    var dialogContent = document.getElementById("dialog-content");
+    var modal = document.getElementById("work-register-root");
+    var dialogContent = document.getElementById("dialog-content") || modal;
     var uploadScreen = document.getElementById("upload-screen");
     var detailsScreen = document.getElementById("details-screen");
     var uploadPanel = document.getElementById("drop-zone");
@@ -75,7 +75,7 @@ function initializeWorkRegister() {
     var tagSuggestionRequestSeq = 0;
     var activeTagSuggestionIndex = -1;
 
-    if (!modal || !dialogContent || !uploadScreen || !detailsScreen || !uploadPanel || !fileInput || !selectFileButton || !closeButton || !fileNameText) {
+    if (!modal || !dialogContent || !uploadScreen || !detailsScreen || !uploadPanel || !fileInput || !selectFileButton || !fileNameText) {
         return;
     }
 
@@ -403,11 +403,11 @@ function initializeWorkRegister() {
         }
 
         input.addEventListener("focus", function () {
-            control.classList.add("is-active");
+            control.classList.add("field-focused");
         });
 
         input.addEventListener("blur", function () {
-            control.classList.remove("is-active");
+            control.classList.remove("field-focused");
         });
     }
 
@@ -432,7 +432,7 @@ function initializeWorkRegister() {
         clone = detailsScreen.cloneNode(true);
         clone.hidden = false;
         clone.removeAttribute("hidden");
-        clone.classList.add("is-active");
+        clone.classList.add("work-register-view-current");
         clone.style.position = "absolute";
         clone.style.visibility = "hidden";
         clone.style.pointerEvents = "none";
@@ -600,7 +600,7 @@ function initializeWorkRegister() {
 
     function highlightActiveTagSuggestion() {
         getTagSuggestionButtons().forEach(function (button, index) {
-            button.classList.toggle("is-active", index === activeTagSuggestionIndex);
+            button.classList.toggle("tags-suggestion-current", index === activeTagSuggestionIndex);
         });
     }
 
@@ -656,7 +656,7 @@ function initializeWorkRegister() {
 
         videoTagsSuggestions.innerHTML = tags.map(function (tag, index) {
             var tagName = escapeHtml(tag && tag.tagName ? tag.tagName : "");
-            var activeClass = index === 0 ? " is-active" : "";
+            var activeClass = index === 0 ? " tags-suggestion-current" : "";
             return '<button type="button" class="tags-suggestion-item' + activeClass + '" data-tag-name="' + tagName + '">' + tagName + '</button>';
         }).join("");
         videoTagsSuggestions.hidden = false;
@@ -863,9 +863,9 @@ function initializeWorkRegister() {
         var title = toDisplayTitle(file.name);
 
         uploadScreen.hidden = true;
-        uploadScreen.classList.remove("is-active");
+        uploadScreen.classList.remove("work-register-view-current");
         detailsScreen.hidden = false;
-        detailsScreen.classList.add("is-active");
+        detailsScreen.classList.add("work-register-view-current");
         dialogContent.classList.add("is-details");
 
         if (detailsVideoTitle) {
@@ -885,9 +885,9 @@ function initializeWorkRegister() {
 
     function showUploadScreen() {
         detailsScreen.hidden = true;
-        detailsScreen.classList.remove("is-active");
+        detailsScreen.classList.remove("work-register-view-current");
         uploadScreen.hidden = false;
-        uploadScreen.classList.add("is-active");
+        uploadScreen.classList.add("work-register-view-current");
         dialogContent.classList.remove("is-details");
     }
 
@@ -945,7 +945,9 @@ function initializeWorkRegister() {
         handleFiles(event.dataTransfer.files);
     });
 
-    closeButton.addEventListener("click", closeModal);
+    if (closeButton) {
+        closeButton.addEventListener("click", closeModal);
+    }
 
     if (uploadCloseButton) {
         uploadCloseButton.addEventListener("click", closeModal);

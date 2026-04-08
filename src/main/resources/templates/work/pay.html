@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>결제하기</title>
+    <th:block th:replace="~{layout/layout :: ytShellHead('결제하기')}"></th:block>
+    <link rel="stylesheet" href="/css/common/reset.css" th:href="@{/css/common/reset.css}">
+    <link rel="stylesheet" href="/css/common/global.css" th:href="@{/css/common/global.css}">
+    <link rel="stylesheet" href="/css/common/util.css" th:href="@{/css/common/util.css}">
+    <link rel="stylesheet" href="/css/common/common.css" th:href="@{/css/common/common.css}">
     <link rel="stylesheet" href="../../templates/work/pay-api.css">
     <link rel="icon" href="/images/BIDEO_LOGO/BIDEO_favicon.png">
     <link rel="stylesheet" href="/css/common/font.css">
@@ -12,9 +14,11 @@
     <script src="https://js.bootpay.co.kr/bootpay-5.0.2.min.js"></script>
 </head>
 <body>
+<div th:replace="~{layout/layout :: ytShellChrome('pay')}"></div>
+<main class="yt-shell__page-content">
 <div class="overlay" onclick="history.back()"></div>
 
-<main class="pay-modal" data-fee-rate="0.10">
+<section class="pay-modal" data-fee-rate="0.10">
     <div class="pay-modal__handle"></div>
 
     <header class="pay-modal__header">
@@ -107,8 +111,10 @@
             <span id="paySubmitLabel">0원 결제하기</span>
         </button>
     </footer>
+</section>
 </main>
 
 <script src="/js/pay/pay-api.js"></script>
+<th:block th:replace="~{layout/layout :: ytShellScripts()}"></th:block>
 </body>
 </html>
