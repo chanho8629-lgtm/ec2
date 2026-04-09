@@ -9,7 +9,6 @@
 .bd-chat-panel,
 .bd-chat-layer__backdrop,
 .bd-chat-panel__close,
-.bd-chat-thread__ghost,
 .bd-chat-composer__send,
 .bd-chat-room,
 .bd-chat-sidebar__search input {
@@ -43,7 +42,7 @@
 
 .bd-chat-fab:focus-visible,
 .bd-chat-panel__close:focus-visible,
-.bd-chat-thread__ghost:focus-visible,
+.bd-chat-thread__identity:focus-visible,
 .bd-chat-composer__send:focus-visible,
 .bd-chat-sidebar__compose:focus-visible,
 .bd-chat-person:focus-visible,
@@ -89,6 +88,10 @@
 }
 
 .bd-chat-layer[hidden] {
+  display: none !important;
+}
+
+.bd-chat-panel [hidden] {
   display: none !important;
 }
 
@@ -525,16 +528,16 @@
   align-items: center;
   gap: 14px;
   min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 14px;
+  padding: 4px 8px;
+  margin: -4px -8px;
+  transition: background 0.16s ease;
 }
 
-.bd-chat-thread__ghost {
-  min-height: 34px;
-  padding: 0 14px;
-  border: 1px solid var(--bd-chat-accent-border);
-  border-radius: 999px;
-  background: #ffffff;
-  color: var(--bd-chat-accent);
-  cursor: pointer;
+.bd-chat-thread__identity:hover {
+  background: rgba(15, 15, 15, 0.04);
 }
 
 .bd-chat-thread__messages {
@@ -574,6 +577,8 @@
   color: #111111;
   font-size: 0.99rem;
   line-height: 1.55;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .bd-chat-bubble--self .bd-chat-bubble__body {
@@ -888,14 +893,15 @@ body[data-bd-chat-open="true"] .bd-chat-fab {
 
   .bd-chat-panel__body {
     grid-template-columns: 1fr;
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-rows: 1fr;
   }
 
   .bd-chat-sidebar {
     max-height: 220px;
+    height: 100%;
     padding-bottom: 12px;
     border-right: 0;
-    border-bottom: 1px solid rgba(15, 15, 15, 0.08);
+    border-bottom: 0;
     overflow-y: auto;
   }
 
@@ -909,43 +915,11 @@ body[data-bd-chat-open="true"] .bd-chat-fab {
     grid-auto-flow: row;
     overflow-y: auto;
   }
-}
-
-@media (max-width: 640px) {
-  .bd-chat-fab {
-    width: 58px;
-    height: 58px;
-  }
-
-  .bd-chat-panel {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 0;
-    transform-origin: bottom center;
-  }
-
-  /* 모바일: 사이드바 전체 표시, 스레드 숨김 */
-  .bd-chat-panel__body {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr;
-  }
-
-  .bd-chat-sidebar {
-    max-height: none;
-    height: 100%;
-    overflow-y: auto;
-    border-bottom: 0;
-  }
 
   .bd-chat-thread {
     display: none;
   }
 
-  /* 대화 선택 시: 사이드바 숨기고 스레드 표시 */
   .bd-chat-panel__body.is-thread-open .bd-chat-sidebar {
     display: none;
   }
@@ -954,20 +928,8 @@ body[data-bd-chat-open="true"] .bd-chat-fab {
     display: block;
   }
 
-  /* 뒤로가기 버튼 표시 */
   .bd-chat-thread__back {
     display: inline-flex;
-  }
-
-  .bd-chat-sidebar__topbar {
-    margin-bottom: 8px;
-    align-items: center;
-  }
-
-  .bd-chat-sidebar__compose {
-    min-height: 38px;
-    margin-bottom: 8px;
-    font-size: 1.1rem;
   }
 
   .bd-chat-thread__header,
@@ -989,5 +951,38 @@ body[data-bd-chat-open="true"] .bd-chat-fab {
 
   .bd-chat-bubble {
     max-width: 86%;
+  }
+}
+
+@media (max-width: 640px) {
+  .bd-chat-fab {
+    width: 58px;
+    height: 58px;
+  }
+
+  .bd-chat-panel {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    transform-origin: bottom center;
+  }
+
+  .bd-chat-sidebar__topbar {
+    margin-bottom: 8px;
+    align-items: center;
+  }
+
+  .bd-chat-sidebar {
+    max-height: none;
+  }
+
+  .bd-chat-sidebar__compose {
+    min-height: 38px;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
   }
 }
