@@ -265,8 +265,48 @@
         <if test="status != null and status != ''">
             and g.status = #{status}
         </if>
-        order by g.created_datetime desc, g.id desc
+        <choose>
+            <when test="sort == 'popular'">
+                order by g.like_count desc, g.view_count desc, g.id desc
+            </when>
+            <otherwise>
+                order by g.created_datetime desc, g.id desc
+            </otherwise>
+        </choose>
         limit #{size} offset (#{page} - 1) * #{size}
+    </select>
+
+    <select id="selectSearchGalleryList" resultType="GalleryListResponseDTO">
+        select
+            g.id,
+            g.member_id,
+            g.title,
+            g.description,
+            g.cover_image,
+            m.nickname as member_nickname,
+            g.work_count,
+            g.like_count,
+            g.view_count,
+            false as is_liked,
+            g.created_datetime
+        from tbl_gallery g
+        left join tbl_member m on g.member_id = m.id
+        where g.deleted_datetime is null
+          and g.status != 'DELETED'
+        <if test="keyword != null and keyword != ''">
+            and (g.title ilike '%' || #{keyword} || '%'
+              or g.description ilike '%' || #{keyword} || '%'
+              or m.nickname ilike '%' || #{keyword} || '%')
+        </if>
+        <choose>
+            <when test="sort == 'popular'">
+                order by g.like_count desc, g.view_count desc, g.id desc
+            </when>
+            <otherwise>
+                order by g.created_datetime desc, g.id desc
+            </otherwise>
+        </choose>
+        limit #{criteria.count} offset #{criteria.offset}
     </select>
 
     <select id="selectGalleryCount" resultType="int">
