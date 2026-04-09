@@ -1,5 +1,6 @@
 package com.app.bideo.repository.gallery;
 
+import com.app.bideo.common.pagination.Criteria;
 import com.app.bideo.domain.interaction.CommentVO;
 import com.app.bideo.dto.common.TagResponseDTO;
 import com.app.bideo.dto.gallery.GalleryCreateRequestDTO;
@@ -145,6 +146,11 @@ public class GalleryDAO {
 
     public List<GalleryListResponseDTO> findAll(GallerySearchDTO searchDTO) {
         return galleryMapper.selectGalleryList(searchDTO);
+    }
+
+    // 검색해서 목록 조회
+    public List<GalleryListResponseDTO> findBySearch(Criteria criteria, String keyword, String sort) {
+        return galleryMapper.selectSearchGalleryList(criteria, keyword, sort);
     }
 
     public int findTotal(GallerySearchDTO searchDTO) {

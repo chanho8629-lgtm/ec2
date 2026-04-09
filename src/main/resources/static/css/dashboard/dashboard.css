@@ -1102,27 +1102,44 @@ body {
     color: #fff;
 }
 
+.Dashboard-ModalLayer {
+    position: relative;
+    z-index: 5000;
+}
+
 .Dashboard-Modal {
     position: fixed;
     inset: 0;
-    z-index: 1000;
+    z-index: 10000;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 80px 16px 24px;
+    isolation: isolate;
+}
+
+.Dashboard-Modal[hidden] {
+    display: none !important;
 }
 
 .Dashboard-ModalBackdrop {
     position: absolute;
     inset: 0;
     background: rgba(15, 23, 42, 0.44);
+    z-index: 1;
+    pointer-events: auto;
 }
 
 .Dashboard-ModalDialog {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     width: min(560px, calc(100% - 32px));
-    margin: 80px auto 0;
+    margin: 0;
     padding: 22px;
     border-radius: 22px;
     background: #fff;
     box-shadow: 0 24px 60px rgba(15, 23, 42, 0.24);
+    pointer-events: auto;
 }
 
 .Dashboard-ModalDialog--small {
