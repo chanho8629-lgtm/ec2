@@ -43,80 +43,9 @@
                         </h2>
                     </div>
 
-                    <!-- 동영상 목록 -->
+                    <!-- 동영상 목록 (JS에서 동적 렌더링) -->
                     <div class="Downloads-VideoList-Container">
-                        <div class="Downloads-VideoList" id="downloadsList">
-
-                            <!-- 동영상 카드 -->
-                            <div class="Downloads-Video-Item" data-type="video">
-                                <div class="Downloads-Video-Card">
-                                    <div class="Downloads-Video-Thumbnail">
-                                        <a class="Downloads-Thumbnail-Link" href="#">
-                                            <img class="Downloads-Thumbnail-Image" alt="" src="https://i.ytimg.com/vi/32yiFNiSoj8/hqdefault.jpg" />
-                                            <div class="Downloads-Thumbnail-Overlay">
-                                                <div class="Downloads-Time-Badge">
-                                                    <span class="Downloads-Time-Badge-Text">2:12</span>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="Downloads-Video-Details">
-                                        <div class="Downloads-Video-Meta">
-                                            <h3 class="Downloads-Video-TitleWrap">
-                                                <a class="Downloads-Video-TitleLink" href="#">
-                                                    <span class="Downloads-Video-Title">[자막뉴스] 미군 정예부대가 알린 소식...12번 말 바꾼 트럼프에 '대혼란' / YTN</span>
-                                                </a>
-                                            </h3>
-                                            <button class="Downloads-Menu-Button" aria-label="작업 메뉴">
-                                                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
-                                                    <path d="M12 4a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Z"></path>
-                                                </svg>
-                                            </button>
-                                            <div class="Downloads-Video-Metadata">
-                                                <div class="Downloads-Channel-Name">YTN</div>
-                                                <div class="Downloads-Meta-Line">
-                                                    <span class="Downloads-Meta-Item">조회수 2.3만회</span>
-                                                    <span class="Downloads-Meta-Item">1시간 전</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 공모전 카드 (샘플) -->
-                            <div class="Downloads-Video-Item" data-type="contest">
-                                <div class="Downloads-Video-Card">
-                                    <div class="Downloads-Video-Thumbnail">
-                                        <a class="Downloads-Thumbnail-Link" href="#">
-                                            <img class="Downloads-Thumbnail-Image" alt="" src="https://i.ytimg.com/vi/nLD84OB7rO0/hqdefault.jpg" />
-                                        </a>
-                                    </div>
-                                    <div class="Downloads-Video-Details">
-                                        <div class="Downloads-Video-Meta">
-                                            <h3 class="Downloads-Video-TitleWrap">
-                                                <a class="Downloads-Video-TitleLink" href="#">
-                                                    <span class="Downloads-Video-Title">2026 신인 영상 크리에이터 공모전</span>
-                                                </a>
-                                            </h3>
-                                            <button class="Downloads-Menu-Button" aria-label="작업 메뉴">
-                                                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
-                                                    <path d="M12 4a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Z"></path>
-                                                </svg>
-                                            </button>
-                                            <div class="Downloads-Video-Metadata">
-                                                <div class="Downloads-Channel-Name">BIDEO 공식</div>
-                                                <div class="Downloads-Meta-Line">
-                                                    <span class="Downloads-Meta-Item">~2026.04.30</span>
-                                                    <span class="Downloads-Meta-Item">총 500만원</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
+                        <div class="Downloads-VideoList" id="downloadsList"></div>
                     </div>
 
                 </div>
@@ -134,7 +63,7 @@
     </div>
 
     <!-- ===== 동영상 없을 때: 빈 상태 프로모 섹션 ===== -->
-    <div class="Downloads-Section">
+    <div class="Downloads-Section" id="downloadsEmptyState" style="display:none;">
         <div class="Downloads-Section-Content">
             <div class="Downloads-Empty-State">
                 <div class="Downloads-Empty-Image">

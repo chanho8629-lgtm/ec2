@@ -590,3 +590,153 @@ button {
 [hidden] {
     display: none !important;
 }
+
+/* ===== 참가 신청 모달 ===== */
+.Entry-Modal-Overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.Entry-Modal-Overlay--visible {
+    display: flex;
+}
+
+.Entry-Modal {
+    background: var(--color-bg, #fff);
+    border-radius: 16px;
+    width: 560px;
+    max-width: 92vw;
+    max-height: 84vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.18);
+}
+
+.Entry-Modal-Header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.Entry-Modal-Title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+}
+
+.Entry-Modal-CloseBtn {
+    width: 32px;
+    height: 32px;
+    font-size: 24px;
+    color: var(--color-text-sub);
+    border-radius: 50%;
+}
+
+.Entry-Modal-CloseBtn:hover {
+    background-color: var(--color-bg-muted);
+}
+
+.Entry-Modal-Body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.Entry-Modal-Empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--color-text-muted);
+    padding: 40px 0;
+    font-size: 14px;
+}
+
+.Entry-Work-Card {
+    border: 2px solid var(--color-border);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s;
+    background: var(--color-bg);
+}
+
+.Entry-Work-Card:hover {
+    border-color: var(--color-primary);
+}
+
+.Entry-Work-Card--selected {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary-light);
+}
+
+.Entry-Work-Thumb {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    background-color: var(--color-bg-muted);
+    display: block;
+}
+
+.Entry-Work-Title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text);
+    padding: 8px 10px;
+    line-height: 18px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.Entry-Modal-Footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--color-border);
+}
+
+.Entry-Modal-CancelBtn,
+.Entry-Modal-SubmitBtn {
+    height: 38px;
+    padding: 0 20px;
+    border-radius: 19px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.Entry-Modal-CancelBtn {
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    background: transparent;
+}
+
+.Entry-Modal-CancelBtn:hover {
+    background-color: var(--color-bg-muted);
+}
+
+.Entry-Modal-SubmitBtn {
+    background-color: var(--color-primary);
+    color: #ffffff;
+}
+
+.Entry-Modal-SubmitBtn:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+}
+
+.Entry-Modal-SubmitBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
