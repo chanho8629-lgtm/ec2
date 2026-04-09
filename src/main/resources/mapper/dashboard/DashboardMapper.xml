@@ -26,6 +26,23 @@
                   and a.status = 'ACTIVE'
             ), 0) as active_auction_count,
             coalesce((
+                select count(*)
+                from tbl_auction a
+                where a.seller_id = #{memberId}
+                  and a.status = 'SOLD'
+            ), 0) as sold_auction_count,
+            coalesce((
+                select count(*)
+                from tbl_auction a
+                where a.seller_id = #{memberId}
+            ), 0) as hosted_auction_count,
+            coalesce((
+                select sum(coalesce(a.final_price, a.current_price, a.asking_price))
+                from tbl_auction a
+                where a.seller_id = #{memberId}
+                  and a.status = 'SOLD'
+            ), 0) as total_auction_transaction_amount,
+            coalesce((
                 select count(distinct ce.contest_id)
                 from tbl_contest_entry ce
                 join tbl_contest c on c.id = ce.contest_id
@@ -33,6 +50,26 @@
                   and c.deleted_datetime is null
                   and c.status not in ('DELETED', 'RESULT', 'CLOSED')
             ), 0) as participating_contest_count,
+            coalesce((
+                select count(*)
+                from tbl_contest c
+                where c.member_id = #{memberId}
+                  and c.deleted_datetime is null
+                  and c.status = 'OPEN'
+            ), 0) as active_contest_count,
+            coalesce((
+                select count(*)
+                from tbl_contest_entry ce
+                where ce.member_id = #{memberId}
+                  and ce.award_rank is not null
+            ), 0) as awarded_contest_count,
+            coalesce((
+                select sum(coalesce(c.price, 0))
+                from tbl_contest c
+                where c.member_id = #{memberId}
+                  and c.deleted_datetime is null
+                  and c.status != 'DELETED'
+            ), 0) as total_contest_prize_amount,
             coalesce((
                 select sum(p.total_price)
                 from tbl_payment p
@@ -52,6 +89,36 @@
                 where p.buyer_id = #{memberId}
                   and p.status in ('PENDING', 'AUTHORIZED')
             ), 0) as pending_payment_count,
+            coalesce((
+                select count(*)
+                from tbl_settlement s
+                where s.member_id = #{memberId}
+                  and s.status = 'PAID'
+            ), 0) as completed_withdrawal_count,
+            coalesce((
+                select sum(s.net_amount)
+                from tbl_settlement s
+                where s.member_id = #{memberId}
+                  and s.status in ('PENDING', 'APPROVED')
+            ), 0) as planned_settlement_amount,
+            coalesce((
+                select sum(p.total_price)
+                from tbl_payment p
+                where p.buyer_id = #{memberId}
+                   or p.seller_id = #{memberId}
+            ), 0) as total_payment_amount,
+            coalesce((
+                select count(*)
+                from tbl_payment p
+                where (p.buyer_id = #{memberId} or p.seller_id = #{memberId})
+                  and p.status = 'COMPLETED'
+            ), 0) as payment_success_count,
+            coalesce((
+                select count(*)
+                from tbl_payment p
+                where (p.buyer_id = #{memberId} or p.seller_id = #{memberId})
+                  and p.status in ('REFUNDED', 'CANCELLED')
+            ), 0) as payment_failure_count,
             coalesce((
                 select count(*)
                 from tbl_settlement s
@@ -154,43 +221,35 @@
         limit 5
     </select>
 
+    <select id="selectBookmarkedWorkItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
+        select
+            'WORK' as tag,
+            false as gold_tag,
+            w.title,
+            '작가 ' || writer.nickname || ' · 저장일 ' || to_char(b.created_datetime, 'YYYY.MM.DD') as description,
+            null as amount
+        from tbl_bookmark b
+        join tbl_work w on b.target_type = 'WORK' and b.target_id = w.id
+        join tbl_member writer on w.member_id = writer.id
+        where b.member_id = #{memberId}
+          and w.deleted_datetime is null
+          and w.status != 'DELETED'
+        order by b.created_datetime desc
+        limit 5
+    </select>
+
     <select id="selectOwnedWorkItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
         select
-            item.tag,
-            item.gold_tag,
-            item.title,
-            item.description,
-            item.priority
-        from (
-            select
-                '모음집' as tag,
-                false as gold_tag,
-                g.title,
-                '작품 ' || g.work_count || '개 · 조회수 ' || g.view_count as description,
-                0 as priority,
-                g.created_datetime as created_at,
-                (g.view_count + g.like_count) as score
-            from tbl_gallery g
-            where g.member_id = #{memberId}
-              and g.deleted_datetime is null
-              and g.status != 'DELETED'
-
-            union all
-
-            select
-                '작품' as tag,
-                false as gold_tag,
-                w.title,
-                '조회수 ' || w.view_count || ' · 좋아요 ' || w.like_count as description,
-                1 as priority,
-                w.created_datetime as created_at,
-                (w.view_count + w.like_count + w.save_count) as score
-            from tbl_work w
-            where w.member_id = #{memberId}
-              and w.deleted_datetime is null
-              and w.status != 'DELETED'
-        ) item
-        order by item.priority asc, item.score desc, item.created_at desc
+            '작품' as tag,
+            false as gold_tag,
+            w.title,
+            '조회수 ' || w.view_count || ' · 좋아요 ' || w.like_count as description,
+            null as amount
+        from tbl_work w
+        where w.member_id = #{memberId}
+          and w.deleted_datetime is null
+          and w.status != 'DELETED'
+        order by (w.view_count + w.like_count + w.save_count) desc, w.created_datetime desc
         limit 5
     </select>
 
@@ -253,6 +312,59 @@
         order by
             case when g.status = 'EXHIBITING' then 0 when g.status = 'SCHEDULED' then 1 else 2 end,
             g.updated_datetime desc
+        limit 5
+    </select>
+
+    <select id="selectSoldWorkItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
+        select
+            case
+                when p.status = 'COMPLETED' then '판매완료'
+                when p.status in ('PENDING', 'AUTHORIZED') then '정산대기'
+                when p.status = 'REFUNDED' then '환불완료'
+                else p.status
+            end as tag,
+            w.title,
+            to_char(coalesce(p.paid_at, p.created_datetime), 'YYYY.MM.DD') || ' · 판매가 ₩' || to_char(p.total_price, 'FM999,999,999') as description,
+            '₩' || to_char(p.total_price, 'FM999,999,999') as amount
+        from tbl_payment p
+        join tbl_work w on p.work_id = w.id
+        where p.seller_id = #{memberId}
+        order by coalesce(p.paid_at, p.created_datetime) desc
+        limit 5
+    </select>
+
+    <select id="selectPurchasedWorkItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
+        select
+            case
+                when p.status = 'COMPLETED' then '구매완료'
+                when p.status in ('PENDING', 'AUTHORIZED') then '구매대기'
+                when p.status = 'REFUNDED' then '환불완료'
+                else p.status
+            end as tag,
+            w.title,
+            to_char(coalesce(p.paid_at, p.created_datetime), 'YYYY.MM.DD') || ' · 구매가 ₩' || to_char(p.total_price, 'FM999,999,999') as description,
+            '₩' || to_char(p.total_price, 'FM999,999,999') as amount
+        from tbl_payment p
+        join tbl_work w on p.work_id = w.id
+        where p.buyer_id = #{memberId}
+        order by coalesce(p.paid_at, p.created_datetime) desc
+        limit 5
+    </select>
+
+    <select id="selectStoredWorkItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
+        select
+            case
+                when p.status = 'REFUNDED' then '이관'
+                else '보관'
+            end as tag,
+            w.title,
+            to_char(coalesce(p.paid_at, p.created_datetime), 'YYYY.MM.DD') || ' · 보관가 ₩' || to_char(p.total_price, 'FM999,999,999') as description,
+            '₩' || to_char(p.total_price, 'FM999,999,999') as amount
+        from tbl_payment p
+        join tbl_work w on p.work_id = w.id
+        where p.buyer_id = #{memberId}
+          and p.status in ('COMPLETED', 'REFUNDED')
+        order by coalesce(p.paid_at, p.created_datetime) desc
         limit 5
     </select>
 
@@ -321,6 +433,100 @@
                 join tbl_auction a on aw.auction_id = a.id
                 where a.seller_id = #{memberId}
             ), 0) as auction_wishlist_count
+    </select>
+
+    <select id="selectBookmarkedWorkCount" resultType="int">
+        select count(*)
+        from tbl_bookmark b
+        join tbl_work w on b.target_type = 'WORK' and b.target_id = w.id
+        where b.member_id = #{memberId}
+          and w.deleted_datetime is null
+          and w.status != 'DELETED'
+    </select>
+
+    <select id="selectOwnedWorkCount" resultType="int">
+        select count(*)
+        from tbl_work
+        where member_id = #{memberId}
+          and deleted_datetime is null
+          and status != 'DELETED'
+    </select>
+
+    <select id="selectOwnedGalleryCount" resultType="int">
+        select count(*)
+        from tbl_gallery
+        where member_id = #{memberId}
+          and deleted_datetime is null
+          and status != 'DELETED'
+    </select>
+
+    <select id="selectHostedContestCount" resultType="int">
+        select count(*)
+        from tbl_contest
+        where member_id = #{memberId}
+          and deleted_datetime is null
+          and status != 'DELETED'
+    </select>
+
+    <select id="selectRegisteredCardCount" resultType="int">
+        select count(*)
+        from tbl_card
+        where member_id = #{memberId}
+          and deleted_datetime is null
+    </select>
+
+    <select id="selectDailyViewCounts" resultType="com.app.bideo.dto.dashboard.DashboardDailyMetricPointDTO">
+        select
+            wv.viewed_at::date as day,
+            count(*)::bigint as count
+        from tbl_work_view wv
+        join tbl_work w on wv.work_id = w.id
+        where w.member_id = #{memberId}
+          and w.deleted_datetime is null
+          and w.status != 'DELETED'
+          and wv.viewed_at::date between #{startDate} and #{endDate}
+        group by wv.viewed_at::date
+        order by day asc
+    </select>
+
+    <select id="selectDailyBookmarkedWorkCounts" resultType="com.app.bideo.dto.dashboard.DashboardDailyMetricPointDTO">
+        select
+            b.created_datetime::date as day,
+            count(*)::bigint as count
+        from tbl_bookmark b
+        join tbl_work w on b.target_type = 'WORK' and b.target_id = w.id
+        where b.member_id = #{memberId}
+          and w.deleted_datetime is null
+          and w.status != 'DELETED'
+          and b.created_datetime::date between #{startDate} and #{endDate}
+        group by b.created_datetime::date
+        order by day asc
+    </select>
+
+    <select id="selectDailyCreatedWorkCounts" resultType="com.app.bideo.dto.dashboard.DashboardDailyMetricPointDTO">
+        select
+            w.created_datetime::date as day,
+            count(*)::bigint as count
+        from tbl_work w
+        where w.member_id = #{memberId}
+          and w.deleted_datetime is null
+          and w.status != 'DELETED'
+          and w.created_datetime::date between #{startDate} and #{endDate}
+        group by w.created_datetime::date
+        order by day asc
+    </select>
+
+    <select id="selectDailyCreatedGalleryCounts" resultType="com.app.bideo.dto.dashboard.DashboardDailyMetricPointDTO">
+        select
+            g.created_datetime::date as day,
+            count(*)::bigint as count
+        from tbl_gallery g
+        where g.member_id = #{memberId}
+          and g.deleted_datetime is null
+          and g.status != 'DELETED'
+          and g.created_datetime::date between #{startDate} and #{endDate}
+        group by g.created_datetime::date
+        order by day asc
     </select>
 
 </mapper>
