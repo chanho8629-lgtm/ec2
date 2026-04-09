@@ -166,4 +166,29 @@
         ORDER BY m.follower_count DESC NULLS LAST
         LIMIT #{limit}
     </select>
+
+    <select id="searchByKeywordPaged" resultType="com.app.bideo.dto.member.MemberListResponseDTO">
+        SELECT
+            m.id,
+            m.nickname,
+            m.profile_image,
+            m.bio,
+            m.creator_verified,
+            m.creator_tier,
+            m.follower_count,
+            CASE WHEN f.id IS NOT NULL THEN true ELSE false END AS is_following
+        FROM tbl_member m
+        LEFT JOIN tbl_follow f ON f.follower_id = #{currentMemberId}
+                              AND f.following_id = m.id
+        WHERE m.status = 'ACTIVE'
+          AND m.id != #{currentMemberId}
+          AND (
+              m.nickname ILIKE '%' || #{keyword} || '%'
+              OR m.real_name ILIKE '%' || #{keyword} || '%'
+              OR m.bio ILIKE '%' || #{keyword} || '%'
+          )
+        ORDER BY m.follower_count DESC NULLS LAST
+        LIMIT #{criteria.count} OFFSET #{criteria.offset}
+    </select>
+
 </mapper>

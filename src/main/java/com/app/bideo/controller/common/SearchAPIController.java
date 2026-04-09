@@ -61,11 +61,14 @@ public class SearchAPIController {
         return galleryService.getSearchSuggestions();
     }
 
-    @GetMapping
+    @GetMapping("/{page}")
     public SearchResultResponseDTO search(
+            @PathVariable int page,
             @RequestParam String keyword,
+            @RequestParam(defaultValue = "all") String type,
+            @RequestParam(defaultValue = "latest") String sort,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long currentMemberId = userDetails != null ? userDetails.getId() : 0L;
-        return searchService.search(keyword, currentMemberId);
+        return searchService.search(page, keyword, type, sort, currentMemberId);
     }
 }

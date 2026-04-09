@@ -26,7 +26,7 @@ const searchLayout = (() => {
             <a href="/profile/${esc(m.nickname)}">${esc(m.nickname)}</a>
             ${m.creatorVerified ? '<svg class="verified-badge" viewBox="0 0 24 24" width="14" height="14" fill="#606060"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>' : ""}
           </h3>
-          <button class="subscribe-btn">구독</button>
+          <button class="subscribe-btn" data-member-id="${m.id}" style="${m.isFollowing ? 'background-color:rgba(0,0,0,0.05);color:#0f0f0f' : ''}">${m.isFollowing ? '구독중' : '구독'}</button>
         </div>
         <p class="channel-handle">팔로워 ${formatCount(m.followerCount)}명</p>
         ${m.bio ? `<p class="channel-desc">${esc(m.bio)}</p>` : ""}
@@ -55,7 +55,7 @@ const searchLayout = (() => {
         ${g.description ? `<p class="gallery-description">${esc(g.description)}</p>` : ""}
       </div>
       <button class="gallery-more-btn" aria-label="예술관더보기버튼">⋮</button>
-      <div class="gallery-dropdown off" data-target-type="GALLERY" data-target-id="${g.id}">
+      <div class="gallery-dropdown off" data-target-type="GALLERY" data-target-id="${g.id}" data-member-id="${g.memberId}">
         <div class="gallery-dropdown-item" data-action="share">
           <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M10 3.158V7.51c-5.428.223-8.27 3.75-8.875 11.199-.04.487-.07.975-.09 1.464l-.014.395c-.014.473.578.684.88.32.302-.368.61-.73.925-1.086l.244-.273c1.79-1.967 3-2.677 4.93-2.917a18.011 18.011 0 012-.112v4.346a1 1 0 001.646.763l9.805-8.297 1.55-1.31-1.55-1.31-9.805-8.297A1 1 0 0010 3.158Zm2 6.27v.002-4.116l7.904 6.688L12 18.689v-4.212l-2.023.024c-1.935.022-3.587.17-5.197 1.024a9 9 0 00-1.348.893c.355-1.947.916-3.39 1.63-4.425 1.062-1.541 2.607-2.385 5.02-2.485L12 9.428Z"></path></svg>
           공유
@@ -96,7 +96,7 @@ const searchLayout = (() => {
         </div>
       </div>
       <button class="work-more-btn" aria-label="작품더보기버튼">⋮</button>
-      <div class="work-dropdown off" data-target-type="WORK" data-target-id="${w.id}">
+      <div class="work-dropdown off" data-target-type="WORK" data-target-id="${w.id}" data-member-id="${w.memberId}">
         <div class="work-dropdown-item" data-action="share">
           <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit;"><path d="M10 3.158V7.51c-5.428.223-8.27 3.75-8.875 11.199-.04.487-.07.975-.09 1.464l-.014.395c-.014.473.578.684.88.32.302-.368.61-.73.925-1.086l.244-.273c1.79-1.967 3-2.677 4.93-2.917a18.011 18.011 0 012-.112v4.346a1 1 0 001.646.763l9.805-8.297 1.55-1.31-1.55-1.31-9.805-8.297A1 1 0 0010 3.158Zm2 6.27v.002-4.116l7.904 6.688L12 18.689v-4.212l-2.023.024c-1.935.022-3.587.17-5.197 1.024a9 9 0 00-1.348.893c.355-1.947.916-3.39 1.63-4.425 1.062-1.541 2.607-2.385 5.02-2.485L12 9.428Z"></path></svg>
           공유
@@ -118,9 +118,13 @@ const searchLayout = (() => {
     return el;
   };
 
-  const render = (container, data) => {
-    console.log("들어옴1 레이아웃", data);
-    container.innerHTML = "";
+  const render = (container, data, page) => {
+    console.log("들어옴1 레이아웃", data, "page:", page);
+
+    // 페이지 1이면 초기화, 2 이상이면 append
+    if (!page || page === 1) {
+      container.innerHTML = "";
+    }
 
     if (data.profiles) data.profiles.forEach(m => container.appendChild(createProfileEl(m)));
     if (data.galleries) data.galleries.forEach(g => container.appendChild(createGalleryEl(g)));
@@ -132,12 +136,7 @@ const searchLayout = (() => {
 
     console.log("들어옴2 레이아웃완료, profiles:", (data.profiles || []).length, "galleries:", (data.galleries || []).length, "works:", (data.works || []).length);
 
-    return {
-      profileCount: (data.profiles || []).length,
-      galleryCount: (data.galleries || []).length,
-      workCount: (data.works || []).length,
-      totalCount: (data.profiles || []).length + (data.galleries || []).length + (data.works || []).length
-    };
+    return data.criteria;
   };
 
   return { render: render };

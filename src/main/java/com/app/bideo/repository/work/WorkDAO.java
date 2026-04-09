@@ -1,5 +1,6 @@
 package com.app.bideo.repository.work;
 
+import com.app.bideo.common.pagination.Criteria;
 import com.app.bideo.domain.interaction.CommentVO;
 import com.app.bideo.domain.work.WorkFileVO;
 import com.app.bideo.domain.work.WorkTagVO;
@@ -59,6 +60,11 @@ public class WorkDAO {
     // 조건별 작품 목록 조회
     public List<WorkListResponseDTO> findAll(WorkSearchDTO searchDTO) {
         return workMapper.selectWorkList(searchDTO);
+    }
+
+    // 검색해서 목록 조회
+    public List<WorkListResponseDTO> findBySearch(Criteria criteria, String keyword, String sort) {
+        return workMapper.selectSearchWorkList(criteria, keyword, sort);
     }
 
     // 목록 페이징용 전체 개수 조회
