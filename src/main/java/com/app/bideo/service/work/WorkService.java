@@ -218,6 +218,14 @@ public class WorkService {
         }
 
         updateGalleryLink(previousGalleryId, galleryId, id);
+        saveAuctionIfRequested(
+                id,
+                resolvedMemberId,
+                requestDTO.getPrice(),
+                requestDTO.getAuctionEnabled(),
+                requestDTO.getAuctionStartingPrice(),
+                requestDTO.getAuctionDeadlineHours()
+        );
 
         return getWorkDetail(id);
     }
@@ -390,6 +398,9 @@ public class WorkService {
 
     private void saveAuctionIfRequested(Long workId, Long sellerId, Integer askingPrice, Boolean auctionEnabled, Integer startingPrice, Integer deadlineHours) {
         if (!Boolean.TRUE.equals(auctionEnabled)) {
+            return;
+        }
+        if (workDAO.existsActiveAuctionByWorkId(workId)) {
             return;
         }
         if (startingPrice == null || startingPrice <= 0) {

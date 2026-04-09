@@ -176,7 +176,6 @@
                             <div class="tags-label">태그</div>
                             <div class="tags-field">
                                 <input type="text" id="video-tags-input" class="tags-input" maxlength="500" placeholder="태그 추가">
-                                <div class="tags-suggestions" id="video-tags-suggestions" hidden></div>
                             </div>
                             <div class="tags-meta">
                                 <span>각 태그의 뒤에 쉼표를 입력하세요.</span>
@@ -205,10 +204,16 @@
                             </div>
                         </div>
 
-                        <button type="button" class="auction-expand-button" aria-label="경매 등록">
-                            <span class="auction-expand-icon auction-expand-icon-collapse" hidden aria-hidden="true"></span>
-                            <span class="auction-expand-icon" aria-hidden="true"></span>
-                            <h3 class="auction-expand-label">경매 등록</h3>
+                        <button type="button" class="auction-expand-button" aria-label="경매 등록" aria-expanded="false">
+                            <span class="auction-expand-icon" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events: none; display: inherit; width: 100%; height: 100%;">
+                                    <path d="M18.707 8.793a1 1 0 00-1.414 0L12 14.086 6.707 8.793a1 1 0 10-1.414 1.414L12 16.914l6.707-6.707a1 1 0 000-1.414Z"></path>
+                                </svg>
+                            </span>
+                            <span class="auction-expand-button__copy">
+                                <strong class="auction-expand-label">경매 등록</strong>
+                                <span class="auction-expand-description">경매 작품으로 등록할 수 있습니다.</span>
+                            </span>
                         </button>
 
                         <div class="work-auction-config" id="auctionConfig" hidden>
@@ -255,7 +260,10 @@
                             <span>링크</span>
                             <div class="side-meta-link-row">
                                 <a href="#" id="video-link-url"></a>
-                                <button type="button" class="side-meta-copy-button" id="video-link-copy-button" aria-label="복사 하기">복사</button>
+                                <div class="side-meta-link-actions">
+                                    <button type="button" class="side-meta-text-button" id="video-link-remove-button">삭제</button>
+                                    <button type="button" class="side-meta-copy-button" id="video-link-copy-button" aria-label="복사 하기">복사</button>
+                                </div>
                             </div>
                         </div>
                         <div class="side-meta-row">
