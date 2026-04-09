@@ -15,6 +15,8 @@ create table tbl_bookmark (
         references tbl_member (id)
 );
 
+alter table tbl_bookmark add column url_target varchar(255);
+
 comment on table tbl_bookmark is '북마크';
 comment on column tbl_bookmark.id is 'PK';
 comment on column tbl_bookmark.member_id is '저장한 회원';
