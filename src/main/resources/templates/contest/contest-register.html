@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/css/common/common.css" th:href="@{/css/common/common.css}" />
     <link rel="stylesheet" href="/css/contest/contest-register-page.css" th:href="@{/css/contest/contest-register-page.css}" />
     <script defer src="/js/contest/contest-register.js" th:src="@{/js/contest/contest-register.js}"></script>
+    <meta th:if="${contestId}" name="contestId" th:content="${contestId}" />
 </head>
 <body>
     <div th:replace="~{layout/layout :: ytShellChrome('contest')}"></div>
@@ -20,8 +21,8 @@
     <div class="Register-Page-Header">
         <h1 class="Register-Page-Title">공모전 등록</h1>
         <div class="Register-ActionBar-Buttons">
-            <button class="Register-Button-Outline">수정</button>
-            <button class="Register-Button-Filled">등록</button>
+            <button class="Register-Button-Outline" id="editContestBtn">수정</button>
+            <button class="Register-Button-Filled" id="registerContestBtn">등록</button>
         </div>
     </div>
 
@@ -58,7 +59,32 @@
             <h2 class="Register-Section-Title">공모전 제목</h2>
             <p class="Register-Section-Desc">공모전을 잘 나타내는 제목을 입력하세요. 변경된 제목은 공모전 목록과 상세 페이지에 표시됩니다. 제목은 14일 내에 2회 변경할 수 있습니다.</p>
             <div class="Register-Input-Wrap">
-                <input class="Register-Input" type="text" placeholder="공모전 제목을 입력하세요" />
+                <input class="Register-Input" type="text" id="titleInput" placeholder="공모전 제목을 입력하세요" />
+            </div>
+        </section>
+
+        <!-- 주최자 -->
+        <section class="Register-Section">
+            <h2 class="Register-Section-Title">주최자</h2>
+            <p class="Register-Section-Desc">공모전을 주최하는 기관 또는 이름을 입력하세요.</p>
+            <div class="Register-Input-Wrap">
+                <input class="Register-Input" type="text" id="organizerInput" placeholder="주최자를 입력하세요" />
+            </div>
+        </section>
+
+        <!-- 카테고리 -->
+        <section class="Register-Section">
+            <h2 class="Register-Section-Title">카테고리</h2>
+            <p class="Register-Section-Desc">공모전의 카테고리를 선택하세요.</p>
+            <div class="Register-Input-Wrap">
+                <select class="Register-Input" id="categoryInput">
+                    <option value="">선택하세요</option>
+                    <option value="영상">영상</option>
+                    <option value="음악">음악</option>
+                    <option value="디자인">디자인</option>
+                    <option value="사진">사진</option>
+                    <option value="기타">기타</option>
+                </select>
             </div>
         </section>
 
@@ -89,12 +115,21 @@
             </div>
         </section>
 
-        <!-- 상금 -->
+        <!-- 상금 정보 -->
         <section class="Register-Section">
-            <h2 class="Register-Section-Title">상금</h2>
-            <p class="Register-Section-Desc">공모전 총 상금을 입력하세요. 상금은 공모전 목록과 상세 페이지에 표시됩니다.</p>
+            <h2 class="Register-Section-Title">상금 정보</h2>
+            <p class="Register-Section-Desc">공모전 상금 정보를 입력하세요.</p>
             <div class="Register-Input-Wrap">
-                <input class="Register-Input" type="text" placeholder="예: 총 500만원" />
+                <input class="Register-Input" type="text" id="prizeInfoInput" placeholder="예: 총 500만원" />
+            </div>
+        </section>
+
+        <!-- 참가비 -->
+        <section class="Register-Section">
+            <h2 class="Register-Section-Title">참가비</h2>
+            <p class="Register-Section-Desc">참가비가 있는 경우 금액을 입력하세요. 무료인 경우 비워두세요.</p>
+            <div class="Register-Input-Wrap">
+                <input class="Register-Input" type="number" id="priceInput" placeholder="0" />
             </div>
         </section>
 
@@ -102,7 +137,7 @@
         <section class="Register-Section">
             <h2 class="Register-Section-Title">설명</h2>
             <div class="Register-Textarea-Wrap">
-                <textarea class="Register-Textarea" rows="6" placeholder="참가자에게 공모전에 대해 설명해 주세요. 이 설명은 공모전의 정보 섹션 및 검색결과 등에 표시됩니다."></textarea>
+                <textarea class="Register-Textarea" rows="6" id="descriptionInput" placeholder="참가자에게 공모전에 대해 설명해 주세요. 이 설명은 공모전의 정보 섹션 및 검색결과 등에 표시됩니다."></textarea>
             </div>
         </section>
 

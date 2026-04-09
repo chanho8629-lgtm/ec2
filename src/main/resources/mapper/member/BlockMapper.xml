@@ -18,4 +18,25 @@
         VALUES (#{blockerId}, #{blockedId})
     </insert>
 
+    <delete id="deleteBlock">
+        delete from tbl_block
+        where blocker_id = #{blockerId}
+          and blocked_id = #{blockedId}
+    </delete>
+
+    <select id="selectBlockedMembers" resultType="com.app.bideo.dto.member.BlockResponseDTO">
+        select
+            b.id,
+            b.blocked_id,
+            m.nickname,
+            m.profile_image,
+            b.created_datetime
+        from tbl_block b
+        join tbl_member m on b.blocked_id = m.id
+        where b.blocker_id = #{blockerId}
+        order by b.created_datetime desc
+        limit #{limit}
+        offset #{offset}
+    </select>
+
 </mapper>

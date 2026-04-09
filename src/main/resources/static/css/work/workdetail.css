@@ -1575,13 +1575,13 @@ svg {
     text-decoration: underline;
 }
 
-.page.panel-open .info {
+.page.panel-open:not(.panel-auction) .info {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
 }
 
-.page.panel-open .media-cluster {
+.page.panel-open:not(.panel-auction) .media-cluster {
     transform: translateX(calc(var(--media-cluster-shift) - var(--anchored-panel-media-shift)));
 }
 
@@ -1614,6 +1614,48 @@ svg {
     pointer-events: auto;
     opacity: 1;
     visibility: visible;
+    background: #ffffff !important;
+    box-shadow: none !important;
+}
+
+.page.panel-open.panel-auction .info {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.page.panel-open.panel-auction .media-cluster {
+    transform: translateX(calc(var(--media-cluster-shift) - var(--anchored-panel-media-shift)));
+}
+
+.page.panel-open.panel-auction .anchored-panel,
+.page.panel-open.panel-auction .comments-panel,
+.page.panel-open.panel-auction .pivot-panel {
+    display: none;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.page.panel-open.panel-auction .thumb::after {
+    background: transparent;
+}
+
+.page.panel-open.panel-auction::before,
+.page.panel-open.panel-auction::after,
+.page.panel-open.panel-auction .card::before,
+.page.panel-open.panel-auction .card::after,
+.page.panel-open.panel-auction .thumb::before {
+    content: none !important;
+    display: none !important;
+}
+
+.page.panel-open.panel-auction .thumb,
+.page.panel-open.panel-auction .card,
+.page.panel-open.panel-auction .media,
+.page.panel-open.panel-auction .view {
+    filter: none !important;
+    opacity: 1 !important;
 }
 
 .page.panel-open.panel-pivot .anchored-panel,
@@ -1691,11 +1733,16 @@ svg {
     transform: translate(-50%, -50%);
 }
 
-.workdetail-stage.stage-fullscreen .page.fullscreen-active-page.panel-open .media-cluster {
+.workdetail-stage.stage-fullscreen .page.fullscreen-active-page.panel-open:not(.panel-auction) .media-cluster {
+    transform: translate(calc(-50% - var(--anchored-panel-media-shift)), -50%);
+}
+
+.workdetail-stage.stage-fullscreen .page.fullscreen-active-page.panel-auction .media-cluster {
     transform: translate(calc(-50% - var(--anchored-panel-media-shift)), -50%);
 }
 
 .workdetail-stage.stage-fullscreen .page.fullscreen-active-page.panel-open .anchored-panel,
+.workdetail-stage.stage-fullscreen .page.fullscreen-active-page.panel-auction .work-auction-modal-backdrop,
 .workdetail-stage.stage-fullscreen .page.fullscreen-active-page.panel-comments .comments-panel,
 .workdetail-stage.stage-fullscreen .page.fullscreen-active-page.panel-pivot .pivot-panel {
     right: var(--anchored-panel-open-right);
@@ -1725,7 +1772,7 @@ svg {
 
 .workdetail-stage.stage-fullscreen .page.fullscreen-active-page .info {
     position: absolute;
-    left: 24px;
+    left: 40px;
     bottom: 24px;
     z-index: 5;
     width: 320px;
@@ -2090,9 +2137,9 @@ svg {
     width: var(--anchored-panel-width);
     min-width: 250px;
     height: calc(var(--player-w) * var(--player-ratio-h) / var(--player-ratio-w) + 1px);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    background: var(--surface);
+    border: 0;
+    border-radius: 0;
+    background: transparent !important;
     color: var(--panel-text);
     overflow: hidden;
     pointer-events: none;
@@ -2118,7 +2165,7 @@ svg {
     border: 0;
     border-radius: 0;
     overflow: hidden;
-    background: var(--surface);
+    background: #ffffff;
     box-shadow: none;
     opacity: 1;
     visibility: visible;
@@ -2181,6 +2228,10 @@ svg {
     overflow: hidden;
     background: #ffffff;
     padding: 0;
+}
+
+.work-auction-modal .Auction-Modal-Backdrop {
+    background: transparent;
 }
 
 .work-auction-modal .Auction-Page-Wrapper,

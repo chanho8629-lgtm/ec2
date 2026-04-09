@@ -12,10 +12,8 @@ document.addEventListener("DOMContentLoaded", function () {
         var value = tagInput.value.trim();
         if (!value) return;
 
-        // #이 없으면 자동 추가
         if (value.charAt(0) !== "#") value = "#" + value;
 
-        // 중복 방지
         if (tags.indexOf(value) !== -1) {
             tagInput.value = "";
             return;
@@ -36,7 +34,6 @@ document.addEventListener("DOMContentLoaded", function () {
         tagInput.value = "";
     });
 
-    // 빈 영역 클릭 시 input에 포커스
     tagWrap.addEventListener("click", function () {
         tagInput.focus();
     });
@@ -96,5 +93,90 @@ document.addEventListener("DOMContentLoaded", function () {
             announceDate.value = "";
         }
     });
+
+    /* ───── 등록 / 수정 버튼 ───── */
+    var registerBtn = document.getElementById("registerContestBtn");
+    var editBtn = document.getElementById("editContestBtn");
+    var isSubmitting = false;
+
+    registerBtn.addEventListener("click", function () {
+        submitContest(false);
+    });
+
+    editBtn.addEventListener("click", function () {
+        submitContest(true);
+    });
+
+    function submitContest(isEdit) {
+        if (isSubmitting) return;
+        isSubmitting = true;
+        var title = document.getElementById("titleInput").value.trim();
+        var organizer = document.getElementById("organizerInput").value.trim();
+        var category = document.getElementById("categoryInput").value;
+        var entryStart = startDate.value;
+        var entryEnd = endDate.value;
+        var resultDate = announceDate.value;
+        var prizeInfo = document.getElementById("prizeInfoInput").value.trim();
+        var price = document.getElementById("priceInput").value;
+        var description = document.getElementById("descriptionInput").value.trim();
+
+        // 유효성 검사
+        if (!title) { alert("공모전 제목을 입력하세요."); isSubmitting = false; return; }
+        if (!organizer) { alert("주최자를 입력하세요."); isSubmitting = false; return; }
+        if (!entryStart || !entryEnd) { alert("접수 기간을 설정하세요."); isSubmitting = false; return; }
+
+        var formData = new FormData();
+        formData.append("title", title);
+        formData.append("organizer", organizer);
+        if (category) formData.append("category", category);
+        formData.append("entryStart", entryStart);
+        formData.append("entryEnd", entryEnd);
+        if (resultDate) formData.append("resultDate", resultDate);
+        if (prizeInfo) formData.append("prizeInfo", prizeInfo);
+        if (price) formData.append("price", price);
+        if (description) formData.append("description", description);
+
+        // 배너 이미지
+        var coverFile = bannerFileInput.files[0];
+        if (coverFile) {
+            formData.append("coverFile", coverFile);
+        }
+
+        // 수정 모드
+        var contestIdMeta = document.querySelector("meta[name='contestId']");
+        var contestId = contestIdMeta ? contestIdMeta.getAttribute("content") : null;
+
+        var url = isEdit && contestId
+            ? "/contest/api/" + contestId + "/edit"
+            : "/contest/api/register";
+
+        fetch(url, {
+            method: "POST",
+            credentials: "same-origin",
+            body: formData
+        })
+        .then(function (res) {
+            if (!res.ok) throw new Error("요청 실패: " + res.status);
+            return res.json();
+        })
+        .then(function (data) {
+            alert(isEdit ? "공모전이 수정되었습니다." : "공모전이 등록되었습니다.");
+            location.href = "/contest/detail/" + data.contestId;
+        })
+        .catch(function (err) {
+            console.error(err);
+            alert("처리 중 오류가 발생했습니다.");
+            isSubmitting = false;
+        });
+    }
+
+    /* ───── 수정 모드: 기존 데이터 바인딩 ───── */
+    var contestIdMeta = document.querySelector("meta[name='contestId']");
+    if (contestIdMeta) {
+        editBtn.style.display = "inline-flex";
+        registerBtn.textContent = "수정";
+    } else {
+        editBtn.style.display = "none";
+    }
 
 });
