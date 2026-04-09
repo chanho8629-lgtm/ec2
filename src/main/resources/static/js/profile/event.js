@@ -1,7 +1,281 @@
-// 공유 상태
+// 공유 대상 상태
 const shareState = {
   selectedUsers: [],
+  receiverMap: new Map(),
 };
+
+// 프로필 화면 상태
+const profilePageState = {
+  followManageLoaded: false,
+  badgeManageLoaded: false,
+  profileNickname: getProfileNicknameFromPage(),
+};
+
+// 현재 프로필 닉네임 조회
+function resolveProfileNickname() {
+  const nickname = getProfileNicknameFromPage();
+  if (nickname) {
+    profilePageState.profileNickname = nickname;
+  }
+  return profilePageState.profileNickname;
+}
+
+// JSON 요청 처리
+async function requestJson(url, options = {}) {
+  const response = await fetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    },
+    credentials: 'same-origin',
+    ...options,
+  });
+
+  if (!response.ok) {
+    let message = '요청 처리 중 오류가 발생했습니다.';
+
+    try {
+      const errorBody = await response.json();
+      message = errorBody.message || message;
+    } catch (error) {
+      try {
+        const text = await response.text();
+        if (text) message = text;
+      } catch (ignore) {
+      }
+    }
+
+    throw new Error(message);
+  }
+
+  if (response.status === 204) {
+    return null;
+  }
+
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    return null;
+  }
+
+  return response.json();
+}
+
+// FormData 요청 처리
+async function requestFormData(url, formData, options = {}) {
+  const response = await fetch(url, {
+    method: 'POST',
+    body: formData,
+    credentials: 'same-origin',
+    ...options,
+  });
+
+  if (!response.ok) {
+    let message = '요청 처리 중 오류가 발생했습니다.';
+
+    try {
+      const errorBody = await response.json();
+      message = errorBody.message || message;
+    } catch (error) {
+      try {
+        const text = await response.text();
+        if (text) message = text;
+      } catch (ignore) {
+      }
+    }
+
+    throw new Error(message);
+  }
+
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) {
+    return null;
+  }
+
+  return response.json();
+}
+
+function showSuccessMessage(message) {
+  alert(message);
+}
+
+// 현재 프로필 경로 조회
+function getProfileNicknameFromPage() {
+  const nicknameNode = document.querySelector('[data-profile-nickname]');
+  if (nicknameNode?.textContent?.trim()) {
+    return nicknameNode.textContent.trim();
+  }
+
+  const pathSegments = window.location.pathname.split('/').filter(Boolean);
+  if (pathSegments[0] === 'profile' && pathSegments[1]) {
+    return decodeURIComponent(pathSegments[1]);
+  }
+
+  return '';
+}
+
+// 내 프로필 여부 조회
+function isMyProfilePage() {
+  return window.location.pathname === '/profile';
+}
+
+// 닉네임 입력값 검증
+function validateNicknameInput(nickname) {
+  if (!nickname) {
+    return '닉네임을 입력해 주세요.';
+  }
+  if (nickname.length < 2 || nickname.length > 20) {
+    return '닉네임은 2자 이상 20자 이하로 입력해 주세요.';
+  }
+  return '';
+}
+
+// 비밀번호 입력값 검증
+function validatePasswordInput(currentPassword, nextPassword, confirmPassword) {
+  if (!currentPassword || !nextPassword || !confirmPassword) {
+    return '비밀번호를 모두 입력해 주세요.';
+  }
+  if (nextPassword.length < 8 || nextPassword.length > 20) {
+    return '새 비밀번호는 8자 이상 20자 이하로 입력해 주세요.';
+  }
+  if (!/[A-Za-z]/.test(nextPassword) || !/\d/.test(nextPassword) || !/[!@#$%^&*()_\-+=\[{\]};:'",<.>/?\\|`~]/.test(nextPassword)) {
+    return '새 비밀번호는 영문, 숫자, 특수문자를 모두 포함해야 합니다.';
+  }
+  if (nextPassword !== confirmPassword) {
+    return '새 비밀번호가 일치하지 않습니다.';
+  }
+  if (currentPassword === nextPassword) {
+    return '현재 비밀번호와 다른 비밀번호를 입력해 주세요.';
+  }
+  return '';
+}
+
+// HTML 이스케이프 처리
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// 프로필 아바타 마크업 생성
+function getAvatarMarkup(profileImage, nickname) {
+  if (profileImage) {
+    return '<img src="' + escapeHtml(profileImage) + '" alt="' + escapeHtml(nickname || '프로필') + ' 프로필 이미지">';
+  }
+
+  const source = (nickname || 'N').trim();
+  const first = source ? source.charAt(0) : 'N';
+  return '<span class="work-share-user__avatar">' + escapeHtml(first) + '</span>';
+}
+
+// 팔로우 버튼 상태 변경
+function setSubscribeButtonState(isFollowing) {
+  const subscribeButton = document.querySelector('[data-subscribe-button]');
+  if (!subscribeButton) return;
+
+  subscribeButton.classList.toggle('is-subscribed', isFollowing);
+  subscribeButton.textContent = isFollowing
+    ? (subscribeButton.dataset.subscribeActive || '팔로잉')
+    : (subscribeButton.dataset.subscribeDefault || '팔로우');
+}
+
+// 공유 링크 정리
+function resolveShareUrl() {
+  const input = document.querySelector('[data-share-link-input]');
+  if (!window.BideoShare) {
+    return input ? input.value : window.location.href;
+  }
+
+  return window.BideoShare.normalizeInputUrl(input, window.location.href);
+}
+
+// 프로필 카운트 갱신
+function applyProfileCounters(profile) {
+  const channelText = document.querySelector('.channelText span:last-child');
+  if (channelText && profile) {
+    channelText.textContent = ' · 팔로워 ' + (profile.followerCount ?? 0) + '명 · 팔로잉 ' + (profile.followingCount ?? 0) + '명 · 작품 ' + (profile.workCount ?? 0) + '개';
+  }
+}
+
+// 팔로우 관리 목록 조회
+async function fetchFollowManageList(tab) {
+  if (tab === 'following') {
+    return requestJson('/api/profile/me/followings?page=0');
+  }
+  if (tab === 'followers') {
+    return requestJson('/api/profile/me/followers?page=0');
+  }
+
+  const response = await requestJson('/api/profile/me/blocks?page=0');
+  return response?.content || [];
+}
+
+// 팔로우 관리 데이터 로드
+async function loadFollowManageData(tab = followManageState.activeTab) {
+  const list = await fetchFollowManageList(tab);
+  followManageState.lists[tab] = Array.isArray(list) ? list : [];
+  profilePageState.followManageLoaded = true;
+  renderFollowManageList();
+}
+
+// 뱃지 관리 데이터 로드
+async function loadBadgeManageData() {
+  const response = await requestJson('/api/profile/me/badges');
+  const ownedBadges = response?.ownedBadges || [];
+
+  BADGES.length = 0;
+  ownedBadges.forEach((badge) => {
+    BADGES.push({
+      id: String(badge.badgeId),
+      badgeId: badge.badgeId,
+      name: badge.badgeName,
+      grade: 'bronze',
+      img: '/images/badge/' + badge.imageFile,
+      owned: true,
+      isDisplayed: !!badge.isDisplayed,
+    });
+  });
+
+  selectedBadges = (response?.displayedBadgeIds || []).map(String);
+  profilePageState.badgeManageLoaded = true;
+  renderBadgeManageGrid();
+}
+
+// 공유 대상 검색
+async function searchShareUsers(keyword) {
+  const profileNickname = resolveProfileNickname();
+  if (!profileNickname) return;
+
+  const users = await requestJson('/api/profile/' + encodeURIComponent(profileNickname) + '/share/receivers?keyword=' + encodeURIComponent(keyword || ''));
+  const list = document.querySelector('[data-share-list]');
+  if (!list) return;
+
+  shareState.receiverMap = new Map();
+  users.forEach((user) => {
+    shareState.receiverMap.set(user.nickname, user);
+  });
+
+  if (users.length === 0) {
+    list.innerHTML = '<div class="followManageEmpty">검색 결과가 없습니다.</div>';
+    return;
+  }
+
+  list.innerHTML = users.map((user) => {
+    return (
+      '<button type="button" class="work-share-user" data-share-user="' + escapeHtml(user.nickname) + '">' +
+        getAvatarMarkup(user.profileImage, user.nickname) +
+        '<span class="work-share-user__meta">' +
+          '<strong>' + escapeHtml(user.nickname) + '</strong>' +
+          '<small>' + escapeHtml(user.creatorVerified ? '크리에이터 인증' : '일반 회원') + '</small>' +
+        '</span>' +
+      '</button>'
+    );
+  }).join('');
+
+  renderShareChips();
+}
 
 // 프로필 이미지 임시 상태
 let pendingProfileAvatarImage = '';
@@ -16,9 +290,11 @@ const avatarHoverMarkup =
   '</svg>' +
   '</span>';
 
-// 기본 아바타 텍스트 계산
+// 기본 아바타 텍스트 조회
 function getDefaultAvatarText() {
-  const profileNickname = document.querySelector('[data-profile-nickname]')?.textContent?.trim() || 'N';
+  const profileNickname = document.querySelector('[data-profile-nickname]')?.textContent?.trim()
+    || document.querySelector('[data-profile-name]')?.textContent?.trim()
+    || 'N';
   const compactName = profileNickname.replace(/\s+/g, '');
   const hangulOnly = compactName.replace(/[^\uac00-\ud7a3]/g, '');
   const englishOnly = compactName.replace(/[^A-Za-z]/g, '');
@@ -60,20 +336,9 @@ const followManageState = {
   activeTab: 'following',
   searchKeyword: '',
   lists: {
-    following: [
-      { id: 'nomadcoder', name: '노마드코더', handle: '@nomadcoder', bio: '프론트엔드와 서비스 제작 과정을 공유합니다.', badge: '맞팔 중' },
-      { id: 'soyeon.art', name: '김소연', handle: '@soyeon.art', bio: '색감 중심의 디지털 아트와 일러스트 작업물을 업로드합니다.', badge: '최근 소식 있음' },
-      { id: 'daily.scene', name: '데일리씬', handle: '@daily.scene', bio: '매일 한 장면씩 기록하는 비주얼 아카이브 채널.', badge: '' },
-    ],
-    followers: [
-      { id: 'minsuu', name: '김민수', handle: '@minsuu', bio: '브랜딩과 영상 편집을 함께 합니다.', badge: '나를 팔로우함', isFollowing: false },
-      { id: 'jieun', name: '이지은', handle: '@jieun', bio: '전시 리뷰와 작가 인터뷰를 정리합니다.', badge: '나를 팔로우함', isFollowing: true },
-      { id: 'atelier.han', name: '한아뜰리에', handle: '@atelier.han', bio: '오브제 기반 작업 기록을 남깁니다.', badge: '', isFollowing: false },
-    ],
-    blocked: [
-      { id: 'spamaccount', name: '스팸계정', handle: '@spamaccount', bio: '반복적인 홍보 메시지 전송으로 차단됨.', badge: '차단됨' },
-      { id: 'noise.user', name: '노이즈유저', handle: '@noise.user', bio: '원치 않는 댓글 반복 작성.', badge: '차단됨' },
-    ],
+    following: [],
+    followers: [],
+    blocked: [],
   },
 };
 
@@ -99,7 +364,7 @@ const GRADE_LABELS = {
 };
 
 // 선택된 대표 뱃지
-let selectedBadges = ['first_video', 'contest_award'];
+let selectedBadges = [];
 
 // 공유 칩 렌더링
 function renderShareChips() {
@@ -118,14 +383,14 @@ function renderShareChips() {
   });
 }
 
-// 공유 버튼 상태 동기화
+// 공유 버튼 상태 변경
 function syncShareButtonState(isActive) {
   const shareButton = document.querySelector('[data-share-button]');
   if (!shareButton) return;
   shareButton.classList.toggle('is-shareBtn', isActive);
 }
 
-// 차단 버튼 상태 동기화
+// 차단 버튼 상태 변경
 function syncBlackButtonState(isBlocked) {
   const blackButton = document.querySelector('[data-black-button]');
   if (!blackButton) return;
@@ -135,10 +400,11 @@ function syncBlackButtonState(isBlocked) {
 }
 
 // 프로필 뱃지 렌더링
-function renderProfileBadges() {
+function renderProfileBadges(force = false) {
   const container = document.querySelector('[data-profile-badges]');
 
   if (!container) return;
+  if (!force && container.querySelector('[data-server-badge="true"]')) return;
 
   const badges = selectedBadges
     .map((badgeId) => BADGES.find((badge) => badge.id === badgeId && badge.owned))
@@ -151,11 +417,16 @@ function renderProfileBadges() {
     .join('');
 }
 
-// 뱃지 관리 그리드 렌더링
+// 뱃지 그리드 렌더링
 function renderBadgeManageGrid() {
   const grid = document.querySelector('[data-badge-manage-grid]');
 
   if (!grid) return;
+
+  if (BADGES.length === 0) {
+    grid.innerHTML = '<div class="followManageEmpty">보유한 뱃지가 없습니다.</div>';
+    return;
+  }
 
   let previousGrade = '';
 
@@ -190,7 +461,7 @@ function renderBadgeManageGrid() {
   }).join('');
 }
 
-// 뱃지 선택 토글
+// 뱃지 선택 변경
 function toggleBadgeSelection(badgeId) {
   const badge = BADGES.find((item) => item.id === badgeId);
 
@@ -213,7 +484,7 @@ function toggleBadgeSelection(badgeId) {
   renderBadgeManageGrid();
 }
 
-// 팔로우 관리 요약 문구
+// 팔로우 관리 요약 조회
 function getFollowManageSummary(tab, count) {
   if (tab === 'following') {
     return '현재 ' + count + '개의 팔로잉 계정을 관리하고 있습니다.';
@@ -226,7 +497,7 @@ function getFollowManageSummary(tab, count) {
   return '현재 ' + count + '개의 차단 계정을 관리하고 있습니다.';
 }
 
-// 팔로우 관리 빈 상태 문구
+// 팔로우 관리 빈 문구 조회
 function getFollowManageEmptyMessage(tab) {
   if (tab === 'following') {
     return '조건에 맞는 팔로잉 계정이 없습니다.';
@@ -239,15 +510,15 @@ function getFollowManageEmptyMessage(tab) {
   return '조건에 맞는 차단 계정이 없습니다.';
 }
 
-// 아바타 이니셜 추출
+// 이니셜 조회
 function getInitialLetter(name) {
   return name ? name.trim().charAt(0) : '?';
 }
 
-// 팔로우 관리 액션 버튼 생성
+// 팔로우 관리 액션 생성
 function getFollowManageActions(tab, item) {
   if (tab === 'following') {
-    return '<button type="button" class="subscribeBtn is-subscribed" data-follow-manage-action="remove-following" data-follow-manage-id="' + item.id + '">팔로잉</button>';
+    return '<button type="button" class="subscribeBtn is-subscribed" data-follow-manage-action="remove-following" data-follow-manage-id="' + escapeHtml(item.nickname) + '">팔로잉</button>';
   }
 
   if (tab === 'followers') {
@@ -256,15 +527,15 @@ function getFollowManageActions(tab, item) {
     const normalizedLabel = item.isFollowing ? '팔로잉' : '팔로우';
 
     return (
-      '<button type="button" class="' + followButtonClass + '" data-follow-manage-action="toggle-follow-back" data-follow-manage-id="' + item.id + '" aria-label="' + followButtonLabel + '">' + normalizedLabel + '</button>' +
-      '<button type="button" class="followManageActionBtn is-danger" data-follow-manage-action="block-follower" data-follow-manage-id="' + item.id + '">차단</button>'
+      '<button type="button" class="' + followButtonClass + '" data-follow-manage-action="toggle-follow-back" data-follow-manage-id="' + escapeHtml(item.nickname) + '" aria-label="' + followButtonLabel + '">' + normalizedLabel + '</button>' +
+      '<button type="button" class="followManageActionBtn is-danger" data-follow-manage-action="block-follower" data-follow-manage-id="' + escapeHtml(item.nickname) + '">차단</button>'
     );
   }
 
-  return '<button type="button" class="followManageActionBtn" data-follow-manage-action="unblock" data-follow-manage-id="' + item.id + '">차단 해제</button>';
+  return '<button type="button" class="followManageActionBtn" data-follow-manage-action="unblock" data-follow-manage-id="' + escapeHtml(item.blockedId) + '" data-follow-manage-nickname="' + escapeHtml(item.nickname) + '">차단 해제</button>';
 }
 
-// 팔로우 관리 리스트 렌더링
+// 팔로우 관리 목록 렌더링
 function renderFollowManageList() {
   const list = document.querySelector('[data-follow-manage-list]');
   const summary = document.querySelector('[data-follow-manage-summary]');
@@ -285,7 +556,7 @@ function renderFollowManageList() {
   const filteredItems = items.filter((item) => {
     if (!keyword) return true;
 
-    return [item.name, item.handle, item.bio]
+    return [item.nickname, item.name, item.handle, item.bio]
       .filter(Boolean)
       .some((value) => value.toLowerCase().includes(keyword));
   });
@@ -299,15 +570,21 @@ function renderFollowManageList() {
 
   list.innerHTML = filteredItems
     .map((item) => {
+      const nickname = item.nickname || item.name || '-';
+      const handle = item.handle || ('@' + nickname);
+      const bio = item.bio || '';
       const badgeMarkup = item.badge ? '<span class="followManageBadge">' + item.badge + '</span>' : '';
+      const avatarMarkup = item.profileImage
+        ? '<img src="' + escapeHtml(item.profileImage) + '" alt="' + escapeHtml(nickname) + ' 프로필 이미지">'
+        : escapeHtml(getInitialLetter(nickname));
 
       return (
         '<article class="followManageItem">' +
-          '<div class="followManageAvatar">' + getInitialLetter(item.name) + '</div>' +
+          '<div class="followManageAvatar">' + avatarMarkup + '</div>' +
           '<div class="followManageInfo">' +
-            '<div class="followManageNameRow"><strong class="followManageName">' + item.name + '</strong>' + badgeMarkup + '</div>' +
-            '<p class="followManageMeta">' + item.handle + '</p>' +
-            '<p class="followManageBio">' + item.bio + '</p>' +
+            '<div class="followManageNameRow"><strong class="followManageName">' + escapeHtml(nickname) + '</strong>' + badgeMarkup + '</div>' +
+            '<p class="followManageMeta">' + escapeHtml(handle) + '</p>' +
+            '<p class="followManageBio">' + escapeHtml(bio) + '</p>' +
           '</div>' +
           '<div class="followManageActions">' + getFollowManageActions(followManageState.activeTab, item) + '</div>' +
         '</article>'
@@ -318,7 +595,10 @@ function renderFollowManageList() {
 
 // 팔로우 관리 항목 제거
 function removeFollowManageItem(tab, itemId) {
-  followManageState.lists[tab] = (followManageState.lists[tab] || []).filter((item) => item.id !== itemId);
+  followManageState.lists[tab] = (followManageState.lists[tab] || []).filter((item) => {
+    const compareKey = tab === 'blocked' ? String(item.blockedId) : item.nickname;
+    return String(compareKey) !== String(itemId);
+  });
 }
 
 // 클릭 이벤트 처리
@@ -372,7 +652,7 @@ document.addEventListener('click', async (event) => {
 
   if (followManageOpen) {
     modalClose('profile-setting-modal');
-    renderFollowManageList();
+    await loadFollowManageData();
     modalOpen('follow-manage-modal');
     return;
   }
@@ -381,7 +661,7 @@ document.addEventListener('click', async (event) => {
 
   if (badgeManageOpen) {
     modalClose('profile-setting-modal');
-    renderBadgeManageGrid();
+    await loadBadgeManageData();
     modalOpen('badge-manage-modal');
     return;
   }
@@ -393,28 +673,50 @@ document.addEventListener('click', async (event) => {
     const nicknameTargets = document.querySelectorAll('[data-profile-nickname]');
     const nextNickname = nicknameInput?.value.trim();
 
-    if (!nextNickname) {
-      alert('닉네임을 입력해 주세요.');
+    const nicknameValidationMessage = validateNicknameInput(nextNickname);
+    if (nicknameValidationMessage) {
+      alert(nicknameValidationMessage);
       return;
     }
 
-    nicknameTargets.forEach((target) => {
-      target.textContent = nextNickname;
-    });
+    try {
+      await requestJson('/api/profile/me/nickname', {
+        method: 'PUT',
+        body: JSON.stringify({ nickname: nextNickname }),
+      });
 
-    if (!document.querySelector('[data-profile-avatar-open] img')) {
-      renderDefaultAvatar();
+      nicknameTargets.forEach((target) => {
+        target.textContent = nextNickname;
+      });
+
+      if (!document.querySelector('[data-profile-avatar-open] img')) {
+        renderDefaultAvatar();
+      }
+
+      modalClose('nickname-edit-modal');
+      profilePageState.profileNickname = nextNickname;
+      showSuccessMessage('닉네임이 수정되었습니다.');
+    } catch (error) {
+      alert(error.message || '닉네임 수정에 실패했습니다.');
     }
-
-    modalClose('nickname-edit-modal');
     return;
   }
 
   const badgeManageSave = event.target.closest('[data-badge-manage-save]');
 
   if (badgeManageSave) {
-    renderProfileBadges();
-    modalClose('badge-manage-modal');
+    try {
+      const badgeIds = selectedBadges.map((badgeId) => Number(badgeId));
+      await requestJson('/api/profile/me/badges/display', {
+        method: 'PUT',
+        body: JSON.stringify(badgeIds),
+      });
+      renderProfileBadges(true);
+      modalClose('badge-manage-modal');
+      showSuccessMessage('대표 뱃지가 저장되었습니다.');
+    } catch (error) {
+      alert(error.message || '뱃지 저장에 실패했습니다.');
+    }
     return;
   }
 
@@ -425,20 +727,34 @@ document.addEventListener('click', async (event) => {
     const nextPassword = document.getElementById('profile-password-next');
     const confirmPassword = document.getElementById('profile-password-confirm');
 
-    if (!currentPassword?.value.trim() || !nextPassword?.value.trim() || !confirmPassword?.value.trim()) {
-      alert('비밀번호를 모두 입력해 주세요.');
+    const validationMessage = validatePasswordInput(
+      currentPassword?.value.trim(),
+      nextPassword?.value.trim(),
+      confirmPassword?.value.trim()
+    );
+    if (validationMessage) {
+      alert(validationMessage);
       return;
     }
 
-    if (nextPassword.value !== confirmPassword.value) {
-      alert('새 비밀번호가 일치하지 않습니다.');
-      return;
-    }
+    try {
+      await requestJson('/api/profile/me/password', {
+        method: 'PUT',
+        body: JSON.stringify({
+          currentPassword: currentPassword.value.trim(),
+          newPassword: nextPassword.value.trim(),
+          confirmPassword: confirmPassword.value.trim(),
+        }),
+      });
 
-    currentPassword.value = '';
-    nextPassword.value = '';
-    confirmPassword.value = '';
-    modalClose('password-edit-modal');
+      currentPassword.value = '';
+      nextPassword.value = '';
+      confirmPassword.value = '';
+      modalClose('password-edit-modal');
+      showSuccessMessage('비밀번호가 수정되었습니다.');
+    } catch (error) {
+      alert(error.message || '비밀번호 수정에 실패했습니다.');
+    }
     return;
   }
 
@@ -477,15 +793,45 @@ document.addEventListener('click', async (event) => {
   const profileAvatarApply = event.target.closest('[data-profile-avatar-apply]');
 
   if (profileAvatarApply) {
-    if (pendingProfileAvatarMode === 'image' && pendingProfileAvatarImage) {
-      renderAvatarButton(pendingProfileAvatarImage);
-    } else if (pendingProfileAvatarMode === 'default') {
-      renderDefaultAvatar();
-    }
+    try {
+      let avatarUpdated = false;
 
-    pendingProfileAvatarImage = '';
-    pendingProfileAvatarMode = 'keep';
-    modalClose('profile-edit-modal');
+      if (pendingProfileAvatarMode === 'image' && pendingProfileAvatarImage) {
+        const fileInput = document.querySelector('[data-profile-edit-file]');
+        const selectedFile = fileInput?.files?.[0];
+
+        if (!selectedFile) {
+          alert('프로필 이미지를 선택해 주세요.');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('profileImageFile', selectedFile);
+        const updatedProfile = await requestFormData('/api/profile/me/profile-image', formData);
+
+        if (updatedProfile?.profileImage) {
+          renderAvatarButton('<img src="' + updatedProfile.profileImage + '" alt="프로필 이미지">');
+          renderAvatarPreview('<img src="' + updatedProfile.profileImage + '" alt="프로필 이미지">');
+        }
+        avatarUpdated = true;
+      } else if (pendingProfileAvatarMode === 'default') {
+        await requestJson('/api/profile/me/basic', {
+          method: 'PUT',
+          body: JSON.stringify({ profileImage: '' }),
+        });
+        renderDefaultAvatar();
+        avatarUpdated = true;
+      }
+
+      pendingProfileAvatarImage = '';
+      pendingProfileAvatarMode = 'keep';
+      modalClose('profile-edit-modal');
+      if (avatarUpdated) {
+        showSuccessMessage('프로필 이미지가 수정되었습니다.');
+      }
+    } catch (error) {
+      alert(error.message || '프로필 수정에 실패했습니다.');
+    }
     return;
   }
 
@@ -499,24 +845,63 @@ document.addEventListener('click', async (event) => {
   const channelTab = event.target.closest('[data-channel-tab]');
 
   if (channelTab) {
-    activateProfileTab(channelTab.dataset.channelTab || 'galleries');
+    const targetPanel = channelTab.dataset.channelTab;
+
+    document.querySelectorAll('[data-channel-tab]').forEach((item) => {
+      item.classList.remove('is-active');
+    });
+
+    channelTab.classList.add('is-active');
+    document.querySelectorAll('[data-profile-panel]').forEach((panel) => {
+      panel.hidden = panel.dataset.profilePanel !== targetPanel;
+    });
     return;
   }
 
   const filterButton = event.target.closest('[data-video-filter]');
 
   if (filterButton) {
+    const filterType = (filterButton.textContent || '').trim();
+
     document.querySelectorAll('[data-video-filter]').forEach((item) => {
       item.classList.remove('is-active');
     });
 
     filterButton.classList.add('is-active');
+    document.querySelectorAll('[data-profile-panel]').forEach((panel) => {
+      const cards = Array.from(panel.querySelectorAll('.videoCard'));
+      if (!cards.length) {
+        return;
+      }
+
+      cards.sort((left, right) => {
+        const leftCreated = left.dataset.createdAt || '';
+        const rightCreated = right.dataset.createdAt || '';
+        const leftPopularity = Number(left.dataset.popularity || 0);
+        const rightPopularity = Number(right.dataset.popularity || 0);
+
+        if (filterType === '인기순') {
+          return rightPopularity - leftPopularity || rightCreated.localeCompare(leftCreated);
+        }
+
+        if (filterType === '오래된순') {
+          return leftCreated.localeCompare(rightCreated);
+        }
+
+        return rightCreated.localeCompare(leftCreated);
+      });
+
+      cards.forEach((card) => {
+        panel.appendChild(card);
+      });
+    });
     return;
   }
 
   const shareOpen = event.target.closest('[data-share-button]');
 
   if (shareOpen) {
+    resolveShareUrl();
     syncShareButtonState(true);
     modalOpen('share-modal');
     return;
@@ -536,16 +921,32 @@ document.addEventListener('click', async (event) => {
   const blackConfirm = event.target.closest('[data-black-confirm]');
 
   if (blackConfirm) {
-    syncBlackButtonState(true);
-    modalClose('black-modal');
+    try {
+      await requestJson('/api/profile/' + encodeURIComponent(resolveProfileNickname()) + '/block', {
+        method: 'POST',
+      });
+      syncBlackButtonState(true);
+      modalClose('black-modal');
+      showSuccessMessage('사용자를 차단했습니다.');
+    } catch (error) {
+      alert(error.message || '차단에 실패했습니다.');
+    }
     return;
   }
 
   const unblackConfirm = event.target.closest('[data-unblack-confirm]');
 
   if (unblackConfirm) {
-    syncBlackButtonState(false);
-    modalClose('unblack-modal');
+    try {
+      await requestJson('/api/profile/' + encodeURIComponent(resolveProfileNickname()) + '/block', {
+        method: 'DELETE',
+      });
+      syncBlackButtonState(false);
+      modalClose('unblack-modal');
+      showSuccessMessage('차단이 해제되었습니다.');
+    } catch (error) {
+      alert(error.message || '차단 해제에 실패했습니다.');
+    }
     return;
   }
 
@@ -578,10 +979,12 @@ document.addEventListener('click', async (event) => {
   if (shareCopy) {
     const input = document.querySelector('[data-share-link-input]');
     if (!input) return;
+    const shareUrl = resolveShareUrl();
 
     try {
-      await navigator.clipboard.writeText(input.value);
+      await navigator.clipboard.writeText(shareUrl);
     } catch (error) {
+      input.value = shareUrl;
       input.select();
       document.execCommand('copy');
     }
@@ -603,24 +1006,52 @@ document.addEventListener('click', async (event) => {
       return;
     }
 
-    shareState.selectedUsers = [];
-    renderShareChips();
-    if (message) message.value = '';
-    syncShareButtonState(false);
-    modalClose('share-modal');
+    try {
+      const shareUrl = resolveShareUrl();
+      const receiverIds = window.BideoShare
+        ? window.BideoShare.collectReceiverIds(shareState.selectedUsers, shareState.receiverMap)
+        : shareState.selectedUsers
+          .map((nickname) => shareState.receiverMap.get(nickname)?.id)
+          .filter(Boolean);
+
+      await requestJson('/api/profile/' + encodeURIComponent(resolveProfileNickname()) + '/share', {
+        method: 'POST',
+        body: JSON.stringify(
+          window.BideoShare
+            ? window.BideoShare.buildSharePayload(receiverIds, shareUrl, message?.value?.trim() || '')
+            : {
+                receiverIds,
+                shareUrl,
+                message: message?.value?.trim() || '',
+              }
+        ),
+      });
+
+      shareState.selectedUsers = [];
+      renderShareChips();
+      if (message) message.value = '';
+      syncShareButtonState(false);
+      modalClose('share-modal');
+      showSuccessMessage('프로필을 공유했습니다.');
+    } catch (error) {
+      alert(error.message || '프로필 공유에 실패했습니다.');
+    }
     return;
   }
 
   const unsubscribeConfirm = event.target.closest('[data-unsubscribe-confirm]');
 
   if (unsubscribeConfirm) {
-    const subscribeButton = document.querySelector('[data-subscribe-button]');
-
-    if (!subscribeButton) return;
-
-    subscribeButton.classList.remove('is-subscribed');
-    subscribeButton.textContent = subscribeButton.dataset.subscribeDefault || '팔로우';
-    modalClose('unsubscribe-modal');
+    try {
+      const response = await requestJson('/api/profile/' + encodeURIComponent(resolveProfileNickname()) + '/follow', {
+        method: 'POST',
+      });
+      setSubscribeButtonState(!!response?.followed);
+      applyProfileCounters(response?.profile);
+      modalClose('unsubscribe-modal');
+    } catch (error) {
+      alert(error.message || '팔로우 변경에 실패했습니다.');
+    }
     return;
   }
 
@@ -633,8 +1064,15 @@ document.addEventListener('click', async (event) => {
     return;
   }
 
-  subscribeButton.classList.add('is-subscribed');
-  subscribeButton.textContent = subscribeButton.dataset.subscribeActive || '팔로잉';
+  try {
+    const response = await requestJson('/api/profile/' + encodeURIComponent(resolveProfileNickname()) + '/follow', {
+      method: 'POST',
+    });
+    setSubscribeButtonState(!!response?.followed);
+    applyProfileCounters(response?.profile);
+  } catch (error) {
+    alert(error.message || '팔로우 변경에 실패했습니다.');
+  }
 });
 
 // 입력 이벤트 처리
@@ -650,11 +1088,8 @@ document.addEventListener('input', (event) => {
   const search = event.target.closest('[data-share-search]');
 
   if (search) {
-    const keyword = search.value.trim().toLowerCase();
-
-    document.querySelectorAll('[data-share-user]').forEach((user) => {
-      const text = user.textContent.toLowerCase();
-      user.style.display = keyword === '' || text.includes(keyword) ? '' : 'none';
+    searchShareUsers(search.value.trim()).catch((error) => {
+      console.error(error);
     });
   }
 });
@@ -709,48 +1144,34 @@ document.addEventListener('click', (event) => {
   if (!action || !itemId) return;
 
   if (action === 'remove-following') {
-    removeFollowManageItem('following', itemId);
-    renderFollowManageList();
+    requestJson('/api/profile/' + encodeURIComponent(itemId) + '/follow', {
+      method: 'POST',
+    }).then(() => loadFollowManageData('following'))
+      .catch((error) => alert(error.message || '팔로잉 변경에 실패했습니다.'));
     return;
   }
 
   if (action === 'toggle-follow-back') {
-    followManageState.lists.followers = followManageState.lists.followers.map((item) => {
-      if (item.id !== itemId) return item;
-
-      return {
-        ...item,
-        isFollowing: !item.isFollowing,
-      };
-    });
-    renderFollowManageList();
+    requestJson('/api/profile/' + encodeURIComponent(itemId) + '/follow', {
+      method: 'POST',
+    }).then(() => loadFollowManageData('followers'))
+      .catch((error) => alert(error.message || '팔로우 변경에 실패했습니다.'));
     return;
   }
 
   if (action === 'block-follower') {
-    const target = followManageState.lists.followers.find((item) => item.id === itemId);
-    removeFollowManageItem('followers', itemId);
-
-    if (target) {
-      followManageState.lists.blocked = [
-        {
-          id: target.id,
-          name: target.name,
-          handle: target.handle,
-          bio: target.bio,
-          badge: '차단됨',
-        },
-        ...followManageState.lists.blocked,
-      ];
-    }
-
-    renderFollowManageList();
+    requestJson('/api/profile/' + encodeURIComponent(itemId) + '/block', {
+      method: 'POST',
+    }).then(() => loadFollowManageData('followers'))
+      .catch((error) => alert(error.message || '차단에 실패했습니다.'));
     return;
   }
 
   if (action === 'unblock') {
-    removeFollowManageItem('blocked', itemId);
-    renderFollowManageList();
+    requestJson('/api/profile/me/blocks?blockedId=' + encodeURIComponent(itemId), {
+      method: 'DELETE',
+    }).then(() => loadFollowManageData('blocked'))
+      .catch((error) => alert(error.message || '차단 해제에 실패했습니다.'));
   }
 });
 
@@ -774,7 +1195,6 @@ document.addEventListener('keydown', (event) => {
 // 초기 렌더링
 renderShareChips();
 syncBlackButtonState(document.querySelector('[data-black-button]')?.classList.contains('is-blocked') || false);
-renderFollowManageList();
 renderProfileBadges();
 
 // 기본 아바타 초기화
@@ -782,17 +1202,6 @@ if (document.querySelector('[data-profile-avatar-open]') && !document.querySelec
   renderDefaultAvatar();
 }
 
-function activateProfileTab(tabName) {
-  const resolvedTab = tabName === 'works' ? 'works' : 'galleries';
-
-  document.querySelectorAll('[data-channel-tab]').forEach((item) => {
-    item.classList.toggle('is-active', item.dataset.channelTab === resolvedTab);
-  });
-
-  document.querySelectorAll('[data-profile-panel]').forEach((panel) => {
-    panel.hidden = panel.dataset.profilePanel !== resolvedTab;
-  });
+if (document.querySelector('[data-share-list]')) {
+  searchShareUsers('');
 }
-
-const initialProfileTab = new URLSearchParams(window.location.search).get('tab');
-activateProfileTab(initialProfileTab);
