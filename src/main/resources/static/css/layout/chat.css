@@ -43,6 +43,7 @@
 .bd-chat-fab:focus-visible,
 .bd-chat-panel__close:focus-visible,
 .bd-chat-thread__identity:focus-visible,
+.bd-chat-sidebar__back:focus-visible,
 .bd-chat-composer__send:focus-visible,
 .bd-chat-sidebar__compose:focus-visible,
 .bd-chat-person:focus-visible,
@@ -182,6 +183,25 @@
   margin: 0;
   font-size: 2rem;
   line-height: 1.08;
+}
+
+.bd-chat-sidebar__back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bd-chat-accent) 8%, white);
+  color: var(--bd-chat-accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.bd-chat-sidebar__back:hover {
+  background: color-mix(in srgb, var(--bd-chat-accent) 14%, white);
 }
 
 .bd-chat-sidebar__compose {
