@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let panelBody = document.querySelector(".bd-chat-panel__body");
 
   function isMobileChat() {
-    return window.matchMedia("(max-width: 900px)").matches;
+    return window.matchMedia("(max-width: 640px)").matches;
   }
 
   function showThreadMobile() {

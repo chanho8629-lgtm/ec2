@@ -186,7 +186,7 @@
 }
 
 .bd-chat-sidebar__back {
-  display: inline-flex;
+  display: none;
   align-items: center;
   justify-content: center;
   width: 38px;
@@ -913,15 +913,14 @@ body[data-bd-chat-open="true"] .bd-chat-fab {
 
   .bd-chat-panel__body {
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
   }
 
   .bd-chat-sidebar {
-    max-height: 220px;
-    height: 100%;
+    max-height: min(320px, 40vh);
     padding-bottom: 12px;
     border-right: 0;
-    border-bottom: 0;
+    border-bottom: 1px solid rgba(15, 15, 15, 0.08);
     overflow-y: auto;
   }
 
@@ -934,6 +933,60 @@ body[data-bd-chat-open="true"] .bd-chat-fab {
   .bd-chat-sidebar__people-list {
     grid-auto-flow: row;
     overflow-y: auto;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+  .bd-chat-panel {
+    height: min(700px, calc(100vh - 72px));
+  }
+
+  .bd-chat-sidebar {
+    max-height: min(360px, 44vh);
+  }
+}
+
+@media (max-width: 640px) {
+  .bd-chat-fab {
+    width: 58px;
+    height: 58px;
+  }
+
+  .bd-chat-panel {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    transform-origin: bottom center;
+  }
+
+  .bd-chat-sidebar__topbar {
+    margin-bottom: 8px;
+    align-items: center;
+  }
+
+  .bd-chat-sidebar__back {
+    display: inline-flex;
+  }
+
+  .bd-chat-sidebar {
+    max-height: none;
+    height: 100%;
+    border-bottom: 0;
+  }
+
+  .bd-chat-sidebar__compose {
+    min-height: 38px;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+  }
+
+  .bd-chat-panel__body {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
   }
 
   .bd-chat-thread {
@@ -971,38 +1024,5 @@ body[data-bd-chat-open="true"] .bd-chat-fab {
 
   .bd-chat-bubble {
     max-width: 86%;
-  }
-}
-
-@media (max-width: 640px) {
-  .bd-chat-fab {
-    width: 58px;
-    height: 58px;
-  }
-
-  .bd-chat-panel {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: 0;
-    transform-origin: bottom center;
-  }
-
-  .bd-chat-sidebar__topbar {
-    margin-bottom: 8px;
-    align-items: center;
-  }
-
-  .bd-chat-sidebar {
-    max-height: none;
-  }
-
-  .bd-chat-sidebar__compose {
-    min-height: 38px;
-    margin-bottom: 8px;
-    font-size: 1.1rem;
   }
 }
