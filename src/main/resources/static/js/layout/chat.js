@@ -22,8 +22,9 @@ document.addEventListener("DOMContentLoaded", function () {
   let composerSend = composer ? composer.querySelector(".bd-chat-composer__send") : null;
   let roomSearchInput = document.querySelector("[data-bd-chat-room-search]");
   let badgeNode = document.querySelector(".bd-chat-fab__badge");
+  let profileLink = document.querySelector("[data-bd-chat-profile-link]");
 
-  if (!toggle || !layer || !panel || !roomList || !emptyState || !detail || !avatar || !nameNode || !statusNode || !messagesNode || !composeToggle || !peopleSearch || !peopleList || !composer || !composerInput || !composerSend) {
+  if (!toggle || !layer || !panel || !roomList || !emptyState || !detail || !avatar || !nameNode || !statusNode || !messagesNode || !composeToggle || !peopleSearch || !peopleList || !composer || !composerInput || !composerSend || !profileLink) {
     return;
   }
 
@@ -37,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let panelBody = document.querySelector(".bd-chat-panel__body");
 
   function isMobileChat() {
-    return window.matchMedia("(max-width: 640px)").matches;
+    return window.matchMedia("(max-width: 900px)").matches;
   }
 
   function showThreadMobile() {
@@ -59,6 +60,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   if (backButton) backButton.addEventListener("click", showListMobile);
+
+  window.addEventListener("resize", function () {
+    if (!isMobileChat() && panelBody) {
+      panelBody.classList.remove("is-thread-open");
+    }
+  });
 
   function escapeHtml(value) {
     return String(value)
@@ -164,6 +171,7 @@ document.addEventListener("DOMContentLoaded", function () {
           return {
             id: room.id,
             name: otherMember ? otherMember.nickname : "알 수 없음",
+            nickname: otherMember ? otherMember.nickname : "",
             profileImage: otherMember ? otherMember.profileImage : null,
             avatar: otherMember ? (otherMember.nickname || "?").charAt(0).toUpperCase() : "?",
             preview: room.lastMessage || "",
@@ -479,6 +487,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     nameNode.textContent = room.name;
     statusNode.textContent = "";
+    profileLink.setAttribute("href", room.nickname ? "/profile/" + encodeURIComponent(room.nickname) : "javascript:void(0)");
     emptyState.hidden = true;
     detail.hidden = false;
     setComposerPlaceholder(room);
