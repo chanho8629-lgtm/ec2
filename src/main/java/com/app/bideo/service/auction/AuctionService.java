@@ -1,5 +1,6 @@
 package com.app.bideo.service.auction;
 
+import com.app.bideo.aop.annotation.LogStatusWithReturn;
 import com.app.bideo.domain.auction.AuctionVO;
 import com.app.bideo.dto.auction.AuctionCreateRequestDTO;
 import com.app.bideo.dto.auction.AuctionDetailResponseDTO;
@@ -10,16 +11,16 @@ import com.app.bideo.repository.auction.BidDAO;
 import com.app.bideo.repository.work.WorkDAO;
 import com.app.bideo.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(rollbackFor = Exception.class)
-public class AuctionCommandService {
+public class AuctionService {
 
     private final AuctionDAO auctionDAO;
     private final BidDAO bidDAO;
@@ -27,6 +28,9 @@ public class AuctionCommandService {
     private final NotificationService notificationService;
     private final AuctionQueryService auctionQueryService;
 
+    // 경매 등록
+    @Transactional
+    @LogStatusWithReturn
     public AuctionDetailResponseDTO createAuction(Long memberId, AuctionCreateRequestDTO requestDTO) {
         if (requestDTO.getWorkId() == null) {
             throw new IllegalArgumentException("작품 정보가 올바르지 않습니다.");
@@ -82,5 +86,21 @@ public class AuctionCommandService {
         );
 
         return auctionQueryService.getActiveAuctionByWorkId(requestDTO.getWorkId());
+    }
+
+    @LogStatusWithReturn
+    public AuctionDetailResponseDTO getActiveAuctionByWorkId(Long workId) {
+        AuctionDetailResponseDTO responseDTO = auctionDAO.findActiveByWorkId(workId)
+                .orElseThrow(() -> new IllegalArgumentException("활성 경매를 찾을 수 없습니다."));
+
+        List<BidResponseDTO> bids = bidDAO.findByAuctionId(responseDTO.getId(), 0, 20);
+        responseDTO.setBids(bids);
+
+        return responseDTO;
+    }
+
+    @LogStatusWithReturn
+    public AuctionVO getAuction(Long auctionId) {
+        return auctionDAO.findRawById(auctionId);
     }
 }

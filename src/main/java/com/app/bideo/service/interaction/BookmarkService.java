@@ -56,7 +56,6 @@ public class BookmarkService {
     public List<Map<String, Object>> getMySavedItems(Long memberId) {
         List<Map<String, Object>> result = new ArrayList<>();
         result.addAll(bookmarkDAO.findMyBookmarks(memberId));
-        result.addAll(auctionDAO.findMyWishlist(memberId));
         result.forEach(item -> {
             Object thumb = item.get("thumbnail");
             if (thumb instanceof String && !((String) thumb).isBlank()) {
