@@ -27,6 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
+  // 채팅방 상태 관리
   let rooms = [];
   let activeRoomId = null;
   let composeOpen = false;
@@ -66,6 +67,25 @@ document.addEventListener("DOMContentLoaded", function () {
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#39;");
+  }
+
+  // 메시지 링크 변환
+  function renderMessageBody(content) {
+    if (!content) {
+      return "";
+    }
+
+    var safeContent = escapeHtml(content);
+
+    safeContent = safeContent.replace(
+      /(https?:\/\/[^\s<]+)/gi,
+      function (url) {
+        return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + url + '</a>';
+      }
+    );
+
+    safeContent = safeContent.replace(/\n/g, "<br>");
+    return safeContent;
   }
 
   function setComposeOpen(nextState, skipAnimation) {
@@ -224,12 +244,13 @@ document.addEventListener("DOMContentLoaded", function () {
       .catch(function () {});
   }
 
+  // 현재 채팅방 메시지를 화면에 다시 그린다.
   function renderMessages(room) {
     messagesNode.innerHTML = room.messages
       .map(function (msg) {
         let isSelf = msg.isSelf || msg.canEdit || msg.canDelete;
         let klass = isSelf ? "bd-chat-bubble bd-chat-bubble--self" : "bd-chat-bubble";
-        let body = msg.deleted ? "<em>삭제된 메시지</em>" : escapeHtml(msg.content || "");
+        let body = msg.deleted ? "<em>삭제된 메시지</em>" : renderMessageBody(msg.content || "");
         let hasAnyLike = msg.isLiked || msg.likeCount > 0;
         let likedClass = hasAnyLike ? " is-liked" : "";
         let actionsClass = "bd-chat-bubble__actions" + (hasAnyLike ? " has-liked" : "");

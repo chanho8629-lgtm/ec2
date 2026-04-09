@@ -92,6 +92,10 @@
   display: none !important;
 }
 
+.bd-chat-panel [hidden] {
+  display: none !important;
+}
+
 .bd-chat-layer__backdrop {
   position: absolute;
   inset: 0;
@@ -574,6 +578,8 @@
   color: #111111;
   font-size: 0.99rem;
   line-height: 1.55;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .bd-chat-bubble--self .bd-chat-bubble__body {
