@@ -922,6 +922,14 @@ function initializeWorkRegister() {
         showUploadScreen();
     }
 
+    function hasSelectedSessionMedia() {
+        return !!currentMediaFile || (currentPreviewUrl && currentPreviewUrl.indexOf("blob:") === 0);
+    }
+
+    function clearLinkOnly() {
+        updateVideoLink("", "");
+    }
+
     function handleFiles(files) {
         var file = files && files[0];
 
@@ -994,7 +1002,12 @@ function initializeWorkRegister() {
 
     if (videoLinkRemoveButton) {
         videoLinkRemoveButton.addEventListener("click", function () {
-            clearSelectedMedia();
+            if (hasSelectedSessionMedia()) {
+                clearSelectedMedia();
+                return;
+            }
+
+            clearLinkOnly();
         });
     }
 
