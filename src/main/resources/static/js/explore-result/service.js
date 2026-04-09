@@ -1,7 +1,7 @@
 const searchService = (() => {
-  const search = async (keyword, callback) => {
-    console.log("들어옴1 - search");
-    const response = await fetch(`/api/search?keyword=${encodeURIComponent(keyword)}`);
+  const search = async (page, keyword, type, sort, callback) => {
+    console.log("들어옴1 - search", page, keyword, type, sort);
+    const response = await fetch(`/api/search/${page}?keyword=${encodeURIComponent(keyword)}&type=${encodeURIComponent(type)}&sort=${encodeURIComponent(sort)}`);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -110,9 +110,51 @@ const searchService = (() => {
     }
   };
 
+  const blockMember = async (memberId, callback) => {
+    console.log("들어옴1 차단", memberId);
+    const response = await fetch(`/api/members/${memberId}/block`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Fetch error");
+    }
+
+    const data = await response.json();
+    console.log("들어옴2 차단 응답", data);
+
+    if (callback) {
+      return callback(data);
+    }
+  };
+
+  const toggleFollow = async (memberId, callback) => {
+    console.log("들어옴1 팔로우토글", memberId);
+    const response = await fetch(`/api/members/${memberId}/follow`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Fetch error");
+    }
+
+    const data = await response.json();
+    console.log("들어옴2 팔로우 응답", data);
+
+    if (callback) {
+      return callback(data);
+    }
+  };
+
   return {
     search: search,
     toggleBookmark: toggleBookmark,
+    toggleFollow: toggleFollow,
+    blockMember: blockMember,
     report: report,
     searchMembers: searchMembers,
     shareToMember: shareToMember

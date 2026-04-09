@@ -23,3 +23,5 @@ comment on column tbl_follow.follower_id is '팔로우 하는 사람';
 comment on column tbl_follow.following_id is '팔로우 당하는 사람';
 
 create index idx_follow_following on tbl_follow (following_id);
+
+select * from tbl_follow;
