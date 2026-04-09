@@ -62,6 +62,8 @@ public interface ContestMapper {
 
     void insertContestTag(@Param("contestId") Long contestId, @Param("tagId") Long tagId);
 
+    Long findOrCreateTag(@Param("tagName") String tagName);
+
     void deleteContestTagsByContestId(@Param("contestId") Long contestId);
 
     List<ContestWinnerNotificationDTO> selectPendingWinnerNotifications(@Param("todayEpochDay") long todayEpochDay);
