@@ -466,7 +466,6 @@ body:has(.bd-voice-modal:not([hidden]))::after,
 body:has(.Dashboard-Modal:not([hidden]))::after,
 body:has(.report-modal-backdrop:not([hidden]))::after,
 body:has(.work-share-modal-overlay:not([hidden]))::after,
-body:has(.work-auction-modal-backdrop:not([hidden]))::after,
 body:has(.artwork-dialog-backdrop:not([hidden]))::after {
   content: "";
   position: fixed;

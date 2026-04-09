@@ -28,8 +28,6 @@ function initializeWorkRegister() {
     var tradeConfig = document.getElementById("tradeConfig");
     var tradePriceInput = document.getElementById("tradePriceInput");
     var auctionExpandButton = document.querySelector(".auction-expand-button");
-    var auctionExpandIcon = document.querySelector(".auction-expand-button .auction-expand-icon:not(.auction-expand-icon-collapse)");
-    var auctionCollapseIcon = document.querySelector(".auction-expand-icon-collapse");
     var auctionConfig = document.getElementById("auctionConfig");
     var auctionBidPriceInput = document.getElementById("auctionBidPriceInput");
     var auctionDeadlineSelected = document.getElementById("auctionDeadlineSelected");
@@ -37,6 +35,7 @@ function initializeWorkRegister() {
     var auctionDeadlineHoursInput = document.getElementById("auctionDeadlineHoursInput");
     var auctionDeadlineButtons = document.querySelectorAll("#auctionConfig .work-auction-config__deadline-btn");
     var videoLinkUrl = document.getElementById("video-link-url");
+    var videoLinkRemoveButton = document.getElementById("video-link-remove-button");
     var videoLinkCopyButton = document.getElementById("video-link-copy-button");
     var playlistDropdownButton = document.getElementById("playlist-dropdown-button");
     var playlistDropdownMenu = document.getElementById("playlist-dropdown-menu");
@@ -107,11 +106,23 @@ function initializeWorkRegister() {
         if (!url) {
             videoLinkUrl.removeAttribute("href");
             videoLinkUrl.textContent = "";
+            if (videoLinkRemoveButton) {
+                videoLinkRemoveButton.hidden = true;
+            }
+            if (videoLinkCopyButton) {
+                videoLinkCopyButton.hidden = true;
+            }
             return;
         }
 
         videoLinkUrl.href = url;
         videoLinkUrl.textContent = label || url;
+        if (videoLinkRemoveButton) {
+            videoLinkRemoveButton.hidden = false;
+        }
+        if (videoLinkCopyButton) {
+            videoLinkCopyButton.hidden = false;
+        }
     }
 
     function navigateAfterSubmit(url) {
@@ -891,6 +902,26 @@ function initializeWorkRegister() {
         dialogContent.classList.remove("is-details");
     }
 
+    function clearSelectedMedia() {
+        currentMediaFile = null;
+        currentExistingMediaUrl = "";
+        currentExistingMediaType = "";
+
+        if (fileInput) {
+            fileInput.value = "";
+        }
+
+        updateSelectedFile(null);
+        updateMediaPreview(null);
+        updateVideoLink("", "");
+
+        if (videoFileLabel) {
+            videoFileLabel.textContent = "";
+        }
+
+        showUploadScreen();
+    }
+
     function handleFiles(files) {
         var file = files && files[0];
 
@@ -959,6 +990,12 @@ function initializeWorkRegister() {
 
     if (detailsBackButton) {
         detailsBackButton.addEventListener("click", showUploadScreen);
+    }
+
+    if (videoLinkRemoveButton) {
+        videoLinkRemoveButton.addEventListener("click", function () {
+            clearSelectedMedia();
+        });
     }
 
     aiPromptCloseTargets.forEach(function (target) {
@@ -1175,23 +1212,73 @@ function initializeWorkRegister() {
         });
     }
 
+    function resetAuctionConfig() {
+        if (auctionConfig) {
+            auctionConfig.hidden = true;
+            auctionConfig.style.display = "none";
+        }
+
+        if (auctionBidPriceInput) {
+            auctionBidPriceInput.value = "";
+        }
+
+        if (auctionDeadlineSelected) {
+            auctionDeadlineSelected.textContent = "0시간";
+        }
+
+        if (auctionDeadlineHoursInput) {
+            auctionDeadlineHoursInput.value = "0";
+        }
+
+        auctionDeadlineButtons.forEach(function (item) {
+            item.classList.remove("work-auction-config__deadline-btn--active");
+        });
+
+        if (auctionExpandButton) {
+            auctionExpandButton.setAttribute("aria-expanded", "false");
+        }
+    }
+
+    function openAuctionConfig() {
+        if (!auctionConfig) {
+            return;
+        }
+
+        auctionConfig.hidden = false;
+        auctionConfig.style.display = "";
+
+        if (auctionExpandButton) {
+            auctionExpandButton.setAttribute("aria-expanded", "true");
+        }
+
+        window.requestAnimationFrame(function () {
+            auctionBidPriceInput?.scrollIntoView({ behavior: "smooth", block: "center" });
+            auctionBidPriceInput?.focus();
+        });
+    }
+
+    function resetTradeConfig() {
+        if (tradeToggle) {
+            tradeToggle.checked = false;
+        }
+
+        if (tradeConfig) {
+            tradeConfig.hidden = true;
+        }
+
+        if (tradePriceInput) {
+            tradePriceInput.value = "";
+        }
+    }
+
     if (tradeToggle && tradeConfig) {
         tradeToggle.addEventListener("change", function () {
             if (tradeToggle.checked) {
-                if (auctionConfig) {
-                    auctionConfig.hidden = true;
-                }
-
-                if (auctionExpandIcon) {
-                    auctionExpandIcon.hidden = false;
-                }
-
-                if (auctionCollapseIcon) {
-                    auctionCollapseIcon.hidden = true;
-                }
+                resetAuctionConfig();
             }
 
             tradeConfig.hidden = !tradeToggle.checked;
+            tradeConfig.style.display = tradeToggle.checked ? "" : "none";
 
             if (!tradeToggle.checked && tradePriceInput) {
                 tradePriceInput.value = "";
@@ -1207,29 +1294,15 @@ function initializeWorkRegister() {
 
     if (auctionExpandButton && auctionConfig) {
         auctionExpandButton.addEventListener("click", function () {
-            var isHidden = auctionConfig.hidden;
+            var willOpen = auctionConfig.hidden;
 
-            if (isHidden && tradeToggle) {
-                tradeToggle.checked = false;
-
-                if (tradeConfig) {
-                    tradeConfig.hidden = true;
-                }
-
-                if (tradePriceInput) {
-                    tradePriceInput.value = "";
-                }
+            if (willOpen) {
+                resetTradeConfig();
+                openAuctionConfig();
+                return;
             }
 
-            auctionConfig.hidden = !isHidden;
-
-            if (auctionExpandIcon) {
-                auctionExpandIcon.hidden = !isHidden;
-            }
-
-            if (auctionCollapseIcon) {
-                auctionCollapseIcon.hidden = isHidden;
-            }
+            resetAuctionConfig();
         });
     }
 
@@ -1308,6 +1381,8 @@ function initializeWorkRegister() {
     updateTextCount(videoDescriptionInput, videoDescriptionCount, 5000);
     updateTextCount(videoTagsInput, videoTagsCount, 500);
     setSubmittingState(false);
+    resetTradeConfig();
+    resetAuctionConfig();
 
     if (playlistOptions.length) {
         selectGalleryOption(playlistOptions[0]);

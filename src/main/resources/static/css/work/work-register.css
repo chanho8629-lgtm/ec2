@@ -1376,6 +1376,10 @@ body.work-register-page a:hover,
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid #d9d9d9;
+    border-radius: 12px;
+    background: #fff;
 }
 
 .toggle-row-text {
@@ -1492,9 +1496,17 @@ body.work-register-page a:hover,
     background: transparent;
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 8px;
     text-align: left;
     cursor: pointer;
+}
+
+.auction-expand-button__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
 }
 
 .auction-expand-icon {
@@ -1505,6 +1517,10 @@ body.work-register-page a:hover,
     align-items: center;
     justify-content: center;
     flex: 0 0 auto;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+    transition: transform 0.2s ease;
 }
 
 .auction-expand-icon svg {
@@ -1513,10 +1529,19 @@ body.work-register-page a:hover,
     fill: currentColor;
 }
 
+.auction-expand-button[aria-expanded="false"] .auction-expand-icon {
+    transform: rotate(-90deg);
+}
+
 .auction-expand-label {
     font-size: 16px;
     font-weight: 700;
     color: #0f0f0f;
+}
+
+.auction-expand-description {
+    font-size: 13px;
+    color: #606060;
 }
 
 .work-auction-config {
@@ -1629,7 +1654,7 @@ body.work-register-page a:hover,
 
 .work-auction-config__deadline-btn {
     flex: 0 0 auto;
-    min-width: 90px;
+    min-width: 83px;
     padding: 9px 8px;
     border: 1px solid #ebebeb;
     border-radius: 8px;
@@ -1795,6 +1820,27 @@ body.work-register-page a:hover,
     width: 100%;
 }
 
+.side-meta-link-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.side-meta-text-button {
+    border: 0;
+    background: transparent;
+    color: #606060;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.side-meta-text-button:hover {
+    background: rgba(15, 15, 15, 0.08);
+    color: #0f0f0f;
+}
+
 .side-meta-copy-button {
     position: relative;
     display: inline-flex;
@@ -1894,6 +1940,8 @@ body.work-register-page a:hover,
     display: flex;
     align-items: center;
     gap: 8px;
+    justify-content: flex-end;
+    margin-left: auto;
 }
 
 @media (max-width: 900px) {

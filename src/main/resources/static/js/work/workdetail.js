@@ -46,6 +46,35 @@ function getAvatarText(nickname) {
     return base ? base.charAt(0).toUpperCase() : "@";
 }
 
+function isTruthyFlag(value) {
+    if (typeof value === "boolean") {
+        return value;
+    }
+
+    if (typeof value === "number") {
+        return value > 0;
+    }
+
+    const normalized = String(value || "").trim().toLowerCase();
+    return normalized === "true" || normalized === "1" || normalized === "y" || normalized === "yes";
+}
+
+function resolveMarketType(detail) {
+    if (isTruthyFlag(detail?.hasActiveAuction)) {
+        return "auction";
+    }
+
+    if (isTruthyFlag(detail?.isTradable)) {
+        return "trade";
+    }
+
+    if (Number(detail?.price) > 0) {
+        return "trade";
+    }
+
+    return "";
+}
+
 function formatRelativeTime(dateTime) {
     if (!dateTime) {
         return "";
@@ -145,6 +174,7 @@ async function normalizeWorkDetail(detail) {
     const isVideo = detail.category === "VIDEO" && Boolean(mediaSource);
     const primaryVisualSource = isVideo ? thumbnailSource : (mediaSource || thumbnailSource);
     const createdDate = detail.createdDatetime || detail.updatedDatetime;
+    const marketType = resolveMarketType(detail);
     let pivotData = {
         pivotThumb: "",
         pivotTitle: "",
@@ -182,8 +212,8 @@ async function normalizeWorkDetail(detail) {
         publishedYear: formatPublishedYear(createdDate),
         commentCount: formatDisplayCount(detail.commentCount || 0),
         shareLabel: "공유",
-        remixLabel: detail.hasActiveAuction ? "경매" : detail.isTradable ? "거래" : "",
-        marketType: detail.hasActiveAuction ? "auction" : detail.isTradable ? "trade" : "",
+        remixLabel: marketType === "auction" ? "경매하기" : marketType === "trade" ? "거래하기" : "",
+        marketType,
         avatarText: getAvatarText(detail.memberNickname),
         channel: `@${detail.memberNickname || "artist"}`,
         isOwner: Boolean(detail.isOwner),
@@ -381,6 +411,8 @@ function bindPageData(page, data) {
     if (marketButton) {
         marketButton.hidden = !hasMarketAction;
         marketButton.style.display = hasMarketAction ? "" : "none";
+        marketButton.dataset.marketType = data.marketType || "";
+        marketButton.setAttribute("aria-hidden", hasMarketAction ? "false" : "true");
     }
 
     if (hasMarketAction && marketIconPath) {
@@ -802,7 +834,7 @@ function bindPageInteractions(page, data) {
         }
 
         auctionModalBackdrop.hidden = true;
-        page.classList.remove("panel-auction");
+        page.classList.remove("panel-open", "panel-auction");
 
         if (activeAuctionPage === page) {
             activeAuctionPage = null;
@@ -832,21 +864,20 @@ function bindPageInteractions(page, data) {
         window.AuctionEvent?.init();
     };
 
-    if (editButton) {
-        editButton.hidden = !isOwner;
-    }
+    const setMenuItemVisibility = (button, visible) => {
+        if (!button) {
+            return;
+        }
 
-    if (deleteButton) {
-        deleteButton.hidden = !isOwner;
-    }
+        button.hidden = !visible;
+        button.style.display = visible ? "" : "none";
+        button.setAttribute("aria-hidden", visible ? "false" : "true");
+    };
 
-    if (notRecommendButton) {
-        notRecommendButton.hidden = isOwner;
-    }
-
-    if (reportButton) {
-        reportButton.hidden = isOwner;
-    }
+    setMenuItemVisibility(editButton, isOwner);
+    setMenuItemVisibility(deleteButton, isOwner);
+    setMenuItemVisibility(notRecommendButton, !isOwner);
+    setMenuItemVisibility(reportButton, !isOwner);
 
     const togglePlayback = () => {
         if (!thumbVideo || thumbVideo.hidden || !playTogglePath || !playToggle) {
@@ -1289,12 +1320,14 @@ function bindPageInteractions(page, data) {
         shareLinkInput.value = data.shareUrl || "https://localhost:10000/profile/ttt?galleryId=9";
     }
 
-    if (marketButton && auctionModalBackdrop) {
-        if (data.marketType !== "auction") {
-            marketButton.addEventListener("click", (event) => {
-                event.stopPropagation();
-            });
-        } else {
+    if (marketButton && data.marketType === "trade") {
+        marketButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+            window.location.href = `/payment/pay-api?workId=${data.id}`;
+        });
+    }
+
+    if (marketButton && auctionModalBackdrop && data.marketType === "auction") {
             marketButton.addEventListener("click", (event) => {
                 event.stopPropagation();
                 const isAuctionOpen =
@@ -1303,7 +1336,6 @@ function bindPageInteractions(page, data) {
                     !auctionModalBackdrop.hidden;
 
                 if (isAuctionOpen) {
-                    page.classList.remove("panel-open");
                     closeAuctionPanelForPage();
                     return;
                 }
@@ -1317,12 +1349,11 @@ function bindPageInteractions(page, data) {
                         return;
                     }
 
-                    activeAuctionPage.classList.remove("panel-open");
                     const activeBackdrop = activeAuctionPage.querySelector('[data-role="auction-modal-backdrop"]');
                     if (activeBackdrop) {
                         activeBackdrop.hidden = true;
                     }
-                    activeAuctionPage.classList.remove("panel-auction");
+                    activeAuctionPage.classList.remove("panel-open", "panel-auction");
                     activeAuctionPage = null;
                 });
 
@@ -1343,7 +1374,6 @@ function bindPageInteractions(page, data) {
 
                 auctionModalBackdrop.dataset.bound = "true";
             }
-        }
     }
 
     if (notRecommendButton && workSnackbar) {
