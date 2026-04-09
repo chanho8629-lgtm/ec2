@@ -495,15 +495,51 @@ body {
     padding: 0 16px 40px;
   }
 
+  .channelSection,
+  .videoSection {
+    width: 100%;
+  }
+
+  .channelTitle {
+    font-size: 30px;
+  }
+
   .videoGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 767px) {
+  .content {
+    padding: 0 12px 32px;
+  }
+
+  .banner {
+    min-height: 124px;
+    margin-top: 8px;
+    border-radius: 10px;
+  }
+
+  .bannerManageButton {
+    top: 12px;
+    right: 12px;
+    min-width: 84px;
+    height: 32px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+
   .channelMeta {
     flex-direction: column;
     gap: 16px;
+    padding: 14px 0 10px;
+  }
+
+  .avatar {
+    width: 80px;
+    min-width: 80px;
+    height: 80px;
+    font-size: 32px;
   }
 
   .tabRow {
@@ -512,8 +548,117 @@ body {
     white-space: nowrap;
   }
 
+  .metaInfo {
+    width: 100%;
+  }
+
+  .channelTitle {
+    font-size: 26px;
+    line-height: 1.2;
+  }
+
+  .channelActionRow {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .channelActionRow button {
+    margin-left: 0;
+  }
+
+  .moreBtn,
+  .shareBtn,
+  .subscribeBtn,
+  .blackBtn {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
   .videoGrid {
     grid-template-columns: 1fr 1fr;
+    gap: 22px 12px;
+  }
+
+  .profileEditModalPanel,
+  .profileSettingModalPanel,
+  .followManageModalPanel,
+  .badgeManageModalPanel,
+  .work-share-modal,
+  .unsubscribeModalPanel {
+    width: min(100%, 100%);
+    border-radius: 18px;
+    padding: 18px;
+  }
+
+  .profileBannerEditModalPanel {
+    width: min(100%, 100%);
+  }
+
+  .profileBannerPreview {
+    border-radius: 14px;
+  }
+
+  .profileFormActionRow {
+    flex-wrap: wrap;
+  }
+
+  .profileFormBtn,
+  .profileEditUpload {
+    width: 100%;
+  }
+
+  .profileFormBtnLeading {
+    margin-right: 0;
+    order: 3;
+  }
+
+  .work-share-modal__link-row,
+  .work-share-modal__footer {
+    flex-direction: column;
+  }
+
+  .work-share-modal__link-copy,
+  .work-share-modal__send {
+    width: 100%;
+  }
+
+  .work-share-modal__header {
+    grid-template-columns: 24px 1fr 24px;
+  }
+}
+
+@media (max-width: 560px) {
+  .channelText {
+    font-size: 12px;
+  }
+
+  .profileBadgeRow {
+    gap: 6px;
+  }
+
+  .profileBadgeChip {
+    height: 32px;
+  }
+
+  .videoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .followManageActions {
+    padding-left: 0;
+  }
+
+  .badgeManageGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .work-share-modal__receiver-body {
+    align-items: stretch;
+  }
+
+  .work-share-modal__search {
+    min-width: 0;
+    width: 100%;
   }
 }
 
