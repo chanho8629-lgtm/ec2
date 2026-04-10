@@ -50,4 +50,8 @@ public class CardDAO {
     public Optional<CardResponseDTO> findLatestActiveCard(Long memberId) {
         return Optional.ofNullable(cardMapper.selectLatestActiveCard(memberId));
     }
+
+    public Optional<CardResponseDTO> findDefaultCard(Long memberId) {
+        return Optional.ofNullable(cardMapper.selectDefaultCard(memberId));
+    }
 }

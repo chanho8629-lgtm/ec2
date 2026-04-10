@@ -14,6 +14,9 @@ public class CardResponseDTO {
     private String cardCompany;
     private String cardNumberMasked;
     private String billingKey;
+    private String billingReceiptId;
+    private String billingMethod;
+    private String billingStatus;
     private Boolean isDefault;
     private LocalDateTime createdDatetime;
 }
