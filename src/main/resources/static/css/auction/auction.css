@@ -543,6 +543,29 @@ ul, ol {
     margin-left: 4px;
 }
 
+/* 입찰 empty div */
+.Auction-BidHistory-Empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 32px 16px;
+    color: #9ca3af;
+    font-size: 13px;
+    text-align: center;
+}
+
+.Auction-BidHistory-Empty svg {
+    width: 32px;
+    height: 32px;
+    opacity: 0.5;
+}
+
+.Auction-BidHistory-Empty p {
+    margin: 0;
+}
+
 /* 입찰 확인 모달 */
 .Auction-Modal-Backdrop {
     position: fixed;

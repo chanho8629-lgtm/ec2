@@ -122,6 +122,14 @@ public class ProfileAPIController {
         return ResponseEntity.ok(profileService.updateMyProfileImage(userDetails.getId(), profileImageFile));
     }
 
+    // 배너 이미지 수정
+    @PostMapping("/me/banner-image")
+    public ResponseEntity<ProfileViewResponseDTO> updateMyBannerImage(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam("bannerImageFile") MultipartFile bannerImageFile) {
+        return ResponseEntity.ok(profileService.updateMyBannerImage(userDetails.getId(), bannerImageFile));
+    }
+
     // 닉네임 수정
     @PutMapping("/me/nickname")
     public ResponseEntity<ProfileViewResponseDTO> updateMyNickname(

@@ -619,6 +619,14 @@
       <div class="bd-chat-panel__shell">
         <div class="bd-chat-panel__body">
           <aside class="bd-chat-sidebar" aria-label="채팅방 목록">
+            <div class="bd-chat-sidebar__topbar">
+              <h2 class="bd-chat-sidebar__title">메시지</h2>
+              <button class="bd-chat-sidebar__back" type="button" aria-label="메신저 닫기" data-bd-chat-dismiss>
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                  <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2Z" fill="currentColor"/>
+                </svg>
+              </button>
+            </div>
 
             <button class="bd-chat-sidebar__compose" type="button" data-bd-chat-compose-toggle>
                 <span class="bd-chat-sidebar__compose-icon" aria-hidden="true">
@@ -657,19 +665,18 @@
 
             <div class="bd-chat-thread__detail" hidden data-bd-chat-detail>
               <header class="bd-chat-thread__header">
-                <button class="bd-chat-thread__back" type="button" aria-label="목록으로 돌아가기" data-bd-chat-back>
-                  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2Z" fill="currentColor"/>
-                  </svg>
-                </button>
-                <div class="bd-chat-thread__identity">
+                <a class="bd-chat-thread__identity" href="javascript:void(0)" data-bd-chat-profile-link>
                   <div class="bd-chat-thread__avatar" data-bd-chat-avatar></div>
                   <div>
                     <strong data-bd-chat-name></strong>
                     <span data-bd-chat-status></span>
                   </div>
-                </div>
-                <button class="bd-chat-thread__ghost" type="button">프로필 보기</button>
+                </a>
+                <button class="bd-chat-thread__back" type="button" aria-label="목록으로 돌아가기" data-bd-chat-back>
+                  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2Z" fill="currentColor"/>
+                  </svg>
+                </button>
               </header>
 
               <div class="bd-chat-thread__messages" data-bd-chat-messages></div>

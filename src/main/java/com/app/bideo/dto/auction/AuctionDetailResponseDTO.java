@@ -2,6 +2,7 @@ package com.app.bideo.dto.auction;
 
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,4 +32,8 @@ public class AuctionDetailResponseDTO {
     private Integer finalPrice;
     private Boolean isWishlisted;
     private LocalDateTime createdDatetime;
+
+    private Long loginMemberId;
+
+    private List<BidResponseDTO> bids;
 }
