@@ -25,4 +25,6 @@ public interface PaymentMapper {
     void updateStatusCompleted(@Param("paymentId") Long paymentId);
 
     void updateStatusRefunded(@Param("paymentId") Long paymentId);
+
+    void updatePgReceiptId(@Param("paymentId") Long paymentId, @Param("pgReceiptId") String pgReceiptId);
 }

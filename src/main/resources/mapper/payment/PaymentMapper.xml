@@ -7,31 +7,31 @@
         INSERT INTO tbl_payment (
             payment_code, order_code, buyer_id, seller_id, work_id, auction_id,
             original_amount, total_price, total_fee,
-            payment_purpose, pay_method, card_id, status
+            payment_purpose, pay_method, card_id, pg_receipt_id, status
         ) VALUES (
             #{paymentCode}, #{orderCode}, #{buyerId}, #{sellerId}, #{workId}, #{auctionId},
             #{originalAmount}, #{totalPrice}, #{totalFee},
-            #{paymentPurpose}, #{payMethod}, #{cardId}, #{status}
+            #{paymentPurpose}, #{payMethod}, #{cardId}, #{pgReceiptId}, #{status}
         )
     </insert>
 
     <select id="selectById" resultType="PaymentResponseDTO">
         SELECT id, payment_code, order_code, total_price, total_fee,
-               payment_purpose, pay_method, status, paid_at, created_datetime
+               payment_purpose, pay_method, pg_receipt_id, status, paid_at, created_datetime
         FROM tbl_payment
         WHERE id = #{paymentId}
     </select>
 
     <select id="selectByPaymentCode" resultType="PaymentResponseDTO">
         SELECT id, payment_code, order_code, total_price, total_fee,
-               payment_purpose, pay_method, status, paid_at, created_datetime
+               payment_purpose, pay_method, pg_receipt_id, status, paid_at, created_datetime
         FROM tbl_payment
         WHERE payment_code = #{paymentCode}
     </select>
 
     <select id="selectByBuyerId" resultType="PaymentResponseDTO">
         SELECT id, payment_code, order_code, total_price, total_fee,
-               payment_purpose, pay_method, status, paid_at, created_datetime
+               payment_purpose, pay_method, pg_receipt_id, status, paid_at, created_datetime
         FROM tbl_payment
         WHERE buyer_id = #{buyerId}
         ORDER BY created_datetime DESC
@@ -51,6 +51,12 @@
     <update id="updateStatusRefunded">
         UPDATE tbl_payment
         SET status = 'REFUNDED', refunded_at = NOW()
+        WHERE id = #{paymentId}
+    </update>
+
+    <update id="updatePgReceiptId">
+        UPDATE tbl_payment
+        SET pg_receipt_id = #{pgReceiptId}
         WHERE id = #{paymentId}
     </update>
 

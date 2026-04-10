@@ -3,9 +3,12 @@ package com.app.bideo.service.payment;
 import com.app.bideo.domain.order.OrderVO;
 import com.app.bideo.domain.payment.PaymentVO;
 import com.app.bideo.dto.common.PageResponseDTO;
+import com.app.bideo.dto.payment.BootpayPaymentResultDTO;
+import com.app.bideo.dto.payment.CardResponseDTO;
 import com.app.bideo.dto.payment.PaymentRequestDTO;
 import com.app.bideo.dto.payment.PaymentResponseDTO;
 import com.app.bideo.repository.order.OrderDAO;
+import com.app.bideo.repository.payment.CardDAO;
 import com.app.bideo.repository.payment.PaymentDAO;
 import com.app.bideo.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -22,12 +25,36 @@ public class PaymentService {
 
     private final PaymentDAO paymentDAO;
     private final OrderDAO orderDAO;
+    private final CardDAO cardDAO;
     private final NotificationService notificationService;
+    private final BootpayBillingService bootpayBillingService;
 
     private static final int PAGE_SIZE = 20;
     private static final double FEE_RATE = 0.10;
 
     public PaymentResponseDTO createPayment(Long buyerId, PaymentRequestDTO requestDTO) {
+        return createPendingPayment(buyerId, requestDTO, requestDTO.getCardId());
+    }
+
+    public PaymentResponseDTO payWithRegisteredCard(Long buyerId, PaymentRequestDTO requestDTO) {
+        CardResponseDTO targetCard = resolveTargetCard(buyerId, requestDTO.getCardId());
+        if (targetCard.getBillingKey() == null || targetCard.getBillingKey().isBlank()) {
+            throw new IllegalStateException("등록된 카드의 빌링키가 없어 간편결제를 진행할 수 없습니다.");
+        }
+
+        PaymentResponseDTO pendingPayment = createPendingPayment(buyerId, requestDTO, targetCard.getId());
+        BootpayPaymentResultDTO bootpayPayment = bootpayBillingService.requestCardPayment(
+                targetCard.getBillingKey(),
+                pendingPayment.getPaymentCode(),
+                "BIDEO 작품 결제",
+                pendingPayment.getTotalPrice()
+        );
+
+        paymentDAO.updatePgReceiptId(pendingPayment.getId(), bootpayPayment.getReceiptId());
+        return completePayment(pendingPayment.getId(), buyerId);
+    }
+
+    private PaymentResponseDTO createPendingPayment(Long buyerId, PaymentRequestDTO requestDTO, Long resolvedCardId) {
         OrderVO order = orderDAO.findByOrderCode(requestDTO.getOrderCode());
         if (order == null) {
             throw new IllegalArgumentException("주문을 찾을 수 없습니다.");
@@ -55,7 +82,7 @@ public class PaymentService {
                 .totalFee(totalFee)
                 .paymentPurpose(requestDTO.getPaymentPurpose())
                 .payMethod(requestDTO.getPayMethod())
-                .cardId(requestDTO.getCardId())
+                .cardId(resolvedCardId)
                 .status("PENDING")
                 .build();
 
@@ -63,6 +90,16 @@ public class PaymentService {
 
         return paymentDAO.findById(paymentVO.getId())
                 .orElseThrow(() -> new IllegalStateException("결제 생성 후 조회 실패"));
+    }
+
+    private CardResponseDTO resolveTargetCard(Long buyerId, Long requestedCardId) {
+        if (requestedCardId != null) {
+            return cardDAO.findById(requestedCardId, buyerId)
+                    .orElseThrow(() -> new IllegalArgumentException("선택한 카드를 찾을 수 없습니다."));
+        }
+
+        return cardDAO.findDefaultCard(buyerId)
+                .orElseThrow(() -> new IllegalArgumentException("대표 카드가 없어 간편결제를 진행할 수 없습니다."));
     }
 
     public PaymentResponseDTO completePayment(Long paymentId, Long memberId) {

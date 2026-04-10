@@ -1,0 +1,378 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
+    background: transparent;
+    color: #111111;
+}
+
+button {
+    font: inherit;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+a {
+    color: inherit;
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 17, 17, 0.72);
+}
+
+.pay-modal {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 460px);
+    margin: 20px auto;
+    border-radius: 18px;
+    background: #ffffff;
+    border: 1px solid #e6e6e6;
+    overflow: hidden;
+}
+
+.pay-modal__handle {
+    width: 52px;
+    height: 5px;
+    border-radius: 999px;
+    background: #e7e7e7;
+    margin: 14px auto 4px;
+}
+
+.pay-modal__header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px 18px;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.pay-modal__title {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+}
+
+.pay-modal__close {
+    position: absolute;
+    top: 50%;
+    right: 18px;
+    transform: translateY(-50%);
+    color: #555;
+    padding: 4px;
+}
+
+.pay-modal__close svg {
+    width: 22px;
+    height: 22px;
+}
+
+.pay-hero {
+    padding: 10px 20px 6px;
+}
+
+.pay-hero__copy {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #606060;
+}
+
+.pay-product {
+    display: flex;
+    gap: 14px;
+    padding: 18px 20px;
+    align-items: center;
+}
+
+.pay-product__thumb {
+    width: 72px;
+    height: 72px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f7f7f7;
+    border: 1px solid #ededed;
+    flex-shrink: 0;
+}
+
+.pay-product__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.pay-product__body {
+    min-width: 0;
+    flex: 1;
+}
+
+.pay-product__creator {
+    font-size: 12px;
+    color: #606060;
+    margin-bottom: 4px;
+    font-weight: 700;
+}
+
+.pay-product__name {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 6px;
+    word-break: keep-all;
+}
+
+.pay-product__license {
+    font-size: 12px;
+    color: #9a9a9a;
+}
+
+.pay-status {
+    padding: 0 20px 12px;
+}
+
+.pay-status__item {
+    padding: 12px;
+    border: 1px solid #ededed;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.pay-status__label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 11px;
+    color: #606060;
+}
+
+.pay-status__value {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #111;
+}
+
+.pay-summary {
+    margin: 0 20px;
+    padding: 18px 0;
+    border-top: 1px solid #f1f1f1;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.pay-summary__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.pay-summary__row + .pay-summary__row {
+    margin-top: 10px;
+}
+
+.pay-summary__row--total {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed #e5e5e5;
+}
+
+.pay-summary__label {
+    font-size: 14px;
+    color: #6f6f6f;
+}
+
+.pay-summary__value {
+    font-size: 15px;
+    font-weight: 700;
+    color: #111;
+}
+
+.pay-summary__value--fee {
+    color: #606060;
+}
+
+.pay-summary__caption {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #9a9a9a;
+    text-align: right;
+}
+
+.pay-section-title {
+    padding: 18px 20px 10px;
+    font-size: 12px;
+    color: #8a8a8a;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.pay-method__list {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 0 20px;
+}
+
+.pay-method__option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1.5px solid #111;
+    border-radius: 12px;
+    text-align: left;
+    background: #f9f9f9;
+}
+
+.pay-method__radio {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid #111;
+    flex-shrink: 0;
+}
+
+.pay-method__radio::after {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: #111;
+}
+
+.pay-method__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    flex: 1;
+}
+
+.pay-method__name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #111;
+}
+
+.pay-method__desc {
+    font-size: 12px;
+    color: #8c8c8c;
+}
+
+.pay-method__chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 46px;
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+    background: #111111;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+.pay-note {
+    padding-bottom: 4px;
+}
+
+.pay-note__list {
+    padding: 0 20px;
+    list-style: none;
+}
+
+.pay-note__list li {
+    position: relative;
+    padding-left: 12px;
+    font-size: 12px;
+    line-height: 1.65;
+    color: #606060;
+}
+
+.pay-note__list li::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 0;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #111111;
+}
+
+.pay-terms {
+    padding: 16px 20px 8px;
+    text-align: center;
+    font-size: 11px;
+    color: #9f9f9f;
+    line-height: 1.6;
+}
+
+.pay-terms a {
+    text-decoration: underline;
+}
+
+.pay-footer {
+    padding: 12px 20px 22px;
+}
+
+.pay-submit {
+    width: 100%;
+    height: 56px;
+    border-radius: 12px;
+    background: #111111;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 800;
+    transition: opacity 0.16s ease, transform 0.12s ease;
+}
+
+.pay-submit:hover {
+    background: #272727;
+}
+
+.pay-submit:active {
+    transform: scale(0.995);
+}
+
+.pay-submit:disabled {
+    opacity: 0.55;
+    cursor: default;
+}
+
+.pay-submit svg {
+    width: 18px;
+    height: 18px;
+}
+
+@media (max-width: 480px) {
+    .pay-modal {
+        width: calc(100% - 24px);
+        margin: 12px auto;
+        border-radius: 16px;
+    }
+
+    .pay-product {
+        align-items: flex-start;
+    }
+
+    .pay-product__thumb {
+        width: 64px;
+        height: 64px;
+    }
+}

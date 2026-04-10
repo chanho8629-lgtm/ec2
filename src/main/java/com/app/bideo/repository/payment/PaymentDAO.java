@@ -42,4 +42,8 @@ public class PaymentDAO {
     public void refundPayment(Long paymentId) {
         paymentMapper.updateStatusRefunded(paymentId);
     }
+
+    public void updatePgReceiptId(Long paymentId, String pgReceiptId) {
+        paymentMapper.updatePgReceiptId(paymentId, pgReceiptId);
+    }
 }
