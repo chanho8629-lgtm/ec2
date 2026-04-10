@@ -370,6 +370,12 @@
         VALUES (#{contestId}, #{tagId})
     </insert>
 
+    <select id="findOrCreateTag" resultType="java.lang.Long">
+        INSERT INTO tbl_tag (tag_name) VALUES (#{tagName})
+        ON CONFLICT (tag_name) DO UPDATE SET tag_name = EXCLUDED.tag_name
+        RETURNING id
+    </select>
+
     <delete id="deleteContestTagsByContestId">
         DELETE FROM tbl_contest_tag WHERE contest_id = #{contestId}
     </delete>

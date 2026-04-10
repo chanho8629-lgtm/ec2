@@ -82,7 +82,7 @@ const ContestListModule = (function () {
             div.innerHTML =
                 '<div class="Contest-Item-Index">' + (startIdx + i + 1) + '</div>' +
                 '<div class="Contest-Item-Thumbnail">' +
-                    '<a class="Contest-Thumbnail-Link" href="/contest/detail/' + item.id + '">' +
+                    '<a class="Contest-Thumbnail-Link" href="#" data-contest-id="' + item.id + '">' +
                         '<img class="Contest-Thumbnail-Image" alt="" src="' + thumbSrc + '" />' +
                     '</a>' +
                 '</div>' +
@@ -195,19 +195,15 @@ const ContestListModule = (function () {
         selectedId = contestId;
         clickedEl.classList.add("Contest-List-Item--active");
 
-        fetch("/contest/detail/" + contestId + "?ajax=true", { credentials: "same-origin" })
-            .then(function () {
-                var cached = itemsCache[contestId];
-                if (!cached) return;
-                bindDetail(cached);
+        fetch("/contest/api/detail/" + contestId, { credentials: "same-origin" })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                bindDetail(data);
             })
             .catch(function () {
                 var cached = itemsCache[contestId];
                 if (cached) bindDetail(cached);
             });
-
-        var cached = itemsCache[contestId];
-        if (cached) bindDetail(cached);
 
         panel.classList.remove("Contest-Detail-Panel--visible", "Contest-Detail-Panel--closing");
         void panel.offsetWidth;
@@ -261,7 +257,7 @@ const ContestListModule = (function () {
         var applyBtn = document.querySelector(".Contest-Detail-ApplyBtn");
         if (applyBtn) {
             applyBtn.onclick = function () {
-                location.href = "/contest/detail/" + data.id;
+                openEntryModal(data.id);
             };
         }
 
@@ -297,9 +293,117 @@ const ContestListModule = (function () {
         }
     }
 
+    /* ───── 참가 신청 모달 ───── */
+    var currentContestId = null;
+    var selectedWorkId = null;
+
+    function openEntryModal(contestId) {
+        currentContestId = contestId;
+        selectedWorkId = null;
+        var overlay = document.getElementById("entryModalOverlay");
+        var body = document.getElementById("entryModalBody");
+        var submitBtn = document.getElementById("entryModalSubmitBtn");
+
+        body.innerHTML = '<div class="Entry-Modal-Empty">불러오는 중...</div>';
+        submitBtn.disabled = true;
+        overlay.classList.add("Entry-Modal-Overlay--visible");
+
+        fetch("/contest/api/my-works", { credentials: "same-origin" })
+            .then(function (res) {
+                if (!res.ok) throw new Error("로그인이 필요합니다");
+                return res.json();
+            })
+            .then(function (works) {
+                renderEntryWorks(works);
+            })
+            .catch(function () {
+                body.innerHTML = '<div class="Entry-Modal-Empty">로그인이 필요합니다.</div>';
+            });
+    }
+
+    function renderEntryWorks(works) {
+        var body = document.getElementById("entryModalBody");
+        body.innerHTML = "";
+
+        if (!works || works.length === 0) {
+            body.innerHTML = '<div class="Entry-Modal-Empty">출품 가능한 작품이 없습니다.</div>';
+            return;
+        }
+
+        works.forEach(function (work) {
+            var card = document.createElement("div");
+            card.className = "Entry-Work-Card";
+            card.setAttribute("data-work-id", work.id);
+
+            var thumbSrc = work.thumbnailUrl || "/images/default-contest.png";
+            card.innerHTML =
+                '<img class="Entry-Work-Thumb" alt="" src="' + thumbSrc + '" />' +
+                '<div class="Entry-Work-Title">' + escapeHtml(work.title) + '</div>';
+
+            card.addEventListener("click", function () {
+                document.querySelectorAll(".Entry-Work-Card").forEach(function (el) {
+                    el.classList.remove("Entry-Work-Card--selected");
+                });
+                card.classList.add("Entry-Work-Card--selected");
+                selectedWorkId = work.id;
+                document.getElementById("entryModalSubmitBtn").disabled = false;
+            });
+
+            body.appendChild(card);
+        });
+    }
+
+    function closeEntryModal() {
+        document.getElementById("entryModalOverlay").classList.remove("Entry-Modal-Overlay--visible");
+        currentContestId = null;
+        selectedWorkId = null;
+    }
+
+    function submitEntry() {
+        if (!currentContestId || !selectedWorkId) return;
+
+        fetch("/contest/api/" + currentContestId + "/entry", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ workId: selectedWorkId })
+        })
+        .then(function (res) {
+            if (!res.ok) {
+                return res.text().then(function (text) {
+                    var msg = text;
+                    try {
+                        var json = JSON.parse(text);
+                        msg = json.message || json.error || text;
+                    } catch (e) {}
+                    throw new Error(msg || ("HTTP " + res.status));
+                });
+            }
+            return res.json();
+        })
+        .then(function () {
+            alert("출품이 완료되었습니다.");
+            closeEntryModal();
+        })
+        .catch(function (err) {
+            console.error("출품 오류:", err);
+            alert("출품 중 오류: " + (err.message || "알 수 없는 오류"));
+        });
+    }
+
+    function initEntryModal() {
+        document.getElementById("entryModalCloseBtn").addEventListener("click", closeEntryModal);
+        document.getElementById("entryModalCancelBtn").addEventListener("click", closeEntryModal);
+        document.getElementById("entryModalSubmitBtn").addEventListener("click", submitEntry);
+        document.getElementById("entryModalOverlay").addEventListener("click", function (e) {
+            if (e.target.id === "entryModalOverlay") closeEntryModal();
+        });
+    }
+
     /* ───── 초기화 ───── */
     function init() {
         initFilters();
+        initEntryModal();
         resetList();
     }
 
