@@ -620,10 +620,10 @@
         <div class="bd-chat-panel__body">
           <aside class="bd-chat-sidebar" aria-label="채팅방 목록">
             <div class="bd-chat-sidebar__topbar">
-              <h2 class="bd-chat-sidebar__title">메시지</h2>
-              <button class="bd-chat-sidebar__back" type="button" aria-label="메신저 닫기" data-bd-chat-dismiss>
-                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                  <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2Z" fill="currentColor"/>
+              <h2 class="bd-chat-sidebar__title">채팅</h2>
+              <button class="bd-chat-mobile-close" type="button" aria-label="채팅 닫기" data-bd-chat-dismiss>
+                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                  <path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12Z" fill="currentColor"/>
                 </svg>
               </button>
             </div>
@@ -665,18 +665,19 @@
 
             <div class="bd-chat-thread__detail" hidden data-bd-chat-detail>
               <header class="bd-chat-thread__header">
-                <a class="bd-chat-thread__identity" href="javascript:void(0)" data-bd-chat-profile-link>
-                  <div class="bd-chat-thread__avatar" data-bd-chat-avatar></div>
-                  <div>
-                    <strong data-bd-chat-name></strong>
-                    <span data-bd-chat-status></span>
-                  </div>
-                </a>
                 <button class="bd-chat-thread__back" type="button" aria-label="목록으로 돌아가기" data-bd-chat-back>
                   <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                     <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2Z" fill="currentColor"/>
                   </svg>
                 </button>
+                <div class="bd-chat-thread__identity">
+                  <div class="bd-chat-thread__avatar" data-bd-chat-avatar></div>
+                  <div>
+                    <strong data-bd-chat-name></strong>
+                    <span data-bd-chat-status></span>
+                  </div>
+                </div>
+                <button class="bd-chat-thread__ghost" type="button">프로필 보기</button>
               </header>
 
               <div class="bd-chat-thread__messages" data-bd-chat-messages></div>

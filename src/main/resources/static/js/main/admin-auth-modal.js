@@ -98,7 +98,7 @@ window.addEventListener('load', function () {
     }
 
     try {
-      var response = await fetch('/api/admin/login', {
+      var response = await fetch('/api/auth/admin-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

@@ -1,6 +1,6 @@
 select * from tbl_member;
 
-select * from tbl_
+select * from tbl_member;
 
 update tbl_member
 set role = 'ADMIN'

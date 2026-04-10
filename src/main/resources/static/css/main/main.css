@@ -87,7 +87,7 @@
 /* 카드 그리드 */
 .shelf-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
 
@@ -242,7 +242,7 @@
 @media (max-width: 900px) {
   .main-page {
     padding-left: 16px;
-    padding-top: calc(var(--bd-shell-header-height) + 12px);
+    padding-top: 0;
   }
   .shelf-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -255,7 +255,7 @@
     padding-right: 8px;
   }
   .shelf-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 12px;
   }
 }
