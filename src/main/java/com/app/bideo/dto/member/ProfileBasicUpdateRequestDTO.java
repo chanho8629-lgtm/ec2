@@ -15,5 +15,6 @@ public class ProfileBasicUpdateRequestDTO {
     private String realName;
     private String bio;
     private String profileImage;
+    private String bannerImage;
     private String phoneNumber;
 }
