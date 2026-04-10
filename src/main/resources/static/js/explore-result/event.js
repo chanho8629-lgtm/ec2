@@ -19,7 +19,7 @@ window.onload = () => {
   let reportTarget = { targetType: null, targetId: null };
 
   const closeAllModals = () => {
-    shareOverlay.classList.add("off");
+    shareOverlay.hidden = true;
     reportOverlay.classList.add("off");
   };
 
@@ -107,7 +107,7 @@ window.onload = () => {
           case "share":
             const linkInput = shareOverlay.querySelector(".work-share-modal__link-input");
             linkInput.value = window.location.href;
-            shareOverlay.classList.remove("off");
+            shareOverlay.hidden = false;
             break;
 
           case "wishlist":
@@ -227,22 +227,22 @@ window.onload = () => {
       navigator.clipboard
         .writeText(shareLinkInput.value)
         .then(() => {
-          shareOverlay.classList.add("off");
+          shareOverlay.hidden = true;
           showToast("링크가 복사되었습니다.");
         })
         .catch(() => {
-          shareOverlay.classList.add("off");
+          shareOverlay.hidden = true;
           showToast("링크가 복사되었습니다.");
         });
     });
 
     shareCloseBtn.addEventListener("click", (e) => {
-      shareOverlay.classList.add("off");
+      shareOverlay.hidden = true;
     });
 
     shareOverlay.addEventListener("click", (e) => {
       if (e.target === shareOverlay) {
-        shareOverlay.classList.add("off");
+        shareOverlay.hidden = true;
       }
     });
 
@@ -282,7 +282,7 @@ window.onload = () => {
               </div>
               <div class="work-share-recipient__check"></div>
             `;
-            btn.addEventListener("click", () => {
+            btn.addEventListener("click", (e) => {
               const id = Number(m.id);
               if (shareSelectedMembers.find((s) => s.id === id)) return;
               shareSelectedMembers.push({ id: id, nickname: m.nickname });
@@ -307,7 +307,7 @@ window.onload = () => {
         const removeBtn = document.createElement("button");
         removeBtn.textContent = "×";
         removeBtn.style.cssText = "border:none;background:none;cursor:pointer;font-size:14px;padding:0 2px;";
-        removeBtn.addEventListener("click", () => {
+        removeBtn.addEventListener("click", (e) => {
           shareSelectedMembers.splice(idx, 1);
           renderShareChips();
         });
@@ -317,7 +317,7 @@ window.onload = () => {
     };
 
     // 공유 모달 - 보내기
-    shareSendBtn.addEventListener("click", async () => {
+    shareSendBtn.addEventListener("click", async (e) => {
       console.log("들어옴1 - 공유 보내기 클릭");
       if (shareSelectedMembers.length === 0) {
         showToast("받는 사람을 선택해주세요.");
@@ -339,7 +339,7 @@ window.onload = () => {
         showToast("로그인이 필요합니다.");
       }
 
-      shareOverlay.classList.add("off");
+      shareOverlay.hidden = true;
       shareSelectedMembers = [];
       shareChips.innerHTML = "";
       shareMessageInput.value = "";
@@ -412,7 +412,7 @@ window.onload = () => {
   };
 
   // 무한스크롤
-  window.addEventListener("scroll", async () => {
+  window.addEventListener("scroll", async (e) => {
     if (!checkScroll || !criteria || !criteria.hasMore) return;
 
     const scrollPos = window.scrollY;
