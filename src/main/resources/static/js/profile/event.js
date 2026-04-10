@@ -162,7 +162,7 @@ function escapeHtml(value) {
 // 프로필 아바타 마크업 생성
 function getAvatarMarkup(profileImage, nickname) {
   if (profileImage) {
-    return '<img src="' + escapeHtml(profileImage) + '" alt="' + escapeHtml(nickname || '프로필') + ' 프로필 이미지">';
+    return '<span class="work-share-user__avatar"><img src="' + escapeHtml(profileImage) + '" alt="' + escapeHtml(nickname || '프로필') + ' 프로필 이미지"></span>';
   }
 
   const source = (nickname || 'N').trim();
@@ -357,6 +357,26 @@ function renderDefaultAvatar() {
   const defaultText = getDefaultAvatarText();
   renderAvatarButton('<span class="avatarValue" data-profile-avatar-value>' + defaultText + '</span>');
   renderAvatarPreview(defaultText);
+}
+
+function syncProfileAvatarModalPreview() {
+  const avatarOpen = document.querySelector('[data-profile-avatar-open]');
+  const fileInput = document.querySelector('[data-profile-edit-file]');
+  const currentImage = avatarOpen?.querySelector('img');
+
+  pendingProfileAvatarImage = '';
+  pendingProfileAvatarMode = 'keep';
+
+  if (fileInput) {
+    fileInput.value = '';
+  }
+
+  if (currentImage) {
+    renderAvatarPreview('<img src="' + currentImage.src + '" alt="프로필 이미지">');
+    return;
+  }
+
+  renderAvatarPreview(getDefaultAvatarText());
 }
 
 // 팔로우 관리 상태
@@ -656,6 +676,7 @@ document.addEventListener('click', async (event) => {
 
   if (profileEditOpen) {
     modalClose('profile-setting-modal');
+    syncProfileAvatarModalPreview();
     modalOpen('profile-edit-modal');
     return;
   }
@@ -801,22 +822,7 @@ document.addEventListener('click', async (event) => {
   const profileAvatarOpen = event.target.closest('[data-profile-avatar-open]');
 
   if (profileAvatarOpen) {
-    const currentImage = profileAvatarOpen.querySelector('img');
-    const fileInput = document.querySelector('[data-profile-edit-file]');
-
-    pendingProfileAvatarImage = '';
-    pendingProfileAvatarMode = 'keep';
-
-    if (fileInput) {
-      fileInput.value = '';
-    }
-
-    if (currentImage) {
-      renderAvatarPreview('<img src="' + currentImage.src + '" alt="프로필 이미지">');
-    } else {
-      renderAvatarPreview(getDefaultAvatarText());
-    }
-
+    syncProfileAvatarModalPreview();
     modalOpen('profile-edit-modal');
     return;
   }
