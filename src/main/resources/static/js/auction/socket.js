@@ -3,32 +3,37 @@ const AuctionSocket = (() => {
     let currentAuctionId = null;
     let currentMemberId = null;
     let subscription = null;
+    let isConnecting = false;
 
     const connect = (auctionId, memberId) => {
-        console.log('connect 시작 - auctionId:', auctionId, 'memberId:', memberId);
-
-        if (stompClient?.connected && currentAuctionId === auctionId) {
-            console.log('이미 연결됨');
-            return;
-        }
-
-        if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') {
-            console.error('SockJS 또는 Stomp 미로드');
-            return;
-        }
+        // 이미 같은 경매에 연결되어 있거나 연결 중이면 스킵
+        if ((stompClient?.connected && currentAuctionId === auctionId) || isConnecting) return;
 
         disconnect();
 
         currentAuctionId = auctionId;
         currentMemberId = memberId;
+        isConnecting = true;  // ← 연결 시작
 
-        console.log('SockJS 연결 시도...');
+        if (typeof SockJS === 'undefined' || typeof Stomp === 'undefined') {
+            console.error('SockJS 또는 Stomp 미로드');
+            isConnecting = false;
+            return;
+        }
+
         const socket = new SockJS('/ws');
         stompClient = Stomp.over(socket);
-        stompClient.debug = (msg) => console.log('STOMP:', msg); // debug 활성화
+        stompClient.debug = null;
 
         stompClient.connect({}, () => {
-            console.log('STOMP 연결 성공, 구독 시작:', `/topic/auction.${auctionId}`);
+            isConnecting = false;  // ← 연결 완료
+
+            // 기존 구독이 있으면 먼저 해제
+            if (subscription) {
+                subscription.unsubscribe();
+                subscription = null;
+            }
+
             subscription = stompClient.subscribe(
                 `/topic/auction.${auctionId}`,
                 (message) => {
@@ -37,15 +42,17 @@ const AuctionSocket = (() => {
                 }
             );
         }, (error) => {
+            isConnecting = false;  // ← 연결 실패
             console.error('WebSocket 연결 실패:', error);
         });
     };
 
     const disconnect = () => {
+        isConnecting = false;
         subscription?.unsubscribe();
+        subscription = null;
         stompClient?.disconnect();
         stompClient = null;
-        subscription = null;
         currentAuctionId = null;
         currentMemberId = null;
     };

@@ -53,16 +53,16 @@ const AuctionLayout = (() => {
         const bidHistoryList = root.getElementById("bidHistoryList");
         const bidHistoryEmpty = root.getElementById("bidHistoryEmpty");
         if (bidHistoryList) {
-            // 기존 입찰 아이템만 제거 (empty div는 유지)
             bidHistoryList.querySelectorAll(".Auction-Bid-Item").forEach(el => el.remove());
 
             if (Array.isArray(auction.bids) && auction.bids.length > 0) {
-                if (bidHistoryEmpty) bidHistoryEmpty.hidden = true;
+                if (bidHistoryEmpty) bidHistoryEmpty.hidden = true;   // ← 입찰 있으면 empty 숨김
                 auction.bids
                     .filter(bid => bid && bid.memberNickname && bid.bidPrice)
+                    .reverse()
                     .forEach(bid => AuctionSocket.appendBidItem(bid));
             } else {
-                if (bidHistoryEmpty) bidHistoryEmpty.hidden = false;
+                if (bidHistoryEmpty) bidHistoryEmpty.hidden = false;  // ← 입찰 없으면 empty 표시
             }
         }
 
