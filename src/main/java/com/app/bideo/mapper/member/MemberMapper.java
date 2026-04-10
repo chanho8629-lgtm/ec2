@@ -42,6 +42,7 @@ public interface MemberMapper {
                        @Param("realName") String realName,
                        @Param("bio") String bio,
                        @Param("profileImage") String profileImage,
+                       @Param("bannerImage") String bannerImage,
                        @Param("phoneNumber") String phoneNumber);
 
     // 공개 작품 수 조회

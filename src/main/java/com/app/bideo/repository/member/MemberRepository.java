@@ -57,8 +57,8 @@ public class MemberRepository {
     }
 
     // 프로필 정보 수정
-    public void updateProfile(Long memberId, String nickname, String realName, String bio, String profileImage, String phoneNumber) {
-        memberMapper.updateProfile(memberId, nickname, realName, bio, profileImage, phoneNumber);
+    public void updateProfile(Long memberId, String nickname, String realName, String bio, String profileImage, String bannerImage, String phoneNumber) {
+        memberMapper.updateProfile(memberId, nickname, realName, bio, profileImage, bannerImage, phoneNumber);
     }
 
     // 공개 작품 수 조회

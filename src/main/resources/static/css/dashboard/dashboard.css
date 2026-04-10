@@ -372,7 +372,7 @@ body {
 
 .Dashboard-ChartSummary {
     margin: 0;
-    max-width: 360px;
+    max-width: none;
     color: #6b7684;
     font-size: 13px;
     line-height: 20px;
@@ -995,6 +995,39 @@ body {
 
 .Dashboard-DataListBody {
     display: grid;
+    max-height: 216px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+}
+
+.Dashboard-DataListBody:hover,
+.Dashboard-DataListBody:focus-within {
+    scrollbar-color: rgba(107, 118, 132, 0.45) transparent;
+}
+
+.Dashboard-DataListBody::-webkit-scrollbar {
+    width: 8px;
+}
+
+.Dashboard-DataListBody::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.Dashboard-DataListBody::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(107, 118, 132, 0);
+    transition: background-color 180ms ease;
+}
+
+.Dashboard-DataListBody:hover::-webkit-scrollbar-thumb,
+.Dashboard-DataListBody:focus-within::-webkit-scrollbar-thumb {
+    background: rgba(107, 118, 132, 0.45);
+}
+
+.Dashboard-DataListBody::-webkit-scrollbar-thumb:hover {
+    background: rgba(107, 118, 132, 0.6);
 }
 
 .Dashboard-DataRow {
@@ -1512,10 +1545,22 @@ html[data-theme="dark"] .Dashboard-ModalBackdrop {
 
     .Dashboard-DateButton {
         justify-items: start;
+        width: 100%;
+        padding-right: 0;
     }
 
     .Dashboard-DateButton svg {
         display: none;
+    }
+
+    .Dashboard-DatePicker {
+        width: 100%;
+    }
+
+    .Dashboard-DateMenu {
+        left: 0;
+        right: auto;
+        width: min(280px, 100%);
     }
 
     .Dashboard-Metrics--4,
@@ -1548,6 +1593,16 @@ html[data-theme="dark"] .Dashboard-ModalBackdrop {
         gap: 10px;
     }
 
+    .Dashboard-ChartSummary {
+        max-width: none;
+        text-align: left;
+    }
+
+    .Dashboard-CardHead--row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
     .Dashboard-CardRow {
         grid-template-columns: 1fr;
     }
@@ -1560,10 +1615,30 @@ html[data-theme="dark"] .Dashboard-ModalBackdrop {
         display: none;
     }
 
+    .Dashboard-DataRow,
     .Dashboard-DataRow--withdrawal,
-    .Dashboard-DataRow--payment {
+    .Dashboard-DataRow--payment,
+    .Dashboard-DataRow--auction,
+    .Dashboard-DataRow--bid,
+    .Dashboard-DataRow--result,
+    .Dashboard-DataRow--contest,
+    .Dashboard-DataRow--contest-result,
+    .Dashboard-DataRow--work,
+    .Dashboard-DataRow--gallery,
+    .Dashboard-DataRow--sold {
         grid-template-columns: 1fr;
         gap: 6px;
+        text-align: left;
+    }
+
+    .Dashboard-DataRow span,
+    .Dashboard-DataRow span:last-child {
+        justify-content: flex-start;
+        text-align: left !important;
+    }
+
+    .Dashboard-DataListBody {
+        max-height: none;
     }
 
     .Dashboard-DetailGrid {
@@ -1586,11 +1661,43 @@ html[data-theme="dark"] .Dashboard-ModalBackdrop {
         width: 100%;
         gap: 20px;
         overflow-x: auto;
+        padding-bottom: 2px;
+        white-space: nowrap;
+        flex-wrap: nowrap;
     }
 
     .Dashboard-CardHead h2 {
         font-size: 18px;
         line-height: 26px;
+    }
+
+    .Dashboard-InfoCard,
+    .Dashboard-ModalDialog {
+        padding: 18px 16px;
+    }
+
+    .Dashboard-FormActions,
+    .Dashboard-ModalActions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .Dashboard-FormActions .Dashboard-TonalButton,
+    .Dashboard-ModalActions .Dashboard-TonalButton {
+        width: 100%;
+    }
+
+    .Dashboard-Modal {
+        padding: 56px 12px 20px;
+    }
+
+    .Dashboard-Metric {
+        min-height: 70px;
+        padding: 10px 14px;
+    }
+
+    .Dashboard-Chart {
+        padding: 8px 14px 16px;
     }
 
     .Dashboard-BarRow {
@@ -1601,5 +1708,78 @@ html[data-theme="dark"] .Dashboard-ModalBackdrop {
     .Dashboard-Table th,
     .Dashboard-Table td {
         padding-inline: 12px;
+    }
+}
+
+@media (max-width: 560px) {
+    .Dashboard-Page {
+        padding: 8px 8px 28px;
+    }
+
+    .Dashboard-Header,
+    .Dashboard-Toolbar,
+    .Dashboard-Panel {
+        padding-inline: 4px;
+    }
+
+    .Dashboard-Title {
+        font-size: 22px;
+        line-height: 28px;
+    }
+
+    .Dashboard-TonalButton,
+    .Dashboard-Tab,
+    .Dashboard-DateLabel {
+        font-size: 13px;
+    }
+
+    .Dashboard-Tabs {
+        gap: 16px;
+    }
+
+    .Dashboard-SectionGrid,
+    .Dashboard-CardLayout {
+        padding-inline: 0;
+    }
+
+    .Dashboard-CardHead h2 {
+        font-size: 17px;
+        line-height: 24px;
+    }
+
+    .Dashboard-CardHead p,
+    .Dashboard-ChartSummary {
+        font-size: 12px;
+        line-height: 18px;
+    }
+
+    .Dashboard-MetricValue {
+        font-size: 17px;
+        line-height: 22px;
+    }
+
+    .Dashboard-CardList {
+        gap: 14px;
+        margin-top: 18px;
+    }
+
+    .Dashboard-CardPreview {
+        padding: 18px;
+    }
+
+    .Dashboard-PaymentNumber {
+        margin-top: 26px;
+        font-size: 20px;
+        line-height: 28px;
+    }
+
+    .Dashboard-ModalDialog,
+    .Dashboard-ModalDialog--small {
+        width: calc(100% - 16px);
+        border-radius: 18px;
+    }
+
+    .Dashboard-DetailItem {
+        padding: 12px 14px;
     }
 }

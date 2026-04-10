@@ -63,11 +63,11 @@ values
 -- ==========================================================
 insert into tbl_oauth (member_id, provider, provider_id, connected_at)
 values
-    (2, 'kakao', 'kakao_kimjh_001', '2024-03-15'),
-    (3, 'kakao', 'kakao_parksy_002', '2024-01-22'),
-    (5, 'naver', 'naver_choisj_003', '2024-06-03'),
-    (6, 'naver', 'naver_jungwh_004', '2024-07-18'),
-    (8, 'kakao', 'kakao_yoones_005', '2024-08-05');
+    (2, 'kakao'::oauth_provider, 'kakao_kimjh_001', '2024-03-15'),
+    (3, 'kakao'::oauth_provider, 'kakao_parksy_002', '2024-01-22'),
+    (5, 'naver'::oauth_provider, 'naver_choisj_003', '2024-06-03'),
+    (6, 'naver'::oauth_provider, 'naver_jungwh_004', '2024-07-18'),
+    (8, 'kakao'::oauth_provider, 'kakao_yoones_005', '2024-08-05');
 
 -- ==========================================================
 -- 3. 카드 (tbl_card)
@@ -83,15 +83,15 @@ values
 -- ==========================================================
 -- 4. 작품 (tbl_work) - 7개
 -- ==========================================================
-insert into tbl_work (member_id, title, category, description, price, is_tradable, allow_comment, show_similar, view_count, like_count, save_count, comment_count, status, created_datetime)
+insert into tbl_work (member_id, title, category, description, price, license_type, is_tradable, allow_comment, show_similar, view_count, like_count, save_count, comment_count, status, created_datetime)
 values
-    (3, '새벽의 여정', '유화', '새벽빛이 물드는 바다 위의 작은 배를 담은 유화 작품', 500000, false, true, true, 342, 45, 89, 12, 'ACTIVE', '2025-11-20'),
-    (2, '도시의 빛', '사진', '서울 야경을 담은 도시 풍경 사진', 300000, true, true, true, 218, 32, 56, 8, 'ACTIVE', '2025-12-05'),
-    (4, '별이 빛나는 밤에 - 모작', '유화', '반 고흐의 별이 빛나는 밤에를 현대적으로 재해석', null, false, true, true, 89, 5, 12, 3, 'HIDDEN', '2026-01-10'),
-    (5, '푸른 숲의 노래', '수채화', '제주도 곶자왈의 초록빛 숲을 수채화로 표현', 800000, false, true, true, 156, 28, 44, 6, 'ACTIVE', '2026-01-22'),
-    (6, '추상적 감정', '디지털아트', '디지털 도구로 표현한 인간의 복잡한 감정', 200000, true, true, true, 431, 67, 98, 15, 'ACTIVE', '2026-02-14'),
-    (7, '무제 #12', '조각', '금속과 나무를 결합한 현대 조각 작품', 150000, true, true, true, 67, 8, 15, 2, 'HIDDEN', '2026-02-28'),
-    (8, '한강의 저녁', '사진', '한강 선유도에서 촬영한 노을 사진', 400000, false, true, true, 289, 41, 72, 9, 'ACTIVE', '2026-03-05');
+    (3, '새벽의 여정', '유화', '새벽빛이 물드는 바다 위의 작은 배를 담은 유화 작품', 500000, 'PERSONAL', false, true, true, 342, 45, 89, 12, 'ACTIVE', '2025-11-20'),
+    (2, '도시의 빛', '사진', '서울 야경을 담은 도시 풍경 사진', 300000, 'PERSONAL', true, true, true, 218, 32, 56, 8, 'ACTIVE', '2025-12-05'),
+    (4, '별이 빛나는 밤에 - 모작', '유화', '반 고흐의 별이 빛나는 밤에를 현대적으로 재해석', null, null, false, true, true, 89, 5, 12, 3, 'HIDDEN', '2026-01-10'),
+    (5, '푸른 숲의 노래', '수채화', '제주도 곶자왈의 초록빛 숲을 수채화로 표현', 800000, 'COMMERCIAL', false, true, true, 156, 28, 44, 6, 'ACTIVE', '2026-01-22'),
+    (6, '추상적 감정', '디지털아트', '디지털 도구로 표현한 인간의 복잡한 감정', 200000, 'PERSONAL', true, true, true, 431, 67, 98, 15, 'ACTIVE', '2026-02-14'),
+    (7, '무제 #12', '조각', '금속과 나무를 결합한 현대 조각 작품', 150000, 'PERSONAL', true, true, true, 67, 8, 15, 2, 'HIDDEN', '2026-02-28'),
+    (8, '한강의 저녁', '사진', '한강 선유도에서 촬영한 노을 사진', 400000, 'PERSONAL', false, true, true, 289, 41, 72, 9, 'ACTIVE', '2026-03-05');
 
 -- ==========================================================
 -- 5. 작품 파일 (tbl_work_file)
@@ -175,28 +175,28 @@ values
 -- ==========================================================
 -- 9. 주문 (tbl_order) - 7건
 -- ==========================================================
-insert into tbl_order (order_code, buyer_id, seller_id, work_id, auction_id, order_type, original_price, fee_amount, total_price, ordered_at, paid_at, completed_at, status)
+insert into tbl_order (order_code, buyer_id, seller_id, work_id, auction_id, order_type, license_type, original_price, discount_amount, fee_amount, total_price, ordered_at, paid_at, completed_at, status)
 values
-    ('ORD-001', 3, 2, 1, 1, 'AUCTION', 2500000, 250000, 2500000, '2026-03-20 14:30:00', '2026-03-20 14:32:00', '2026-03-20 14:32:00', 'COMPLETED'),
-    ('ORD-002', 5, 3, 2, 2, 'AUCTION', 1800000, 180000, 1800000, '2026-03-18 16:30:00', '2026-03-18 16:35:00', '2026-03-18 16:35:00', 'COMPLETED'),
-    ('ORD-003', 4, 6, 5, null, 'DIRECT', 750000, 75000, 750000, '2026-03-15 10:00:00', null, null, 'CANCELLED'),
-    ('ORD-004', 2, 5, 4, 3, 'AUCTION', 3200000, 320000, 3200000, '2026-03-15 18:30:00', '2026-03-15 18:40:00', '2026-03-15 18:40:00', 'COMPLETED'),
-    ('ORD-005', 8, 2, 2, null, 'DIRECT', 1200000, 120000, 1200000, '2026-03-12 11:00:00', '2026-03-12 11:05:00', '2026-03-12 11:05:00', 'COMPLETED'),
-    ('ORD-006', 7, 4, 3, null, 'DIRECT', 680000, 68000, 680000, '2026-03-10 09:00:00', null, null, 'CANCELLED'),
-    ('ORD-007', 6, 8, 7, 5, 'AUCTION', 1450000, 145000, 1450000, '2026-03-10 14:30:00', '2026-03-10 14:35:00', '2026-03-10 14:35:00', 'COMPLETED');
+    ('ORD-001', 3, 2, 1, 1, 'AUCTION', 'PERSONAL', 2500000, 0, 250000, 2500000, '2026-03-20 14:30:00', '2026-03-20 14:32:00', '2026-03-20 14:32:00', 'COMPLETED'),
+    ('ORD-002', 5, 3, 2, 2, 'AUCTION', 'PERSONAL', 1800000, 0, 180000, 1800000, '2026-03-18 16:30:00', '2026-03-18 16:35:00', '2026-03-18 16:35:00', 'COMPLETED'),
+    ('ORD-003', 4, 6, 5, null, 'DIRECT', 'COMMERCIAL', 750000, 0, 75000, 750000, '2026-03-15 10:00:00', null, null, 'CANCELLED'),
+    ('ORD-004', 2, 5, 4, 3, 'AUCTION', 'PERSONAL', 3200000, 0, 320000, 3200000, '2026-03-15 18:30:00', '2026-03-15 18:40:00', '2026-03-15 18:40:00', 'COMPLETED'),
+    ('ORD-005', 8, 2, 2, null, 'DIRECT', 'PERSONAL', 1200000, 0, 120000, 1200000, '2026-03-12 11:00:00', '2026-03-12 11:05:00', '2026-03-12 11:05:00', 'COMPLETED'),
+    ('ORD-006', 7, 4, 3, null, 'DIRECT', 'PERSONAL', 680000, 0, 68000, 680000, '2026-03-10 09:00:00', null, null, 'CANCELLED'),
+    ('ORD-007', 6, 8, 7, 5, 'AUCTION', 'PERSONAL', 1450000, 0, 145000, 1450000, '2026-03-10 14:30:00', '2026-03-10 14:35:00', '2026-03-10 14:35:00', 'COMPLETED');
 
 -- ==========================================================
 -- 10. 결제 (tbl_payment) - 7건
 -- ==========================================================
-insert into tbl_payment (payment_code, order_code, buyer_id, seller_id, work_id, auction_id, original_amount, total_price, total_fee, pay_method, card_id, status, paid_at)
+insert into tbl_payment (payment_code, order_code, buyer_id, seller_id, work_id, auction_id, original_amount, total_price, total_fee, payment_purpose, pay_method, card_id, status, paid_at)
 values
-    ('PAY-001', 'ORD-001', 3, 2, 1, 1, 2500000, 2500000, 250000, 'CARD', 2, 'COMPLETED', '2026-03-20 14:32:00'),
-    ('PAY-002', 'ORD-002', 5, 3, 2, 2, 1800000, 1800000, 180000, 'CARD', 3, 'COMPLETED', '2026-03-18 16:35:00'),
-    ('PAY-003', 'ORD-003', 4, 6, 5, null, 750000, 750000, 75000, 'CARD', null, 'CANCELLED', '2026-03-15 10:05:00'),
-    ('PAY-004', 'ORD-004', 2, 5, 4, 3, 3200000, 3200000, 320000, 'CARD', 1, 'COMPLETED', '2026-03-15 18:40:00'),
-    ('PAY-005', 'ORD-005', 8, 2, 2, null, 1200000, 1200000, 120000, 'KAKAO_PAY', null, 'COMPLETED', '2026-03-12 11:05:00'),
-    ('PAY-006', 'ORD-006', 7, 4, 3, null, 680000, 680000, 68000, 'CARD', null, 'CANCELLED', '2026-03-10 09:05:00'),
-    ('PAY-007', 'ORD-007', 6, 8, 7, 5, 1450000, 1450000, 145000, 'CARD', 4, 'COMPLETED', '2026-03-10 14:35:00');
+    ('PAY-001', 'ORD-001', 3, 2, 1, 1, 2500000, 2500000, 250000, 'PURCHASE', 'CARD', 2, 'COMPLETED', '2026-03-20 14:32:00'),
+    ('PAY-002', 'ORD-002', 5, 3, 2, 2, 1800000, 1800000, 180000, 'PURCHASE', 'CARD', 3, 'COMPLETED', '2026-03-18 16:35:00'),
+    ('PAY-003', 'ORD-003', 4, 6, 5, null, 750000, 750000, 75000, 'PURCHASE', 'CARD', null, 'CANCELLED', '2026-03-15 10:05:00'),
+    ('PAY-004', 'ORD-004', 2, 5, 4, 3, 3200000, 3200000, 320000, 'PURCHASE', 'CARD', 1, 'COMPLETED', '2026-03-15 18:40:00'),
+    ('PAY-005', 'ORD-005', 8, 2, 2, null, 1200000, 1200000, 120000, 'PURCHASE', 'KAKAO_PAY', null, 'COMPLETED', '2026-03-12 11:05:00'),
+    ('PAY-006', 'ORD-006', 7, 4, 3, null, 680000, 680000, 68000, 'PURCHASE', 'CARD', null, 'CANCELLED', '2026-03-10 09:05:00'),
+    ('PAY-007', 'ORD-007', 6, 8, 7, 5, 1450000, 1450000, 145000, 'PURCHASE', 'CARD', 4, 'COMPLETED', '2026-03-10 14:35:00');
 
 -- ==========================================================
 -- 11. 정산 (tbl_settlement) - 완료된 주문 5건

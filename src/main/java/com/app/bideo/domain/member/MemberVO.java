@@ -20,6 +20,7 @@ public class MemberVO {
     private LocalDate birthDate;
     private String bio;
     private String profileImage;
+    private String bannerImage;
     private MemberRole role;
     private Boolean creatorVerified;
     private Boolean sellerVerified;
