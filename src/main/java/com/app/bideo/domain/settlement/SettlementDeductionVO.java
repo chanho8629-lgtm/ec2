@@ -11,6 +11,6 @@ public class SettlementDeductionVO {
     private Long id;
     private Long settlementId;
     private String deductionName;
-    private Integer amount;
+    private Long amount;
     private Integer sortOrder;
 }

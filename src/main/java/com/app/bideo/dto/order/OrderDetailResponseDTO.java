@@ -20,11 +20,11 @@ public class OrderDetailResponseDTO {
     private Long auctionId;
     private String orderType;
     private String licenseType;
-    private Integer originalPrice;
-    private Integer discountAmount;
-    private Integer feeAmount;
-    private Integer totalPrice;
-    private Integer depositAmount;
+    private Long originalPrice;
+    private Long discountAmount;
+    private Long feeAmount;
+    private Long totalPrice;
+    private Long depositAmount;
     private String depositStatus;
     private String status;
     private LocalDateTime orderedAt;

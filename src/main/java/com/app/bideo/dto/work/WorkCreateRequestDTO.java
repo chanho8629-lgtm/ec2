@@ -13,7 +13,7 @@ public class WorkCreateRequestDTO {
     private String title;
     private String category;
     private String description;
-    private Integer price;
+    private Long price;
     private String licenseType;
     private String licenseTerms;
     private Boolean isTradable;
@@ -21,7 +21,7 @@ public class WorkCreateRequestDTO {
     private Boolean showSimilar;
     private String linkUrl;
     private Boolean auctionEnabled;
-    private Integer auctionStartingPrice;
+    private Long auctionStartingPrice;
     private Integer auctionDeadlineHours;
     private List<Long> tagIds;
     private List<String> tagNames;

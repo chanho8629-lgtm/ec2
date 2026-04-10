@@ -16,7 +16,7 @@ public class WorkVO {
     private String title;
     private String category;
     private String description;
-    private Integer price;
+    private Long price;
     private String licenseType;
     private String licenseTerms;
     private Boolean isTradable;

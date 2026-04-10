@@ -861,7 +861,6 @@ function bindPageInteractions(page, data) {
         activeAuctionPage = page;
         page.classList.add("panel-open", "panel-auction");
         auctionModalBackdrop.hidden = false;
-        AuctionEvent.bindEvents();
     };
 
     const setMenuItemVisibility = (button, visible) => {
@@ -1342,9 +1341,8 @@ function bindPageInteractions(page, data) {
                     return;
                 }
 
-                openAuctionPanelForPage();
-
                 await AuctionService.getAuctionInfo(data.id, (auction) => {
+                    openAuctionPanelForPage();
                     AuctionLayout.init(auction);
                     AuctionEvent.setAuctionId(auction.id);
                     AuctionEvent.bindEvents();

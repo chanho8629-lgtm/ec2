@@ -9,5 +9,5 @@ import lombok.*;
 @Builder
 public class BidRequestDTO {
     private Long auctionId;
-    private Integer bidPrice;
+    private Long bidPrice;
 }

@@ -19,7 +19,7 @@ public interface AuctionMapper {
 
     // 최고가 갱신
     void updateCurrentPrice(@Param("auctionId") Long auctionId,
-                            @Param("currentPrice") Integer currentPrice,
+                            @Param("currentPrice") Long currentPrice,
                             @Param("bidCount") Integer bidCount);
 
     // 경매 상태 변경
@@ -29,5 +29,5 @@ public interface AuctionMapper {
     // 낙찰자 등록
     void updateWinner(@Param("auctionId") Long auctionId,
                       @Param("winnerId") Long winnerId,
-                      @Param("finalPrice") Integer finalPrice);
+                      @Param("finalPrice") Long finalPrice);
 }

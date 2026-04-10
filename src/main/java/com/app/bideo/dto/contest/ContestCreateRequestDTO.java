@@ -20,6 +20,6 @@ public class ContestCreateRequestDTO {
     private LocalDate entryEnd;
     private LocalDate resultDate;
     private String prizeInfo;
-    private Integer price;
+    private Long price;
     private List<Long> tagIds;
 }

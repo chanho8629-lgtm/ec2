@@ -30,7 +30,7 @@ public class AuctionDAO {
     }
 
     // 최고가 반영
-    public void updateCurrentPrice(Long auctionId, Integer currentPrice, Integer bidCount) {
+    public void updateCurrentPrice(Long auctionId, Long currentPrice, Integer bidCount) {
         auctionMapper.updateCurrentPrice(auctionId, currentPrice, bidCount);
     }
 
@@ -40,7 +40,7 @@ public class AuctionDAO {
     }
 
     // 낙찰자 등록
-    public void updateWinner(Long auctionId, Long winnerId, Integer finalPrice) {
+    public void updateWinner(Long auctionId, Long winnerId, Long finalPrice) {
         auctionMapper.updateWinner(auctionId, winnerId, finalPrice);
     }
 }

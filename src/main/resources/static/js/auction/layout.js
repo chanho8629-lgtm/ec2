@@ -36,7 +36,7 @@ const AuctionLayout = (() => {
             elements.bidNextAmountEl.textContent = `${minAmount.toLocaleString("ko-KR")}원으로 입찰하기`;
         }
 
-        Socket.sendBid(auctionId, bidAmount);
+        AuctionSocket.sendBid(auctionId, bidAmount);
     };
 
     const init = (auction, root = document) => {
@@ -58,7 +58,9 @@ const AuctionLayout = (() => {
 
             if (Array.isArray(auction.bids) && auction.bids.length > 0) {
                 if (bidHistoryEmpty) bidHistoryEmpty.hidden = true;
-                auction.bids.forEach(bid => AuctionSocket.appendBidItem(bid));
+                auction.bids
+                    .filter(bid => bid && bid.memberNickname && bid.bidPrice)
+                    .forEach(bid => AuctionSocket.appendBidItem(bid));
             } else {
                 if (bidHistoryEmpty) bidHistoryEmpty.hidden = false;
             }
@@ -69,7 +71,7 @@ const AuctionLayout = (() => {
             currentHighestPrice.textContent = `${(auction.currentPrice ?? 0).toLocaleString()}원`;
         }
 
-        const minNextBid = Math.ceil((auction.currentPrice ?? 0) * 1.1);
+        const minNextBid = Math.round((auction.currentPrice ?? 0) * 1.1);
         const bidNextAmount = root.getElementById("bidNextAmount");
         if (bidNextAmount) {
             bidNextAmount.textContent = `${minNextBid.toLocaleString()}원으로 입찰하기`;
