@@ -1,5 +1,6 @@
 package com.app.bideo.repository.member;
 
+import com.app.bideo.common.pagination.Criteria;
 import com.app.bideo.domain.member.MemberVO;
 import com.app.bideo.dto.member.MemberBadgeResponseDTO;
 import com.app.bideo.dto.member.MemberListResponseDTO;
@@ -56,8 +57,8 @@ public class MemberRepository {
     }
 
     // 프로필 정보 수정
-    public void updateProfile(Long memberId, String nickname, String realName, String bio, String profileImage, String phoneNumber) {
-        memberMapper.updateProfile(memberId, nickname, realName, bio, profileImage, phoneNumber);
+    public void updateProfile(Long memberId, String nickname, String realName, String bio, String profileImage, String bannerImage, String phoneNumber) {
+        memberMapper.updateProfile(memberId, nickname, realName, bio, profileImage, bannerImage, phoneNumber);
     }
 
     // 공개 작품 수 조회
@@ -88,5 +89,9 @@ public class MemberRepository {
     // 공유 대상 조회
     public List<MemberListResponseDTO> searchByKeyword(String keyword, Long currentMemberId, int limit) {
         return memberMapper.searchByKeyword(keyword, currentMemberId, limit);
+    }
+
+    public List<MemberListResponseDTO> searchByKeywordPaged(Criteria criteria, String keyword, Long currentMemberId) {
+        return memberMapper.searchByKeywordPaged(criteria, keyword, currentMemberId);
     }
 }

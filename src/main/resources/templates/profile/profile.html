@@ -21,12 +21,9 @@
         <!-- 채널 상단 영역 -->
         <div class="channelSection">
           <!-- 배너 영역 -->
-          <div class="banner">
-            <div class="bannerArt">
-              <span class="bannerBadge" th:text="${profile.creatorVerified} ? 'CREATOR' : 'PROFILE'">PROFILE</span>
-              <strong th:text="${profile.nickname}">닉네임</strong>
-              <p th:text="${profile.bio != null and !#strings.isEmpty(profile.bio) ? profile.bio : '프로필 소개가 아직 없습니다.'}">프로필 소개가 아직 없습니다.</p>
-            </div>
+          <div class="banner"
+               th:classappend="${profile.bannerImage != null and !#strings.isEmpty(profile.bannerImage)} ? ' has-image' : ' is-hidden'"
+               th:style="${profile.bannerImage != null and !#strings.isEmpty(profile.bannerImage)} ? |background-image: linear-gradient(180deg, rgba(16, 24, 40, 0.16), rgba(16, 24, 40, 0.48)), url('${profile.bannerImage}');| : null">
           </div>
 
           <!-- 프로필 메타 영역 -->

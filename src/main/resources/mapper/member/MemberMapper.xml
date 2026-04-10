@@ -3,17 +3,17 @@
 <mapper namespace="com.app.bideo.mapper.member.MemberMapper">
     <insert id="insert" parameterType="com.app.bideo.domain.member.MemberVO" useGeneratedKeys="true" keyProperty="id">
         insert into tbl_member (
-            email, password, nickname, real_name, birth_date, phone_number, profile_image,
+            email, password, nickname, real_name, birth_date, phone_number, profile_image, banner_image,
             role, status, creator_verified, seller_verified, creator_tier, follower_count, following_count, gallery_count
         ) values (
-            #{email}, #{password}, #{nickname}, #{realName}, #{birthDate}, #{phoneNumber}, #{profileImage},
+            #{email}, #{password}, #{nickname}, #{realName}, #{birthDate}, #{phoneNumber}, #{profileImage}, #{bannerImage},
             #{role}, #{status}, #{creatorVerified}, #{sellerVerified}, #{creatorTier}, #{followerCount}, #{followingCount}, #{galleryCount}
         )
     </insert>
 
     <select id="selectById" parameterType="long" resultType="com.app.bideo.domain.member.MemberVO">
         select
-            id, email, password, nickname, real_name, birth_date, bio, profile_image,
+            id, email, password, nickname, real_name, birth_date, bio, profile_image, banner_image,
             role, creator_verified, seller_verified, creator_tier, follower_count, following_count,
             gallery_count, phone_number, last_login_datetime, status, created_datetime, updated_datetime, deleted_datetime
         from tbl_member
@@ -22,7 +22,7 @@
 
     <select id="selectByEmail" parameterType="string" resultType="com.app.bideo.domain.member.MemberVO">
         select
-            id, email, password, nickname, real_name, birth_date, bio, profile_image,
+            id, email, password, nickname, real_name, birth_date, bio, profile_image, banner_image,
             role, creator_verified, seller_verified, creator_tier, follower_count, following_count,
             gallery_count, phone_number, last_login_datetime, status, created_datetime, updated_datetime, deleted_datetime
         from tbl_member
@@ -32,7 +32,7 @@
 
     <select id="selectByNickname" parameterType="string" resultType="com.app.bideo.domain.member.MemberVO"> <!-- 이승민| 프로필 닉네임 경로 조회로 인한 추가 -->
         select
-            id, email, password, nickname, real_name, birth_date, bio, profile_image,
+            id, email, password, nickname, real_name, birth_date, bio, profile_image, banner_image,
             role, creator_verified, seller_verified, creator_tier, follower_count, following_count,
             gallery_count, phone_number, last_login_datetime, status, created_datetime, updated_datetime, deleted_datetime
         from tbl_member
@@ -42,7 +42,7 @@
 
     <select id="selectByPhoneNumber" parameterType="string" resultType="com.app.bideo.domain.member.MemberVO">
         select
-            id, email, password, nickname, real_name, birth_date, bio, profile_image,
+            id, email, password, nickname, real_name, birth_date, bio, profile_image, banner_image,
             role, creator_verified, seller_verified, creator_tier, follower_count, following_count,
             gallery_count, phone_number, last_login_datetime, status, created_datetime, updated_datetime, deleted_datetime
         from tbl_member
@@ -86,6 +86,7 @@
             real_name = #{realName},
             bio = #{bio},
             profile_image = #{profileImage},
+            banner_image = #{bannerImage},
             phone_number = #{phoneNumber},
             updated_datetime = now()
         where id = #{memberId}
@@ -166,4 +167,29 @@
         ORDER BY m.follower_count DESC NULLS LAST
         LIMIT #{limit}
     </select>
+
+    <select id="searchByKeywordPaged" resultType="com.app.bideo.dto.member.MemberListResponseDTO">
+        SELECT
+            m.id,
+            m.nickname,
+            m.profile_image,
+            m.bio,
+            m.creator_verified,
+            m.creator_tier,
+            m.follower_count,
+            CASE WHEN f.id IS NOT NULL THEN true ELSE false END AS is_following
+        FROM tbl_member m
+        LEFT JOIN tbl_follow f ON f.follower_id = #{currentMemberId}
+                              AND f.following_id = m.id
+        WHERE m.status = 'ACTIVE'
+          AND m.id != #{currentMemberId}
+          AND (
+              m.nickname ILIKE '%' || #{keyword} || '%'
+              OR m.real_name ILIKE '%' || #{keyword} || '%'
+              OR m.bio ILIKE '%' || #{keyword} || '%'
+          )
+        ORDER BY m.follower_count DESC NULLS LAST
+        LIMIT #{criteria.count} OFFSET #{criteria.offset}
+    </select>
+
 </mapper>

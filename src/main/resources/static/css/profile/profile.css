@@ -45,6 +45,7 @@ body {
 
 /* 배너 영역 */
 .banner {
+  position: relative;
   overflow: hidden;
   margin-top: 12px;
   border-radius: 12px;
@@ -52,34 +53,46 @@ body {
     radial-gradient(circle at 18% 24%, rgba(0, 213, 255, 0.28), transparent 22%),
     radial-gradient(circle at 84% 20%, rgba(255, 79, 216, 0.22), transparent 24%),
     linear-gradient(120deg, #2a0a54 0%, var(--color-primary) 52%, #00a9d6 100%);
+  background-size: cover;
+  background-position: center;
 }
 
-/* 배너 내부 */
-.bannerArt {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+.banner.is-hidden {
+  display: none;
+}
+
+.banner.has-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.12), rgba(15, 23, 42, 0.34));
+  pointer-events: none;
+}
+
+.banner {
   min-height: 154px;
+}
+
+.bannerManageButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  min-width: 92px;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
   color: #fff;
-  text-align: center;
-}
-
-.bannerBadge {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
+  backdrop-filter: blur(10px);
+  cursor: pointer;
 }
 
-.bannerArt strong {
-  margin-top: 2px;
-  font-size: 32px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
-
-.bannerArt p {
-  margin-top: 6px;
-  font-size: 14px;
+.bannerManageButton:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* 프로필 메타 영역 */
@@ -482,15 +495,51 @@ body {
     padding: 0 16px 40px;
   }
 
+  .channelSection,
+  .videoSection {
+    width: 100%;
+  }
+
+  .channelTitle {
+    font-size: 30px;
+  }
+
   .videoGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 767px) {
+  .content {
+    padding: 0 12px 32px;
+  }
+
+  .banner {
+    min-height: 124px;
+    margin-top: 8px;
+    border-radius: 10px;
+  }
+
+  .bannerManageButton {
+    top: 12px;
+    right: 12px;
+    min-width: 84px;
+    height: 32px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+
   .channelMeta {
     flex-direction: column;
     gap: 16px;
+    padding: 14px 0 10px;
+  }
+
+  .avatar {
+    width: 80px;
+    min-width: 80px;
+    height: 80px;
+    font-size: 32px;
   }
 
   .tabRow {
@@ -499,8 +548,117 @@ body {
     white-space: nowrap;
   }
 
+  .metaInfo {
+    width: 100%;
+  }
+
+  .channelTitle {
+    font-size: 26px;
+    line-height: 1.2;
+  }
+
+  .channelActionRow {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .channelActionRow button {
+    margin-left: 0;
+  }
+
+  .moreBtn,
+  .shareBtn,
+  .subscribeBtn,
+  .blackBtn {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
   .videoGrid {
     grid-template-columns: 1fr 1fr;
+    gap: 22px 12px;
+  }
+
+  .profileEditModalPanel,
+  .profileSettingModalPanel,
+  .followManageModalPanel,
+  .badgeManageModalPanel,
+  .work-share-modal,
+  .unsubscribeModalPanel {
+    width: min(100%, 100%);
+    border-radius: 18px;
+    padding: 18px;
+  }
+
+  .profileBannerEditModalPanel {
+    width: min(100%, 100%);
+  }
+
+  .profileBannerPreview {
+    border-radius: 14px;
+  }
+
+  .profileFormActionRow {
+    flex-wrap: wrap;
+  }
+
+  .profileFormBtn,
+  .profileEditUpload {
+    width: 100%;
+  }
+
+  .profileFormBtnLeading {
+    margin-right: 0;
+    order: 3;
+  }
+
+  .work-share-modal__link-row,
+  .work-share-modal__footer {
+    flex-direction: column;
+  }
+
+  .work-share-modal__link-copy,
+  .work-share-modal__send {
+    width: 100%;
+  }
+
+  .work-share-modal__header {
+    grid-template-columns: 24px 1fr 24px;
+  }
+}
+
+@media (max-width: 560px) {
+  .channelText {
+    font-size: 12px;
+  }
+
+  .profileBadgeRow {
+    gap: 6px;
+  }
+
+  .profileBadgeChip {
+    height: 32px;
+  }
+
+  .videoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .followManageActions {
+    padding-left: 0;
+  }
+
+  .badgeManageGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .work-share-modal__receiver-body {
+    align-items: stretch;
+  }
+
+  .work-share-modal__search {
+    min-width: 0;
+    width: 100%;
   }
 }
 
@@ -968,6 +1126,47 @@ body {
   display: none;
 }
 
+[data-profile-banner-file] {
+  display: none;
+}
+
+.profileBannerEditModalPanel {
+  width: min(100%, 520px);
+}
+
+.profileBannerPreview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 45 / 5;
+  overflow: hidden;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 18% 24%, rgba(0, 213, 255, 0.28), transparent 22%),
+    radial-gradient(circle at 84% 20%, rgba(255, 79, s-primary) 52%, #00a9d6 100%);
+  background-size: cover;
+  background-position: center;
+}
+
+.profileBannerPreview::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.12), rgba(15, 23, 42, 0.34));
+}
+
+.profileBannerPreview span {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
 /* 아바타 수정 버튼 */
 .avatarEditable {
   position: relative;
@@ -1075,6 +1274,10 @@ body {
 
 .profileFormBtnGhost:hover {
   filter: opacity(0.72);
+}
+
+.profileFormBtnLeading {
+  margin-right: auto;
 }
 
 .profileFormBtnPrimary {

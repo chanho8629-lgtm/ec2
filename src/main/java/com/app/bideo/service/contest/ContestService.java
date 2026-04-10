@@ -35,7 +35,7 @@ public class ContestService {
         validateContestCreateRequest(contestCreateRequestDTO);
         contestMapper.insertContest(memberId, contestCreateRequestDTO);
         Long contestId = contestCreateRequestDTO.getId();
-        saveTags(contestId, contestCreateRequestDTO.getTagIds());
+        saveTags(contestId, contestCreateRequestDTO.getTagIds(), contestCreateRequestDTO.getTagNames());
         return contestId;
     }
 
@@ -191,7 +191,7 @@ public class ContestService {
             throw new IllegalArgumentException("contest not found or not owned by member");
         }
         contestMapper.deleteContestTagsByContestId(contestId);
-        saveTags(contestId, requestDTO.getTagIds());
+        saveTags(contestId, requestDTO.getTagIds(), requestDTO.getTagNames());
     }
 
     public void updateContest(Long contestId, Long memberId, ContestUpdateRequestDTO requestDTO, MultipartFile coverFile) {
@@ -231,12 +231,20 @@ public class ContestService {
         }
     }
 
-    private void saveTags(Long contestId, List<Long> tagIds) {
-        if (tagIds == null || tagIds.isEmpty()) {
+    private void saveTags(Long contestId, List<Long> tagIds, List<String> tagNames) {
+        if (tagNames != null && !tagNames.isEmpty()) {
+            for (String name : tagNames) {
+                String cleaned = name.startsWith("#") ? name.substring(1) : name;
+                if (cleaned.isBlank()) continue;
+                Long tagId = contestMapper.findOrCreateTag(cleaned);
+                contestMapper.insertContestTag(contestId, tagId);
+            }
             return;
         }
-        for (Long tagId : tagIds) {
-            contestMapper.insertContestTag(contestId, tagId);
+        if (tagIds != null && !tagIds.isEmpty()) {
+            for (Long tagId : tagIds) {
+                contestMapper.insertContestTag(contestId, tagId);
+            }
         }
     }
 

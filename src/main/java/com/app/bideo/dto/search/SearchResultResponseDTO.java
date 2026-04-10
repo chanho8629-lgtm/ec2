@@ -1,5 +1,6 @@
 package com.app.bideo.dto.search;
 
+import com.app.bideo.common.pagination.Criteria;
 import com.app.bideo.dto.gallery.GalleryListResponseDTO;
 import com.app.bideo.dto.member.MemberListResponseDTO;
 import com.app.bideo.dto.work.WorkListResponseDTO;
@@ -16,4 +17,5 @@ public class SearchResultResponseDTO {
     private List<MemberListResponseDTO> profiles;
     private List<GalleryListResponseDTO> galleries;
     private List<WorkListResponseDTO> works;
+    private Criteria criteria;
 }

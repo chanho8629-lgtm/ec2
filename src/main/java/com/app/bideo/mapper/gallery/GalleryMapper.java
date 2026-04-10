@@ -1,5 +1,6 @@
 package com.app.bideo.mapper.gallery;
 
+import com.app.bideo.common.pagination.Criteria;
 import com.app.bideo.domain.interaction.CommentVO;
 import com.app.bideo.dto.common.TagResponseDTO;
 import com.app.bideo.dto.gallery.GalleryCreateRequestDTO;
@@ -75,6 +76,10 @@ public interface GalleryMapper {
     Integer selectGalleryLikeCount(@Param("galleryId") Long galleryId);
 
     List<GalleryListResponseDTO> selectGalleryList(GallerySearchDTO searchDTO);
+
+    List<GalleryListResponseDTO> selectSearchGalleryList(@Param("criteria") Criteria criteria,
+                                                          @Param("keyword") String keyword,
+                                                          @Param("sort") String sort);
 
     int selectGalleryCount(GallerySearchDTO searchDTO);
 

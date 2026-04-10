@@ -18,12 +18,10 @@
     <div id="section" class="profilePage section">
       <div class="content">
         <div class="channelSection">
-          <div class="banner">
-            <div class="bannerArt">
-              <span class="bannerBadge" th:text="${profile.creatorVerified} ? 'CREATOR' : 'PROFILE'">PROFILE</span>
-              <strong th:text="${profile.nickname}">닉네임</strong>
-              <p th:text="${profile.bio != null and !#strings.isEmpty(profile.bio) ? profile.bio : '프로필 소개가 아직 없습니다.'}">프로필 소개가 아직 없습니다.</p>
-            </div>
+          <div class="banner"
+               th:classappend="${profile.bannerImage != null and !#strings.isEmpty(profile.bannerImage)} ? ' has-image' : ' is-hidden'"
+               th:style="${profile.bannerImage != null and !#strings.isEmpty(profile.bannerImage)} ? |background-image: linear-gradient(180deg, rgba(16, 24, 40, 0.16), rgba(16, 24, 40, 0.48)), url('${profile.bannerImage}');| : null">
+            <button type="button" class="bannerManageButton" data-banner-edit-open>배너 수정</button>
           </div>
 
           <div class="channelMeta">
@@ -195,11 +193,33 @@
           <button type="button" class="profileSettingModalClose" data-modal-close="profile-setting-modal" aria-label="닫기">X</button>
         </div>
         <div class="profileSettingModalList">
+          <button type="button" class="profileSettingModalItem" data-banner-edit-open>배너 수정</button>
           <button type="button" class="profileSettingModalItem" data-profile-edit-open>프로필 수정</button>
           <button type="button" class="profileSettingModalItem" data-nickname-open>닉네임 수정</button>
           <button type="button" class="profileSettingModalItem" data-password-open>비밀번호 수정</button>
           <button type="button" class="profileSettingModalItem" data-follow-manage-open>팔로잉·팔로우 관리</button>
           <button type="button" class="profileSettingModalItem" data-badge-manage-open>뱃지관리</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="banner-edit-modal" class="modal profile none">
+      <div class="profileEditModalPanel profileBannerEditModalPanel">
+        <div class="profileSettingModalHeader">
+          <h2 class="profileSettingModalTitle">배너 수정</h2>
+          <button type="button" class="profileSettingModalClose" data-modal-close="banner-edit-modal" aria-label="닫기">X</button>
+        </div>
+        <div class="profileEditModalBody">
+          <div class="profileBannerPreview" data-profile-banner-preview>
+            <span>배너 미리보기</span>
+          </div>
+          <label class="profileEditUpload" for="profile-banner-file">사진 선택</label>
+          <input id="profile-banner-file" type="file" accept="image/*" data-profile-banner-file />
+          <div class="profileFormActionRow profileEditActionRow">
+            <button type="button" class="profileFormBtn profileFormBtnGhost profileFormBtnLeading" data-profile-banner-remove>배너 제거</button>
+            <button type="button" class="profileFormBtn profileFormBtnGhost" data-modal-close="banner-edit-modal">취소</button>
+            <button type="button" class="profileFormBtn profileFormBtnPrimary" data-profile-banner-apply>적용하기</button>
+          </div>
         </div>
       </div>
     </div>

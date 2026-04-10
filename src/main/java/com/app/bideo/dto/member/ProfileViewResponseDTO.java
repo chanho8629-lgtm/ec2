@@ -19,6 +19,7 @@ public class ProfileViewResponseDTO {
     private String realName;
     private String bio;
     private String profileImage;
+    private String bannerImage;
     private Boolean creatorVerified;
     private Boolean sellerVerified;
     private String creatorTier;

@@ -11,7 +11,6 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
-import java.io.InputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -24,8 +23,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class S3FileService {
-
-    private static final Path LOCAL_IMAGE_UPLOAD_DIR = Paths.get("src", "main", "resources", "static", "images", "uploads");
 
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
@@ -58,7 +55,7 @@ public class S3FileService {
             s3Client.putObject(putRequest, RequestBody.fromBytes(file.getBytes()));
             return key;
         } catch (Exception e) {
-            return saveToLocal(directory, key, file, e);
+            return saveToLocal(directory, file);
         }
     }
 
@@ -129,20 +126,5 @@ public class S3FileService {
         }
 
         return "/uploads/" + normalizedDirectory + "/" + storedFileName;
-    }
-
-    private String saveToLocal(String directory, String key, MultipartFile file, Exception cause) {
-        Path targetDirectory = LOCAL_IMAGE_UPLOAD_DIR.resolve(directory);
-        Path targetFile = LOCAL_IMAGE_UPLOAD_DIR.resolve(key).normalize();
-
-        try {
-            Files.createDirectories(targetDirectory);
-            try (InputStream inputStream = file.getInputStream()) {
-                Files.copy(inputStream, targetFile, StandardCopyOption.REPLACE_EXISTING);
-            }
-            return "/images/uploads/" + key.replace("\\", "/");
-        } catch (IOException e) {
-            throw new RuntimeException("S3 file upload failed", cause);
-        }
     }
 }
