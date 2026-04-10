@@ -865,6 +865,11 @@
   background: var(--bd-chat-accent-strong);
 }
 
+/* 모바일 닫기 버튼 — 기본 숨김 */
+.bd-chat-mobile-close {
+  display: none;
+}
+
 body[data-bd-chat-open="true"] .bd-chat-fab {
   opacity: 0;
   pointer-events: none;
@@ -957,6 +962,25 @@ body[data-bd-chat-open="true"] .bd-chat-fab {
   /* 뒤로가기 버튼 표시 */
   .bd-chat-thread__back {
     display: inline-flex;
+  }
+
+  .bd-chat-mobile-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.06);
+    color: #333;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .bd-chat-mobile-close:hover {
+    background: rgba(0, 0, 0, 0.1);
   }
 
   .bd-chat-sidebar__topbar {

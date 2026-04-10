@@ -59,6 +59,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (backButton) backButton.addEventListener("click", showListMobile);
 
+  let profileButton = document.querySelector(".bd-chat-thread__ghost");
+  if (profileButton) {
+    profileButton.addEventListener("click", function () {
+      if (!activeRoomId) return;
+      let room = findRoom(activeRoomId);
+      if (room && room.name) {
+        window.location.href = "/profile/" + encodeURIComponent(room.name);
+      }
+    });
+  }
+
   function escapeHtml(value) {
     return String(value)
       .replace(/&/g, "&amp;")
