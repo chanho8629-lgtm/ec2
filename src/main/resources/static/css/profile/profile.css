@@ -1153,7 +1153,8 @@ body {
   border-radius: 18px;
   background:
     radial-gradient(circle at 18% 24%, rgba(0, 213, 255, 0.28), transparent 22%),
-    radial-gradient(circle at 84% 20%, rgba(255, 79, s-primary) 52%, #00a9d6 100%);
+    radial-gradient(circle at 84% 20%, rgba(255, 79, 216, 0.22), transparent 24%),
+    linear-gradient(120deg, #2a0a54 0%, var(--color-primary) 52%, #00a9d6 100%);
   background-size: cover;
   background-position: center;
 }
