@@ -1,6 +1,85 @@
 const AuctionLayout = (() => {
     let countdownTimerId = null;
 
+    const getElements = (root = document) => ({
+        bidSubmitBtn: root.getElementById("bidSubmitBtn"),
+        bidCustomInput: root.getElementById("bidCustomInput"),
+        bidNextAmountEl: root.getElementById("bidNextAmount"),
+        bidInfoBtn: root.getElementById("bidInfoBtn"),
+        bidInfoTooltip: root.getElementById("bidInfoTooltip")
+    });
+
+    const getMinAmount = (elements) =>
+        parseInt(elements.bidNextAmountEl?.dataset.amount || "0", 10);
+
+    const setInputError = (elements, isError) => {
+        const bidInputWrapper = elements.bidCustomInput?.closest(".Auction-Bid-InputWrapper");
+        bidInputWrapper?.classList.toggle("is-error", isError);
+    };
+
+    const executeBid = (elements, auctionId) => {
+        const minAmount = getMinAmount(elements);
+        const inputValue = elements.bidCustomInput?.value.trim();
+        const bidAmount = inputValue ? parseInt(inputValue, 10) : minAmount;
+
+        if (Number.isNaN(bidAmount) || bidAmount < minAmount) {
+            setInputError(elements, true);
+            elements.bidCustomInput?.focus();
+            return;
+        }
+
+        setInputError(elements, false);
+        if (elements.bidCustomInput) {
+            elements.bidCustomInput.value = "";
+        }
+        if (elements.bidNextAmountEl) {
+            elements.bidNextAmountEl.textContent = `${minAmount.toLocaleString("ko-KR")}원으로 입찰하기`;
+        }
+
+        Socket.sendBid(auctionId, bidAmount);
+    };
+
+    const init = (auction, root = document) => {
+        const deadlineEl = root.getElementById("auctionDeadlineDate");
+        if (deadlineEl) {
+            deadlineEl.textContent = formatDeadline(auction.closingAt);
+        }
+
+        const bidHistoryCount = root.getElementById("bidHistoryCount");
+        if (bidHistoryCount) {
+            bidHistoryCount.textContent = `${(auction.bidCount ?? 0).toLocaleString()}건`;
+        }
+
+        const bidHistoryList = root.getElementById("bidHistoryList");
+        const bidHistoryEmpty = root.getElementById("bidHistoryEmpty");
+        if (bidHistoryList) {
+            // 기존 입찰 아이템만 제거 (empty div는 유지)
+            bidHistoryList.querySelectorAll(".Auction-Bid-Item").forEach(el => el.remove());
+
+            if (Array.isArray(auction.bids) && auction.bids.length > 0) {
+                if (bidHistoryEmpty) bidHistoryEmpty.hidden = true;
+                auction.bids.forEach(bid => AuctionSocket.appendBidItem(bid));
+            } else {
+                if (bidHistoryEmpty) bidHistoryEmpty.hidden = false;
+            }
+        }
+
+        const currentHighestPrice = root.getElementById("currentHighestPrice");
+        if (currentHighestPrice) {
+            currentHighestPrice.textContent = `${(auction.currentPrice ?? 0).toLocaleString()}원`;
+        }
+
+        const minNextBid = Math.ceil((auction.currentPrice ?? 0) * 1.1);
+        const bidNextAmount = root.getElementById("bidNextAmount");
+        if (bidNextAmount) {
+            bidNextAmount.textContent = `${minNextBid.toLocaleString()}원으로 입찰하기`;
+            bidNextAmount.dataset.amount = minNextBid;
+        }
+
+        startCountdown(auction.closingAt, root);
+    };
+
+
     function startCountdown(closingAt, root = document) {
         const cdDay = root.getElementById("cdDay");
         const cdHour = root.getElementById("cdHour");
@@ -66,19 +145,11 @@ const AuctionLayout = (() => {
         })}`;
     }
 
-    function init(root = document) {
-        const auctionDeadlineDate = root.getElementById("auctionDeadlineDate");
-        const mockClosingAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
-
-        if (auctionDeadlineDate) {
-            auctionDeadlineDate.textContent = formatDeadline(mockClosingAt);
-        }
-
-        startCountdown(mockClosingAt, root);
-    }
-
     return {
-        startCountdown,
-        init
+        init: init,
+        getElements: getElements,
+        getMinAmount: getMinAmount,
+        setInputError: setInputError,
+        executeBid: executeBid,
     };
 })();

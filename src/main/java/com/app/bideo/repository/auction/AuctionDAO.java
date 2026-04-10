@@ -1,15 +1,11 @@
 package com.app.bideo.repository.auction;
 
 import com.app.bideo.dto.auction.AuctionDetailResponseDTO;
-import com.app.bideo.dto.auction.AuctionListResponseDTO;
-import com.app.bideo.dto.auction.AuctionSearchDTO;
 import com.app.bideo.domain.auction.AuctionVO;
 import com.app.bideo.mapper.auction.AuctionMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -18,55 +14,33 @@ public class AuctionDAO {
 
     private final AuctionMapper auctionMapper;
 
+    // 경매 등록
     public void save(AuctionVO auctionVO) {
-        auctionMapper.insertAuction(auctionVO);
+        auctionMapper.insert(auctionVO);
     }
 
+    // 작품 id로 조회
     public Optional<AuctionDetailResponseDTO> findActiveByWorkId(Long workId) {
         return Optional.ofNullable(auctionMapper.selectActiveAuctionByWorkId(workId));
     }
 
-    public List<AuctionListResponseDTO> findAuctions(AuctionSearchDTO searchDTO) {
-        return auctionMapper.selectAuctions(searchDTO);
-    }
-
-    public int countAuctions(AuctionSearchDTO searchDTO) {
-        return auctionMapper.countAuctions(searchDTO);
-    }
-
-    public Optional<AuctionDetailResponseDTO> findById(Long auctionId, Long memberId) {
-        return Optional.ofNullable(auctionMapper.selectAuctionDetail(auctionId, memberId));
-    }
-
+    // 경매 id로 조회
     public AuctionVO findRawById(Long auctionId) {
         return auctionMapper.selectById(auctionId);
     }
 
+    // 최고가 반영
     public void updateCurrentPrice(Long auctionId, Integer currentPrice, Integer bidCount) {
         auctionMapper.updateCurrentPrice(auctionId, currentPrice, bidCount);
     }
 
+    // 경매 상태 변경
     public void updateStatus(Long auctionId, String status) {
         auctionMapper.updateStatus(auctionId, status);
     }
 
+    // 낙찰자 등록
     public void updateWinner(Long auctionId, Long winnerId, Integer finalPrice) {
         auctionMapper.updateWinner(auctionId, winnerId, finalPrice);
-    }
-
-    public boolean existsWishlist(Long memberId, Long auctionId) {
-        return auctionMapper.existsWishlist(memberId, auctionId);
-    }
-
-    public void saveWishlist(Long memberId, Long auctionId) {
-        auctionMapper.insertWishlist(memberId, auctionId);
-    }
-
-    public void deleteWishlist(Long memberId, Long auctionId) {
-        auctionMapper.deleteWishlist(memberId, auctionId);
-    }
-
-    public List<Map<String, Object>> findMyWishlist(Long memberId) {
-        return auctionMapper.selectMyWishlist(memberId);
     }
 }
