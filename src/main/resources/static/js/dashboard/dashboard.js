@@ -29,7 +29,10 @@ document.addEventListener('DOMContentLoaded', function () {
   var cardForm = document.querySelector('[data-card-form]');
   var cardCompanyInput = document.querySelector('[data-card-company-input]');
   var cardNumberInput = document.querySelector('[data-card-number-input]');
-  var cardBillingKeyInput = document.querySelector('[data-card-billing-key-input]');
+  var cardPasswordInput = document.querySelector('[data-card-password-input]');
+  var cardIdentityInput = document.querySelector('[data-card-identity-input]');
+  var cardExpireMonthInput = document.querySelector('[data-card-expire-month-input]');
+  var cardExpireYearInput = document.querySelector('[data-card-expire-year-input]');
   var cardPrimaryInput = document.querySelector('[data-card-primary-input]');
   var cardPreviewBrand = document.querySelector('[data-card-preview-brand]');
   var cardPreviewNumberText = document.querySelector('[data-card-preview-number-text]');
@@ -81,6 +84,29 @@ document.addEventListener('DOMContentLoaded', function () {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+  }
+
+  function digitsOnly(value) {
+    return String(value || '').replace(/\D/g, '');
+  }
+
+  function formatCardNumber(value) {
+    return digitsOnly(value).slice(0, 16).replace(/(\d{4})(?=\d)/g, '$1 ').trim();
+  }
+
+  function maskCardNumber(value) {
+    var digits = digitsOnly(value).slice(0, 16);
+    if (digits.length < 8) {
+      return '**** **** **** ****';
+    }
+
+    var first = digits.slice(0, 4);
+    var last = digits.slice(-4);
+    return first + ' **** **** ' + last;
+  }
+
+  function hasRawCardInput(payload) {
+    return !!(payload.cardNumber || payload.cardPasswordTwoDigits || payload.cardIdentityNo || payload.cardExpireMonth || payload.cardExpireYear);
   }
 
   // 모달 열기
@@ -376,7 +402,7 @@ document.addEventListener('DOMContentLoaded', function () {
       cardPreviewBrand.textContent = (cardCompanyInput && cardCompanyInput.value.trim()) || 'NEW CARD';
     }
     if (cardPreviewNumberText) {
-      cardPreviewNumberText.textContent = (cardNumberInput && cardNumberInput.value.trim()) || '**** **** **** ****';
+      cardPreviewNumberText.textContent = maskCardNumber(cardNumberInput ? cardNumberInput.value : '');
     }
   }
 
@@ -388,8 +414,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     if (cardFormDescription) {
       cardFormDescription.textContent = editing
-        ? '등록된 카드 정보를 수정하고 대표 카드 여부를 변경합니다.'
-        : '현재 백엔드 저장 기준으로 카드 정보를 등록하고 대표 카드 여부를 설정합니다.';
+        ? '카드사와 대표 카드 상태를 수정할 수 있습니다. 민감한 카드 정보는 다시 저장하지 않습니다.'
+        : '불필요한 정보는 저장하지 않고, 카드 식별에 필요한 값만 검증합니다.';
     }
     if (cardSubmitButton) {
       cardSubmitButton.textContent = editing ? '카드 수정' : '카드 등록';
@@ -414,11 +440,19 @@ document.addEventListener('DOMContentLoaded', function () {
   function fillCardForm(card) {
     state.editingCardId = card.id;
     if (cardCompanyInput) cardCompanyInput.value = card.cardCompany || '';
-    if (cardNumberInput) cardNumberInput.value = card.cardNumberMasked || '';
-    if (cardBillingKeyInput) cardBillingKeyInput.value = card.billingKey || '';
+    if (cardNumberInput) cardNumberInput.value = '';
+    if (cardPasswordInput) cardPasswordInput.value = '';
+    if (cardIdentityInput) cardIdentityInput.value = '';
+    if (cardExpireMonthInput) cardExpireMonthInput.value = '';
+    if (cardExpireYearInput) cardExpireYearInput.value = '';
     if (cardPrimaryInput) cardPrimaryInput.checked = !!card.isDefault;
     setCardFormMode(true);
-    syncCardPreview();
+    if (cardPreviewBrand) {
+      cardPreviewBrand.textContent = card.cardCompany || 'CARD';
+    }
+    if (cardPreviewNumberText) {
+      cardPreviewNumberText.textContent = card.cardNumberMasked || '**** **** **** ****';
+    }
   }
 
   // 카드 목록을 그리고 각 버튼 이벤트를 연결한다.
@@ -482,10 +516,15 @@ document.addEventListener('DOMContentLoaded', function () {
   // 카드 등록/수정 요청 바디를 만든다.
   // 카드 요청값 생성
   function buildCardPayload() {
+    var cardNumber = formatCardNumber(cardNumberInput ? cardNumberInput.value : '');
     return {
       cardCompany: cardCompanyInput ? cardCompanyInput.value.trim() : '',
-      cardNumberMasked: cardNumberInput ? cardNumberInput.value.trim() : '',
-      billingKey: cardBillingKeyInput ? cardBillingKeyInput.value.trim() : '',
+      cardNumber: digitsOnly(cardNumber),
+      cardNumberMasked: digitsOnly(cardNumber).length >= 8 ? maskCardNumber(cardNumber) : '',
+      cardPasswordTwoDigits: digitsOnly(cardPasswordInput ? cardPasswordInput.value : '').slice(0, 2),
+      cardIdentityNo: digitsOnly(cardIdentityInput ? cardIdentityInput.value : '').slice(0, 6),
+      cardExpireMonth: digitsOnly(cardExpireMonthInput ? cardExpireMonthInput.value : '').slice(0, 2),
+      cardExpireYear: digitsOnly(cardExpireYearInput ? cardExpireYearInput.value : '').slice(0, 2),
       isDefault: !!(cardPrimaryInput && cardPrimaryInput.checked),
     };
   }
@@ -496,8 +535,30 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!payload.cardCompany) {
       throw new Error('카드사를 입력해 주세요.');
     }
-    if (!payload.cardNumberMasked) {
-      throw new Error('마스킹 카드 번호를 입력해 주세요.');
+
+    if (state.editingCardId && !hasRawCardInput(payload)) {
+      return;
+    }
+
+    if (!payload.cardNumber || payload.cardNumber.length < 12) {
+      throw new Error('카드 번호를 정확히 입력해 주세요.');
+    }
+    if (!/^\d{2}$/.test(payload.cardPasswordTwoDigits)) {
+      throw new Error('카드 비밀번호 앞 2자리를 입력해 주세요.');
+    }
+    if (!/^\d{6}$/.test(payload.cardIdentityNo)) {
+      throw new Error('생년월일 6자리를 입력해 주세요.');
+    }
+    if (!/^\d{2}$/.test(payload.cardExpireMonth)) {
+      throw new Error('유효기간 월을 입력해 주세요.');
+    }
+    if (!/^\d{2}$/.test(payload.cardExpireYear)) {
+      throw new Error('유효기간 년을 입력해 주세요.');
+    }
+
+    var month = Number(payload.cardExpireMonth);
+    if (month < 1 || month > 12) {
+      throw new Error('유효기간 월은 01부터 12 사이여야 합니다.');
     }
   }
 
@@ -549,7 +610,30 @@ document.addEventListener('DOMContentLoaded', function () {
       cardCompanyInput.addEventListener('input', syncCardPreview);
     }
     if (cardNumberInput) {
-      cardNumberInput.addEventListener('input', syncCardPreview);
+      cardNumberInput.addEventListener('input', function () {
+        cardNumberInput.value = formatCardNumber(cardNumberInput.value);
+        syncCardPreview();
+      });
+    }
+    if (cardPasswordInput) {
+      cardPasswordInput.addEventListener('input', function () {
+        cardPasswordInput.value = digitsOnly(cardPasswordInput.value).slice(0, 2);
+      });
+    }
+    if (cardIdentityInput) {
+      cardIdentityInput.addEventListener('input', function () {
+        cardIdentityInput.value = digitsOnly(cardIdentityInput.value).slice(0, 6);
+      });
+    }
+    if (cardExpireMonthInput) {
+      cardExpireMonthInput.addEventListener('input', function () {
+        cardExpireMonthInput.value = digitsOnly(cardExpireMonthInput.value).slice(0, 2);
+      });
+    }
+    if (cardExpireYearInput) {
+      cardExpireYearInput.addEventListener('input', function () {
+        cardExpireYearInput.value = digitsOnly(cardExpireYearInput.value).slice(0, 2);
+      });
     }
 
     if (cardForm) {
