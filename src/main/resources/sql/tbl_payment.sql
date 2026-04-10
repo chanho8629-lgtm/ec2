@@ -17,7 +17,6 @@ create table tbl_payment (
     payment_purpose varchar(255)   not null default 'PURCHASE',
     pay_method      varchar(255)   not null,
     card_id         bigint        null,
-    receipt_id      varchar(255)   null,
     status          varchar(255)   not null default 'PENDING',
     paid_at         timestamp     not null default now(),
     refunded_at     timestamp     null,
@@ -53,7 +52,6 @@ comment on column tbl_payment.total_fee       is '총 수수료';
 comment on column tbl_payment.payment_purpose is '결제 목적 (PURCHASE / DEPOSIT / BALANCE)';
 comment on column tbl_payment.pay_method      is '결제 수단 (KAKAO_PAY / CARD 등)';
 comment on column tbl_payment.card_id         is '사용 카드 FK';
-comment on column tbl_payment.receipt_id      is '부트페이 영수증 ID';
 comment on column tbl_payment.status          is '상태 (PENDING/AUTHORIZED/COMPLETED/REFUNDED/CANCELLED)';
 comment on column tbl_payment.paid_at         is '거래 일시';
 

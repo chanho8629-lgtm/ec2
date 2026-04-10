@@ -20,7 +20,7 @@ body .bd-shell {
 
 body .yt-shell__page-content {
     position: relative;
-    z-index: 10000;
+    z-index: 1;
 }
 
 button {
@@ -38,12 +38,12 @@ a {
     position: fixed;
     inset: 0;
     background: rgba(17, 17, 17, 0.72);
-    z-index: 10000;
+    z-index: 10;
 }
 
 .pay-modal {
     position: relative;
-    z-index: 10001;
+    z-index: 11;
     width: min(100%, 460px);
     margin: 20px;
     border-radius: 18px;

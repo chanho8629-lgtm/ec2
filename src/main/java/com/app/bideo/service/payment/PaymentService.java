@@ -8,6 +8,7 @@ import com.app.bideo.dto.payment.PaymentRequestDTO;
 import com.app.bideo.dto.payment.PaymentResponseDTO;
 import com.app.bideo.repository.order.OrderDAO;
 import com.app.bideo.repository.payment.PaymentDAO;
+import com.app.bideo.repository.work.WorkDAO;
 import com.app.bideo.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,6 +25,7 @@ public class PaymentService {
 
     private final PaymentDAO paymentDAO;
     private final OrderDAO orderDAO;
+    private final WorkDAO workDAO;
     private final NotificationService notificationService;
     private final BootpayClient bootpayClient;
 
@@ -83,6 +85,9 @@ public class PaymentService {
         OrderVO order = orderDAO.findByOrderCode(payment.getOrderCode());
         if (order != null) {
             orderDAO.updateStatus(order.getId(), "PAID");
+            if (order.getWorkId() != null) {
+                workDAO.updateStatus(order.getWorkId(), "SOLD");
+            }
 
             notificationService.createNotification(
                     order.getSellerId(), order.getBuyerId(), "PAYMENT", "ORDER",
@@ -127,7 +132,6 @@ public class PaymentService {
             throw new IllegalStateException("부트페이 결제 상태가 완료가 아닙니다.");
         }
 
-        paymentDAO.updateReceiptId(payment.getId(), requestDTO.getReceiptId());
         return completePayment(payment.getId(), buyerId);
     }
 

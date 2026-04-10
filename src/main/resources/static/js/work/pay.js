@@ -1,5 +1,5 @@
 const payState = {
-    selectedMethod: "card",
+    selectedMethod: "bootpay",
     workId: null,
     workDetail: null,
     order: null,
@@ -19,6 +19,17 @@ function selectPayMethod(method) {
 
 function formatCurrency(value) {
     return `${Number(value || 0).toLocaleString("ko-KR")}원`;
+}
+
+function getBootpayReceiptId(result) {
+    return String(
+        result?.receipt_id ||
+        result?.data?.receipt_id ||
+        result?.data?.response?.receipt_id ||
+        result?.response?.receipt_id ||
+        result?.event_resources?.receipt_id ||
+        ""
+    ).trim();
 }
 
 function getThumbnailSource(detail) {
@@ -184,7 +195,7 @@ async function requestBootpayPayment(order, payment) {
         order_name: payState.workDetail?.title || "작품 결제",
         order_id: payment.paymentCode,
         pg: bootpayPg,
-        method: payState.selectedMethod === "bootpay" ? "easy_pay" : "card",
+        method: "card",
         tax_free: 0,
         user: {
             id: String(order.buyerId || ""),
@@ -205,11 +216,15 @@ async function requestBootpayPayment(order, payment) {
         }
     });
 
-    if (!result || !result.receipt_id) {
+    const receiptId = getBootpayReceiptId(result);
+    if (!receiptId) {
         throw new Error("부트페이 결제 응답이 올바르지 않습니다.");
     }
 
-    return result;
+    return {
+        ...result,
+        receipt_id: receiptId
+    };
 }
 
 async function submitPayment() {
@@ -223,7 +238,7 @@ async function submitPayment() {
         const bootpayResult = await requestBootpayPayment(order, payment);
         await confirmBootpayPayment(bootpayResult.receipt_id);
         alert("결제가 완료되었습니다.");
-        window.location.href = "/payment/history";
+        window.location.href = "/dashboard?tab=payment";
     } catch (error) {
         alert(error.message || "결제 처리 중 오류가 발생했습니다.");
     } finally {
@@ -232,7 +247,7 @@ async function submitPayment() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-    selectPayMethod("card");
+    selectPayMethod("bootpay");
 
     try {
         await loadWorkForPayment();

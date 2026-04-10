@@ -147,6 +147,10 @@ public class WorkDAO {
         return Optional.ofNullable(workMapper.selectWorkLikeCount(workId)).orElse(0);
     }
 
+    public void updateStatus(Long id, String status) {
+        workMapper.updateWorkStatus(id, status);
+    }
+
     // 작품 기본 정보 수정
     public void setWork(WorkDTO workDTO) {
         workMapper.updateWork(workDTO);
