@@ -23,6 +23,10 @@ public class PaymentDAO {
         return Optional.ofNullable(paymentMapper.selectById(paymentId));
     }
 
+    public Optional<PaymentVO> findRawById(Long paymentId) {
+        return Optional.ofNullable(paymentMapper.selectRawById(paymentId));
+    }
+
     public Optional<PaymentResponseDTO> findByPaymentCode(String paymentCode) {
         return Optional.ofNullable(paymentMapper.selectByPaymentCode(paymentCode));
     }
@@ -41,5 +45,9 @@ public class PaymentDAO {
 
     public void refundPayment(Long paymentId) {
         paymentMapper.updateStatusRefunded(paymentId);
+    }
+
+    public void updateReceiptId(Long paymentId, String receiptId) {
+        paymentMapper.updateReceiptId(paymentId, receiptId);
     }
 }

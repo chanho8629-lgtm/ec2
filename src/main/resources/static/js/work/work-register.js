@@ -86,6 +86,26 @@ function initializeWorkRegister() {
 
     modal.dataset.workRegisterInitialized = "true";
 
+    if (document.body && document.body.classList.contains("work-register-page")) {
+        var composeModal = document.querySelector("[data-yt-compose-modal]");
+        var composeContent = document.querySelector("[data-yt-compose-content]");
+        var embeddedRoots = document.querySelectorAll('[data-compose-embedded="true"]');
+
+        if (composeContent) {
+            composeContent.innerHTML = "";
+        }
+
+        if (composeModal) {
+            composeModal.hidden = true;
+        }
+
+        Array.prototype.forEach.call(embeddedRoots, function (node) {
+            if (node !== modal && !modal.contains(node)) {
+                node.remove();
+            }
+        });
+    }
+
     function closeModal() {
         if (typeof window.closeComposeModal === "function") {
             window.closeComposeModal();
@@ -1056,8 +1076,10 @@ function initializeWorkRegister() {
     function showDetailsScreen(file) {
         var title = toDisplayTitle(file.name);
 
-        uploadScreen.hidden = true;
-        uploadScreen.classList.remove("work-register-view-current");
+        if (uploadScreen) {
+            uploadScreen.hidden = true;
+            uploadScreen.classList.remove("work-register-view-current");
+        }
         detailsScreen.hidden = false;
         detailsScreen.classList.add("work-register-view-current");
         dialogContent.classList.add("is-details");
@@ -1620,6 +1642,9 @@ function initializeWorkRegister() {
     }
 
     if (isEditMode() && registerState) {
+        if (document.body) {
+            document.body.classList.add("work-register-edit-mode");
+        }
         var editTradeEnabled = isStateFlagEnabled("data-is-tradable");
         var editAuctionEnabled = isStateFlagEnabled("data-has-active-auction");
         var editTradePrice = registerState.getAttribute("data-price") || "";
@@ -1693,6 +1718,8 @@ function initializeWorkRegister() {
         renderExistingMediaPreview(currentExistingMediaUrl, currentExistingMediaType);
         updateVideoLink(registerState.getAttribute("data-link-url") || currentExistingMediaUrl, registerState.getAttribute("data-link-url") || currentExistingMediaUrl);
         showDetailsScreen({ name: registerState.getAttribute("data-title") || "업로드 파일" });
+    } else if (document.body) {
+        document.body.classList.remove("work-register-edit-mode");
     }
 
     window.addEventListener("resize", syncDialogSizeToDetailsScreen);

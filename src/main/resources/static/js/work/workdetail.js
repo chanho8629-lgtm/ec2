@@ -215,6 +215,7 @@ async function normalizeWorkDetail(detail) {
         shareLabel: "공유",
         remixLabel: marketType === "auction" ? "경매하기" : marketType === "trade" ? "거래하기" : "",
         marketType,
+        avatar: detail.memberProfileImage || "",
         avatarText: getAvatarText(detail.memberNickname),
         channel: `@${detail.memberNickname || "artist"}`,
         profileUrl: detail.memberNickname ? `/profile/${encodeURIComponent(detail.memberNickname)}` : "/profile",
@@ -301,6 +302,7 @@ const pageStack = document.getElementById("page-stack");
 const workPageTemplate = document.getElementById("work-page-template");
 const navigationButtonUp = document.getElementById("navigation-button-up");
 const navigationButtonDown = document.getElementById("navigation-button-down");
+const MOBILE_CARD_OVERLAY_INSET = 0;
 
 // 브라우저별 전체화면 API 래퍼
 function getFullscreenElement() {
@@ -412,10 +414,22 @@ function bindPageData(page, data) {
     const hasPivotItems = Array.isArray(data.pivotItems) && data.pivotItems.length > 0;
 
     if (marketButton) {
-        marketButton.hidden = !hasMarketAction;
-        marketButton.style.display = hasMarketAction ? "" : "none";
-        marketButton.dataset.marketType = data.marketType || "";
-        marketButton.setAttribute("aria-hidden", hasMarketAction ? "false" : "true");
+        if (!hasMarketAction) {
+            marketButton.hidden = true;
+            marketButton.style.display = "none";
+            marketButton.dataset.marketType = "";
+            marketButton.setAttribute("aria-hidden", "true");
+            marketButton.setAttribute("tabindex", "-1");
+            marketButton.setAttribute("disabled", "disabled");
+            marketButton.remove();
+        } else {
+            marketButton.hidden = false;
+            marketButton.style.display = "";
+            marketButton.dataset.marketType = data.marketType;
+            marketButton.setAttribute("aria-hidden", "false");
+            marketButton.removeAttribute("tabindex");
+            marketButton.removeAttribute("disabled");
+        }
     }
 
     if (hasMarketAction && marketIconPath) {
@@ -761,6 +775,7 @@ function bindPageInteractions(page, data) {
     const commentsList = page.querySelector('[data-role="comments-list"]');
     const commentInput = page.querySelector('[data-role="comment-input"]');
     const commentSubmit = page.querySelector('[data-role="comment-submit"]');
+    const commentComposerAvatar = page.querySelector(".cp-av");
     const pivotPanel = page.querySelector('[data-role="pivot-panel"]');
     const pivotPanelClose = page.querySelector('[data-role="pivot-panel-close"]');
     const pivotGalleryCover = page.querySelector('[data-role="pivot-gallery-cover"]');
@@ -802,6 +817,23 @@ function bindPageInteractions(page, data) {
     const isOwner = Boolean(data.isOwner);
     let lastNonZeroVolume = 0.5;
     let isPaused = false;
+
+    const renderCommentComposerAvatar = () => {
+        if (!commentComposerAvatar) {
+            return;
+        }
+
+        if (workState.avatar) {
+            commentComposerAvatar.classList.add("has-image");
+            commentComposerAvatar.innerHTML = `<img src="${escapeHtml(workState.avatar)}" alt="${escapeHtml(workState.channel || "프로필")}">`;
+            return;
+        }
+
+        commentComposerAvatar.classList.remove("has-image");
+        commentComposerAvatar.textContent = workState.avatarText || "@";
+    };
+
+    renderCommentComposerAvatar();
     const navigateToProfile = (event) => {
         const target = event.currentTarget;
         const profileUrl = target?.dataset?.profileUrl || data.profileUrl || "/profile";
@@ -1271,6 +1303,55 @@ function bindPageInteractions(page, data) {
         });
     }
 
+    const submitComment = async (content, options = {}) => {
+        const trimmedContent = String(content || "").trim();
+
+        if (!trimmedContent || !workState.id) {
+            return false;
+        }
+
+        try {
+            const detail = await apiRequest(`/api/works/${workState.id}/comments`, {
+                method: "POST",
+                body: JSON.stringify({ content: trimmedContent })
+            });
+            const normalizedComments = Array.isArray(detail.comments)
+                ? detail.comments.map(normalizeComment)
+                : workState.comments;
+            const nextCommentCount = detail.commentCount || normalizedComments.length || 0;
+
+            workState = {
+                ...workState,
+                comments: normalizedComments,
+                commentCount: formatDisplayCount(nextCommentCount)
+            };
+
+            renderCommentsList(commentsList, workState.comments);
+            updateCountFields(page, "commentCount", nextCommentCount, false);
+
+            if (typeof options.resetInput === "function") {
+                options.resetInput();
+            }
+
+            if (commentsList) {
+                commentsList.scrollTop = commentsList.scrollHeight;
+            }
+
+            if (mobilePanelShell && activeMobilePanelType === "comments") {
+                const mobileCommentsList = mobilePanelShell.querySelector('[data-role="mobile-comments-list"]');
+                if (mobileCommentsList) {
+                    mobileCommentsList.innerHTML = commentsList ? commentsList.innerHTML : "";
+                    mobileCommentsList.scrollTop = mobileCommentsList.scrollHeight;
+                }
+            }
+
+            return true;
+        } catch (error) {
+            window.alert(error.message || "댓글 등록에 실패했습니다.");
+            return false;
+        }
+    };
+
     if (commentInput && commentSubmit) {
         const syncCommentSubmitState = () => {
             commentSubmit.disabled = !commentInput.value.trim();
@@ -1289,36 +1370,19 @@ function bindPageInteractions(page, data) {
         commentSubmit.addEventListener("click", async () => {
             const content = commentInput.value.trim();
 
-            if (!content || !workState.id) {
+            if (!content) {
                 return;
             }
 
             commentSubmit.disabled = true;
-
-            try {
-                const detail = await apiRequest(`/api/works/${workState.id}/comments`, {
-                    method: "POST",
-                    body: JSON.stringify({ content })
-                });
-                const normalizedComments = Array.isArray(detail.comments)
-                    ? detail.comments.map(normalizeComment)
-                    : workState.comments;
-                const nextCommentCount = detail.commentCount || normalizedComments.length || 0;
-
-                workState = {
-                    ...workState,
-                    comments: normalizedComments,
-                    commentCount: formatDisplayCount(nextCommentCount)
-                };
-                renderCommentsList(commentsList, workState.comments);
-                updateCountFields(page, "commentCount", nextCommentCount, false);
-                commentInput.value = "";
-                syncCommentSubmitState();
-                if (commentsList) {
-                    commentsList.scrollTop = commentsList.scrollHeight;
+            const submitted = await submitComment(content, {
+                resetInput: () => {
+                    commentInput.value = "";
+                    syncCommentSubmitState();
                 }
-            } catch (error) {
-                window.alert(error.message || "댓글 등록에 실패했습니다.");
+            });
+
+            if (!submitted) {
                 syncCommentSubmitState();
             }
         });
@@ -1357,17 +1421,14 @@ function bindPageInteractions(page, data) {
 
         const shell = document.createElement("div");
         shell.className = "workdetail-mobile-panel-shell";
-        shell.style.position = "fixed";
-        shell.style.inset = "0";
+        shell.style.position = "absolute";
         shell.style.zIndex = "10050";
         shell.style.display = "none";
-        shell.style.alignItems = "flex-start";
-        shell.style.justifyContent = "center";
-        shell.style.pointerEvents = "auto";
+        shell.style.pointerEvents = "none";
         shell.style.background = "transparent";
         shell.style.padding = "0";
         shell.innerHTML = `
-            <div class="workdetail-mobile-panel-sheet" style="position:fixed;left:50%;bottom:0;width:min(calc(100vw - 16px), 414px);max-width:calc(100vw - 16px);height:min(68dvh, 560px);max-height:68dvh;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 18px 40px rgba(0,0,0,.24);transform:translate(-50%, 0);opacity:1;pointer-events:auto;display:flex;flex-direction:column;overflow:hidden;">
+            <div class="workdetail-mobile-panel-sheet" style="position:absolute;left:50%;bottom:0;width:100%;height:min(70%, 560px);max-height:min(70%, 560px);background:#fff;border-radius:24px 24px 0 0;box-shadow:0 18px 40px rgba(0,0,0,.24);transform:translate(-50%, calc(100% + 32px));opacity:0;pointer-events:auto;display:flex;flex-direction:column;overflow:hidden;transition:transform .2s ease, opacity .2s ease;">
                 <div data-role="mobile-panel-content" style="flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow:hidden;"></div>
             </div>
         `;
@@ -1376,7 +1437,7 @@ function bindPageInteractions(page, data) {
                 hideMobileBottomSheet();
             }
         });
-        document.body.appendChild(shell);
+        page.appendChild(shell);
         mobilePanelShell = shell;
         return shell;
     };
@@ -1385,13 +1446,52 @@ function bindPageInteractions(page, data) {
         if (!mobilePanelShell) {
             return;
         }
+
         const sheet = mobilePanelShell.querySelector(".workdetail-mobile-panel-sheet");
         if (!sheet) {
             return;
         }
-        sheet.style.bottom = "0";
-        sheet.style.height = "min(68dvh, 560px)";
-        sheet.style.maxHeight = "68dvh";
+
+        const anchorTarget = card || mediaCluster || thumb || page;
+        const anchorRect = anchorTarget?.getBoundingClientRect();
+        const pageRect = page.getBoundingClientRect();
+
+        if (!anchorRect || !pageRect) {
+            mobilePanelShell.style.left = "0";
+            mobilePanelShell.style.top = "0";
+            mobilePanelShell.style.width = "100%";
+            mobilePanelShell.style.height = "100%";
+            sheet.style.left = "50%";
+            sheet.style.bottom = `${MOBILE_CARD_OVERLAY_INSET}px`;
+            sheet.style.width = `calc(100% - ${MOBILE_CARD_OVERLAY_INSET * 2}px)`;
+            sheet.style.maxWidth = `calc(100% - ${MOBILE_CARD_OVERLAY_INSET * 2}px)`;
+            sheet.style.height = "min(70%, 560px)";
+            sheet.style.maxHeight = "min(70%, 560px)";
+            return;
+        }
+
+        const shellLeft = Math.round(anchorRect.left - pageRect.left);
+        const shellTop = Math.round(anchorRect.top - pageRect.top);
+        const shellWidth = Math.round(anchorRect.width);
+        const shellHeight = Math.round(anchorRect.height);
+        const desiredHeight = Math.round(anchorRect.height * 0.7);
+        const maxSheetHeight = Math.min(
+            640,
+            Math.max(320, desiredHeight)
+        );
+
+        mobilePanelShell.style.left = `${shellLeft}px`;
+        mobilePanelShell.style.top = `${shellTop}px`;
+        mobilePanelShell.style.width = `${shellWidth}px`;
+        mobilePanelShell.style.height = `${shellHeight}px`;
+
+        sheet.style.left = "50%";
+        sheet.style.bottom = `${MOBILE_CARD_OVERLAY_INSET}px`;
+        sheet.style.width = `calc(100% - ${MOBILE_CARD_OVERLAY_INSET * 2}px)`;
+        sheet.style.maxWidth = `calc(100% - ${MOBILE_CARD_OVERLAY_INSET * 2}px)`;
+        const boundedSheetHeight = Math.min(maxSheetHeight, Math.max(240, shellHeight - (MOBILE_CARD_OVERLAY_INSET * 2)));
+        sheet.style.height = `${boundedSheetHeight}px`;
+        sheet.style.maxHeight = `${boundedSheetHeight}px`;
     };
 
     const hideMobileBottomSheet = () => {
@@ -1402,10 +1502,16 @@ function bindPageInteractions(page, data) {
 
         const sheet = mobilePanelShell.querySelector(".workdetail-mobile-panel-sheet");
         if (sheet) {
-            sheet.style.opacity = "1";
-            sheet.style.transform = "translate(-50%, 0)";
+            sheet.style.opacity = "0";
+            sheet.style.transform = "translate(-50%, calc(100% + 32px))";
         }
-        mobilePanelShell.style.display = "none";
+        mobilePanelShell.style.pointerEvents = "none";
+        activeMobilePanelType = "";
+        window.setTimeout(() => {
+            if (mobilePanelShell && !activeMobilePanelType) {
+                mobilePanelShell.style.display = "none";
+            }
+        }, 200);
     };
 
     const renderMobileDescriptionSheet = () => {
@@ -1440,6 +1546,9 @@ function bindPageInteractions(page, data) {
 
     const renderMobileCommentsSheet = () => {
         const commentsHtml = commentsList ? commentsList.innerHTML : "";
+        const mobileAvatarMarkup = workState.avatar
+            ? `<img src="${escapeHtml(workState.avatar)}" alt="${escapeHtml(workState.channel || "프로필")}" style="width:100%;height:100%;display:block;object-fit:cover;border-radius:999px;">`
+            : escapeHtml(workState.avatarText || "e");
         return `
             <div style="display:flex;align-items:center;justify-content:center;padding:8px 0 2px;">
                 <div style="width:40px;height:4px;border-radius:999px;background:#d4d4d8;"></div>
@@ -1450,11 +1559,14 @@ function bindPageInteractions(page, data) {
             </div>
             <div style="padding:14px 16px;border-bottom:1px solid #ececf1;background:#fff;">
                 <div style="display:flex;gap:10px;align-items:flex-start;">
-                    <div style="width:36px;height:36px;border-radius:999px;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;">e</div>
-                    <input type="text" placeholder="댓글 추가..." style="flex:1;height:44px;border:1px solid #e4e4e7;border-radius:12px;padding:0 14px;font-size:14px;outline:none;">
+                    <div style="width:36px;height:36px;border-radius:999px;background:${workState.avatar ? "transparent" : "#2563eb"};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;overflow:hidden;">${mobileAvatarMarkup}</div>
+                    <div style="flex:1;display:flex;gap:8px;align-items:center;">
+                        <input type="text" data-role="mobile-comment-input" placeholder="댓글 추가..." style="flex:1;height:44px;border:1px solid #e4e4e7;border-radius:12px;padding:0 14px;font-size:14px;outline:none;">
+                        <button type="button" data-role="mobile-comment-submit" style="height:44px;padding:0 14px;border:0;border-radius:12px;background:#111;color:#fff;font-size:14px;font-weight:700;cursor:pointer;" disabled>등록</button>
+                    </div>
                 </div>
             </div>
-            <div style="flex:1 1 auto;min-height:0;overflow:auto;padding:0 16px 18px;background:#fff;">${commentsHtml}</div>
+            <div data-role="mobile-comments-list" style="flex:1 1 auto;min-height:0;overflow:auto;padding:0 16px 18px;background:#fff;">${commentsHtml}</div>
         `;
     };
 
@@ -1467,10 +1579,17 @@ function bindPageInteractions(page, data) {
             return;
         }
 
+        const isAuctionBackdrop = backdrop.classList.contains("work-auction-modal-backdrop");
+        const isShareBackdrop = backdrop.classList.contains("work-share-modal-overlay");
+
         if (!isMobileShortsViewport()) {
             [
                 "position",
                 "inset",
+                "left",
+                "top",
+                "width",
+                "height",
                 "display",
                 "alignItems",
                 "justifyContent",
@@ -1490,12 +1609,82 @@ function bindPageInteractions(page, data) {
                 "left",
                 "top",
                 "bottom",
+                "width",
+                "height",
                 "borderRadius",
                 "overflow",
                 "boxShadow",
                 "transform"
             ].forEach((property) => dialog.style.removeProperty(property));
             }
+            return;
+        }
+
+        if (isAuctionBackdrop || isShareBackdrop) {
+            const anchorTarget = card || mediaCluster || thumb || page;
+            const anchorRect = anchorTarget?.getBoundingClientRect();
+            const pageRect = page.getBoundingClientRect();
+            const useFixedViewportAnchor = false;
+
+            backdrop.style.setProperty("display", isOpen ? "flex" : "none", "important");
+            backdrop.style.setProperty("position", useFixedViewportAnchor ? "fixed" : "absolute", "important");
+            backdrop.style.setProperty("inset", "auto", "important");
+            backdrop.style.setProperty("align-items", "stretch", "important");
+            backdrop.style.setProperty("justify-content", "center", "important");
+            backdrop.style.setProperty("padding", "0", "important");
+            backdrop.style.setProperty("background", "transparent", "important");
+            backdrop.style.setProperty("z-index", "10035", "important");
+            backdrop.style.setProperty("opacity", isOpen ? "1" : "0", "important");
+            backdrop.style.setProperty("visibility", isOpen ? "visible" : "hidden", "important");
+            backdrop.style.setProperty("pointer-events", isOpen ? "auto" : "none", "important");
+            backdrop.style.setProperty("transform", "none", "important");
+
+            if (!dialog) {
+                return;
+            }
+
+            if (!anchorRect || !pageRect) {
+                dialog.style.setProperty("position", "absolute", "important");
+                dialog.style.setProperty("left", "50%", "important");
+                dialog.style.setProperty("top", "auto", "important");
+                dialog.style.setProperty("bottom", `${MOBILE_CARD_OVERLAY_INSET}px`, "important");
+                dialog.style.setProperty("width", `calc(100% - ${MOBILE_CARD_OVERLAY_INSET * 2}px)`, "important");
+                dialog.style.setProperty("max-width", `calc(100% - ${MOBILE_CARD_OVERLAY_INSET * 2}px)`, "important");
+                dialog.style.setProperty("height", isShareBackdrop ? "auto" : "min(70%, 560px)", "important");
+                dialog.style.setProperty("max-height", isShareBackdrop ? "min(70%, 560px)" : "min(70%, 560px)", "important");
+                dialog.style.setProperty("margin", "0", "important");
+                dialog.style.setProperty("border-radius", "24px 24px 0 0", "important");
+                dialog.style.setProperty("overflow", "hidden", "important");
+                dialog.style.setProperty("box-shadow", "0 18px 40px rgba(0, 0, 0, 0.24)", "important");
+                dialog.style.setProperty("transform", "translate(-50%, 0)", "important");
+                return;
+            }
+
+            const shellLeft = Math.round(anchorRect.left - pageRect.left);
+            const shellTop = Math.round(anchorRect.top - pageRect.top);
+            const shellWidth = Math.round(anchorRect.width);
+            const shellHeight = Math.round(anchorRect.height);
+            const desiredHeight = Math.round(anchorRect.height * 0.7);
+            const modalHeight = Math.min(640, Math.max(320, desiredHeight), Math.max(240, shellHeight - (MOBILE_CARD_OVERLAY_INSET * 2)));
+
+            backdrop.style.setProperty("left", `${shellLeft}px`, "important");
+            backdrop.style.setProperty("top", `${shellTop}px`, "important");
+            backdrop.style.setProperty("width", `${shellWidth}px`, "important");
+            backdrop.style.setProperty("height", `${shellHeight}px`, "important");
+
+            dialog.style.setProperty("position", "absolute", "important");
+            dialog.style.setProperty("left", isShareBackdrop ? "0" : "50%", "important");
+            dialog.style.setProperty("top", "auto", "important");
+            dialog.style.setProperty("bottom", isShareBackdrop ? "0" : `${MOBILE_CARD_OVERLAY_INSET}px`, "important");
+            dialog.style.setProperty("width", isShareBackdrop ? "100%" : `calc(100% - ${MOBILE_CARD_OVERLAY_INSET * 2}px)`, "important");
+            dialog.style.setProperty("max-width", isShareBackdrop ? "100%" : `calc(100% - ${MOBILE_CARD_OVERLAY_INSET * 2}px)`, "important");
+            dialog.style.setProperty("height", isShareBackdrop ? "auto" : `${modalHeight}px`, "important");
+            dialog.style.setProperty("max-height", isShareBackdrop ? `${modalHeight}px` : `${modalHeight}px`, "important");
+            dialog.style.setProperty("margin", "0", "important");
+            dialog.style.setProperty("border-radius", "24px 24px 0 0", "important");
+            dialog.style.setProperty("overflow", "hidden", "important");
+            dialog.style.setProperty("box-shadow", "0 18px 40px rgba(0, 0, 0, 0.24)", "important");
+            dialog.style.setProperty("transform", isShareBackdrop ? "none" : "translate(-50%, 0)", "important");
             return;
         }
 
@@ -1592,6 +1781,21 @@ function bindPageInteractions(page, data) {
 
         const openSnackbar = () => {
             window.clearTimeout(snackbarTimerId);
+            if (isMobileShortsViewport()) {
+                const anchorTarget = card || mediaCluster || thumb || page;
+                const anchorRect = anchorTarget?.getBoundingClientRect();
+                if (anchorRect) {
+                    workSnackbar.style.left = `${Math.round(anchorRect.left + (anchorRect.width / 2))}px`;
+                    workSnackbar.style.bottom = `${Math.max(12, Math.round(window.innerHeight - anchorRect.bottom + 12))}px`;
+                    workSnackbar.style.width = `${Math.min(Math.round(anchorRect.width - 24), 360)}px`;
+                    workSnackbar.style.transform = "translateX(-50%)";
+                }
+            } else {
+                workSnackbar.style.removeProperty("left");
+                workSnackbar.style.removeProperty("bottom");
+                workSnackbar.style.removeProperty("width");
+                workSnackbar.style.removeProperty("transform");
+            }
             workSnackbar.hidden = false;
             snackbarTimerId = window.setTimeout(() => {
                 workSnackbar.hidden = true;
@@ -1780,6 +1984,14 @@ function bindPageInteractions(page, data) {
         };
 
         const openShareModal = () => {
+            if (isMobileShortsViewport()) {
+                if (shareModalBackdrop.parentElement !== page) {
+                    page.appendChild(shareModalBackdrop);
+                }
+            } else if (shareModalBackdrop.parentElement !== document.body) {
+                document.body.appendChild(shareModalBackdrop);
+            }
+
             searchShareUsers(shareSearchInput ? shareSearchInput.value : "");
             renderShareChips();
             shareModalBackdrop.hidden = false;
@@ -2044,6 +2256,244 @@ function bindPageInteractions(page, data) {
                 hideMobileBottomSheet();
             });
 
+            if (panelType === "comments") {
+                const mobileCommentInput = content.querySelector('[data-role="mobile-comment-input"]');
+                const mobileCommentSubmit = content.querySelector('[data-role="mobile-comment-submit"]');
+                const mobileCommentsList = content.querySelector('[data-role="mobile-comments-list"]');
+                const syncMobileCommentState = () => {
+                    if (!mobileCommentInput || !mobileCommentSubmit) {
+                        return;
+                    }
+                    mobileCommentSubmit.disabled = !mobileCommentInput.value.trim();
+                };
+
+                mobileCommentInput?.addEventListener("input", syncMobileCommentState);
+                mobileCommentInput?.addEventListener("keydown", (event) => {
+                    if (event.key === "Enter" && !event.shiftKey) {
+                        event.preventDefault();
+                        mobileCommentSubmit?.click();
+                    }
+                });
+                mobileCommentSubmit?.addEventListener("click", async () => {
+                    if (!mobileCommentInput || !mobileCommentSubmit) {
+                        return;
+                    }
+
+                    const contentValue = mobileCommentInput.value.trim();
+                    if (!contentValue) {
+                        return;
+                    }
+
+                    mobileCommentSubmit.disabled = true;
+                    const submitted = await submitComment(contentValue, {
+                        resetInput: () => {
+                            mobileCommentInput.value = "";
+                            syncMobileCommentState();
+                        }
+                    });
+
+                    if (!submitted) {
+                        syncMobileCommentState();
+                    }
+                });
+
+                if (mobileCommentsList) {
+                    const closeMobileCommentMenus = () => {
+                        mobileCommentsList.querySelectorAll('[data-role="comment-action-menu"]').forEach((menu) => {
+                            menu.hidden = true;
+                        });
+                        mobileCommentsList.querySelectorAll('[data-role="comment-menu-toggle"]').forEach((button) => {
+                            button.setAttribute("aria-expanded", "false");
+                        });
+                    };
+
+                    const closeMobileInlineEditors = () => {
+                        mobileCommentsList.querySelectorAll('[data-role="comment-inline-editor"]').forEach((editor) => {
+                            editor.remove();
+                        });
+                        mobileCommentsList.querySelectorAll(".cm-tx, .rp-tx").forEach((textNode) => {
+                            textNode.hidden = false;
+                        });
+                    };
+
+                    mobileCommentsList.addEventListener("click", (event) => {
+                        const toggle = event.target.closest('[data-role="reply-toggle"]');
+                        if (!toggle) {
+                            return;
+                        }
+
+                        const wrap = toggle.closest(".cm-rp");
+                        const list = wrap?.querySelector(".cm-rp-ls");
+                        if (!list) {
+                            return;
+                        }
+
+                        const willOpen = list.hidden;
+                        list.hidden = !willOpen;
+                        toggle.setAttribute("aria-expanded", willOpen ? "true" : "false");
+                        toggle.textContent = willOpen ? "답글 숨기기" : `답글 ${list.children.length}개`;
+                    });
+
+                    mobileCommentsList.addEventListener("click", (event) => {
+                        const menuToggle = event.target.closest('[data-role="comment-menu-toggle"]');
+                        if (!menuToggle) {
+                            if (!event.target.closest('[data-role="comment-action-menu"]')) {
+                                closeMobileCommentMenus();
+                            }
+                            return;
+                        }
+
+                        event.stopPropagation();
+                        const menu = menuToggle.closest(".comment-action-wrap")?.querySelector('[data-role="comment-action-menu"]');
+                        if (!menu) {
+                            return;
+                        }
+
+                        const willOpen = menu.hidden;
+                        closeMobileCommentMenus();
+                        menu.hidden = !willOpen;
+                        menuToggle.setAttribute("aria-expanded", willOpen ? "true" : "false");
+                    });
+
+                    mobileCommentsList.addEventListener("click", async (event) => {
+                        const voteButton = event.target.closest('[data-vote]');
+                        if (!voteButton || voteButton.dataset.vote !== "like") {
+                            return;
+                        }
+
+                        const commentItem = voteButton.closest("[data-comment-id]");
+                        const commentId = Number(commentItem?.dataset.commentId || "0");
+                        const voteWrap = voteButton.closest(".cm-hd, .rp-hd, .cm-ft, .rp-ft");
+                        if (!voteWrap || !commentId) {
+                            return;
+                        }
+
+                        try {
+                            const result = await apiRequest(`/api/comments/${commentId}/likes`, {
+                                method: "POST"
+                            });
+                            const likeButton = voteWrap.querySelector('[data-vote="like"]');
+                            const dislikeButton = voteWrap.querySelector('[data-vote="dislike"]');
+                            const countNode = commentItem.querySelector('[data-role="comment-like-count"]');
+
+                            updateVoteButtonState(likeButton, Boolean(result.liked));
+                            updateVoteButtonState(dislikeButton, false);
+
+                            if (countNode) {
+                                countNode.dataset.baseCount = String(result.likeCount || 0);
+                                countNode.textContent = result.likeCount ? `좋아요 ${formatDisplayCount(result.likeCount)}` : "";
+                            }
+                        } catch (error) {
+                            window.alert(error.message || "댓글 좋아요 처리에 실패했습니다.");
+                        }
+                    });
+
+                    mobileCommentsList.addEventListener("click", async (event) => {
+                        const editButton = event.target.closest('[data-role="comment-edit"]');
+                        const deleteButton = event.target.closest('[data-role="comment-delete"]');
+                        const editSaveButton = event.target.closest('[data-role="comment-edit-save"]');
+                        const editCancelButton = event.target.closest('[data-role="comment-edit-cancel"]');
+                        const commentItem = event.target.closest("[data-comment-id]");
+                        const commentId = Number(commentItem?.dataset.commentId || "0");
+
+                        if (!commentId) {
+                            return;
+                        }
+
+                        if (editCancelButton) {
+                            closeMobileInlineEditors();
+                            return;
+                        }
+
+                        if (editSaveButton) {
+                            closeMobileCommentMenus();
+                            const editor = commentItem.querySelector('[data-role="comment-inline-editor"]');
+                            const input = editor?.querySelector('[data-role="comment-inline-input"]');
+                            const textNode = commentItem.querySelector(".cm-tx, .rp-tx");
+                            const currentText = textNode?.textContent?.trim() || "";
+                            const normalizedText = input?.value?.trim() || "";
+
+                            if (!normalizedText || normalizedText === currentText) {
+                                closeMobileInlineEditors();
+                                return;
+                            }
+
+                            try {
+                                const updated = await apiRequest(`/api/comments/${commentId}`, {
+                                    method: "PUT",
+                                    body: JSON.stringify({ content: normalizedText })
+                                });
+
+                                workState.comments = updateCommentTree(workState.comments, commentId, (comment) => ({
+                                    ...comment,
+                                    text: updated.content || normalizedText,
+                                    time: formatRelativeTime(updated.updatedDatetime || updated.createdDatetime)
+                                }));
+                                renderCommentsList(commentsList, workState.comments);
+                                mobileCommentsList.innerHTML = commentsList ? commentsList.innerHTML : "";
+                            } catch (error) {
+                                window.alert(error.message || "댓글 수정에 실패했습니다.");
+                            }
+
+                            return;
+                        }
+
+                        if (editButton) {
+                            closeMobileCommentMenus();
+                            const textNode = commentItem.querySelector(".cm-tx, .rp-tx");
+                            const currentText = textNode?.textContent?.trim() || "";
+                            const anchorNode =
+                                commentItem.querySelector(".cm-ft, .rp-ft")
+                                || commentItem.querySelector(".cm-rp")
+                                || textNode;
+
+                            if (!textNode || !anchorNode) {
+                                return;
+                            }
+
+                            closeMobileInlineEditors();
+                            textNode.hidden = true;
+                            anchorNode.insertAdjacentHTML("beforebegin", `
+                                <div class="comment-inline-editor" data-role="comment-inline-editor">
+                                    <textarea class="comment-inline-input" data-role="comment-inline-input">${escapeHtml(currentText)}</textarea>
+                                    <div class="comment-inline-actions">
+                                        <button class="comment-inline-button comment-inline-button--ghost" type="button" data-role="comment-edit-cancel">취소</button>
+                                        <button class="comment-inline-button comment-inline-button--primary" type="button" data-role="comment-edit-save">저장</button>
+                                    </div>
+                                </div>
+                            `);
+                            commentItem.querySelector('[data-role="comment-inline-input"]')?.focus();
+                            return;
+                        }
+
+                        if (deleteButton) {
+                            closeMobileCommentMenus();
+                            if (!window.confirm("댓글을 삭제하시겠습니까?")) {
+                                return;
+                            }
+
+                            try {
+                                await apiRequest(`/api/comments/${commentId}`, {
+                                    method: "DELETE"
+                                });
+
+                                workState.comments = removeCommentTree(workState.comments, commentId);
+                                workState.commentCount = Math.max(0, parseDisplayCount(workState.commentCount) - 1);
+                                renderCommentsList(commentsList, workState.comments);
+                                updateCountFields(page, "commentCount", workState.commentCount);
+                                mobileCommentsList.innerHTML = commentsList ? commentsList.innerHTML : "";
+                            } catch (error) {
+                                window.alert(error.message || "댓글 삭제에 실패했습니다.");
+                            }
+                        }
+                    });
+
+                    document.addEventListener("click", closeMobileCommentMenus);
+                }
+
+                syncMobileCommentState();
+            }
+
             shell.style.display = "flex";
             shell.style.pointerEvents = "auto";
             syncMobilePanelAnchor();
@@ -2081,6 +2531,17 @@ function bindPageInteractions(page, data) {
             if (isMobileShortsViewport()) {
                 if (activeMobilePanelType) {
                     syncMobilePanelAnchor();
+                }
+                if (
+                    activeAuctionPage === page &&
+                    auctionModalBackdrop &&
+                    !auctionModalBackdrop.hidden
+                ) {
+                    syncResponsiveModalStyles(
+                        auctionModalBackdrop,
+                        auctionModalBackdrop.querySelector(".work-auction-modal"),
+                        true
+                    );
                 }
                 return;
             }
@@ -2373,11 +2834,6 @@ function bindPageInteractions(page, data) {
                 moreButton.setAttribute("aria-expanded", "false");
             }
             if (workState.id) {
-                if (typeof window.openComposeModal === "function") {
-                    window.openComposeModal(`/work/work-edit/${workState.id}`);
-                    return;
-                }
-
                 window.location.href = `/work/work-edit/${workState.id}`;
             }
         });
@@ -2447,7 +2903,7 @@ function scrollToPage(index, behavior = "smooth") {
 }
 
 function isMobileShortsViewport() {
-    return typeof window !== "undefined" && window.matchMedia("(max-width: 1200px)").matches;
+    return typeof window !== "undefined" && window.matchMedia("(max-width: 820px)").matches;
 }
 
 function syncMobileShortsLayout() {

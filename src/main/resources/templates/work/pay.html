@@ -18,7 +18,9 @@
 <main class="yt-shell__page-content">
 <div class="overlay" onclick="history.back()"></div>
 
-<section class="pay-modal" data-fee-rate="0.10">
+<section class="pay-modal"
+         data-fee-rate="0.10"
+         th:attr="data-bootpay-js-application-id=${bootpayJsApplicationId},data-bootpay-pg=${bootpayPg}">
     <div class="pay-modal__handle"></div>
 
     <header class="pay-modal__header">

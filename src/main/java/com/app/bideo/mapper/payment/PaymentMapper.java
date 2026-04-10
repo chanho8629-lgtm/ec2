@@ -14,6 +14,8 @@ public interface PaymentMapper {
 
     PaymentResponseDTO selectById(@Param("paymentId") Long paymentId);
 
+    PaymentVO selectRawById(@Param("paymentId") Long paymentId);
+
     PaymentResponseDTO selectByPaymentCode(@Param("paymentCode") String paymentCode);
 
     List<PaymentResponseDTO> selectByBuyerId(@Param("buyerId") Long buyerId,
@@ -25,4 +27,6 @@ public interface PaymentMapper {
     void updateStatusCompleted(@Param("paymentId") Long paymentId);
 
     void updateStatusRefunded(@Param("paymentId") Long paymentId);
+
+    void updateReceiptId(@Param("paymentId") Long paymentId, @Param("receiptId") String receiptId);
 }

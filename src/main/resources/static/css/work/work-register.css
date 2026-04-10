@@ -15,6 +15,38 @@ body.work-register-page {
     background: #f5f5f5;
 }
 
+body.work-register-page [hidden],
+.work-register-embedded-root [hidden],
+.ai-prompt-modal[hidden],
+.ai-prompt-modal [hidden] {
+    display: none !important;
+}
+
+body.work-register-page#section {
+    margin-top: 0 !important;
+    margin-left: 0 !important;
+    min-width: 0 !important;
+    min-height: 100vh !important;
+    padding: 0 !important;
+}
+
+body.work-register-page .yt-shell__page-content {
+    margin-left: 240px;
+    margin-top: 56px;
+    min-height: calc(100vh - 56px);
+}
+
+body.work-register-page [data-yt-compose-modal],
+body.work-register-page [data-yt-compose-modal] *,
+body.work-register-page .yt-compose-modal,
+body.work-register-page .yt-compose-modal *,
+body.work-register-page [data-compose-embedded="true"],
+body.work-register-page [data-compose-embedded="true"] * {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
 body.work-register-page button,
 body.work-register-page input,
 body.work-register-page textarea,
@@ -235,6 +267,24 @@ body.work-register-page a:hover,
 .work-register-view#upload-screen {
     min-height: 0;
     flex: 1;
+}
+
+body.work-register-page.work-register-edit-mode #upload-screen {
+    display: none !important;
+}
+
+body.work-register-page.work-register-edit-mode #details-screen {
+    display: flex !important;
+    min-height: 0;
+}
+
+body.work-register-page.work-register-edit-mode #details-screen[hidden] {
+    display: flex !important;
+}
+
+body.work-register-page.work-register-edit-mode .dialog-content {
+    min-height: auto;
+    max-height: none;
 }
 
 .dialog-body {
@@ -1938,6 +1988,10 @@ body.work-register-page a:hover,
 }
 
 @media (max-width: 900px) {
+    body.work-register-page .yt-shell__page-content {
+        margin-left: 72px;
+    }
+
     .upload-dialog {
         padding: 12px;
     }
@@ -1961,8 +2015,38 @@ body.work-register-page a:hover,
 }
 
 @media (max-width: 640px) {
+    body.work-register-page .yt-shell__page-content {
+        margin-left: 0;
+        margin-top: 56px;
+        min-height: calc(100vh - 56px);
+    }
+
+    .page-shell,
+    .upload-dialog,
+    .dialog-content,
+    .work-register-panel,
+    .work-register-embedded-root {
+        width: 100%;
+        max-width: 100%;
+    }
+
     .dialog-content {
-        border-radius: 16px;
+        border-radius: 0;
+        min-height: calc(100vh - 56px);
+        max-height: none;
+    }
+
+    .upload-dialog {
+        padding: 0;
+        background: transparent;
+        display: block;
+        min-height: auto;
+    }
+
+    .work-register-details-layout {
+        gap: 16px;
+        padding-top: 16px;
+        padding-bottom: 16px;
     }
 
     .dialog-header,
@@ -1974,11 +2058,11 @@ body.work-register-page a:hover,
     }
 
     .dialog-body {
-        padding: 40px 20px 20px;
+        padding: 24px 16px 16px;
     }
 
     .dialog-footer {
-        padding: 0 20px 20px;
+        padding: 0 16px 16px;
     }
 
     .dialog-title {
@@ -1991,6 +2075,23 @@ body.work-register-page a:hover,
         grid-template-columns: 1fr;
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .form-card,
+    .work-trade-toggle-row,
+    .work-trade-config,
+    .work-auction-config {
+        max-width: none;
+    }
+
+    .video-side-card {
+        margin-top: 0;
+    }
+
+    .details-main,
+    .details-side {
+        width: 100%;
+        max-width: none;
     }
 
     .stepper {

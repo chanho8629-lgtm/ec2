@@ -23,6 +23,7 @@ public class PaymentVO {
     private String payMethod;
     private Long cardId;
     private String status;
+    private String receiptId;
     private LocalDateTime paidAt;
     private LocalDateTime refundedAt;
     private LocalDateTime createdDatetime;
