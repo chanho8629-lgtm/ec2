@@ -422,6 +422,10 @@ create table tbl_card (
     card_company       varchar(255)  not null,
     card_number_masked varchar(255)  not null,
     billing_key        varchar(255) null,
+    -- 변경: 부트페이 빌링키 발급 이력을 추적하기 위한 컬럼 추가
+    billing_receipt_id varchar(255) null,
+    billing_method     varchar(100) null,
+    billing_status     varchar(100) null,
     is_default         boolean      not null default false,
     created_datetime         timestamp    not null default now(),
     deleted_datetime         timestamp    null,
@@ -436,6 +440,9 @@ comment on column tbl_card.member_id is '회원 FK';
 comment on column tbl_card.card_company is '카드사';
 comment on column tbl_card.card_number_masked is '마스킹된 카드번호 (****-****-****-1234)';
 comment on column tbl_card.billing_key is 'PG 빌링키 (암호화 저장)';
+comment on column tbl_card.billing_receipt_id is '부트페이 빌링키 발급 receipt_id';
+comment on column tbl_card.billing_method is '부트페이 빌링 결제수단 표기값';
+comment on column tbl_card.billing_status is '부트페이 빌링 발급 상태값';
 comment on column tbl_card.is_default is '기본 카드 여부';
 comment on column tbl_card.deleted_datetime is '삭제 일시';
 
@@ -751,7 +758,7 @@ comment on column tbl_bookmark.target_id is '대상 PK';
 
 create index idx_bookmark_target on tbl_bookmark (target_type, target_id);
 
-select * from tbl_bookmark
+
 
 
 -- ----------------------------------------------------------
@@ -1464,6 +1471,8 @@ create table tbl_payment (
     payment_purpose varchar(255)   not null default 'PURCHASE',
     pay_method      varchar(255)   not null,
     card_id         bigint        null,
+    -- 변경: 부트페이 서버 결제 영수증 추적용 컬럼 추가
+    pg_receipt_id   varchar(255)  null,
     status          varchar(255)   not null default 'PENDING',
     paid_at         timestamp     not null default now(),
     refunded_at     timestamp     null,
@@ -1499,6 +1508,7 @@ comment on column tbl_payment.total_fee       is '총 수수료';
 comment on column tbl_payment.payment_purpose is '결제 목적 (PURCHASE / DEPOSIT / BALANCE)';
 comment on column tbl_payment.pay_method      is '결제 수단 (KAKAO_PAY / CARD 등)';
 comment on column tbl_payment.card_id         is '사용 카드 FK';
+comment on column tbl_payment.pg_receipt_id   is 'PG/부트페이 영수증 ID';
 comment on column tbl_payment.status          is '상태 (PENDING/AUTHORIZED/COMPLETED/REFUNDED/CANCELLED)';
 comment on column tbl_payment.paid_at         is '거래 일시';
 
@@ -1654,3 +1664,33 @@ comment on column tbl_like.target_id is '대상 PK';
 
 create index idx_like_target on tbl_like (target_type, target_id);
 
+-- tbl_work
+ALTER TABLE tbl_work ALTER COLUMN price TYPE bigint;
+
+-- tbl_contest
+ALTER TABLE tbl_contest ALTER COLUMN price TYPE bigint;
+
+-- tbl_order
+ALTER TABLE tbl_order ALTER COLUMN original_price   TYPE bigint;
+ALTER TABLE tbl_order ALTER COLUMN discount_amount  TYPE bigint;
+ALTER TABLE tbl_order ALTER COLUMN fee_amount       TYPE bigint;
+ALTER TABLE tbl_order ALTER COLUMN total_price      TYPE bigint;
+ALTER TABLE tbl_order ALTER COLUMN deposit_amount   TYPE bigint;
+
+-- tbl_payment
+ALTER TABLE tbl_payment ALTER COLUMN original_amount TYPE bigint;
+ALTER TABLE tbl_payment ALTER COLUMN total_price     TYPE bigint;
+ALTER TABLE tbl_payment ALTER COLUMN total_fee       TYPE bigint;
+
+-- tbl_settlement
+ALTER TABLE tbl_settlement ALTER COLUMN pre_tax_amount  TYPE bigint;
+ALTER TABLE tbl_settlement ALTER COLUMN total_deduction TYPE bigint;
+ALTER TABLE tbl_settlement ALTER COLUMN net_amount      TYPE bigint;
+
+-- tbl_settlement_deduction
+ALTER TABLE tbl_settlement_deduction ALTER COLUMN amount TYPE bigint;
+
+-- tbl_withdrawal_request
+ALTER TABLE tbl_withdrawal_request ALTER COLUMN requested_amount TYPE bigint;
+ALTER TABLE tbl_withdrawal_request ALTER COLUMN fee              TYPE bigint;
+ALTER TABLE tbl_withdrawal_request ALTER COLUMN net_amount       TYPE bigint;
