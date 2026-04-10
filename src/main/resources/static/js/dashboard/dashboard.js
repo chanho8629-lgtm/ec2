@@ -114,28 +114,49 @@ document.addEventListener('DOMContentLoaded', function () {
     tabIndicator.style.transform = 'translateX(' + (tabRect.left - containerRect.left) + 'px)';
   }
 
+  function activateTab(target) {
+    if (!target) {
+      return;
+    }
+
+    var activeButton = tabButtons.find(function (button) {
+      return button.dataset.dashboardTab === target;
+    });
+
+    if (!activeButton) {
+      return;
+    }
+
+    tabButtons.forEach(function (button) {
+      var active = button === activeButton;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+
+    panels.forEach(function (panel) {
+      var active = panel.dataset.dashboardPanel === target;
+      panel.classList.toggle('is-active', active);
+      panel.hidden = !active;
+    });
+
+    syncTabIndicator(activeButton);
+  }
+
   // 탭 이벤트 연결
   function setupTabs() {
     tabButtons.forEach(function (button) {
       button.addEventListener('click', function () {
-        var target = button.dataset.dashboardTab;
-
-        tabButtons.forEach(function (item) {
-          item.classList.toggle('is-active', item === button);
-          item.setAttribute('aria-selected', item === button ? 'true' : 'false');
-        });
-
-        panels.forEach(function (panel) {
-          var active = panel.dataset.dashboardPanel === target;
-          panel.classList.toggle('is-active', active);
-          panel.hidden = !active;
-        });
-
-        syncTabIndicator(button);
+        activateTab(button.dataset.dashboardTab);
       });
     });
 
-    syncTabIndicator(document.querySelector('.Dashboard-Tab.is-active'));
+    var initialTab = new URLSearchParams(window.location.search).get('tab');
+    if (initialTab) {
+      activateTab(initialTab);
+    } else {
+      syncTabIndicator(document.querySelector('.Dashboard-Tab.is-active'));
+    }
+
     window.addEventListener('resize', function () {
       syncTabIndicator(document.querySelector('.Dashboard-Tab.is-active'));
     });

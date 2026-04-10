@@ -47,11 +47,12 @@ function initializeWorkRegister() {
     var aiPromptModal = document.getElementById("ai-prompt-modal");
     var aiPromptCloseButton = document.getElementById("ai-prompt-close-button");
     var aiPromptInput = document.getElementById("ai-prompt-input");
-    var aiPromptBubble = document.getElementById("ai-prompt-bubble");
+    var aiPromptThread = document.getElementById("ai-prompt-thread");
     var aiPromptSendButton = document.getElementById("ai-prompt-send-button");
     var aiPromptToolButton = document.getElementById("ai-prompt-tool-button");
     var aiPromptComposeMenu = document.getElementById("ai-prompt-compose-menu");
     var aiPromptAttachButton = document.getElementById("ai-prompt-attach-button");
+    var aiPromptDeleteButton = document.getElementById("ai-prompt-delete-button");
     var aiPromptFileInput = document.getElementById("ai-prompt-file-input");
     var aiPromptAttachments = document.getElementById("ai-prompt-attachments");
     var aiPromptImageAttachment = document.getElementById("ai-prompt-image-attachment");
@@ -64,6 +65,7 @@ function initializeWorkRegister() {
     var registerState = document.getElementById("work-register-state");
     var currentPreviewUrl = "";
     var currentAiPromptAttachmentUrl = "";
+    var currentAiGeneratedAssetUrl = "";
     var thumbnailPreviewUrls = {};
     var currentMediaFile = null;
     var currentExistingMediaUrl = registerState ? (registerState.getAttribute("data-media-url") || "").trim() : "";
@@ -83,6 +85,26 @@ function initializeWorkRegister() {
     }
 
     modal.dataset.workRegisterInitialized = "true";
+
+    if (document.body && document.body.classList.contains("work-register-page")) {
+        var composeModal = document.querySelector("[data-yt-compose-modal]");
+        var composeContent = document.querySelector("[data-yt-compose-content]");
+        var embeddedRoots = document.querySelectorAll('[data-compose-embedded="true"]');
+
+        if (composeContent) {
+            composeContent.innerHTML = "";
+        }
+
+        if (composeModal) {
+            composeModal.hidden = true;
+        }
+
+        Array.prototype.forEach.call(embeddedRoots, function (node) {
+            if (node !== modal && !modal.contains(node)) {
+                node.remove();
+            }
+        });
+    }
 
     function closeModal() {
         if (typeof window.closeComposeModal === "function") {
@@ -140,6 +162,14 @@ function initializeWorkRegister() {
         return !!registerState && registerState.getAttribute("data-edit-mode") === "true";
     }
 
+    function isStateFlagEnabled(name) {
+        if (!registerState) {
+            return false;
+        }
+
+        return String(registerState.getAttribute(name) || "").trim().toLowerCase() === "true";
+    }
+
     function openAiPromptModal() {
         if (!aiPromptModal) {
             return;
@@ -170,6 +200,18 @@ function initializeWorkRegister() {
         aiPromptToolButton.setAttribute("aria-expanded", "false");
     }
 
+    function hasAiPromptAttachment() {
+        return !!(aiPromptFileInput && aiPromptFileInput.files && aiPromptFileInput.files[0]);
+    }
+
+    function syncAiPromptComposeMenuState() {
+        if (!aiPromptDeleteButton) {
+            return;
+        }
+
+        aiPromptDeleteButton.hidden = !hasAiPromptAttachment();
+    }
+
     function toggleAiPromptComposeMenu() {
         var willOpen;
 
@@ -178,6 +220,7 @@ function initializeWorkRegister() {
         }
 
         willOpen = aiPromptComposeMenu.hidden;
+        syncAiPromptComposeMenuState();
         aiPromptComposeMenu.hidden = !willOpen;
         aiPromptToolButton.setAttribute("aria-expanded", willOpen ? "true" : "false");
     }
@@ -211,6 +254,16 @@ function initializeWorkRegister() {
         if (aiPromptAttachments) {
             aiPromptAttachments.hidden = true;
         }
+
+        syncAiPromptComposeMenuState();
+    }
+
+    function clearAiGeneratedAsset() {
+        if (currentAiGeneratedAssetUrl && currentAiGeneratedAssetUrl.indexOf("blob:") === 0) {
+            URL.revokeObjectURL(currentAiGeneratedAssetUrl);
+        }
+
+        currentAiGeneratedAssetUrl = "";
     }
 
     function renderAiPromptAttachment(file) {
@@ -220,6 +273,7 @@ function initializeWorkRegister() {
 
         clearAiPromptAttachment();
         aiPromptAttachments.hidden = false;
+        syncAiPromptComposeMenuState();
 
         if (file.type && file.type.indexOf("image/") === 0) {
             currentAiPromptAttachmentUrl = URL.createObjectURL(file);
@@ -278,10 +332,168 @@ function initializeWorkRegister() {
         placeholder.classList.add("has-thumbnail-preview");
     }
 
+    function escapeHtml(value) {
+        return String(value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/\"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+    function buildAiGeneratedPlaceholderSvg(promptText) {
+        var safePrompt = escapeHtml(promptText || "해질 무렵 산 정상의 여인");
+        return [
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1280">',
+            '<defs>',
+            '<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">',
+            '<stop offset="0%" stop-color="#d7dcff"/>',
+            '<stop offset="42%" stop-color="#f8c8bd"/>',
+            '<stop offset="70%" stop-color="#f4b56d"/>',
+            '<stop offset="100%" stop-color="#3c312d"/>',
+            '</linearGradient>',
+            '<linearGradient id="ground" x1="0" y1="0" x2="1" y2="1">',
+            '<stop offset="0%" stop-color="#6b4a35"/>',
+            '<stop offset="100%" stop-color="#251d1a"/>',
+            '</linearGradient>',
+            '</defs>',
+            '<rect width="1080" height="1280" fill="url(#sky)"/>',
+            '<circle cx="515" cy="420" r="96" fill="#fff2c2" opacity="0.95"/>',
+            '<ellipse cx="520" cy="560" rx="440" ry="120" fill="#fff8ee" opacity="0.35"/>',
+            '<ellipse cx="520" cy="620" rx="520" ry="120" fill="#f7ede8" opacity="0.44"/>',
+            '<path d="M0 820L170 720L280 760L420 650L610 720L760 640L900 740L1080 700V1280H0Z" fill="url(#ground)"/>',
+            '<path d="M470 615C500 615 524 640 524 670V820H444V670C444 640 470 615 470 615Z" fill="#2c2a2c"/>',
+            '<circle cx="484" cy="586" r="34" fill="#2c2a2c"/>',
+            '<path d="M414 680L556 680L630 812L340 812Z" fill="#876332"/>',
+            '<path d="M434 700H538V736H434Z" fill="#c9a24e"/>',
+            '<path d="M404 720L454 918H392L338 806Z" fill="#2b2422"/>',
+            '<path d="M526 720L602 900H544L486 812Z" fill="#2b2422"/>',
+            '<text x="84" y="1122" fill="#ffffff" fill-opacity="0.88" font-size="42" font-family="Noto Sans KR, sans-serif">이미지 생성됨 · </text>',
+            '<text x="310" y="1122" fill="#ffffff" fill-opacity="0.96" font-size="42" font-family="Noto Sans KR, sans-serif">', safePrompt, '</text>',
+            '</svg>'
+        ].join("");
+    }
+
+    function createAiGeneratedAssetUrl(promptText) {
+        var svgBlob = new Blob([buildAiGeneratedPlaceholderSvg(promptText)], { type: "image/svg+xml;charset=UTF-8" });
+
+        clearAiGeneratedAsset();
+        currentAiGeneratedAssetUrl = URL.createObjectURL(svgBlob);
+        return currentAiGeneratedAssetUrl;
+    }
+
+    function scrollAiPromptThreadToBottom() {
+        if (!aiPromptThread) {
+            return;
+        }
+
+        aiPromptThread.scrollTop = aiPromptThread.scrollHeight;
+    }
+
+    function renderAiPromptConversation(promptText) {
+        var previewSource;
+        var labelText;
+
+        if (!aiPromptThread) {
+            return;
+        }
+
+        previewSource = currentAiPromptAttachmentUrl || createAiGeneratedAssetUrl(promptText);
+        labelText = promptText || "해질 무렵 산 정상의 여인";
+
+        aiPromptThread.innerHTML = [
+            '<div class="ai-prompt-thread__message ai-prompt-thread__message--user">', escapeHtml(promptText), '</div>',
+            '<div class="ai-prompt-thread__result">',
+            '<div class="ai-prompt-thread__label">이미지 생성됨 \u00b7 ', escapeHtml(labelText), '</div>',
+            '<div class="ai-prompt-preview-card" data-role="ai-preview-card">',
+            '<div class="ai-prompt-preview-card__split">',
+            '<img src="', escapeHtml(previewSource), '" alt="AI 생성 이미지">',
+            '</div>',
+            '<div class="ai-prompt-preview-card__split">',
+            '<img src="', escapeHtml(previewSource), '" alt="AI 생성 비디오 썸네일">',
+            '<span class="ai-prompt-preview-card__play" aria-hidden="true">',
+            '<svg viewBox="0 0 24 24"><path d="M8 5.14v13.72L19 12 8 5.14Z"/></svg>',
+            '</span>',
+            '</div>',
+            '</div>',
+            '<div class="ai-prompt-preview-actions">',
+            '<button type="button" class="ai-prompt-preview-actions__button" data-role="ai-preview-copy" aria-label="복사">',
+            '<svg viewBox="0 0 24 24"><path d="M16 1H6c-1.1 0-2 .9-2 2v12h2V3h10V1Zm3 4H10c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2Zm0 16H10V7h9v14Z"/></svg>',
+            '</button>',
+            '<button type="button" class="ai-prompt-preview-actions__button" data-role="ai-preview-apply" aria-label="업로드에 사용">',
+            '<svg viewBox="0 0 24 24"><path d="M14 3v7h7v2h-7v7h-2v-7H5v-2h7V3h2Z"/></svg>',
+            '</button>',
+            '<button type="button" class="ai-prompt-preview-actions__button" data-role="ai-preview-more" aria-label="더보기">',
+            '<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>',
+            '</button>',
+            '</div>',
+            '</div>'
+        ].join("");
+
+        scrollAiPromptThreadToBottom();
+    }
+
+    function dataUrlToFile(dataUrl, fileName) {
+        var parts;
+        var mimeMatch;
+        var mimeType;
+        var binaryString;
+        var length;
+        var bytes;
+        var index;
+
+        parts = String(dataUrl || "").split(",");
+        if (parts.length < 2) {
+            return null;
+        }
+
+        mimeMatch = parts[0].match(/data:(.*?);base64/);
+        mimeType = mimeMatch ? mimeMatch[1] : "image/png";
+        binaryString = window.atob(parts[1]);
+        length = binaryString.length;
+        bytes = new Uint8Array(length);
+
+        for (index = 0; index < length; index += 1) {
+            bytes[index] = binaryString.charCodeAt(index);
+        }
+
+        return new File([bytes], fileName || "ai-generated.png", { type: mimeType });
+    }
+
+    function applyAiGeneratedPreview() {
+        var promptText;
+        var generatedFile;
+        var dataUrl;
+        var attachedFile;
+
+        promptText = aiPromptInput ? aiPromptInput.value.trim() : "";
+        attachedFile = aiPromptFileInput && aiPromptFileInput.files ? aiPromptFileInput.files[0] : null;
+
+        if (attachedFile && attachedFile.type && attachedFile.type.indexOf("image/") === 0) {
+            generatedFile = attachedFile;
+        } else {
+            dataUrl = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(buildAiGeneratedPlaceholderSvg(promptText))));
+            generatedFile = dataUrlToFile(dataUrl, "ai-generated-artwork.svg");
+        }
+
+        if (!generatedFile) {
+            return;
+        }
+
+        currentMediaFile = generatedFile;
+        currentExistingMediaUrl = "";
+        currentExistingMediaType = generatedFile.type || "image/svg+xml";
+        updateSelectedFile(generatedFile);
+        updateMediaPreview(generatedFile);
+        updateVideoLink(currentPreviewUrl, generatedFile.name);
+        closeAiPromptModal();
+        showDetailsScreen(generatedFile);
+    }
+
     function submitAiPrompt() {
         var promptText;
 
-        if (!aiPromptInput || !aiPromptBubble) {
+        if (!aiPromptInput || !aiPromptThread) {
             return;
         }
 
@@ -292,7 +504,7 @@ function initializeWorkRegister() {
             return;
         }
 
-        aiPromptBubble.textContent = promptText;
+        renderAiPromptConversation(promptText);
     }
 
     function updateMediaPreview(file) {
@@ -644,15 +856,6 @@ function initializeWorkRegister() {
         videoTagsInput.focus();
     }
 
-    function escapeHtml(value) {
-        return String(value || "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/\"/g, "&quot;")
-            .replace(/'/g, "&#39;");
-    }
-
     function renderTagSuggestions(tags) {
         if (!videoTagsSuggestions) {
             return;
@@ -873,8 +1076,10 @@ function initializeWorkRegister() {
     function showDetailsScreen(file) {
         var title = toDisplayTitle(file.name);
 
-        uploadScreen.hidden = true;
-        uploadScreen.classList.remove("work-register-view-current");
+        if (uploadScreen) {
+            uploadScreen.hidden = true;
+            uploadScreen.classList.remove("work-register-view-current");
+        }
         detailsScreen.hidden = false;
         detailsScreen.classList.add("work-register-view-current");
         dialogContent.classList.add("is-details");
@@ -1015,6 +1220,31 @@ function initializeWorkRegister() {
         target.addEventListener("click", closeAiPromptModal);
     });
 
+    if (aiPromptThread) {
+        aiPromptThread.addEventListener("click", function (event) {
+            var actionButton = event.target.closest("[data-role]");
+
+            if (!actionButton) {
+                return;
+            }
+
+            if (actionButton.getAttribute("data-role") === "ai-preview-apply") {
+                applyAiGeneratedPreview();
+                return;
+            }
+
+            if (actionButton.getAttribute("data-role") === "ai-preview-copy" && aiPromptInput && navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(aiPromptInput.value.trim()).catch(function () {
+                });
+                return;
+            }
+
+            if (actionButton.getAttribute("data-role") === "ai-preview-more") {
+                window.alert("AI 생성 결과 옵션은 다음 단계에서 연결할 수 있습니다.");
+            }
+        });
+    }
+
     if (aiPromptCloseButton) {
         aiPromptCloseButton.addEventListener("click", closeAiPromptModal);
     }
@@ -1034,6 +1264,13 @@ function initializeWorkRegister() {
         aiPromptAttachButton.addEventListener("click", function () {
             closeAiPromptComposeMenu();
             aiPromptFileInput.click();
+        });
+    }
+
+    if (aiPromptDeleteButton) {
+        aiPromptDeleteButton.addEventListener("click", function () {
+            clearAiPromptAttachment();
+            closeAiPromptComposeMenu();
         });
     }
 
@@ -1388,6 +1625,9 @@ function initializeWorkRegister() {
     updateSelectedFile(null);
     updateMediaPreview(null);
     updateVideoLink("", "");
+    if (aiPromptThread) {
+        aiPromptThread.innerHTML = "";
+    }
     syncDialogSizeToDetailsScreen();
     autoResizeTextarea(videoTitleInput);
     updateTextCount(videoTitleInput, videoTitleCount, 100);
@@ -1402,6 +1642,15 @@ function initializeWorkRegister() {
     }
 
     if (isEditMode() && registerState) {
+        if (document.body) {
+            document.body.classList.add("work-register-edit-mode");
+        }
+        var editTradeEnabled = isStateFlagEnabled("data-is-tradable");
+        var editAuctionEnabled = isStateFlagEnabled("data-has-active-auction");
+        var editTradePrice = registerState.getAttribute("data-price") || "";
+        var editAuctionStartingPrice = registerState.getAttribute("data-auction-starting-price") || "";
+        var editAuctionDeadlineHours = Number(registerState.getAttribute("data-auction-deadline-hours") || "0");
+
         if (videoTitleInput) {
             videoTitleInput.value = registerState.getAttribute("data-title") || "";
             autoResizeTextarea(videoTitleInput);
@@ -1430,9 +1679,47 @@ function initializeWorkRegister() {
             videoFileLabel.textContent = registerState.getAttribute("data-title") || "업로드 파일";
         }
 
+        if (editTradeEnabled) {
+            if (tradeToggle) {
+                tradeToggle.checked = true;
+            }
+
+            if (tradeConfig) {
+                tradeConfig.hidden = false;
+                tradeConfig.style.display = "";
+            }
+
+            if (tradePriceInput) {
+                tradePriceInput.value = formatAuctionPrice(editTradePrice);
+            }
+        }
+
+        if (editAuctionEnabled) {
+            openAuctionConfig();
+
+            if (auctionBidPriceInput) {
+                auctionBidPriceInput.value = formatAuctionPrice(editAuctionStartingPrice);
+            }
+
+            if (auctionDeadlineSelected) {
+                auctionDeadlineSelected.textContent = formatAuctionDeadline(editAuctionDeadlineHours);
+            }
+
+            if (auctionDeadlineHoursInput) {
+                auctionDeadlineHoursInput.value = String(editAuctionDeadlineHours);
+            }
+
+            auctionDeadlineButtons.forEach(function (item) {
+                var itemHours = Number(item.getAttribute("data-hours") || "0");
+                item.classList.toggle("work-auction-config__deadline-btn--active", itemHours === editAuctionDeadlineHours);
+            });
+        }
+
         renderExistingMediaPreview(currentExistingMediaUrl, currentExistingMediaType);
         updateVideoLink(registerState.getAttribute("data-link-url") || currentExistingMediaUrl, registerState.getAttribute("data-link-url") || currentExistingMediaUrl);
         showDetailsScreen({ name: registerState.getAttribute("data-title") || "업로드 파일" });
+    } else if (document.body) {
+        document.body.classList.remove("work-register-edit-mode");
     }
 
     window.addEventListener("resize", syncDialogSizeToDetailsScreen);

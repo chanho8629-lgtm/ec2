@@ -409,6 +409,10 @@ ytd-rich-shelf-renderer h2, .content-row-section h2 {
 
 /* Responsive */
 @media (max-width: 1024px) {
+    .bd-shell__page-content.gallery-page {
+        margin-left: 72px;
+    }
+
     #content.ytd-default-promo-panel-renderer { padding: 0 40px; }
     .gallery-promo-content { padding: 0 40px; }
     .gallery-nav ul, .gallery-content { padding-left: 40px; padding-right: 40px; }
@@ -417,6 +421,10 @@ ytd-rich-shelf-renderer h2, .content-row-section h2 {
 }
 
 @media (max-width: 768px) {
+    .bd-shell__page-content.gallery-page {
+        margin-left: 0;
+    }
+
     ytd-default-promo-panel-renderer { height: 320px; }
     .gallery-promo-panel { height: 320px; }
     #hero { width: 100%; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 50%); }
