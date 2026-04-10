@@ -398,6 +398,7 @@ public class WorkService {
 
     private void saveAuctionIfRequested(Long workId, Long sellerId, Integer askingPrice, Boolean auctionEnabled, Integer startingPrice, Integer deadlineHours) {
         if (!Boolean.TRUE.equals(auctionEnabled)) {
+            auctionDAO.updateStatusByWorkId(workId, "CLOSED");
             return;
         }
         if (workDAO.existsActiveAuctionByWorkId(workId)) {

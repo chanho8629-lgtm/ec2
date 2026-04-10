@@ -60,6 +60,11 @@
                                                     <span th:text="${gallery != null ? gallery.description : '예술관 설명'}">예술관 설명</span>
                                                 </div>
 
+                                                <a class="hero-meta"
+                                                   th:if="${gallery != null and gallery.memberNickname != null and !#strings.isEmpty(gallery.memberNickname)}"
+                                                   th:href="@{/profile/{nickname}(nickname=${gallery.memberNickname})}"
+                                                   th:text="|@${gallery.memberNickname}|">@artist</a>
+
 
                                                 <p class="hero-meta"
                                                    th:text="|작품 ${gallery != null and gallery.workCount != null ? gallery.workCount : 0}개 · 조회수 ${gallery != null and gallery.viewCount != null ? gallery.viewCount : 0}회|">작품 0개 · 조회수 0회</p>
@@ -117,13 +122,22 @@
                                             </div>
                                             <div class="item-meta">
                                                 <div class="item-avatar">
-                                                    <img th:if="${work.memberProfileImage != null and !#strings.isEmpty(work.memberProfileImage)}"
-                                                         th:src="${work.memberProfileImage}"
-                                                         th:alt="${work.memberNickname != null ? work.memberNickname : '작가'}">
+                                                    <span th:if="${work.memberNickname != null and !#strings.isEmpty(work.memberNickname)}"
+                                                          class="item-profile-link"
+                                                          th:attr="data-profile-url=@{/profile/{nickname}(nickname=${work.memberNickname})}">
+                                                        <img th:if="${work.memberProfileImage != null and !#strings.isEmpty(work.memberProfileImage)}"
+                                                             th:src="${work.memberProfileImage}"
+                                                             th:alt="${work.memberNickname != null ? work.memberNickname : '작가'}">
+                                                    </span>
                                                 </div>
                                                 <div class="item-copy">
                                                     <h3 th:text="${work.title}">작품 제목</h3>
-                                                    <p class="item-channel" th:text="${gallery != null ? gallery.memberNickname : '작가명'}">작가명</p>
+                                                    <span class="item-channel item-profile-link"
+                                                          th:if="${work.memberNickname != null and !#strings.isEmpty(work.memberNickname)}"
+                                                          th:attr="data-profile-url=@{/profile/{nickname}(nickname=${work.memberNickname})}"
+                                                          th:text="|@${work.memberNickname}|">@작가명</span>
+                                                    <p class="item-channel"
+                                                       th:unless="${work.memberNickname != null and !#strings.isEmpty(work.memberNickname)}">작가명</p>
                                                     <p class="item-stats"
                                                        th:text="|조회수 ${work.viewCount == null ? 0 : work.viewCount}회 · 좋아요 ${work.likeCount == null ? 0 : work.likeCount}개|">조회수 0회 · 좋아요 0개</p>
                                                 </div>
@@ -247,6 +261,19 @@
             closeButton?.addEventListener("click", () => {
                 closeMenu();
                 window.location.href = "/profile";
+            });
+
+            document.querySelectorAll(".item-profile-link").forEach((node) => {
+                node.addEventListener("click", (event) => {
+                    const profileUrl = node.getAttribute("data-profile-url");
+                    if (!profileUrl) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    event.stopPropagation();
+                    window.location.href = profileUrl;
+                });
             });
         })();
     </script>

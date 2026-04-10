@@ -50,6 +50,10 @@ public class AuctionDAO {
         auctionMapper.updateStatus(auctionId, status);
     }
 
+    public void updateStatusByWorkId(Long workId, String status) {
+        auctionMapper.updateStatusByWorkId(workId, status);
+    }
+
     public void updateWinner(Long auctionId, Long winnerId, Integer finalPrice) {
         auctionMapper.updateWinner(auctionId, winnerId, finalPrice);
     }

@@ -172,6 +172,14 @@
         WHERE id = #{auctionId}
     </update>
 
+    <update id="updateStatusByWorkId">
+        UPDATE tbl_auction
+        SET status = #{status},
+            updated_datetime = now()
+        WHERE work_id = #{workId}
+          AND status = 'ACTIVE'
+    </update>
+
     <update id="updateWinner">
         UPDATE tbl_auction
         SET winner_id = #{winnerId},

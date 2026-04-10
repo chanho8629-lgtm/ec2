@@ -1,5 +1,6 @@
 const workDetails = [];
 const currentWorkId = Number(window.location.pathname.split("/").filter(Boolean).pop() || "0");
+let mobileSnapTimeoutId = null;
 
 function getCurrentWorkId() {
     return Number.isFinite(currentWorkId) && currentWorkId > 0 ? currentWorkId : null;
@@ -216,6 +217,7 @@ async function normalizeWorkDetail(detail) {
         marketType,
         avatarText: getAvatarText(detail.memberNickname),
         channel: `@${detail.memberNickname || "artist"}`,
+        profileUrl: detail.memberNickname ? `/profile/${encodeURIComponent(detail.memberNickname)}` : "/profile",
         isOwner: Boolean(detail.isOwner),
         subscribe: "팔로우",
         desc: detail.description || "",
@@ -405,6 +407,7 @@ function bindPageData(page, data) {
     const marketIconPath = page.querySelector('[data-role="market-icon-path"]');
     const marketIconSvg = marketButton?.querySelector("svg");
     const pivotButton = page.querySelector('[data-role="pivot-button"]');
+    const channelNodes = page.querySelectorAll(".channel");
     const hasMarketAction = data.marketType === "trade" || data.marketType === "auction";
     const hasPivotItems = Array.isArray(data.pivotItems) && data.pivotItems.length > 0;
 
@@ -429,6 +432,11 @@ function bindPageData(page, data) {
         pivotButton.style.display = hasPivotItems ? "" : "none";
         pivotButton.setAttribute("aria-hidden", hasPivotItems ? "false" : "true");
     }
+
+    channelNodes.forEach((node) => {
+        node.dataset.profileUrl = data.profileUrl || "/profile";
+        node.style.cursor = "pointer";
+    });
 }
 
 // 댓글/답글 렌더링에 사용하는 기본 유틸
@@ -745,6 +753,7 @@ function bindPageInteractions(page, data) {
     const commentsButton = page.querySelector('[data-role="comments-button"]');
     const pivotButton = page.querySelector('[data-role="pivot-button"]');
     const leftMeta = page.querySelector(".left-meta");
+    const channelBox = page.querySelector(".channel");
     const anchoredPanel = page.querySelector('[data-role="anchored-panel"]');
     const anchoredPanelClose = page.querySelector('[data-role="anchored-panel-close"]');
     const commentsPanel = page.querySelector('[data-role="comments-panel"]');
@@ -765,6 +774,11 @@ function bindPageInteractions(page, data) {
     const shareLinkInput = page.querySelector('[data-role="share-link-input"]');
     const shareLinkCopy = page.querySelector('[data-role="share-link-copy"]');
     const shareModal = shareModalBackdrop?.querySelector(".work-share-modal");
+    const shareSearchInput = shareModalBackdrop?.querySelector('[data-share-search]') || shareModalBackdrop?.querySelector(".work-share-modal__search");
+    const shareList = shareModalBackdrop?.querySelector('[data-share-list]') || shareModalBackdrop?.querySelector(".work-share-modal__list");
+    const shareChips = shareModalBackdrop?.querySelector('[data-share-chips]') || shareModalBackdrop?.querySelector(".work-share-modal__chips");
+    const shareMessageInput = shareModalBackdrop?.querySelector('[data-share-message]') || shareModalBackdrop?.querySelector(".work-share-modal__message");
+    const shareSendButton = shareModalBackdrop?.querySelector('[data-share-send]') || shareModalBackdrop?.querySelector(".work-share-modal__send");
     const auctionModal = ensureAuctionModalShell();
     const auctionModalBackdrop = auctionModal.backdrop;
     const auctionModalClose = auctionModal.closeButton;
@@ -788,6 +802,17 @@ function bindPageInteractions(page, data) {
     const isOwner = Boolean(data.isOwner);
     let lastNonZeroVolume = 0.5;
     let isPaused = false;
+    const navigateToProfile = (event) => {
+        const target = event.currentTarget;
+        const profileUrl = target?.dataset?.profileUrl || data.profileUrl || "/profile";
+        if (!profileUrl) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        window.location.href = profileUrl;
+    };
 
     const updateVolumeUi = () => {
         if (!thumbVideo || !volumeButton || !volumeIconPath) {
@@ -834,6 +859,7 @@ function bindPageInteractions(page, data) {
         }
 
         auctionModalBackdrop.hidden = true;
+        syncResponsiveModalStyles(auctionModalBackdrop, auctionModalBackdrop.querySelector(".work-auction-modal"), false);
         page.classList.remove("panel-open", "panel-auction");
 
         if (activeAuctionPage === page) {
@@ -861,6 +887,7 @@ function bindPageInteractions(page, data) {
         activeAuctionPage = page;
         page.classList.add("panel-open", "panel-auction");
         auctionModalBackdrop.hidden = false;
+        syncResponsiveModalStyles(auctionModalBackdrop, auctionModalBackdrop.querySelector(".work-auction-modal"), true);
         window.AuctionEvent?.init();
     };
 
@@ -920,6 +947,10 @@ function bindPageInteractions(page, data) {
             event.stopPropagation();
             togglePlayback();
         });
+    }
+
+    if (channelBox) {
+        channelBox.addEventListener("click", navigateToProfile);
     }
 
     if (thumbVideo && !thumbVideo.hidden) {
@@ -1316,6 +1347,186 @@ function bindPageInteractions(page, data) {
         pivotGrid.innerHTML = (data.pivotItems || []).map(renderPivotCard).join("");
     }
 
+    let mobilePanelShell = null;
+    let activeMobilePanelType = "";
+
+    const ensureMobilePanelShell = () => {
+        if (mobilePanelShell) {
+            return mobilePanelShell;
+        }
+
+        const shell = document.createElement("div");
+        shell.className = "workdetail-mobile-panel-shell";
+        shell.style.position = "fixed";
+        shell.style.inset = "0";
+        shell.style.zIndex = "10050";
+        shell.style.display = "none";
+        shell.style.alignItems = "flex-start";
+        shell.style.justifyContent = "center";
+        shell.style.pointerEvents = "auto";
+        shell.style.background = "transparent";
+        shell.style.padding = "0";
+        shell.innerHTML = `
+            <div class="workdetail-mobile-panel-sheet" style="position:fixed;left:50%;bottom:0;width:min(calc(100vw - 16px), 414px);max-width:calc(100vw - 16px);height:min(68dvh, 560px);max-height:68dvh;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 18px 40px rgba(0,0,0,.24);transform:translate(-50%, 0);opacity:1;pointer-events:auto;display:flex;flex-direction:column;overflow:hidden;">
+                <div data-role="mobile-panel-content" style="flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow:hidden;"></div>
+            </div>
+        `;
+        shell.addEventListener("click", (event) => {
+            if (event.target === shell) {
+                hideMobileBottomSheet();
+            }
+        });
+        document.body.appendChild(shell);
+        mobilePanelShell = shell;
+        return shell;
+    };
+
+    const syncMobilePanelAnchor = () => {
+        if (!mobilePanelShell) {
+            return;
+        }
+        const sheet = mobilePanelShell.querySelector(".workdetail-mobile-panel-sheet");
+        if (!sheet) {
+            return;
+        }
+        sheet.style.bottom = "0";
+        sheet.style.height = "min(68dvh, 560px)";
+        sheet.style.maxHeight = "68dvh";
+    };
+
+    const hideMobileBottomSheet = () => {
+        if (!mobilePanelShell) {
+            activeMobilePanelType = "";
+            return;
+        }
+
+        const sheet = mobilePanelShell.querySelector(".workdetail-mobile-panel-sheet");
+        if (sheet) {
+            sheet.style.opacity = "1";
+            sheet.style.transform = "translate(-50%, 0)";
+        }
+        mobilePanelShell.style.display = "none";
+    };
+
+    const renderMobileDescriptionSheet = () => {
+        return `
+            <div style="display:flex;align-items:center;justify-content:center;padding:8px 0 2px;">
+                <div style="width:40px;height:4px;border-radius:999px;background:#d4d4d8;"></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #ececf1;">
+                <strong style="font-size:20px;font-weight:800;color:#111;">설명</strong>
+                <button type="button" data-role="mobile-panel-close" style="border:0;background:transparent;font-size:28px;line-height:1;color:#111;cursor:pointer;">×</button>
+            </div>
+            <div style="flex:1 1 auto;min-height:0;overflow:auto;padding:18px;background:#fff;">
+                <p style="margin:0 0 10px;font-size:22px;font-weight:800;line-height:1.35;color:#111;">${escapeHtml(workState.headline || "")}</p>
+                <p style="margin:0 0 18px;font-size:15px;line-height:1.7;color:#3f3f46;white-space:pre-wrap;">${escapeHtml(workState.desc || "")}</p>
+                <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;">
+                    <div style="padding:14px 10px;border-radius:12px;background:#f6f7e8;text-align:center;">
+                        <strong style="display:block;font-size:24px;font-weight:800;color:#3f3f46;">${escapeHtml(workState.likeCount || "0")}</strong>
+                        <span style="font-size:12px;color:#71717a;">좋아요</span>
+                    </div>
+                    <div style="padding:14px 10px;border-radius:12px;background:#f6f7e8;text-align:center;">
+                        <strong style="display:block;font-size:24px;font-weight:800;color:#3f3f46;">${escapeHtml(workState.viewCount || "0")}</strong>
+                        <span style="font-size:12px;color:#71717a;">조회수</span>
+                    </div>
+                    <div style="padding:14px 10px;border-radius:12px;background:#f6f7e8;text-align:center;">
+                        <strong style="display:block;font-size:18px;font-weight:800;color:#3f3f46;">${escapeHtml(workState.publishedDate || "")}</strong>
+                        <span style="font-size:12px;color:#71717a;">${escapeHtml(workState.publishedYear || "")}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+
+    const renderMobileCommentsSheet = () => {
+        const commentsHtml = commentsList ? commentsList.innerHTML : "";
+        return `
+            <div style="display:flex;align-items:center;justify-content:center;padding:8px 0 2px;">
+                <div style="width:40px;height:4px;border-radius:999px;background:#d4d4d8;"></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #ececf1;">
+                <strong style="font-size:20px;font-weight:800;color:#111;">댓글 ${escapeHtml(workState.commentCount || "")}</strong>
+                <button type="button" data-role="mobile-panel-close" style="border:0;background:transparent;font-size:28px;line-height:1;color:#111;cursor:pointer;">×</button>
+            </div>
+            <div style="padding:14px 16px;border-bottom:1px solid #ececf1;background:#fff;">
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                    <div style="width:36px;height:36px;border-radius:999px;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;">e</div>
+                    <input type="text" placeholder="댓글 추가..." style="flex:1;height:44px;border:1px solid #e4e4e7;border-radius:12px;padding:0 14px;font-size:14px;outline:none;">
+                </div>
+            </div>
+            <div style="flex:1 1 auto;min-height:0;overflow:auto;padding:0 16px 18px;background:#fff;">${commentsHtml}</div>
+        `;
+    };
+
+    const syncMobilePanelStyles = (panel, isOpen) => {
+        return { panel, isOpen };
+    };
+
+    const syncResponsiveModalStyles = (backdrop, dialog, isOpen) => {
+        if (!backdrop) {
+            return;
+        }
+
+        if (!isMobileShortsViewport()) {
+            [
+                "position",
+                "inset",
+                "display",
+                "alignItems",
+                "justifyContent",
+                "padding",
+                "background",
+                "zIndex"
+            ].forEach((property) => backdrop.style.removeProperty(property));
+
+            if (dialog) {
+                [
+                "width",
+                "maxWidth",
+                "height",
+                "maxHeight",
+                "margin",
+                "position",
+                "left",
+                "top",
+                "bottom",
+                "borderRadius",
+                "overflow",
+                "boxShadow",
+                "transform"
+            ].forEach((property) => dialog.style.removeProperty(property));
+            }
+            return;
+        }
+
+        backdrop.style.position = "fixed";
+        backdrop.style.inset = "0";
+        backdrop.style.setProperty("display", isOpen ? "flex" : "none", "important");
+        backdrop.style.alignItems = "flex-end";
+        backdrop.style.justifyContent = "center";
+        backdrop.style.padding = "12px";
+        backdrop.style.background = "transparent";
+        backdrop.style.zIndex = "10035";
+
+        if (!dialog) {
+            return;
+        }
+
+        dialog.style.position = "fixed";
+        dialog.style.left = "50%";
+        dialog.style.top = "auto";
+        dialog.style.bottom = "12px";
+        dialog.style.width = "min(92vw, 360px)";
+        dialog.style.maxWidth = "92vw";
+        dialog.style.height = "auto";
+        dialog.style.maxHeight = "min(62dvh, 520px)";
+        dialog.style.margin = "0";
+        dialog.style.borderRadius = "20px";
+        dialog.style.overflow = "hidden";
+        dialog.style.boxShadow = "0 18px 40px rgba(0, 0, 0, 0.24)";
+        dialog.style.transform = "translate(-50%, 0)";
+    };
+
     if (shareLinkInput) {
         shareLinkInput.value = data.shareUrl || "https://localhost:10000/profile/ttt?galleryId=9";
     }
@@ -1323,7 +1534,7 @@ function bindPageInteractions(page, data) {
     if (marketButton && data.marketType === "trade") {
         marketButton.addEventListener("click", (event) => {
             event.stopPropagation();
-            window.location.href = `/payment/pay-api?workId=${data.id}`;
+            window.location.href = `/payment/pay?workId=${data.id}`;
         });
     }
 
@@ -1413,7 +1624,7 @@ function bindPageInteractions(page, data) {
         shareModalBackdrop.style.inset = "0";
         shareModalBackdrop.style.zIndex = "9999";
         shareModalBackdrop.style.display = "none";
-        shareModalBackdrop.style.background = "rgba(15, 23, 42, 0.42)";
+        shareModalBackdrop.style.setProperty("background", "transparent", "important");
         shareModalBackdrop.style.padding = "16px";
         shareModalBackdrop.style.alignItems = "center";
         shareModalBackdrop.style.justifyContent = "center";
@@ -1426,16 +1637,162 @@ function bindPageInteractions(page, data) {
             shareModal.style.zIndex = "10000";
         }
 
+        const demoShareUsers = [
+            { username: "diy_master", subtitle: "크리에이터 인증", avatar: "/images/sample/avatar_08.png" },
+            { username: "art_studio_kr", subtitle: "크리에이터 인증", avatar: "/images/sample/avatar_05.png" },
+            { username: "포토그래퍼은서", subtitle: "크리에이터 인증", avatar: "/images/sample/avatar_04.png" },
+            { username: "여행가수현", subtitle: "크리에이터 인증", avatar: "/images/sample/avatar_02.png" },
+            { username: "영상작가현우", subtitle: "크리에이터 인증", avatar: "/images/sample/avatar_09.png" },
+            { username: "요리하는지훈", subtitle: "일반 회원", avatar: "/images/sample/avatar_03.png" },
+            { username: "크리에이터지아", subtitle: "일반 회원", avatar: "/images/sample/avatar_10.png" },
+            { username: "디자인하는민지", subtitle: "크리에이터 인증", avatar: "/images/sample/avatar_01.png" },
+            { username: "인테리어소희", subtitle: "일반 회원", avatar: "/images/sample/avatar_06.png" },
+            { username: "패션블로거하늘", subtitle: "일반 회원", avatar: "/images/sample/avatar_07.png" }
+        ];
+        let selectedShareUsers = [];
+        const shareReceiverMap = new Map();
+
+        const requestJson = async (url, options = {}) => {
+            const response = await fetch(url, {
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(options.headers || {})
+                },
+                credentials: "same-origin",
+                ...options
+            });
+
+            if (!response.ok) {
+                let message = "요청 처리 중 오류가 발생했습니다.";
+
+                try {
+                    const errorBody = await response.json();
+                    message = errorBody.message || message;
+                } catch (_) {
+                    try {
+                        const text = await response.text();
+                        if (text) {
+                            message = text;
+                        }
+                    } catch (_) {
+                    }
+                }
+
+                throw new Error(message);
+            }
+
+            if (response.status === 204) {
+                return null;
+            }
+
+            const contentType = response.headers.get("content-type") || "";
+            if (!contentType.includes("application/json")) {
+                return null;
+            }
+
+            return response.json();
+        };
+
+        const resolveShareNickname = () => {
+            const profileUrl = String(workState.profileUrl || "").trim();
+            if (profileUrl.startsWith("/profile/")) {
+                return decodeURIComponent(profileUrl.slice("/profile/".length));
+            }
+
+            return String(workState.channel || "").replace(/^@/, "").trim();
+        };
+
+        const renderShareChips = () => {
+            if (!shareChips) {
+                return;
+            }
+
+            shareChips.innerHTML = selectedShareUsers.map((username) => `
+                <button type="button" class="work-share-chip" data-share-chip="${escapeHtml(username)}">
+                    <span class="work-share-chip__text">${escapeHtml(username)}</span>
+                    <span class="work-share-chip__remove" aria-hidden="true">×</span>
+                </button>
+            `).join("");
+
+            if (shareList) {
+                shareList.querySelectorAll("[data-share-user]").forEach((node) => {
+                    const username = node.getAttribute("data-share-user") || "";
+                    node.classList.toggle("is-selected", selectedShareUsers.includes(username));
+                });
+            }
+        };
+
+        const renderShareList = (keyword = "") => {
+            if (!shareList) {
+                return;
+            }
+
+            const normalizedKeyword = String(keyword || "").trim().toLowerCase();
+            const filtered = demoShareUsers.filter((user) => !normalizedKeyword || user.username.toLowerCase().includes(normalizedKeyword));
+
+            shareList.innerHTML = filtered.map((user) => `
+                <button type="button" class="work-share-user" data-share-user="${escapeHtml(user.username)}">
+                    <img src="${escapeHtml(user.avatar)}" alt="${escapeHtml(user.username)} 프로필 이미지">
+                    <span class="work-share-user__meta">
+                        <strong>${escapeHtml(user.username)}</strong>
+                        <small>${escapeHtml(user.subtitle)}</small>
+                    </span>
+                </button>
+            `).join("");
+        };
+
+        const searchShareUsers = async (keyword = "") => {
+            const profileNickname = resolveShareNickname();
+
+            if (!profileNickname || !shareList) {
+                renderShareList(keyword);
+                return;
+            }
+
+            try {
+                const users = await requestJson(`/api/profile/${encodeURIComponent(profileNickname)}/share/receivers?keyword=${encodeURIComponent(keyword || "")}`);
+                const safeUsers = Array.isArray(users) ? users : [];
+
+                shareReceiverMap.clear();
+                safeUsers.forEach((user) => {
+                    if (user?.nickname) {
+                        shareReceiverMap.set(user.nickname, user);
+                    }
+                });
+
+                if (!safeUsers.length) {
+                    shareList.innerHTML = '<div class="followManageEmpty">검색 결과가 없습니다.</div>';
+                    return;
+                }
+
+                shareList.innerHTML = safeUsers.map((user) => `
+                    <button type="button" class="work-share-user" data-share-user="${escapeHtml(user.nickname)}">
+                        ${user.profileImage ? `<img src="${escapeHtml(user.profileImage)}" alt="${escapeHtml(user.nickname)} 프로필 이미지">` : `<span class="work-share-user__avatar">${escapeHtml((user.nickname || "N").charAt(0))}</span>`}
+                        <span class="work-share-user__meta">
+                            <strong>${escapeHtml(user.nickname)}</strong>
+                            <small>${escapeHtml(user.creatorVerified ? "크리에이터 인증" : "일반 회원")}</small>
+                        </span>
+                    </button>
+                `).join("");
+            } catch (_) {
+                renderShareList(keyword);
+            }
+        };
+
         const openShareModal = () => {
+            searchShareUsers(shareSearchInput ? shareSearchInput.value : "");
+            renderShareChips();
             shareModalBackdrop.hidden = false;
             shareModalBackdrop.setAttribute("aria-hidden", "false");
             shareModalBackdrop.style.display = "flex";
+            syncResponsiveModalStyles(shareModalBackdrop, shareModal, true);
         };
 
         const closeShareModal = () => {
             shareModalBackdrop.hidden = true;
             shareModalBackdrop.setAttribute("aria-hidden", "true");
             shareModalBackdrop.style.display = "none";
+            syncResponsiveModalStyles(shareModalBackdrop, shareModal, false);
         };
 
         shareButton.addEventListener("click", async (event) => {
@@ -1444,21 +1801,6 @@ function bindPageInteractions(page, data) {
             if (!shareModalBackdrop.hidden) {
                 closeShareModal();
                 return;
-            }
-
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: workState.headline || document.title,
-                        text: workState.desc || "",
-                        url: workState.shareUrl || window.location.href
-                    });
-                    return;
-                } catch (error) {
-                    if (error?.name === "AbortError") {
-                        return;
-                    }
-                }
             }
 
             openShareModal();
@@ -1502,6 +1844,75 @@ function bindPageInteractions(page, data) {
                 shareLinkInput.select();
             }
         });
+
+        shareSearchInput?.addEventListener("input", () => {
+            searchShareUsers(shareSearchInput.value);
+        });
+
+        shareList?.addEventListener("click", (event) => {
+            const userButton = event.target.closest("[data-share-user]");
+            const username = userButton?.getAttribute("data-share-user");
+
+            if (!username) {
+                return;
+            }
+
+            if (selectedShareUsers.includes(username)) {
+                selectedShareUsers = selectedShareUsers.filter((item) => item !== username);
+            } else {
+                selectedShareUsers = selectedShareUsers.concat(username);
+            }
+
+            renderShareChips();
+
+            if (shareSearchInput) {
+                shareSearchInput.value = "";
+                searchShareUsers("");
+            }
+        });
+
+        shareChips?.addEventListener("click", (event) => {
+            const chip = event.target.closest("[data-share-chip]");
+            const username = chip?.getAttribute("data-share-chip");
+
+            if (!username) {
+                return;
+            }
+
+            selectedShareUsers = selectedShareUsers.filter((item) => item !== username);
+            renderShareChips();
+        });
+
+        shareSendButton?.addEventListener("click", () => {
+            const receiverIds = selectedShareUsers
+                .map((username) => shareReceiverMap.get(username)?.id)
+                .filter(Boolean);
+            const shareNickname = resolveShareNickname();
+
+            if (!receiverIds.length || !shareNickname) {
+                window.alert("받는 사람을 선택해 주세요.");
+                return;
+            }
+
+            requestJson(`/api/profile/${encodeURIComponent(shareNickname)}/share`, {
+                method: "POST",
+                body: JSON.stringify({
+                    receiverIds,
+                    shareUrl: workState.shareUrl || window.location.href,
+                    message: (shareMessageInput?.value || "").trim()
+                })
+            }).then(() => {
+                closeShareModal();
+                selectedShareUsers = [];
+                renderShareChips();
+                if (shareMessageInput) {
+                    shareMessageInput.value = "";
+                }
+                window.alert("작품을 공유했습니다.");
+            }).catch((error) => {
+                window.alert(error.message || "작품 공유에 실패했습니다.");
+            });
+        });
     }
 
     if (reportButton && reportModalBackdrop) {
@@ -1531,24 +1942,29 @@ function bindPageInteractions(page, data) {
             }
             syncReportNextButton();
             reportModalBackdrop.hidden = false;
+            syncResponsiveModalStyles(reportModalBackdrop, reportModalBackdrop.querySelector(".report-modal-dialog"), true);
             if (reportConfirmationBackdrop) {
                 reportConfirmationBackdrop.hidden = true;
+                syncResponsiveModalStyles(reportConfirmationBackdrop, reportConfirmationBackdrop.querySelector(".report-modal-dialog"), false);
             }
         };
 
         const closeReportModal = () => {
             reportModalBackdrop.hidden = true;
+            syncResponsiveModalStyles(reportModalBackdrop, reportModalBackdrop.querySelector(".report-modal-dialog"), false);
         };
 
         const openReportConfirmationModal = () => {
             if (reportConfirmationBackdrop) {
                 reportConfirmationBackdrop.hidden = false;
+                syncResponsiveModalStyles(reportConfirmationBackdrop, reportConfirmationBackdrop.querySelector(".report-modal-dialog"), true);
             }
         };
 
         const closeReportConfirmationModal = () => {
             if (reportConfirmationBackdrop) {
                 reportConfirmationBackdrop.hidden = true;
+                syncResponsiveModalStyles(reportConfirmationBackdrop, reportConfirmationBackdrop.querySelector(".report-modal-dialog"), false);
             }
         };
 
@@ -1599,17 +2015,97 @@ function bindPageInteractions(page, data) {
         });
     }
 
-    if (anchoredPanel) {
-        let closePanelTimer;
+        if (anchoredPanel) {
+            let closePanelTimer;
+            syncMobilePanelStyles(anchoredPanel, false);
+            syncMobilePanelStyles(commentsPanel, false);
+        const openMobileSheet = (panelType) => {
+            if (!isMobileShortsViewport()) {
+                return false;
+            }
+
+            window.clearTimeout(closePanelTimer);
+            closeAuctionPanelForPage();
+            page.classList.remove("panel-open", "panel-comments", "panel-pivot", "panel-auction");
+            const shell = ensureMobilePanelShell();
+            const sheet = shell.querySelector(".workdetail-mobile-panel-sheet");
+            const content = shell.querySelector('[data-role="mobile-panel-content"]');
+
+            if (!sheet || !content) {
+                return false;
+            }
+
+            content.innerHTML = panelType === "comments"
+                ? renderMobileCommentsSheet()
+                : renderMobileDescriptionSheet();
+
+            content.querySelector('[data-role="mobile-panel-close"]')?.addEventListener("click", () => {
+                activeMobilePanelType = "";
+                hideMobileBottomSheet();
+            });
+
+            shell.style.display = "flex";
+            shell.style.pointerEvents = "auto";
+            syncMobilePanelAnchor();
+            sheet.style.opacity = "1";
+            sheet.style.transform = "translate(-50%, 0)";
+            activeMobilePanelType = panelType;
+
+            return true;
+        };
+
+        const closeMobileSheets = () => {
+            if (!isMobileShortsViewport()) {
+                return false;
+            }
+
+            if (mobilePanelShell) {
+                const sheet = mobilePanelShell.querySelector(".workdetail-mobile-panel-sheet");
+                if (sheet) {
+                    sheet.style.opacity = "0";
+                    sheet.style.transform = "translate(-50%, calc(100% + 32px))";
+                }
+                mobilePanelShell.style.pointerEvents = "none";
+                window.setTimeout(() => {
+                    if (mobilePanelShell && !activeMobilePanelType) {
+                        mobilePanelShell.style.display = "none";
+                    }
+                }, 200);
+            }
+            activeMobilePanelType = "";
+
+            return true;
+        };
+
+        window.addEventListener("resize", () => {
+            if (isMobileShortsViewport()) {
+                if (activeMobilePanelType) {
+                    syncMobilePanelAnchor();
+                }
+                return;
+            }
+
+            if (mobilePanelShell) {
+                mobilePanelShell.style.display = "none";
+                mobilePanelShell.style.pointerEvents = "none";
+            }
+            activeMobilePanelType = "";
+        });
 
         const openPanel = (panelType) => {
+            if (openMobileSheet(panelType)) {
+                return;
+            }
+
             window.clearTimeout(closePanelTimer);
             closeAuctionPanelForPage();
             if (anchoredPanel) {
                 anchoredPanel.hidden = panelType !== "description";
+                syncMobilePanelStyles(anchoredPanel, panelType === "description");
             }
             if (commentsPanel) {
                 commentsPanel.hidden = panelType !== "comments";
+                syncMobilePanelStyles(commentsPanel, panelType === "comments");
             }
             if (pivotPanel) {
                 pivotPanel.hidden = panelType !== "pivot";
@@ -1623,6 +2119,10 @@ function bindPageInteractions(page, data) {
         };
 
         const closePanel = () => {
+            if (closeMobileSheets()) {
+                return;
+            }
+
             closeAuctionPanelForPage();
             page.classList.remove("panel-open");
             page.classList.remove("panel-comments");
@@ -1632,9 +2132,11 @@ function bindPageInteractions(page, data) {
                 if (!page.classList.contains("panel-open")) {
                     if (anchoredPanel) {
                         anchoredPanel.hidden = true;
+                        syncMobilePanelStyles(anchoredPanel, false);
                     }
                     if (commentsPanel) {
                         commentsPanel.hidden = true;
+                        syncMobilePanelStyles(commentsPanel, false);
                     }
                     if (pivotPanel) {
                         pivotPanel.hidden = true;
@@ -1664,11 +2166,14 @@ function bindPageInteractions(page, data) {
             commentsButton.addEventListener("click", (event) => {
                 event.stopPropagation();
 
-                const isCommentsOpen =
-                    page.classList.contains("panel-open") &&
-                    page.classList.contains("panel-comments") &&
-                    commentsPanel &&
-                    !commentsPanel.hidden;
+                const isCommentsOpen = isMobileShortsViewport()
+                    ? activeMobilePanelType === "comments"
+                    : Boolean(
+                        page.classList.contains("panel-open") &&
+                        page.classList.contains("panel-comments") &&
+                        commentsPanel &&
+                        !commentsPanel.hidden
+                    );
 
                 if (isCommentsOpen) {
                     closePanel();
@@ -1928,7 +2433,7 @@ function getCurrentPageIndex() {
 }
 
 // 상하 네비게이션 이동
-function scrollToPage(index) {
+function scrollToPage(index, behavior = "smooth") {
     if (!pageStack) {
         return;
     }
@@ -1937,8 +2442,56 @@ function scrollToPage(index) {
     const targetPage = pages[index];
 
     if (targetPage) {
-        targetPage.scrollIntoView({ behavior: "smooth", block: "start" });
+        targetPage.scrollIntoView({ behavior, block: "start" });
     }
+}
+
+function isMobileShortsViewport() {
+    return typeof window !== "undefined" && window.matchMedia("(max-width: 1200px)").matches;
+}
+
+function syncMobileShortsLayout() {
+    const pages = pageStack ? Array.from(pageStack.querySelectorAll(".page")) : [];
+
+    if (!pageStack || !isMobileShortsViewport()) {
+        document.body.removeAttribute("data-mobile-shorts");
+        document.body.style.removeProperty("--mobile-stage-height");
+        pages.forEach((page) => {
+            page.style.removeProperty("height");
+            page.style.removeProperty("min-height");
+            page.style.removeProperty("flex-basis");
+        });
+        return;
+    }
+
+    const viewportHeight = window.visualViewport && window.visualViewport.height
+        ? window.visualViewport.height
+        : window.innerHeight;
+    const usableHeight = Math.max(Math.round(viewportHeight), 320);
+
+    document.body.setAttribute("data-mobile-shorts", "true");
+    document.body.style.setProperty("--mobile-stage-height", `${usableHeight}px`);
+
+    pages.forEach((page) => {
+        page.style.height = `${usableHeight}px`;
+        page.style.minHeight = `${usableHeight}px`;
+        page.style.flexBasis = `${usableHeight}px`;
+    });
+}
+
+function scheduleMobilePageSnap() {
+    if (!pageStack || !isMobileShortsViewport()) {
+        return;
+    }
+
+    if (mobileSnapTimeoutId) {
+        window.clearTimeout(mobileSnapTimeoutId);
+    }
+
+    mobileSnapTimeoutId = window.setTimeout(() => {
+        const currentIndex = getCurrentPageIndex();
+        scrollToPage(currentIndex, "auto");
+    }, 120);
 }
 
 // 전체화면 대상 페이지 표시 동기화
@@ -2031,9 +2584,21 @@ function resetInactivePages() {
 
         if (anchoredPanel) {
             anchoredPanel.hidden = true;
+            anchoredPanel.classList.remove("mobile-sheet-open");
+            anchoredPanel.style.removeProperty("display");
+            anchoredPanel.style.removeProperty("visibility");
+            anchoredPanel.style.removeProperty("opacity");
+            anchoredPanel.style.removeProperty("pointer-events");
+            anchoredPanel.style.removeProperty("transform");
         }
         if (commentsPanel) {
             commentsPanel.hidden = true;
+            commentsPanel.classList.remove("mobile-sheet-open");
+            commentsPanel.style.removeProperty("display");
+            commentsPanel.style.removeProperty("visibility");
+            commentsPanel.style.removeProperty("opacity");
+            commentsPanel.style.removeProperty("pointer-events");
+            commentsPanel.style.removeProperty("transform");
         }
         if (pivotPanel) {
             pivotPanel.hidden = true;
@@ -2099,13 +2664,16 @@ async function initializeWorkDetailPage() {
             pageStack.addEventListener("scroll", () => {
                 updateNavigationState();
                 resetInactivePages();
+                scheduleMobilePageSnap();
                 if (document.querySelector(".workdetail-stage")?.classList.contains("stage-fullscreen")) {
                     syncFullscreenActivePage();
                 }
             }, { passive: true });
             window.addEventListener("resize", updateNavigationState);
+            window.addEventListener("resize", syncMobileShortsLayout);
             resetInactivePages();
             updateNavigationState();
+            syncMobileShortsLayout();
             syncFullscreenActivePage();
         }
     } catch (error) {

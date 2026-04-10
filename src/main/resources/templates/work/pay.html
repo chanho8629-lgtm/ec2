@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="/css/common/global.css" th:href="@{/css/common/global.css}">
     <link rel="stylesheet" href="/css/common/util.css" th:href="@{/css/common/util.css}">
     <link rel="stylesheet" href="/css/common/common.css" th:href="@{/css/common/common.css}">
-    <link rel="stylesheet" href="../../templates/work/pay-api.css">
+    <link rel="stylesheet" href="/css/work/pay.css" th:href="@{/css/work/pay.css}">
     <link rel="icon" href="/images/BIDEO_LOGO/BIDEO_favicon.png">
     <link rel="stylesheet" href="/css/common/font.css">
     <link rel="stylesheet" href="/css/common/global.css">
@@ -48,7 +48,7 @@
     <section class="pay-status">
         <div class="pay-status__item">
             <span class="pay-status__label">거래 상태</span>
-            <strong class="pay-status__value">결제 대기</strong>
+            <strong class="pay-status__value" id="paymentStatusLabel">결제 대기</strong>
         </div>
     </section>
 
@@ -114,7 +114,7 @@
 </section>
 </main>
 
-<script src="/js/pay/pay-api.js"></script>
+<script src="/js/work/pay.js" th:src="@{/js/work/pay.js}"></script>
 <th:block th:replace="~{layout/layout :: ytShellScripts()}"></th:block>
 </body>
 </html>

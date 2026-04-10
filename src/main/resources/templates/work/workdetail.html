@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Work Detail</title>
     <meta name="shell-head" th:replace="~{layout/layout :: ytShellHead('Work Detail - Bideo')}">
+    <link rel="stylesheet" href="/css/common/global.css" th:href="@{/css/common/global.css}" />
     <link rel="stylesheet" href="/css/common/font.css" th:href="@{/css/common/font.css}">
     <link rel="stylesheet" href="/css/work/workdetail.css" th:href="@{/css/work/workdetail.css}">
     <link rel="stylesheet" href="/css/auction/auction.css" th:href="@{/css/auction/auction.css}">
+    <link rel="stylesheet" href="/templates/work/pay-api.css" th:href="@{/templates/work/pay-api.css}">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
  </head>
 <body class="workdetail-page" id="section">
@@ -272,8 +274,8 @@
                 </div>
             </aside>
 
-            <div class="work-share-modal-backdrop" hidden data-role="share-modal-backdrop">
-                <div class="work-share-modal" role="dialog" aria-modal="true" aria-labelledby="work-share-modal-title" style="left: 800px; top: 300px;">
+            <div class="work-share-modal-backdrop work-share-modal-overlay" hidden data-role="share-modal-backdrop" aria-hidden="true">
+                <div class="work-share-modal" role="dialog" aria-modal="true" aria-labelledby="work-share-modal-title">
                     <div class="work-share-modal__header">
                         <div class="work-share-modal__spacer"></div>
                         <h2 class="work-share-modal__title" id="work-share-modal-title">공유</h2>
@@ -286,19 +288,19 @@
                     </div>
                     <div class="work-share-modal__link-row">
                         <input class="work-share-modal__link-input" type="text" readonly value="https://localhost:10000/profile/ttt?galleryId=9" data-role="share-link-input">
-                        <button class="work-share-modal__link-copy" type="button" data-role="share-link-copy">복사</button>
+                        <button class="work-share-modal__link-copy" type="button" data-role="share-link-copy" data-share-copy>복사</button>
                     </div>
                     <div class="work-share-modal__receiver">
                         <label class="work-share-modal__label">받는 사람:</label>
                         <div class="work-share-modal__receiver-body">
-                            <div class="work-share-modal__chips"></div>
-                            <input class="work-share-modal__search" type="text" placeholder="검색..." autocomplete="off">
+                            <div class="work-share-modal__chips" data-share-chips></div>
+                            <input class="work-share-modal__search" type="text" placeholder="검색..." autocomplete="off" data-share-search>
                         </div>
                     </div>
-                    <div class="work-share-modal__list"></div>
+                    <div class="work-share-modal__list" data-share-list></div>
                     <div class="work-share-modal__footer">
-                        <input class="work-share-modal__message" type="text" placeholder="메시지 쓰기..." autocomplete="off">
-                        <button class="work-share-modal__send" type="button">보내기</button>
+                        <input class="work-share-modal__message" type="text" placeholder="메시지 쓰기..." autocomplete="off" data-share-message>
+                        <button class="work-share-modal__send" type="button" data-share-send>보내기</button>
                     </div>
                 </div>
             </div>
