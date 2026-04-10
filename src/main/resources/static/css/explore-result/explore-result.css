@@ -13,7 +13,7 @@ body {
   font-family: 'Noto Sans KR', 'Roboto', Arial, sans-serif;
   background-color: #ffffff;
   color: #0f0f0f;
-  display: flex;
+  /*display: flex; => 해당 속성으로 오른쪽 짧아짐*/
   min-height: 100vh;
 }
 
@@ -30,15 +30,15 @@ button {
   font-family: inherit;
 }
 
-/* ===== 메인 콘텐츠 ===== */
+/* 메인 중앙 */
 .main-content {
   padding: 60px 24px 24px;
   width: calc(100% - 72px);
-  /* max-width: 1096px; */
+  max-width: 1096px;
   margin-left: 240px;
 }
 
-/* ===== 필터 칩 ===== */
+/* 필터 */
 .filter-chips {
   display: flex;
   gap: 12px;
@@ -546,6 +546,7 @@ img.work-icon-circle {
 .toast.off {
   opacity: 0;
   pointer-events: none;
+  display: none;
 }
 
 .toast-action {
@@ -585,6 +586,7 @@ img.work-icon-circle {
 .modal-overlay.off {
   opacity: 0;
   pointer-events: none;
+  display: none;
 }
 
 .modal {
@@ -816,7 +818,7 @@ img.work-icon-circle {
     background: rgba(0, 0, 0, 0.45);
 }
 
-.work-share-modal-overlay.off {
+.work-share-modal-overlay[hidden] {
     display: none;
 }
 
@@ -1144,3 +1146,8 @@ img.work-icon-circle {
     aspect-ratio: 16 / 9;
   }
 }
+
+.off {
+  display: none;
+}
+
