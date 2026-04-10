@@ -10,6 +10,9 @@
             card_company,
             card_number_masked,
             billing_key,
+            billing_receipt_id,
+            billing_method,
+            billing_status,
             is_default,
             created_datetime
         from tbl_card
@@ -24,6 +27,9 @@
             card_company,
             card_number_masked,
             billing_key,
+            billing_receipt_id,
+            billing_method,
+            billing_status,
             is_default,
             created_datetime
         from tbl_card
@@ -41,9 +47,9 @@
 
     <insert id="insert" parameterType="com.app.bideo.domain.payment.CardVO" useGeneratedKeys="true" keyProperty="id">
         insert into tbl_card (
-            member_id, card_company, card_number_masked, billing_key, is_default
+            member_id, card_company, card_number_masked, billing_key, billing_receipt_id, billing_method, billing_status, is_default
         ) values (
-            #{memberId}, #{cardCompany}, #{cardNumberMasked}, #{billingKey}, #{isDefault}
+            #{memberId}, #{cardCompany}, #{cardNumberMasked}, #{billingKey}, #{billingReceiptId}, #{billingMethod}, #{billingStatus}, #{isDefault}
         )
     </insert>
 
@@ -52,6 +58,9 @@
         set card_company = #{cardCompany},
             card_number_masked = #{cardNumberMasked},
             billing_key = #{billingKey},
+            billing_receipt_id = #{billingReceiptId},
+            billing_method = #{billingMethod},
+            billing_status = #{billingStatus},
             is_default = #{isDefault}
         where id = #{id}
           and member_id = #{memberId}
@@ -89,12 +98,33 @@
             card_company,
             card_number_masked,
             billing_key,
+            billing_receipt_id,
+            billing_method,
+            billing_status,
             is_default,
             created_datetime
         from tbl_card
         where member_id = #{memberId}
           and deleted_datetime is null
         order by created_datetime desc
+        limit 1
+    </select>
+
+    <select id="selectDefaultCard" resultType="com.app.bideo.dto.payment.CardResponseDTO">
+        select
+            id,
+            card_company,
+            card_number_masked,
+            billing_key,
+            billing_receipt_id,
+            billing_method,
+            billing_status,
+            is_default,
+            created_datetime
+        from tbl_card
+        where member_id = #{memberId}
+          and deleted_datetime is null
+          and is_default = true
         limit 1
     </select>
 
