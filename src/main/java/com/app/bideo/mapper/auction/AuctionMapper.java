@@ -33,9 +33,11 @@ public interface AuctionMapper {
     void updateStatus(@Param("auctionId") Long auctionId,
                       @Param("status") String status);
 
+    void updateStatusByWorkId(@Param("workId") Long workId,
+                              @Param("status") String status);
+
     void updateWinner(@Param("auctionId") Long auctionId,
                       @Param("winnerId") Long winnerId,
-                      @Param("finalPrice") Long finalPrice);
                       @Param("finalPrice") Integer finalPrice);
 
     boolean existsWishlist(@Param("memberId") Long memberId,

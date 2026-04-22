@@ -44,8 +44,9 @@
                 <a class="more" href="javascript:void(0)"></a>
               </h1>
               <p class="channelText">
-                <span data-profile-name th:text="${profile.realName != null and !#strings.isEmpty(profile.realName) ? profile.realName : '-'}">이름</span>
-                <span th:text="| · 팔로워 ${profile.followerCount}명 · 팔로잉 ${profile.followingCount}명 · 작품 ${profile.workCount}개|"> · 팔로워 0명 · 팔로잉 0명 · 작품 0개</span>
+                <span th:if="${profile.realName != null and !#strings.isEmpty(profile.realName)}"
+                      data-profile-name th:text="|${profile.realName} · |">이름 · </span>
+                <span th:text="|팔로워 ${profile.followerCount}명 · 팔로잉 ${profile.followingCount}명 · 작품 ${profile.workCount}개|">팔로워 0명 · 팔로잉 0명 · 작품 0개</span>
               </p>
               <div class="profileBadgeRow" data-profile-badges>
                 <span class="profileBadgeChip" data-server-badge="true" th:each="badge : ${profileBadges}">

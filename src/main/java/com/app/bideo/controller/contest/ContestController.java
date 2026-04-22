@@ -164,7 +164,7 @@ public class ContestController {
         PageResponseDTO<ContestListResponseDTO> result = contestService.getHostedContestList(userDetails.getId());
         model.addAttribute("contestList", result.getContent());
         model.addAttribute("page", result);
-        return "contest/contestlist";
+        return "contest/contest-list";
     }
 
     @GetMapping("/my-entries")
@@ -172,7 +172,7 @@ public class ContestController {
         PageResponseDTO<ContestListResponseDTO> result = contestService.getParticipatedContestList(userDetails.getId());
         model.addAttribute("contestList", result.getContent());
         model.addAttribute("page", result);
-        return "contest/mycontests";
+        return "contest/contest-list";
     }
 
     @GetMapping("/{id}/edit")
