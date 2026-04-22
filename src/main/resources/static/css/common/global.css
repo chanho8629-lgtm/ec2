@@ -72,7 +72,7 @@
   /* 콘텐츠 영역 */
   --content-top: var(--layout-header-height);
   --content-left: var(--layout-guide-width);
-  --content-width: calc(100& - var(--layout-guide-width));
+  --content-width: calc(100 - var(--layout-guide-width));
   --content-padding: 24px;
 
   /* 다크 테마 색상 */

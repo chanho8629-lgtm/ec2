@@ -89,4 +89,6 @@ public interface WorkMapper {
     int decreaseWorkLikeCount(@Param("workId") Long workId);
 
     Integer selectWorkLikeCount(@Param("workId") Long workId);
+
+    int updateWorkStatus(@Param("id") Long id, @Param("status") String status);
 }

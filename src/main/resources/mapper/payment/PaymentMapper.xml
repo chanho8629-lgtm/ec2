@@ -22,6 +22,14 @@
         WHERE id = #{paymentId}
     </select>
 
+    <select id="selectRawById" resultType="PaymentVO">
+        SELECT id, payment_code, order_code, buyer_id, seller_id, work_id, auction_id,
+               original_amount, total_price, total_fee, payment_purpose, pay_method,
+               card_id, status, paid_at, refunded_at, created_datetime
+        FROM tbl_payment
+        WHERE id = #{paymentId}
+    </select>
+
     <select id="selectByPaymentCode" resultType="PaymentResponseDTO">
         SELECT id, payment_code, order_code, total_price, total_fee,
                payment_purpose, pay_method, status, paid_at, created_datetime
