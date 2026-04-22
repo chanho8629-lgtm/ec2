@@ -21,6 +21,7 @@ public class DashboardAPIController {
     private final DashboardService dashboardService;
     private final CardService cardService;
 
+    // 대시보드 조회
     @GetMapping
     public ResponseEntity<Map<String, Object>> getDashboard(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -34,9 +35,7 @@ public class DashboardAPIController {
 
         return ResponseEntity.ok(Map.of(
                 "dashboard", dashboardService.getDashboard(userDetails.getId()),
-                "cards", cardService.getMyCards(userDetails.getId()) == null
-                        ? List.of()
-                        : cardService.getMyCards(userDetails.getId())
+                "cards", cardService.getMyCards(userDetails.getId()) == null ? List.of() : cardService.getMyCards(userDetails.getId())
         ));
     }
 }

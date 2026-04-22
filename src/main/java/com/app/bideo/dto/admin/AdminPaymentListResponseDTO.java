@@ -14,7 +14,7 @@ public class AdminPaymentListResponseDTO {
     private String sellerName;
     private String orderType;
     private String workTitle;
-    private Integer totalPrice;
+    private Long totalPrice;
     private String paidAt;
     private String status;
 }

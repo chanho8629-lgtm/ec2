@@ -97,6 +97,15 @@
           and deleted_datetime is null
     </update>
 
+    <update id="updateWorkStatus">
+        update tbl_work
+        set
+            status = #{status},
+            updated_datetime = now()
+        where id = #{id}
+          and deleted_datetime is null
+    </update>
+
     <select id="selectWork" resultType="WorkDTO">
         select
             id,
@@ -169,6 +178,7 @@
         left join tbl_member m on w.member_id = m.id
         where w.id = #{id}
           and w.deleted_datetime is null
+          and w.status = 'ACTIVE'
     </select>
 
     <select id="selectWorkList" resultType="WorkListResponseDTO">
@@ -201,7 +211,7 @@
             limit 1
         ) t_file on true
         where w.deleted_datetime is null
-          and w.status != 'DELETED'
+          and w.status = 'ACTIVE'
         <if test="galleryId != null">
             and exists (
                 select 1
@@ -279,7 +289,7 @@
             limit 1
         ) t_file on true
         where w.deleted_datetime is null
-          and w.status != 'DELETED'
+          and w.status = 'ACTIVE'
         <if test="keyword != null and keyword != ''">
             and (
                 w.title ilike '%' || #{keyword} || '%'
@@ -303,7 +313,7 @@
         from tbl_work w
         left join tbl_member m on w.member_id = m.id
         where w.deleted_datetime is null
-          and w.status != 'DELETED'
+          and w.status = 'ACTIVE'
         <if test="galleryId != null">
             and exists (
                 select 1

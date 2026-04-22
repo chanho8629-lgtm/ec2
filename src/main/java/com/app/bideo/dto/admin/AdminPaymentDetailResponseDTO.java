@@ -14,9 +14,9 @@ public class AdminPaymentDetailResponseDTO {
     private String sellerName;
     private Long sellerId;
     private String orderType;
-    private Integer totalPrice;
-    private Integer totalFee;
-    private Integer settlementAmount;
+    private Long totalPrice;
+    private Long totalFee;
+    private Long settlementAmount;
     private String buyerName;
     private String buyerEmail;
     private String payMethod;

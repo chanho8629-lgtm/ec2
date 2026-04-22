@@ -33,7 +33,7 @@ public class OrderService {
 
     public OrderDetailResponseDTO createOrder(Long buyerId, OrderCreateRequestDTO requestDTO) {
         Long sellerId;
-        Integer originalPrice;
+        Long originalPrice;
         String licenseType = requestDTO.getLicenseType();
 
         if ("AUCTION".equals(requestDTO.getOrderType())) {
@@ -63,8 +63,8 @@ public class OrderService {
             }
         }
 
-        int feeAmount = (int) (originalPrice * FEE_RATE);
-        int totalPrice = originalPrice + feeAmount;
+        long feeAmount = Math.round(originalPrice * FEE_RATE);
+        long totalPrice = originalPrice + feeAmount;
 
         OrderVO orderVO = OrderVO.builder()
                 .orderCode(UUID.randomUUID().toString().replace("-", "").substring(0, 20).toUpperCase())
@@ -75,7 +75,7 @@ public class OrderService {
                 .orderType(requestDTO.getOrderType())
                 .licenseType(licenseType)
                 .originalPrice(originalPrice)
-                .discountAmount(0)
+                .discountAmount(0L)
                 .feeAmount(feeAmount)
                 .totalPrice(totalPrice)
                 .status("PENDING_PAYMENT")

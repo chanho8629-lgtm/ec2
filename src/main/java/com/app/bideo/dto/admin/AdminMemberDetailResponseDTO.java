@@ -38,7 +38,7 @@ public class AdminMemberDetailResponseDTO {
     private Integer workCount;
     private Integer auctionParticipateCount;
     private Integer soldCount;
-    private Integer totalTradeAmount;
+    private Long totalTradeAmount;
     private Integer pendingWithdrawalCount;
     private String lastTransactionDate;
     private Integer refundCount;

@@ -16,9 +16,9 @@ public class SettlementDetailResponseDTO {
     private String paymentCode;
     private Long memberId;
     private String memberNickname;
-    private Integer preTaxAmount;
-    private Integer totalDeduction;
-    private Integer netAmount;
+    private Long preTaxAmount;
+    private Long totalDeduction;
+    private Long netAmount;
     private Integer effectiveTaxRate;
     private String status;
     private List<SettlementDeductionVO> deductions;

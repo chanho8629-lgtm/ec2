@@ -2,6 +2,7 @@ package com.app.bideo.controller.payment;
 
 import com.app.bideo.auth.member.CustomUserDetails;
 import com.app.bideo.dto.common.PageResponseDTO;
+import com.app.bideo.dto.payment.BootpayConfirmRequestDTO;
 import com.app.bideo.dto.payment.PaymentRequestDTO;
 import com.app.bideo.dto.payment.PaymentResponseDTO;
 import com.app.bideo.service.payment.PaymentService;
@@ -55,5 +56,12 @@ public class PaymentAPIController {
             @PathVariable Long id,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(paymentService.refundPayment(id, userDetails.getId()));
+    }
+
+    @PostMapping("/bootpay/confirm")
+    public ResponseEntity<PaymentResponseDTO> confirmBootpayPayment(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody BootpayConfirmRequestDTO requestDTO) {
+        return ResponseEntity.ok(paymentService.confirmBootpayPayment(userDetails.getId(), requestDTO));
     }
 }

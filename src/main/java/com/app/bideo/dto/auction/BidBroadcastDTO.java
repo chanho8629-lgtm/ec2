@@ -15,9 +15,9 @@ public class BidBroadcastDTO {
     private Long auctionId;
     private Long memberId;
     private String memberNickname;
-    private Integer bidPrice;
-    private Integer currentPrice;
+    private Long bidPrice;
+    private Long currentPrice;
     private Integer bidCount;
-    private Integer nextMinBid;      // currentPrice + bidIncrement
+    private Long nextMinBid;      // currentPrice + bidIncrement
     private LocalDateTime createdDatetime;
 }

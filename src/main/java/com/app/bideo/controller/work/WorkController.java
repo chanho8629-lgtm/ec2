@@ -1,6 +1,8 @@
 package com.app.bideo.controller.work;
 
+import com.app.bideo.dto.auction.AuctionDetailResponseDTO;
 import com.app.bideo.dto.work.WorkDetailResponseDTO;
+import com.app.bideo.service.auction.AuctionQueryService;
 import com.app.bideo.service.gallery.GalleryService;
 import com.app.bideo.service.work.WorkService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +20,7 @@ public class WorkController {
 
     private final WorkService workService;
     private final GalleryService galleryService;
+    private final AuctionQueryService auctionQueryService;
 
     // 작품 등록 페이지 이동
     @GetMapping("/work-register")
@@ -32,8 +35,19 @@ public class WorkController {
     @GetMapping("/work-edit/{id}")
     public String goToWorkEdit(@PathVariable Long id, HttpServletRequest request, Model model) {
         WorkDetailResponseDTO work = workService.getWorkDetail(id);
+        AuctionDetailResponseDTO activeAuction = null;
+
+        if (Boolean.TRUE.equals(work.getHasActiveAuction())) {
+            try {
+                activeAuction = auctionQueryService.getActiveAuctionByWorkId(id);
+            } catch (IllegalArgumentException ignored) {
+                activeAuction = null;
+            }
+        }
+
         model.addAttribute("editMode", true);
         model.addAttribute("work", work);
+        model.addAttribute("activeAuction", activeAuction);
         model.addAttribute("galleries", galleryService.getProfileGalleries());
         model.addAttribute("embeddedMode", isEmbeddedRequest(request));
         return "work/work-register";

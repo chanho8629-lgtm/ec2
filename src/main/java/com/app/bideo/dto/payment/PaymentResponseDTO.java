@@ -12,8 +12,8 @@ public class PaymentResponseDTO {
     private Long id;
     private String paymentCode;
     private String orderCode;
-    private Integer totalPrice;
-    private Integer totalFee;
+    private Long totalPrice;
+    private Long totalFee;
     private String paymentPurpose;
     private String payMethod;
     private String pgReceiptId;

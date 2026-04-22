@@ -12,7 +12,7 @@ public class BidVO {
     private Long id;
     private Long auctionId;
     private Long memberId;
-    private Integer bidPrice;
+    private Long bidPrice;
     private Boolean isWinning;
     private LocalDateTime createdDatetime;
 }

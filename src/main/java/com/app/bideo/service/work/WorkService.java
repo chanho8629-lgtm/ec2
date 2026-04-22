@@ -400,8 +400,9 @@ public class WorkService {
         return keyword.trim().toLowerCase(Locale.ROOT);
     }
 
-    private void saveAuctionIfRequested(Long workId, Long sellerId, Integer askingPrice, Boolean auctionEnabled, Integer startingPrice, Integer deadlineHours) {
+    private void saveAuctionIfRequested(Long workId, Long sellerId, Long askingPrice, Boolean auctionEnabled, Long startingPrice, Integer deadlineHours) {
         if (!Boolean.TRUE.equals(auctionEnabled)) {
+            auctionDAO.updateStatusByWorkId(workId, "CLOSED");
             return;
         }
         if (workDAO.existsActiveAuctionByWorkId(workId)) {
@@ -413,14 +414,14 @@ public class WorkService {
         if (deadlineHours == null || deadlineHours <= 0) {
             throw new IllegalArgumentException("입찰 마감기한을 선택해주세요.");
         }
-        int resolvedAskingPrice = askingPrice != null && askingPrice > 0 ? askingPrice : startingPrice;
+        long resolvedAskingPrice = askingPrice != null && askingPrice > 0 ? askingPrice : startingPrice;
         if (startingPrice > resolvedAskingPrice) {
             throw new IllegalArgumentException("입찰가는 작품 가격보다 클 수 없습니다.");
         }
 
         LocalDateTime startedAt = LocalDateTime.now();
-        int feeAmount = (int) Math.round(resolvedAskingPrice * 0.10d);
-        int settlementAmount = Math.max(0, resolvedAskingPrice - feeAmount);
+        long feeAmount = Math.round(resolvedAskingPrice * 0.10d);
+        long settlementAmount = Math.max(0, resolvedAskingPrice - feeAmount);
 
         auctionDAO.save(
                 AuctionVO.builder()
@@ -428,7 +429,7 @@ public class WorkService {
                         .sellerId(sellerId)
                         .askingPrice(resolvedAskingPrice)
                         .startingPrice(startingPrice)
-                        .bidIncrement(10000)
+                        .bidIncrement(10000L)
                         .currentPrice(startingPrice)
                         .bidCount(0)
                         .feeRate(0.10d)

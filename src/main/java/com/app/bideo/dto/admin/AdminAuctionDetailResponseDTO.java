@@ -11,9 +11,9 @@ import java.math.BigDecimal;
 public class AdminAuctionDetailResponseDTO {
     private Long id;
     private String auctionCode;
-    private Integer startingPrice;
-    private Integer bidIncrement;
-    private Integer finalPrice;
+    private Long startingPrice;
+    private Long bidIncrement;
+    private Long finalPrice;
     private Integer bidCount;
     private Integer participantCount;
     private String startedAt;
@@ -23,8 +23,8 @@ public class AdminAuctionDetailResponseDTO {
     private String category;
     private String winnerName;
     private BigDecimal feeRate;
-    private Integer feeAmount;
-    private Integer settlementAmount;
+    private Long feeAmount;
+    private Long settlementAmount;
     private String status;
     private String paymentStatus;
     private String settlementStatus;
