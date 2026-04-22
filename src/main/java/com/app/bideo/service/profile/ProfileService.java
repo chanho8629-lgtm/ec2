@@ -59,7 +59,8 @@ public class ProfileService {
                 .nickname(profileMember.getNickname())
                 .realName(profileMember.getRealName())
                 .bio(profileMember.getBio())
-                .profileImage(profileMember.getProfileImage())
+                .profileImage(s3FileService.getPresignedUrl(profileMember.getProfileImage()))
+                .bannerImage(s3FileService.getPresignedUrl(profileMember.getBannerImage()))
                 .creatorVerified(profileMember.getCreatorVerified())
                 .sellerVerified(profileMember.getSellerVerified())
                 .creatorTier(profileMember.getCreatorTier())
@@ -139,7 +140,15 @@ public class ProfileService {
             throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
         }
 
-        memberRepository.updateProfile(memberId, nickname, realName, bio, profileImage, phoneNumber);
+        memberRepository.updateProfile(
+                memberId,
+                nickname,
+                realName,
+                bio,
+                profileImage,
+                member.getBannerImage(),
+                phoneNumber
+        );
 
         MemberVO updatedMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
@@ -159,6 +168,7 @@ public class ProfileService {
                 normalizeNullableText(requestDTO.getRealName(), member.getRealName()),
                 normalizeNullableText(requestDTO.getBio(), member.getBio()),
                 normalizeNullableText(requestDTO.getProfileImage(), member.getProfileImage()),
+                normalizeNullableText(requestDTO.getBannerImage(), member.getBannerImage()),
                 normalizeNullableText(requestDTO.getPhoneNumber(), member.getPhoneNumber())
         );
 
@@ -182,6 +192,32 @@ public class ProfileService {
                 member.getNickname(),
                 member.getRealName(),
                 member.getBio(),
+                uploadedKey,
+                member.getBannerImage(),
+                member.getPhoneNumber()
+        );
+
+        return getMyProfile(memberId);
+    }
+
+    // 배너 이미지 수정
+    @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = "profile", allEntries = true)
+    public ProfileViewResponseDTO updateMyBannerImage(Long memberId, MultipartFile bannerImageFile) {
+        if (bannerImageFile == null || bannerImageFile.isEmpty()) {
+            throw new IllegalArgumentException("배너 이미지를 선택해 주세요.");
+        }
+
+        MemberVO member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
+
+        String uploadedKey = s3FileService.upload("profile-banners", bannerImageFile);
+        memberRepository.updateProfile(
+                memberId,
+                member.getNickname(),
+                member.getRealName(),
+                member.getBio(),
+                member.getProfileImage(),
                 uploadedKey,
                 member.getPhoneNumber()
         );
@@ -210,6 +246,7 @@ public class ProfileService {
                 member.getRealName(),
                 member.getBio(),
                 member.getProfileImage(),
+                member.getBannerImage(),
                 member.getPhoneNumber()
         );
 

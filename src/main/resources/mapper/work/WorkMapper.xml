@@ -97,6 +97,15 @@
           and deleted_datetime is null
     </update>
 
+    <update id="updateWorkStatus">
+        update tbl_work
+        set
+            status = #{status},
+            updated_datetime = now()
+        where id = #{id}
+          and deleted_datetime is null
+    </update>
+
     <select id="selectWork" resultType="WorkDTO">
         select
             id,
@@ -169,6 +178,7 @@
         left join tbl_member m on w.member_id = m.id
         where w.id = #{id}
           and w.deleted_datetime is null
+          and w.status = 'ACTIVE'
     </select>
 
     <select id="selectWorkList" resultType="WorkListResponseDTO">
@@ -201,7 +211,7 @@
             limit 1
         ) t_file on true
         where w.deleted_datetime is null
-          and w.status != 'DELETED'
+          and w.status = 'ACTIVE'
         <if test="galleryId != null">
             and exists (
                 select 1
@@ -238,8 +248,64 @@
         <if test="status != null and status != ''">
             and w.status = #{status}
         </if>
-        order by w.created_datetime desc
+        <choose>
+            <when test="sort == 'popular'">
+                order by w.like_count desc, w.view_count desc, w.id desc
+            </when>
+            <otherwise>
+                order by w.created_datetime desc, w.id desc
+            </otherwise>
+        </choose>
         limit #{size} offset (#{page} - 1) * #{size}
+    </select>
+
+    <select id="selectSearchWorkList" resultType="WorkListResponseDTO">
+        select
+            w.id,
+            w.member_id,
+            w.title,
+            w.category,
+            w.is_tradable,
+            w.price,
+            w.status,
+            m.nickname as member_nickname,
+            m.profile_image as member_profile_image,
+            t_file.file_url as thumbnail_url,
+            t_file.file_type as thumbnail_file_type,
+            t_file.width as thumbnail_width,
+            t_file.height as thumbnail_height,
+            w.view_count,
+            w.like_count,
+            w.save_count,
+            w.comment_count,
+            w.created_datetime
+        from tbl_work w
+        left join tbl_member m on w.member_id = m.id
+        left join lateral (
+            select wf.file_url, wf.file_type, wf.width, wf.height
+            from tbl_work_file wf
+            where wf.work_id = w.id
+            order by wf.sort_order asc, wf.id asc
+            limit 1
+        ) t_file on true
+        where w.deleted_datetime is null
+          and w.status = 'ACTIVE'
+        <if test="keyword != null and keyword != ''">
+            and (
+                w.title ilike '%' || #{keyword} || '%'
+                or w.description ilike '%' || #{keyword} || '%'
+                or m.nickname ilike '%' || #{keyword} || '%'
+            )
+        </if>
+        <choose>
+            <when test="sort == 'popular'">
+                order by w.like_count desc, w.view_count desc, w.id desc
+            </when>
+            <otherwise>
+                order by w.created_datetime desc, w.id desc
+            </otherwise>
+        </choose>
+        limit #{criteria.count} offset #{criteria.offset}
     </select>
 
     <select id="selectWorkCount" resultType="int">
@@ -247,7 +313,7 @@
         from tbl_work w
         left join tbl_member m on w.member_id = m.id
         where w.deleted_datetime is null
-          and w.status != 'DELETED'
+          and w.status = 'ACTIVE'
         <if test="galleryId != null">
             and exists (
                 select 1

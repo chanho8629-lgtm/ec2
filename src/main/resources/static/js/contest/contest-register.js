@@ -136,6 +136,11 @@ document.addEventListener("DOMContentLoaded", function () {
         if (price) formData.append("price", price);
         if (description) formData.append("description", description);
 
+        // 태그
+        tags.forEach(function (tag) {
+            formData.append("tagNames", tag);
+        });
+
         // 배너 이미지
         var coverFile = bannerFileInput.files[0];
         if (coverFile) {
@@ -161,7 +166,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(function (data) {
             alert(isEdit ? "공모전이 수정되었습니다." : "공모전이 등록되었습니다.");
-            location.href = "/contest/detail/" + data.contestId;
+            location.href = "/contest/list";
         })
         .catch(function (err) {
             console.error(err);

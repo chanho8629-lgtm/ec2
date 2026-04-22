@@ -19,6 +19,9 @@ public class DashboardController {
     // 로그인 사용자의 대시보드 화면에 필요한 집계 데이터를 바인딩한다.
     @GetMapping
     public String dashboard(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        if (userDetails == null) {
+            return "redirect:/error-page";
+        }
         model.addAttribute("dashboard", dashboardService.getDashboard(userDetails.getId()));
         return "dashboard/dashboard";
     }

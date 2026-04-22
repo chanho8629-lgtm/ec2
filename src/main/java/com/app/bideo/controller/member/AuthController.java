@@ -62,6 +62,39 @@ public class AuthController {
         MemberVO memberVO = memberRepository.findByEmail(userDetails.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
+        if (memberVO.getRole() == com.app.bideo.common.enumeration.MemberRole.ADMIN) {
+            SecurityContextHolder.clearContext();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "관리자는 관리자 로그인을 이용해 주세요."));
+        }
+
+        authService.updateLastLogin(memberVO.getId());
+        String accessToken = jwtTokenProvider.createAccessToken(memberVO.getEmail(), "LOCAL", response);
+        jwtTokenProvider.createRefreshToken(memberVO.getEmail(), "LOCAL", response);
+
+        return ResponseEntity.ok(Map.of(
+                "accessToken", accessToken,
+                "email", memberVO.getEmail(),
+                "nickname", memberVO.getNickname()
+        ));
+    }
+
+    @PostMapping("/admin-login")
+    public ResponseEntity<?> adminLogin(@RequestBody MemberLoginRequestDTO requestDTO, HttpServletResponse response) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(requestDTO.getEmail(), requestDTO.getPassword())
+        );
+
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        MemberVO memberVO = memberRepository.findByEmail(userDetails.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
+
+        if (memberVO.getRole() != com.app.bideo.common.enumeration.MemberRole.ADMIN) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "관리자 권한이 없습니다."));
+        }
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
         authService.updateLastLogin(memberVO.getId());
         String accessToken = jwtTokenProvider.createAccessToken(memberVO.getEmail(), "LOCAL", response);
         jwtTokenProvider.createRefreshToken(memberVO.getEmail(), "LOCAL", response);

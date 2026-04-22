@@ -861,6 +861,7 @@ function bindPageInteractions(page, data) {
         activeAuctionPage = page;
         page.classList.add("panel-open", "panel-auction");
         auctionModalBackdrop.hidden = false;
+        window.AuctionEvent?.init();
     };
 
     const setMenuItemVisibility = (button, visible) => {
@@ -1327,9 +1328,8 @@ function bindPageInteractions(page, data) {
     }
 
     if (marketButton && auctionModalBackdrop && data.marketType === "auction") {
-            marketButton.addEventListener("click", async (event) => {
+            marketButton.addEventListener("click", (event) => {
                 event.stopPropagation();
-
                 const isAuctionOpen =
                     page.classList.contains("panel-open") &&
                     page.classList.contains("panel-auction") &&
@@ -1337,7 +1337,6 @@ function bindPageInteractions(page, data) {
 
                 if (isAuctionOpen) {
                     closeAuctionPanelForPage();
-                    AuctionSocket.disconnect(); // 패널 닫으면 연결 해제
                     return;
                 }
 
@@ -1348,6 +1347,7 @@ function bindPageInteractions(page, data) {
                     AuctionEvent.bindEvents();
                     AuctionSocket.connect(auction.id, auction.loginMemberId);
                 });
+                openAuctionPanelForPage();
             });
 
             if (!auctionModalBackdrop.dataset.bound) {
@@ -2063,8 +2063,6 @@ function resetInactivePages() {
 
 async function initializeWorkDetailPage() {
     if (!pageStack || !workPageTemplate) {
-        console.log("1. pageStack:", pageStack);
-        console.log("2. workPageTemplate:", workPageTemplate);
         return;
     }
 

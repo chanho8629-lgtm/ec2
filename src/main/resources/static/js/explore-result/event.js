@@ -19,7 +19,7 @@ window.onload = () => {
   let reportTarget = { targetType: null, targetId: null };
 
   const closeAllModals = () => {
-    shareOverlay.classList.add("off");
+    shareOverlay.hidden = true;
     reportOverlay.classList.add("off");
   };
 
@@ -65,16 +65,21 @@ window.onload = () => {
     document.querySelectorAll(".subscribe-btn").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         console.log("들어옴1 - 구독 버튼 클릭");
-        const isSubscribed = btn.textContent === "구독중";
-        if (isSubscribed) {
-          btn.textContent = "구독";
-          btn.style.backgroundColor = "#0f0f0f";
-          btn.style.color = "#ffffff";
-        } else {
-          btn.textContent = "구독중";
-          btn.style.backgroundColor = "rgba(0, 0, 0, 0.05)";
-          btn.style.color = "#0f0f0f";
-        }
+        const memberId = btn.dataset.memberId;
+        if (!memberId) return;
+
+        searchService.toggleFollow(memberId, (result) => {
+          console.log("들어옴2 - 팔로우 콜백", result);
+          if (result.followed) {
+            btn.textContent = "구독중";
+            btn.style.backgroundColor = "rgba(0, 0, 0, 0.05)";
+            btn.style.color = "#0f0f0f";
+          } else {
+            btn.textContent = "구독";
+            btn.style.backgroundColor = "#0f0f0f";
+            btn.style.color = "#ffffff";
+          }
+        }).catch(() => showToast("로그인이 필요합니다."));
       });
     });
 
@@ -102,7 +107,7 @@ window.onload = () => {
           case "share":
             const linkInput = shareOverlay.querySelector(".work-share-modal__link-input");
             linkInput.value = window.location.href;
-            shareOverlay.classList.remove("off");
+            shareOverlay.hidden = false;
             break;
 
           case "wishlist":
@@ -126,7 +131,17 @@ window.onload = () => {
             break;
 
           case "no-recommend":
-            showToast("앞으로 이 채널을 추천받지 않습니다.");
+            const blockDropdown = item.closest(".gallery-dropdown, .work-dropdown");
+            const blockMemberId = Number(blockDropdown.dataset.memberId);
+            const blockItem = item.closest(".item-section-content");
+
+            searchService.blockMember(blockMemberId, (result) => {
+              console.log("들어옴2 - 차단 콜백", result);
+              if (blockItem) {
+                blockItem.style.display = "none";
+              }
+              showToast("앞으로 이 채널을 추천받지 않습니다.");
+            }).catch(() => showToast("로그인이 필요합니다."));
             break;
 
           case "report":
@@ -170,6 +185,8 @@ window.onload = () => {
       chip.addEventListener("click", (e) => {
         chips.forEach((c) => c.classList.remove("active"));
         chip.classList.add("active");
+        currentType = chip.dataset.filter;
+        doSearch();
       });
     });
 
@@ -191,6 +208,8 @@ window.onload = () => {
         item.classList.add("active");
         sortFilterBtn.querySelector(".sort-filter-text").textContent = item.textContent;
         sortFilterDropdown.classList.add("off");
+        currentSort = item.dataset.sort;
+        doSearch();
       });
     });
 
@@ -208,22 +227,22 @@ window.onload = () => {
       navigator.clipboard
         .writeText(shareLinkInput.value)
         .then(() => {
-          shareOverlay.classList.add("off");
+          shareOverlay.hidden = true;
           showToast("링크가 복사되었습니다.");
         })
         .catch(() => {
-          shareOverlay.classList.add("off");
+          shareOverlay.hidden = true;
           showToast("링크가 복사되었습니다.");
         });
     });
 
     shareCloseBtn.addEventListener("click", (e) => {
-      shareOverlay.classList.add("off");
+      shareOverlay.hidden = true;
     });
 
     shareOverlay.addEventListener("click", (e) => {
       if (e.target === shareOverlay) {
-        shareOverlay.classList.add("off");
+        shareOverlay.hidden = true;
       }
     });
 
@@ -263,7 +282,7 @@ window.onload = () => {
               </div>
               <div class="work-share-recipient__check"></div>
             `;
-            btn.addEventListener("click", () => {
+            btn.addEventListener("click", (e) => {
               const id = Number(m.id);
               if (shareSelectedMembers.find((s) => s.id === id)) return;
               shareSelectedMembers.push({ id: id, nickname: m.nickname });
@@ -288,7 +307,7 @@ window.onload = () => {
         const removeBtn = document.createElement("button");
         removeBtn.textContent = "×";
         removeBtn.style.cssText = "border:none;background:none;cursor:pointer;font-size:14px;padding:0 2px;";
-        removeBtn.addEventListener("click", () => {
+        removeBtn.addEventListener("click", (e) => {
           shareSelectedMembers.splice(idx, 1);
           renderShareChips();
         });
@@ -298,7 +317,7 @@ window.onload = () => {
     };
 
     // 공유 모달 - 보내기
-    shareSendBtn.addEventListener("click", async () => {
+    shareSendBtn.addEventListener("click", async (e) => {
       console.log("들어옴1 - 공유 보내기 클릭");
       if (shareSelectedMembers.length === 0) {
         showToast("받는 사람을 선택해주세요.");
@@ -320,7 +339,7 @@ window.onload = () => {
         showToast("로그인이 필요합니다.");
       }
 
-      shareOverlay.classList.add("off");
+      shareOverlay.hidden = true;
       shareSelectedMembers = [];
       shareChips.innerHTML = "";
       shareMessageInput.value = "";
@@ -372,17 +391,45 @@ window.onload = () => {
 
   // 페이지 초기화
   const keyword = new URLSearchParams(location.search).get("search_query") || "";
+  let currentType = "all";
+  let currentSort = "latest";
+  let page = 1;
+  let criteria = null;
+  let checkScroll = true;
   console.log("들어옴2 keyword", keyword);
 
-  init();
+  const searchResults = document.getElementById("searchResults");
 
-  if (keyword.trim()) {
-    const searchResults = document.getElementById("searchResults");
-    searchService.search(keyword, (data) => {
+  const doSearch = () => {
+    if (!keyword.trim()) return;
+    page = 1;
+    searchService.search(page, keyword, currentType, currentSort, (data) => {
       console.log("들어옴3 search 콜백댐");
-      const criteria = searchLayout.render(searchResults, data);
+      criteria = searchLayout.render(searchResults, data, page);
       console.log("들어옴4 결과", criteria);
       bindDynamic();
     });
-  }
+  };
+
+  // 무한스크롤
+  window.addEventListener("scroll", async (e) => {
+    if (!checkScroll || !criteria || !criteria.hasMore) return;
+
+    const scrollPos = window.scrollY;
+    const windowHeight = window.innerHeight;
+    const docHeight = document.documentElement.scrollHeight;
+
+    if (scrollPos + windowHeight >= docHeight - 1) {
+      checkScroll = false;
+      searchService.search(++page, keyword, currentType, currentSort, (data) => {
+        console.log("들어옴5 스크롤 페이지", page);
+        criteria = searchLayout.render(searchResults, data, page);
+        bindDynamic();
+        setTimeout(() => { checkScroll = true; }, 1000);
+      });
+    }
+  });
+
+  init();
+  doSearch();
 };

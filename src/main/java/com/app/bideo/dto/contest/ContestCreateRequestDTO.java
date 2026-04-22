@@ -22,4 +22,5 @@ public class ContestCreateRequestDTO {
     private String prizeInfo;
     private Long price;
     private List<Long> tagIds;
+    private List<String> tagNames;
 }

@@ -27,6 +27,11 @@
                       data-description=${editMode and work != null ? work.description : ''},
                       data-gallery-id=${editMode and work != null ? work.galleryId : ''},
                       data-category=${editMode and work != null ? work.category : ''},
+                      data-is-tradable=${editMode and work != null ? work.isTradable : false},
+                      data-price=${editMode and work != null and work.price != null ? work.price : ''},
+                      data-has-active-auction=${editMode and work != null ? work.hasActiveAuction : false},
+                      data-auction-starting-price=${editMode and activeAuction != null and activeAuction.startingPrice != null ? activeAuction.startingPrice : ''},
+                      data-auction-deadline-hours=${editMode and activeAuction != null and activeAuction.deadlineHours != null ? activeAuction.deadlineHours : 0},
                       data-media-url=${editMode and work != null and work.files != null and !#lists.isEmpty(work.files) ? work.files[0].fileUrl : ''},
                       data-media-type=${editMode and work != null and work.files != null and !#lists.isEmpty(work.files) ? work.files[0].fileType : ''},
                       data-link-url=${editMode and work != null ? '/work/detail/' + work.id : ''},
@@ -47,23 +52,26 @@
                     <button type="button" class="ai-prompt-modal__close" id="ai-prompt-close-button" aria-label="닫기">닫기</button>
                 </div>
                 <div class="ai-prompt-modal__body">
-                    <div class="ai-prompt-thread">
-                        <div class="ai-prompt-thread__bubble" id="ai-prompt-bubble">작품을 생성해줘</div>
-                    </div>
+                    <div class="ai-prompt-thread" id="ai-prompt-thread"></div>
                     <div class="ai-prompt-compose-wrap">
                         <div class="ai-prompt-compose-menu" id="ai-prompt-compose-menu" hidden>
                             <button type="button" class="ai-prompt-compose-menu__item" id="ai-prompt-attach-button">사진 및 파일 추가</button>
+                            <button type="button" class="ai-prompt-compose-menu__item ai-prompt-compose-menu__item--danger" id="ai-prompt-delete-button" hidden>삭제하기</button>
                         </div>
                         <input type="file" id="ai-prompt-file-input" accept="image/*,*" hidden>
                         <div class="ai-prompt-compose">
                             <div class="ai-prompt-compose__attachments" id="ai-prompt-attachments" hidden>
                                 <div class="ai-prompt-attachment ai-prompt-attachment--image" id="ai-prompt-image-attachment" hidden>
                                     <img id="ai-prompt-image-preview" alt="첨부 이미지 미리보기">
-                                    <button type="button" class="ai-prompt-attachment__remove" id="ai-prompt-remove-attachment" aria-label="첨부 삭제">삭제</button>
+                                    <button type="button" class="ai-prompt-attachment__remove" id="ai-prompt-remove-attachment" aria-label="첨부 삭제" tabindex="-1">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.41L10.59 13.4 4.29 19.7 2.88 18.29 9.17 12 2.88 5.71 4.29 4.29l6.3 6.3 6.29-6.3z"/></svg>
+                                    </button>
                                 </div>
                                 <div class="ai-prompt-attachment ai-prompt-attachment--file" id="ai-prompt-file-attachment" hidden>
                                     <span class="ai-prompt-attachment__file-name" id="ai-prompt-file-name"></span>
-                                    <button type="button" class="ai-prompt-attachment__remove" id="ai-prompt-remove-file-attachment" aria-label="첨부 삭제">삭제</button>
+                                    <button type="button" class="ai-prompt-attachment__remove" id="ai-prompt-remove-file-attachment" aria-label="첨부 삭제" tabindex="-1">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.41L10.59 13.4 4.29 19.7 2.88 18.29 9.17 12 2.88 5.71 4.29 4.29l6.3 6.3 6.29-6.3z"/></svg>
+                                    </button>
                                 </div>
                             </div>
                             <button type="button" class="ai-prompt-compose__tool" id="ai-prompt-tool-button" aria-label="추가" aria-expanded="false">+</button>

@@ -22,4 +22,5 @@ public class ContestUpdateRequestDTO {
     private Long price;
     private String status;
     private List<Long> tagIds;
+    private List<String> tagNames;
 }

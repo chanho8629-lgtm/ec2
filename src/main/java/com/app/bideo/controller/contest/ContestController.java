@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -62,28 +63,12 @@ public class ContestController {
         return contestService.getContestList(searchDTO);
     }
 
-    @GetMapping("/detail/{id}")
-    public String detail(@PathVariable Long id,
-                         @AuthenticationPrincipal CustomUserDetails userDetails,
-                         Model model) {
+    @GetMapping("/api/detail/{id}")
+    @ResponseBody
+    public ContestDetailResponseDTO apiDetail(@PathVariable Long id,
+                                              @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long memberId = userDetails != null ? userDetails.getId() : null;
-        ContestDetailResponseDTO contest = contestService.getContestDetail(id, memberId);
-        boolean isOwner = userDetails != null && contest.getMemberId() != null && contest.getMemberId().equals(userDetails.getId());
-        List<ContestEntryResponseDTO> entries = isOwner ? contestService.getContestEntryList(id) : Collections.emptyList();
-        model.addAttribute("contest", contest);
-        model.addAttribute("entries", entries);
-        model.addAttribute("entryForm", ContestEntryRequestDTO.builder().contestId(id).build());
-        model.addAttribute("isOwner", isOwner);
-        model.addAttribute("canSelectWinner",
-                isOwner
-                        && contest.getWinnerNotifiedAt() == null
-                        && contest.getEntryEnd() != null
-                        && LocalDate.now().isAfter(contest.getEntryEnd()));
-        if (userDetails != null && !isOwner) {
-            List<ContestWorkOptionDTO> availableWorks = contestService.getEntryWorkOptions(userDetails.getId());
-            model.addAttribute("availableWorks", availableWorks);
-        }
-        return "contest/contest-detail";
+        return contestService.getContestDetail(id, memberId);
     }
 
     @GetMapping("/register")
@@ -91,6 +76,51 @@ public class ContestController {
         model.addAttribute("contestForm", new ContestCreateRequestDTO());
         model.addAttribute("isEdit", false);
         return "contest/contest-register";
+    }
+
+    @GetMapping("/api/my-works")
+    @ResponseBody
+    public List<ContestWorkOptionDTO> apiMyWorks(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) return Collections.emptyList();
+        return contestService.getEntryWorkOptions(userDetails.getId());
+    }
+
+    @PostMapping("/api/{id}/entry")
+    @ResponseBody
+    public org.springframework.http.ResponseEntity<Map<String, Object>> apiSubmitEntry(
+            @PathVariable Long id,
+            @RequestBody ContestEntryRequestDTO entryForm,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return org.springframework.http.ResponseEntity.status(401)
+                    .body(Map.of("success", false, "message", "로그인이 필요합니다."));
+        }
+        entryForm.setContestId(id);
+        try {
+            contestService.submitEntry(userDetails.getId(), entryForm);
+            return org.springframework.http.ResponseEntity.ok(Map.of("success", true));
+        } catch (IllegalStateException e) {
+            return org.springframework.http.ResponseEntity.status(409)
+                    .body(Map.of("success", false, "message", "이미 참여한 작품입니다."));
+        } catch (IllegalArgumentException e) {
+            String msg = e.getMessage();
+            String userMsg;
+            if ("contest entry period is closed".equals(msg)) {
+                userMsg = "공모전 접수 기간이 아닙니다.";
+            } else if ("자신의 공모전에는 참여할 수 없습니다".equals(msg)) {
+                userMsg = msg;
+            } else if ("work does not belong to member".equals(msg)) {
+                userMsg = "본인의 작품만 출품할 수 있습니다.";
+            } else if ("contest not found".equals(msg)) {
+                userMsg = "공모전을 찾을 수 없습니다.";
+            } else if ("contest and work are required".equals(msg)) {
+                userMsg = "공모전과 작품 정보가 필요합니다.";
+            } else {
+                userMsg = "출품에 실패했습니다.";
+            }
+            return org.springframework.http.ResponseEntity.badRequest()
+                    .body(Map.of("success", false, "message", userMsg));
+        }
     }
 
     @PostMapping("/api/register")
@@ -120,7 +150,7 @@ public class ContestController {
                          Model model) {
         try {
             Long contestId = contestService.createContest(userDetails.getId(), contestForm);
-            return "redirect:/contest/detail/" + contestId;
+            return "redirect:/contest/list";
         } catch (IllegalArgumentException e) {
             model.addAttribute("contestForm", contestForm);
             model.addAttribute("isEdit", false);
@@ -152,7 +182,7 @@ public class ContestController {
         Long memberId = userDetails != null ? userDetails.getId() : null;
         ContestDetailResponseDTO contest = contestService.getContestDetail(id, memberId);
         if (userDetails == null || contest.getMemberId() == null || !contest.getMemberId().equals(userDetails.getId())) {
-            return "redirect:/contest/detail/" + id;
+            return "redirect:/contest/list";
         }
 
         ContestUpdateRequestDTO contestForm = ContestUpdateRequestDTO.builder()
@@ -189,7 +219,7 @@ public class ContestController {
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
-        return "redirect:/contest/detail/" + id;
+        return "redirect:/contest/list";
     }
 
     @PostMapping("/{id}/edit")
@@ -201,7 +231,7 @@ public class ContestController {
         try {
             contestService.updateContest(id, userDetails.getId(), contestForm);
             redirectAttributes.addFlashAttribute("successMessage", "공모전이 수정되었습니다.");
-            return "redirect:/contest/detail/" + id;
+            return "redirect:/contest/list";
         } catch (IllegalArgumentException e) {
             model.addAttribute("contestForm", contestForm);
             model.addAttribute("isEdit", true);
@@ -222,6 +252,6 @@ public class ContestController {
         } catch (IllegalStateException | IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
-        return "redirect:/contest/detail/" + id;
+        return "redirect:/contest/list";
     }
 }
