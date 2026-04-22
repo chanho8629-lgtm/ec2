@@ -16,6 +16,7 @@ public class PaymentResponseDTO {
     private Long totalFee;
     private String paymentPurpose;
     private String payMethod;
+    private String pgReceiptId;
     private String status;
     private LocalDateTime paidAt;
     private LocalDateTime createdDatetime;

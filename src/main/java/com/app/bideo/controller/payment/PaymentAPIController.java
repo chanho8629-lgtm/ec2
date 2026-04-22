@@ -25,6 +25,13 @@ public class PaymentAPIController {
         return ResponseEntity.ok(paymentService.createPayment(userDetails.getId(), requestDTO));
     }
 
+    @PostMapping("/easy")
+    public ResponseEntity<PaymentResponseDTO> payWithRegisteredCard(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody PaymentRequestDTO requestDTO) {
+        return ResponseEntity.ok(paymentService.payWithRegisteredCard(userDetails.getId(), requestDTO));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PaymentResponseDTO> getPaymentDetail(@PathVariable Long id) {
         return ResponseEntity.ok(paymentService.getPaymentDetail(id));

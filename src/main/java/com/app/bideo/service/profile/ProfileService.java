@@ -314,7 +314,11 @@ public class ProfileService {
     @Transactional(readOnly = true)
     public List<MemberListResponseDTO> searchShareReceivers(Long currentMemberId, String keyword) {
         String safeKeyword = keyword == null ? "" : keyword.trim();
-        return memberRepository.searchByKeyword(safeKeyword, currentMemberId, 20);
+        List<MemberListResponseDTO> receivers = memberRepository.searchByKeyword(safeKeyword, currentMemberId, 20);
+        receivers.forEach(receiver -> receiver.setProfileImage(
+                s3FileService.getPresignedUrl(receiver.getProfileImage())
+        ));
+        return receivers;
     }
 
     // 프로필 공유

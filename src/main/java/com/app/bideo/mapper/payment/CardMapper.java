@@ -36,4 +36,7 @@ public interface CardMapper {
 
     // 최근 카드 조회
     CardResponseDTO selectLatestActiveCard(@Param("memberId") Long memberId);
+
+    // 대표 카드 조회
+    CardResponseDTO selectDefaultCard(@Param("memberId") Long memberId);
 }

@@ -25,6 +25,7 @@ import com.app.bideo.service.notification.NotificationService;
 import com.app.bideo.repository.gallery.GalleryDAO;
 import com.app.bideo.repository.work.WorkDAO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.core.Authentication;
@@ -53,6 +54,7 @@ public class WorkService {
     private final S3FileService s3FileService;
 
     // 작품 등록 후 파일/태그까지 함께 저장한다.
+    @CacheEvict(value = {"dashboard", "profile"}, allEntries = true)
     public WorkCreateResponseDTO write(Long memberId, WorkCreateRequestDTO requestDTO, MultipartFile mediaFile, MultipartFile thumbnailFile) {
         Long resolvedMemberId = resolveMemberId(memberId);
         Long galleryId = requireGalleryId(requestDTO.getGalleryId());
@@ -177,6 +179,7 @@ public class WorkService {
         return update(id, memberId, requestDTO, mediaFile, null);
     }
 
+    @CacheEvict(value = {"dashboard", "profile"}, allEntries = true)
     public WorkDetailResponseDTO update(Long id, Long memberId, WorkUpdateRequestDTO requestDTO, MultipartFile mediaFile, MultipartFile thumbnailFile) {
         Long resolvedMemberId = resolveMemberId(memberId);
         validateWorkOwner(id, resolvedMemberId);
@@ -291,6 +294,7 @@ public class WorkService {
     }
 
     // 파일/태그 연결을 먼저 정리하고 작품을 soft delete 한다.
+    @CacheEvict(value = {"dashboard", "profile"}, allEntries = true)
     public void delete(Long id) {
         Long resolvedMemberId = resolveMemberId(null);
         validateWorkOwner(id, resolvedMemberId);
