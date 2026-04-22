@@ -48,7 +48,7 @@ public class AuctionCommandService {
             throw new IllegalStateException("이미 진행 중인 경매가 있습니다.");
         }
 
-        int resolvedAskingPrice = requestDTO.getAskingPrice() != null && requestDTO.getAskingPrice() > 0
+        long resolvedAskingPrice = requestDTO.getAskingPrice() != null && requestDTO.getAskingPrice() > 0
                 ? requestDTO.getAskingPrice()
                 : requestDTO.getStartingPrice();
         if (requestDTO.getStartingPrice() > resolvedAskingPrice) {
@@ -56,8 +56,8 @@ public class AuctionCommandService {
         }
 
         LocalDateTime startedAt = LocalDateTime.now();
-        int feeAmount = (int) Math.round(resolvedAskingPrice * 0.10d);
-        int settlementAmount = Math.max(0, resolvedAskingPrice - feeAmount);
+        long feeAmount = (int) Math.round(resolvedAskingPrice * 0.10d);
+        long settlementAmount = Math.max(0, resolvedAskingPrice - feeAmount);
 
         auctionDAO.save(
                 AuctionVO.builder()

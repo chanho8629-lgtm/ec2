@@ -14,7 +14,7 @@ public class WorkListResponseDTO {
     private String title;
     private String category;
     private Boolean isTradable;
-    private Integer price;
+    private Long price;
     private String status;
     private String memberNickname;
     private String memberProfileImage;

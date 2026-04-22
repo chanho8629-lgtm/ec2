@@ -53,8 +53,9 @@ public class AuctionController {
                 .memberId(result.getMemberId())
                 .memberNickname(result.getMemberNickname())
                 .bidPrice(result.getBidPrice())
+                .currentPrice(auction.getCurrentPrice())
                 .bidCount(auction.getBidCount())
-                .nextMinBid((int) Math.ceil(result.getBidPrice() * 1.1))
+                .nextMinBid(Math.round(result.getBidPrice() * 1.1))
                 .createdDatetime(result.getCreatedDatetime())
                 .build();
 

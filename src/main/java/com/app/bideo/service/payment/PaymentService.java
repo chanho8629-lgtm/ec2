@@ -44,9 +44,9 @@ public class PaymentService {
             throw new IllegalStateException("결제 대기 상태가 아닙니다.");
         }
 
-        int originalAmount = order.getOriginalPrice();
-        int totalFee = (int) (originalAmount * FEE_RATE);
-        int totalPrice = originalAmount + totalFee;
+        long originalAmount = order.getOriginalPrice();
+        long totalFee = Math.round(originalAmount * FEE_RATE);
+        long totalPrice = originalAmount + totalFee;
 
         PaymentVO paymentVO = PaymentVO.builder()
                 .paymentCode(UUID.randomUUID().toString().replace("-", "").substring(0, 20).toUpperCase())

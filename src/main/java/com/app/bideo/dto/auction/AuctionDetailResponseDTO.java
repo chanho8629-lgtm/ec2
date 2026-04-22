@@ -16,20 +16,20 @@ public class AuctionDetailResponseDTO {
     private String workThumbnail;
     private Long sellerId;
     private String sellerNickname;
-    private Integer askingPrice;
-    private Integer startingPrice;
-    private Integer currentPrice;
-    private Integer bidCount;
-    private Integer bidIncrement;
-    private Integer estimateLow;
-    private Integer estimateHigh;
+    private Long askingPrice;
+    private Long startingPrice;
+    private Long currentPrice;
+    private Long bidCount;
+    private Long bidIncrement;
+    private Long estimateLow;
+    private Long estimateHigh;
     private Double feeRate;
     private Integer deadlineHours;
     private LocalDateTime startedAt;
     private LocalDateTime closingAt;
     private String status;
     private Long winnerId;
-    private Integer finalPrice;
+    private Long finalPrice;
     private Boolean isWishlisted;
     private LocalDateTime createdDatetime;
 

@@ -39,7 +39,7 @@ public class BidCommandService {
         if (requestDTO.getBidPrice() <= auction.getCurrentPrice()) {
             throw new IllegalArgumentException("현재가보다 높은 금액으로 입찰해야 합니다.");
         }
-        if (requestDTO.getBidPrice() < auction.getCurrentPrice() + auction.getBidIncrement()) {
+        if (requestDTO.getBidPrice() < Math.round(auction.getCurrentPrice() * 1.1)) {
             throw new IllegalArgumentException("최소 입찰 단위 이상으로 입찰해야 합니다.");
         }
 

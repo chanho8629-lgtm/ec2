@@ -124,7 +124,12 @@ const AuctionEvent = (() => {
 
     const setAuctionId = (id) => {
         currentAuctionId = id;
+        isBound = false;
     };
 
-    return { bindEvents, setAuctionId, showToast };
+    return {
+        bindEvents: bindEvents,
+        setAuctionId: setAuctionId,
+        showToast: showToast
+    };
 })();

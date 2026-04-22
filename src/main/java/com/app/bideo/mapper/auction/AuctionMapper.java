@@ -27,7 +27,7 @@ public interface AuctionMapper {
     AuctionVO selectById(@Param("auctionId") Long auctionId);
 
     void updateCurrentPrice(@Param("auctionId") Long auctionId,
-                            @Param("currentPrice") Integer currentPrice,
+                            @Param("currentPrice") Long currentPrice,
                             @Param("bidCount") Integer bidCount);
 
     void updateStatus(@Param("auctionId") Long auctionId,
@@ -35,6 +35,7 @@ public interface AuctionMapper {
 
     void updateWinner(@Param("auctionId") Long auctionId,
                       @Param("winnerId") Long winnerId,
+                      @Param("finalPrice") Long finalPrice);
                       @Param("finalPrice") Integer finalPrice);
 
     boolean existsWishlist(@Param("memberId") Long memberId,

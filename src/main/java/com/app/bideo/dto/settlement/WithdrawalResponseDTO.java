@@ -11,9 +11,9 @@ import java.time.LocalDateTime;
 public class WithdrawalResponseDTO {
     private Long id;
     private String withdrawalCode;
-    private Integer requestedAmount;
-    private Integer fee;
-    private Integer netAmount;
+    private Long requestedAmount;
+    private Long fee;
+    private Long netAmount;
     private String status;
     private LocalDateTime requestedAt;
     private LocalDateTime approvedAt;

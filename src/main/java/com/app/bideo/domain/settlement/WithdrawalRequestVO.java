@@ -13,9 +13,9 @@ public class WithdrawalRequestVO {
     private String withdrawalCode;
     private Long memberId;
     private Long settlementId;
-    private Integer requestedAmount;
-    private Integer fee;
-    private Integer netAmount;
+    private Long requestedAmount;
+    private Long fee;
+    private Long netAmount;
     private String status;
     private Long adminId;
     private String rejectedReason;

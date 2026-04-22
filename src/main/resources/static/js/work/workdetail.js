@@ -1340,6 +1340,13 @@ function bindPageInteractions(page, data) {
                     return;
                 }
 
+                await AuctionService.getAuctionInfo(data.id, (auction) => {
+                    openAuctionPanelForPage();
+                    AuctionLayout.init(auction);
+                    AuctionEvent.setAuctionId(auction.id);
+                    AuctionEvent.bindEvents();
+                    AuctionSocket.connect(auction.id, auction.loginMemberId);
+                });
                 openAuctionPanelForPage();
             });
 
