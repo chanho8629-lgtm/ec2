@@ -42,12 +42,16 @@ public class AuctionDAO {
         return auctionMapper.selectById(auctionId);
     }
 
-    public void updateCurrentPrice(Long auctionId, Integer currentPrice, Integer bidCount) {
+    public void updateCurrentPrice(Long auctionId, Long currentPrice, Integer bidCount) {
         auctionMapper.updateCurrentPrice(auctionId, currentPrice, bidCount);
     }
 
     public void updateStatus(Long auctionId, String status) {
         auctionMapper.updateStatus(auctionId, status);
+    }
+
+    public void updateStatusByWorkId(Long workId, String status) {
+        auctionMapper.updateStatusByWorkId(workId, status);
     }
 
     public void updateWinner(Long auctionId, Long winnerId, Integer finalPrice) {

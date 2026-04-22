@@ -89,7 +89,7 @@ public class BootpayBillingService {
         return lookupBillingKey(receiptId);
     }
 
-    public BootpayPaymentResultDTO requestCardPayment(String billingKey, String orderId, String orderName, int price) {
+    public BootpayPaymentResultDTO requestCardPayment(String billingKey, String orderId, String orderName, long price) {
         ensureConfigured();
 
         Map<String, Object> requestBody = new HashMap<>();
