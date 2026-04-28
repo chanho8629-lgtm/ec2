@@ -72,6 +72,11 @@ public class WorkDAO {
         return workMapper.selectWorkCount(searchDTO);
     }
 
+    // 쇼츠형 추천 피드용 작품 목록 조회
+    public List<WorkListResponseDTO> findFeed(List<Long> excludeIds, String category, int limit) {
+        return workMapper.selectWorkFeed(excludeIds, category, limit);
+    }
+
     // 작품에 연결된 파일 목록 조회
     public List<WorkFileResponseDTO> findFilesByWorkId(Long workId) {
         return workMapper.selectWorkFilesByWorkId(workId);

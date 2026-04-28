@@ -9,15 +9,17 @@
     <link rel="stylesheet" href="/css/common/font.css" th:href="@{/css/common/font.css}">
     <link rel="stylesheet" href="/css/work/workdetail.css" th:href="@{/css/work/workdetail.css}">
     <link rel="stylesheet" href="/css/auction/auction.css" th:href="@{/css/auction/auction.css}">
-    <link rel="stylesheet" href="/templates/work/pay-api.css" th:href="@{/templates/work/pay-api.css}">
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/pay/pay-api.css" th:href="@{/css/pay/pay-api.css}">
+    <link rel="shortcut icon" href="/images/favicon.png" type="image/png">
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js" defer></script>
  </head>
 <body class="workdetail-page" id="section">
     <div th:replace="~{layout/layout :: ytShellChrome('workdetail')}"></div>
 
-    <main class="bd-shell__page-content workdetail-shell" aria-label="작품 상세">
+    <main class="bd-shell__page-content workdetail-shell" aria-label="작품 상세"
+          th:attr="data-feed-mode=${(feedMode != null and feedMode) ? 'true' : 'false'},
+                   data-seed-work-id=${(work != null) ? work.id : ''}">
         <section class="workdetail-stage">
             <main class="page-stack" id="page-stack"></main>
             <nav class="shorts-navigation" aria-label="쇼츠 탐색">

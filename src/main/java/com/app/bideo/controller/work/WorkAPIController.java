@@ -55,6 +55,16 @@ public class WorkAPIController {
         return workService.getTagSuggestions(keyword);
     }
 
+    // 쇼츠형 추천 피드 — 다음 작품 batch 반환
+    @GetMapping("/feed")
+    public List<WorkListResponseDTO> feed(
+            @RequestParam(required = false) List<Long> excludeIds,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) Integer limit
+    ) {
+        return workService.getFeed(excludeIds, category, limit);
+    }
+
     // 작품 상세 조회
     @GetMapping("/{id}")
     public WorkDetailResponseDTO detail(@PathVariable Long id) {

@@ -308,6 +308,57 @@
         limit #{criteria.count} offset #{criteria.offset}
     </select>
 
+    <select id="selectWorkFeed" resultType="WorkListResponseDTO">
+        select
+            w.id,
+            w.member_id,
+            w.title,
+            w.category,
+            w.is_tradable,
+            w.price,
+            w.status,
+            m.nickname as member_nickname,
+            m.profile_image as member_profile_image,
+            t_file.file_url as thumbnail_url,
+            t_file.file_type as thumbnail_file_type,
+            t_file.width as thumbnail_width,
+            t_file.height as thumbnail_height,
+            w.view_count,
+            w.like_count,
+            w.save_count,
+            w.comment_count,
+            w.created_datetime
+        from tbl_work w
+        left join tbl_member m on w.member_id = m.id
+        left join lateral (
+            select wf.file_url, wf.file_type, wf.width, wf.height
+            from tbl_work_file wf
+            where wf.work_id = w.id
+            order by wf.sort_order asc, wf.id asc
+            limit 1
+        ) t_file on true
+        where w.deleted_datetime is null
+          and w.status = 'ACTIVE'
+        <if test="excludeIds != null and excludeIds.size() > 0">
+            and w.id not in
+            <foreach item="excludeId" collection="excludeIds" open="(" separator="," close=")">
+                #{excludeId}
+            </foreach>
+        </if>
+        <if test="category != null and category != ''">
+            and w.category = #{category}
+        </if>
+        order by (
+            coalesce(w.like_count, 0) * 3
+            + coalesce(w.comment_count, 0) * 2
+            + coalesce(w.view_count, 0)
+            + greatest(0, 30 - extract(day from (now() - w.created_datetime))) * 5
+            + (random() * 50)
+        ) desc,
+        w.id desc
+        limit #{limit}
+    </select>
+
     <select id="selectWorkCount" resultType="int">
         select count(*)
         from tbl_work w

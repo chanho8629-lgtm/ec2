@@ -11,12 +11,6 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.UUID;
 
@@ -30,17 +24,13 @@ public class S3FileService {
     @Value("${cloud.aws.s3.bucket:}")
     private String bucket;
 
-    // Pre-signed URL 유효 기간 (7일)
     private static final Duration PRESIGNED_URL_DURATION = Duration.ofDays(7);
 
     /**
-     * S3에 파일을 업로드하고 S3 키를 반환한다.
-     * 반환된 키를 DB에 저장하고, 조회 시 getPresignedUrl()로 접근 URL을 생성한다.
+     * 모든 파일은 S3에 저장한다. bucket 미설정 또는 업로드 실패 시 예외를 던진다.
      */
     public String upload(String directory, MultipartFile file) {
-        if (bucket == null || bucket.isBlank()) {
-            return saveToLocal(directory, file);
-        }
+        requireBucket();
 
         String extension = extractExtension(file.getOriginalFilename());
         String key = directory + "/" + UUID.randomUUID() + extension;
@@ -55,44 +45,48 @@ public class S3FileService {
             s3Client.putObject(putRequest, RequestBody.fromBytes(file.getBytes()));
             return key;
         } catch (Exception e) {
-            return saveToLocal(directory, file);
+            throw new IllegalStateException("S3 업로드에 실패했습니다.", e);
         }
     }
 
     /**
-     * DB에 저장된 S3 키로 Pre-signed URL을 생성한다.
-     * null이거나 빈 값이면 null을 반환한다.
+     * S3 키에 대해 Pre-signed URL을 생성한다.
+     * 외부 URL(http, https), data/blob URI는 그대로 반환한다.
+     * null/blank는 null 반환.
      */
     public String getPresignedUrl(String key) {
         if (key == null || key.isBlank()) {
             return null;
         }
-        if (key.startsWith("/") || key.startsWith("http://") || key.startsWith("https://")) {
-            return key;
-        }
-        if (bucket == null || bucket.isBlank()) {
-            return key;
-        }
 
         String normalizedKey = key.trim();
 
-        if (normalizedKey.startsWith("/")
-                || normalizedKey.startsWith("http://")
+        if (normalizedKey.startsWith("http://")
                 || normalizedKey.startsWith("https://")
                 || normalizedKey.startsWith("data:")
                 || normalizedKey.startsWith("blob:")) {
             return normalizedKey;
         }
 
+        requireBucket();
+
+        String s3Key = normalizedKey.startsWith("/") ? normalizedKey.substring(1) : normalizedKey;
+
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
                 .signatureDuration(PRESIGNED_URL_DURATION)
                 .getObjectRequest(GetObjectRequest.builder()
                         .bucket(bucket)
-                        .key(normalizedKey)
+                        .key(s3Key)
                         .build())
                 .build();
 
         return s3Presigner.presignGetObject(presignRequest).url().toString();
+    }
+
+    private void requireBucket() {
+        if (bucket == null || bucket.isBlank()) {
+            throw new IllegalStateException("S3 bucket이 설정되지 않았습니다. cloud.aws.s3.bucket 프로퍼티를 확인하세요.");
+        }
     }
 
     private String extractExtension(String filename) {
@@ -100,31 +94,5 @@ public class S3FileService {
             return "";
         }
         return filename.substring(filename.lastIndexOf("."));
-    }
-
-    private String saveToLocal(String directory, MultipartFile file) {
-        String extension = extractExtension(file.getOriginalFilename());
-        String storedFileName = UUID.randomUUID() + extension;
-        String normalizedDirectory = directory == null || directory.isBlank() ? "common" : directory;
-        Path projectRoot = Path.of(System.getProperty("user.dir"));
-        Path runtimeDirectory = projectRoot.resolve("build").resolve("resources").resolve("main")
-                .resolve("static").resolve("uploads").resolve(normalizedDirectory);
-        Path sourceDirectory = projectRoot.resolve("src").resolve("main").resolve("resources")
-                .resolve("static").resolve("uploads").resolve(normalizedDirectory);
-
-        try {
-            Files.createDirectories(runtimeDirectory);
-            Files.createDirectories(sourceDirectory);
-
-            Path runtimeTarget = runtimeDirectory.resolve(storedFileName);
-            Path sourceTarget = sourceDirectory.resolve(storedFileName);
-
-            Files.copy(file.getInputStream(), runtimeTarget, StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(runtimeTarget, sourceTarget, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            throw new UncheckedIOException("Local file upload failed", e);
-        }
-
-        return "/uploads/" + normalizedDirectory + "/" + storedFileName;
     }
 }

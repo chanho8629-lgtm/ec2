@@ -111,6 +111,26 @@ public class WorkService {
                 .build();
     }
 
+    // 쇼츠형 추천 피드 — 좋아요/조회/댓글/최신성 + 약간의 랜덤성 기반 다음 작품 N개 반환
+    @Transactional(readOnly = true)
+    public List<WorkListResponseDTO> getFeed(List<Long> excludeIds, String category, Integer limit) {
+        int safeLimit = (limit == null || limit <= 0) ? 5 : Math.min(limit, 20);
+        List<Long> safeExcludeIds = excludeIds == null ? Collections.emptyList() : excludeIds;
+        List<WorkListResponseDTO> feed = workDAO.findFeed(safeExcludeIds, category, safeLimit);
+        applyThumbnailUrls(feed);
+        return feed;
+    }
+
+    // 추천 피드 진입 시드 작품 — 첫 화면에 띄울 작품 1개를 추천 정렬 기준으로 결정
+    @Transactional(readOnly = true)
+    public Long resolveFeedSeedId() {
+        List<WorkListResponseDTO> feed = workDAO.findFeed(Collections.emptyList(), null, 1);
+        if (feed == null || feed.isEmpty()) {
+            return null;
+        }
+        return feed.get(0).getId();
+    }
+
     @Transactional(readOnly = true)
     public List<TagResponseDTO> getTagSuggestions(String keyword) {
         String normalizedKeyword = normalizeTagKeyword(keyword);
