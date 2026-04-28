@@ -46,6 +46,10 @@ public interface WorkMapper {
 
     int selectWorkCount(WorkSearchDTO searchDTO);
 
+    List<WorkListResponseDTO> selectWorkFeed(@Param("excludeIds") List<Long> excludeIds,
+                                             @Param("category") String category,
+                                             @Param("limit") int limit);
+
     void insertWorkFile(WorkFileVO workFileVO);
 
     int deleteWorkFilesByWorkId(@Param("workId") Long workId);

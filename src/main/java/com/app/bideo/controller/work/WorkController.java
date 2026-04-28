@@ -61,6 +61,19 @@ public class WorkController {
         return "work/workdetail";
     }
 
+    // 쇼츠형 추천 피드 진입 — 시드 작품으로 시작, 이후 클라이언트가 무한 스크롤로 다음 작품 로드
+    @GetMapping("/feed")
+    public String feed(Model model) {
+        Long seedId = workService.resolveFeedSeedId();
+        if (seedId == null) {
+            return "redirect:/";
+        }
+        WorkDetailResponseDTO work = workService.getWorkDetail(seedId);
+        model.addAttribute("work", work);
+        model.addAttribute("feedMode", true);
+        return "work/workdetail";
+    }
+
     private boolean isEmbeddedRequest(HttpServletRequest request) {
         return request != null && "XMLHttpRequest".equalsIgnoreCase(request.getHeader("X-Requested-With"));
     }

@@ -1,9 +1,25 @@
 const workDetails = [];
-const currentWorkId = Number(window.location.pathname.split("/").filter(Boolean).pop() || "0");
+const workdetailShellEl = document.querySelector(".workdetail-shell");
+const seedWorkIdAttr = Number(workdetailShellEl?.dataset?.seedWorkId || "");
+const feedModeEnabled = workdetailShellEl?.dataset?.feedMode === "true";
+const pathWorkId = Number(window.location.pathname.split("/").filter(Boolean).pop() || "0");
+const currentWorkId = Number.isFinite(pathWorkId) && pathWorkId > 0
+    ? pathWorkId
+    : (Number.isFinite(seedWorkIdAttr) && seedWorkIdAttr > 0 ? seedWorkIdAttr : 0);
 
 function getCurrentWorkId() {
     return Number.isFinite(currentWorkId) && currentWorkId > 0 ? currentWorkId : null;
 }
+
+function isFeedMode() {
+    return feedModeEnabled;
+}
+
+const feedState = {
+    isLoading: false,
+    exhausted: false,
+    seenIds: new Set()
+};
 
 function getMediaFiles(detail) {
     return Array.isArray(detail?.files) ? detail.files : [];
@@ -566,7 +582,7 @@ function renderReplyItem(reply) {
         <article class="rp" data-comment-id="${escapeHtml(reply.id || "")}">
             <div class="rp-ln"></div>
             <button class="rp-av" type="button" aria-label="${escapeHtml(reply.author)}">
-                <img src="${escapeHtml(reply.avatar || "")}" alt="">
+                <img src="${escapeHtml(reply.avatar || "/images/favicon.png")}" alt="" onerror="this.onerror=null;this.src='/images/favicon.png';">
             </button>
             <div class="rp-bd">
                 <div class="rp-hd">
@@ -604,7 +620,7 @@ function renderCommentItem(comment) {
         <article class="cm" data-comment-id="${escapeHtml(comment.id || "")}">
             <div class="cm-row">
                 <button class="cm-av" type="button" aria-label="${escapeHtml(comment.author)}">
-                    <img src="${escapeHtml(comment.avatar || "")}" alt="">
+                    <img src="${escapeHtml(comment.avatar || "/images/favicon.png")}" alt="" onerror="this.onerror=null;this.src='/images/favicon.png';">
                 </button>
                 <div class="cm-bd">
                     <div class="cm-hd">
@@ -1328,7 +1344,7 @@ function bindPageInteractions(page, data) {
     }
 
     if (marketButton && auctionModalBackdrop && data.marketType === "auction") {
-            marketButton.addEventListener("click", (event) => {
+            marketButton.addEventListener("click", async (event) => {
                 event.stopPropagation();
                 const isAuctionOpen =
                     page.classList.contains("panel-open") &&
@@ -2061,6 +2077,80 @@ function resetInactivePages() {
     });
 }
 
+// 정규화된 작품 데이터를 page-stack에 페이지 단위로 렌더링한다.
+async function appendWorkPage(detail) {
+    if (!detail || !pageStack || !workPageTemplate) {
+        return;
+    }
+    if (detail.id != null) {
+        if (feedState.seenIds.has(detail.id)) {
+            return;
+        }
+        feedState.seenIds.add(detail.id);
+    }
+
+    const normalized = await normalizeWorkDetail(detail);
+    const fragment = workPageTemplate.content.cloneNode(true);
+    const page = fragment.querySelector(".page");
+
+    bindPageData(page, normalized);
+    bindPageInteractions(page, normalized);
+    pageStack.appendChild(fragment);
+    workDetails.push(normalized);
+}
+
+// 추천 피드 batch — 쇼츠 알고리즘처럼 다음 작품 N개를 가져와 stack에 append
+async function loadFeedBatch(limit = 5) {
+    if (feedState.isLoading || feedState.exhausted) {
+        return;
+    }
+    feedState.isLoading = true;
+
+    try {
+        const params = new URLSearchParams();
+        params.set("limit", String(limit));
+        feedState.seenIds.forEach((id) => params.append("excludeIds", id));
+
+        const list = await apiRequest(`/api/works/feed?${params.toString()}`);
+        const items = Array.isArray(list) ? list : [];
+        if (!items.length) {
+            feedState.exhausted = true;
+            return;
+        }
+
+        for (const item of items) {
+            if (item == null || item.id == null || feedState.seenIds.has(item.id)) {
+                continue;
+            }
+            try {
+                const detail = await apiRequest(`/api/works/${item.id}`);
+                await appendWorkPage(detail);
+            } catch (_) {
+                // 단건 실패는 무시하고 다음 추천으로 진행
+            }
+        }
+    } catch (_) {
+        // 추천 실패 시 다음 스크롤에서 재시도
+    } finally {
+        feedState.isLoading = false;
+        updateNavigationState();
+    }
+}
+
+// 마지막에서 2번째 페이지 진입 시 다음 batch prefetch
+async function maybePrefetchFeed() {
+    if (!isFeedMode() || !pageStack) {
+        return;
+    }
+
+    const pages = pageStack.querySelectorAll(".page");
+    const currentIndex = getCurrentPageIndex();
+    const remaining = pages.length - 1 - currentIndex;
+    if (remaining <= 1) {
+        await loadFeedBatch(5);
+    }
+}
+
 async function initializeWorkDetailPage() {
     if (!pageStack || !workPageTemplate) {
         return;
@@ -2074,20 +2164,19 @@ async function initializeWorkDetailPage() {
 
     try {
         const detail = await apiRequest(`/api/works/${workId}`);
-        const detailPages = await loadScrollableWorkDetails(detail);
+        const initialPages = isFeedMode() ? [detail] : await loadScrollableWorkDetails(detail);
 
         pageStack.innerHTML = "";
         workDetails.length = 0;
+        feedState.seenIds.clear();
+        feedState.exhausted = false;
 
-        for (const item of detailPages) {
-            const normalized = await normalizeWorkDetail(item);
-            const fragment = workPageTemplate.content.cloneNode(true);
-            const page = fragment.querySelector(".page");
+        for (const item of initialPages) {
+            await appendWorkPage(item);
+        }
 
-            bindPageData(page, normalized);
-            bindPageInteractions(page, normalized);
-            pageStack.appendChild(fragment);
-            workDetails.push(normalized);
+        if (isFeedMode()) {
+            await loadFeedBatch(4);
         }
 
         if (navigationButtonUp && navigationButtonDown) {
@@ -2109,6 +2198,7 @@ async function initializeWorkDetailPage() {
                 if (document.querySelector(".workdetail-stage")?.classList.contains("stage-fullscreen")) {
                     syncFullscreenActivePage();
                 }
+                maybePrefetchFeed();
             }, { passive: true });
             window.addEventListener("resize", updateNavigationState);
             resetInactivePages();
