@@ -75,6 +75,7 @@ function initializeWorkRegister() {
     var tagSuggestionAbortController = null;
     var tagSuggestionRequestSeq = 0;
     var activeTagSuggestionIndex = -1;
+    var selectedExistingTagNames = {};
 
     if (!modal || !dialogContent || !uploadScreen || !detailsScreen || !uploadPanel || !fileInput || !selectFileButton || !fileNameText) {
         return;
@@ -774,6 +775,16 @@ function initializeWorkRegister() {
         playlistDropdownText.textContent = galleryName || "선택";
     }
 
+    function normalizeSelectedTagName(tagName) {
+        var normalized = (tagName || "").trim();
+
+        if (normalized.indexOf("#") === 0) {
+            normalized = normalized.substring(1).trim();
+        }
+
+        return normalized;
+    }
+
     function extractTagNames(rawTags) {
         if (!rawTags) {
             return [];
@@ -781,7 +792,7 @@ function initializeWorkRegister() {
 
         return rawTags.split(",")
             .map(function (tag) {
-                return tag.trim();
+                return normalizeSelectedTagName(tag);
             })
             .filter(function (tag) {
                 return !!tag;
@@ -797,6 +808,8 @@ function initializeWorkRegister() {
             return "";
         }
 
+        tagName = normalizeSelectedTagName(tagName);
+        selectedExistingTagNames[tagName] = true;
         rawValue = videoTagsInput.value || "";
         parts = rawValue.split(",");
         currentPart = parts.length ? parts[parts.length - 1] : rawValue;
@@ -854,6 +867,16 @@ function initializeWorkRegister() {
         updateTextCount(videoTagsInput, videoTagsCount, 500);
         closeTagSuggestions();
         videoTagsInput.focus();
+    }
+
+    function validateSelectedTags(tags) {
+        var invalidTag = tags.find(function (tagName) {
+            return !selectedExistingTagNames[tagName];
+        });
+
+        if (invalidTag) {
+            throw new Error("태그는 추천 목록에서 선택해주세요: " + invalidTag);
+        }
     }
 
     function renderTagSuggestions(tags) {
@@ -964,6 +987,8 @@ function initializeWorkRegister() {
         if (!selectedGalleryId) {
             throw new Error("예술관을 선택해주세요.");
         }
+
+        validateSelectedTags(tags);
 
         formData.append("galleryId", String(selectedGalleryId));
         formData.append("title", title);
@@ -1429,7 +1454,7 @@ function initializeWorkRegister() {
                     return;
                 }
 
-                if (event.key === "Enter" && activeTagSuggestionIndex >= 0) {
+                if ((event.key === "Enter" || event.key === ",") && activeTagSuggestionIndex >= 0) {
                     event.preventDefault();
                     activeButton = buttons[activeTagSuggestionIndex];
                     if (activeButton) {
@@ -1441,6 +1466,11 @@ function initializeWorkRegister() {
                 if (event.key === "Escape") {
                     closeTagSuggestions();
                 }
+            }
+
+            if (event.key === "Enter" || event.key === ",") {
+                event.preventDefault();
+                fetchTagSuggestions();
             }
         });
 

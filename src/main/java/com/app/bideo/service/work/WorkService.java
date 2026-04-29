@@ -347,7 +347,7 @@ public class WorkService {
         ));
     }
 
-    // 입력된 태그명을 기준으로 기존 태그를 재사용하거나 새로 만든다.
+    // 입력된 태그명은 기존 태그만 연결한다.
     private List<Long> resolveTagIds(List<String> tagNames) {
         List<String> safeTagNames = tagNames == null ? Collections.emptyList() : tagNames;
 
@@ -355,7 +355,7 @@ public class WorkService {
                 .map(this::normalizeTagName)
                 .filter(Objects::nonNull)
                 .distinct()
-                .map(this::findOrCreateTagId)
+                .map(this::requireExistingTagId)
                 .toList();
     }
 
@@ -379,13 +379,9 @@ public class WorkService {
         return galleryId;
     }
 
-    private Long findOrCreateTagId(String tagName) {
+    private Long requireExistingTagId(String tagName) {
         return workDAO.findTagIdByName(tagName)
-                .orElseGet(() -> {
-                    workDAO.saveTagName(tagName);
-                    return workDAO.findTagIdByName(tagName)
-                            .orElseThrow(() -> new IllegalStateException("tag save failed"));
-                });
+                .orElseThrow(() -> new IllegalArgumentException("등록된 태그만 선택할 수 있습니다: " + tagName));
     }
 
     private String normalizeTagKeyword(String keyword) {

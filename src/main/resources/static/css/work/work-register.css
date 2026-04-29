@@ -1232,6 +1232,10 @@ body.work-register-page.work-register-edit-mode .dialog-content {
 
 .art-list-section {
     margin-top: 18px;
+    padding: 16px;
+    border: 1px solid #e3e3e3;
+    border-radius: 14px;
+    background: #fafafa;
 }
 
 .playlist-label {
@@ -1261,10 +1265,10 @@ body.work-register-page.work-register-edit-mode .dialog-content {
 
 .playlist-dropdown {
     width: 100%;
-    min-height: 38px;
-    padding: 0 12px;
-    border: 1px solid #d6d6d6;
-    border-radius: 8px;
+    min-height: 42px;
+    padding: 0 14px;
+    border: 1px solid #d0d5dd;
+    border-radius: 12px;
     background: #fff;
     display: flex;
     align-items: center;
@@ -1274,7 +1278,8 @@ body.work-register-page.work-register-edit-mode .dialog-content {
 
 .playlist-dropdown-text {
     font-size: 13px;
-    color: #606060;
+    font-weight: 600;
+    color: #344054;
 }
 
 .playlist-dropdown-icon {
@@ -1295,15 +1300,17 @@ body.work-register-page.work-register-edit-mode .dialog-content {
 
 .playlist-dropdown-menu {
     position: absolute;
-    bottom: calc(100% + 0px);
+    top: calc(100% + 8px);
+    bottom: auto;
     left: 0;
-    width: 491px;
-    min-height: 108px;
-    border: 1px solid #d6d6d6;
-    border-radius: 10px;
+    width: 100%;
+    min-height: 0;
+    max-height: 220px;
+    border: 1px solid #d0d5dd;
+    border-radius: 14px;
     background: #fff;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-    overflow: hidden;
+    overflow-y: auto;
     z-index: 5;
 }
 
@@ -1312,14 +1319,23 @@ body.work-register-page.work-register-edit-mode .dialog-content {
     border: 0;
     background: #fff;
     text-align: left;
-    padding: 14px 14px;
+    padding: 12px 14px;
     font-size: 13px;
+    font-weight: 600;
     color: #0f0f0f;
     cursor: pointer;
 }
 
 .playlist-option:hover {
-    background: #f6f6f6;
+    background: #f2f4f7;
+}
+
+.playlist-option-empty {
+    padding: 14px;
+    border-radius: 12px;
+    color: #667085;
+    font-size: 13px;
+    background: #fff;
 }
 
 .tags-section {
@@ -2099,5 +2115,4 @@ body.work-register-page.work-register-edit-mode .dialog-content {
         padding-bottom: 4px;
     }
 }
-
 

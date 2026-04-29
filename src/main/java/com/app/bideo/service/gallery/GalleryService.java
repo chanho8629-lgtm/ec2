@@ -358,7 +358,7 @@ public class GalleryService {
                 .map(this::normalizeTagName)
                 .filter(Objects::nonNull)
                 .distinct()
-                .map(this::findOrCreateTagId)
+                .map(this::requireExistingTagId)
                 .toList();
     }
 
@@ -375,12 +375,8 @@ public class GalleryService {
         return normalized.isBlank() ? null : normalized;
     }
 
-    private Long findOrCreateTagId(String tagName) {
+    private Long requireExistingTagId(String tagName) {
         return galleryDAO.findTagIdByName(tagName)
-                .orElseGet(() -> {
-                    galleryDAO.saveTagName(tagName);
-                    return galleryDAO.findTagIdByName(tagName)
-                            .orElseThrow(() -> new IllegalStateException("tag save failed"));
-                });
+                .orElseThrow(() -> new IllegalArgumentException("등록된 태그만 선택할 수 있습니다: " + tagName));
     }
 }
