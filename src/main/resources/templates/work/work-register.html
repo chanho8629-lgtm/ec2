@@ -175,7 +175,7 @@
                                                 th:each="gallery : ${galleries}"
                                                 th:attr="data-gallery-id=${gallery.id},data-playlist-name=${gallery.title}"
                                                 th:text="${gallery.title}">예술관</button>
-                                        <div th:if="${#lists.isEmpty(galleries)}" class="playlist-option-empty">등록 가능한 예술관이 없습니다.</div>
+                                        <div th:if="${#lists.isEmpty(galleries)}" class="playlist-option-empty">.</div>
                                     </div>
                                 </div>
                             </div>
