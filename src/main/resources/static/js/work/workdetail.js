@@ -1,10 +1,25 @@
 const workDetails = [];
-const currentWorkId = Number(window.location.pathname.split("/").filter(Boolean).pop() || "0");
-let mobileSnapTimeoutId = null;
+const workdetailShellEl = document.querySelector(".workdetail-shell");
+const seedWorkIdAttr = Number(workdetailShellEl?.dataset?.seedWorkId || "");
+const feedModeEnabled = workdetailShellEl?.dataset?.feedMode === "true";
+const pathWorkId = Number(window.location.pathname.split("/").filter(Boolean).pop() || "0");
+const currentWorkId = Number.isFinite(pathWorkId) && pathWorkId > 0
+    ? pathWorkId
+    : (Number.isFinite(seedWorkIdAttr) && seedWorkIdAttr > 0 ? seedWorkIdAttr : 0);
 
 function getCurrentWorkId() {
     return Number.isFinite(currentWorkId) && currentWorkId > 0 ? currentWorkId : null;
 }
+
+function isFeedMode() {
+    return feedModeEnabled;
+}
+
+const feedState = {
+    isLoading: false,
+    exhausted: false,
+    seenIds: new Set()
+};
 
 function getMediaFiles(detail) {
     return Array.isArray(detail?.files) ? detail.files : [];
@@ -215,10 +230,8 @@ async function normalizeWorkDetail(detail) {
         shareLabel: "공유",
         remixLabel: marketType === "auction" ? "경매하기" : marketType === "trade" ? "거래하기" : "",
         marketType,
-        avatar: detail.memberProfileImage || "",
         avatarText: getAvatarText(detail.memberNickname),
         channel: `@${detail.memberNickname || "artist"}`,
-        profileUrl: detail.memberNickname ? `/profile/${encodeURIComponent(detail.memberNickname)}` : "/profile",
         isOwner: Boolean(detail.isOwner),
         subscribe: "팔로우",
         desc: detail.description || "",
@@ -302,7 +315,6 @@ const pageStack = document.getElementById("page-stack");
 const workPageTemplate = document.getElementById("work-page-template");
 const navigationButtonUp = document.getElementById("navigation-button-up");
 const navigationButtonDown = document.getElementById("navigation-button-down");
-const MOBILE_CARD_OVERLAY_INSET = 0;
 
 // 브라우저별 전체화면 API 래퍼
 function getFullscreenElement() {
@@ -409,27 +421,14 @@ function bindPageData(page, data) {
     const marketIconPath = page.querySelector('[data-role="market-icon-path"]');
     const marketIconSvg = marketButton?.querySelector("svg");
     const pivotButton = page.querySelector('[data-role="pivot-button"]');
-    const channelNodes = page.querySelectorAll(".channel");
     const hasMarketAction = data.marketType === "trade" || data.marketType === "auction";
     const hasPivotItems = Array.isArray(data.pivotItems) && data.pivotItems.length > 0;
 
     if (marketButton) {
-        if (!hasMarketAction) {
-            marketButton.hidden = true;
-            marketButton.style.display = "none";
-            marketButton.dataset.marketType = "";
-            marketButton.setAttribute("aria-hidden", "true");
-            marketButton.setAttribute("tabindex", "-1");
-            marketButton.setAttribute("disabled", "disabled");
-            marketButton.remove();
-        } else {
-            marketButton.hidden = false;
-            marketButton.style.display = "";
-            marketButton.dataset.marketType = data.marketType;
-            marketButton.setAttribute("aria-hidden", "false");
-            marketButton.removeAttribute("tabindex");
-            marketButton.removeAttribute("disabled");
-        }
+        marketButton.hidden = !hasMarketAction;
+        marketButton.style.display = hasMarketAction ? "" : "none";
+        marketButton.dataset.marketType = data.marketType || "";
+        marketButton.setAttribute("aria-hidden", hasMarketAction ? "false" : "true");
     }
 
     if (hasMarketAction && marketIconPath) {
@@ -446,11 +445,6 @@ function bindPageData(page, data) {
         pivotButton.style.display = hasPivotItems ? "" : "none";
         pivotButton.setAttribute("aria-hidden", hasPivotItems ? "false" : "true");
     }
-
-    channelNodes.forEach((node) => {
-        node.dataset.profileUrl = data.profileUrl || "/profile";
-        node.style.cursor = "pointer";
-    });
 }
 
 // 댓글/답글 렌더링에 사용하는 기본 유틸
@@ -588,7 +582,7 @@ function renderReplyItem(reply) {
         <article class="rp" data-comment-id="${escapeHtml(reply.id || "")}">
             <div class="rp-ln"></div>
             <button class="rp-av" type="button" aria-label="${escapeHtml(reply.author)}">
-                <img src="${escapeHtml(reply.avatar || "")}" alt="">
+                <img src="${escapeHtml(reply.avatar || "/images/favicon.png")}" alt="" onerror="this.onerror=null;this.src='/images/favicon.png';">
             </button>
             <div class="rp-bd">
                 <div class="rp-hd">
@@ -626,7 +620,7 @@ function renderCommentItem(comment) {
         <article class="cm" data-comment-id="${escapeHtml(comment.id || "")}">
             <div class="cm-row">
                 <button class="cm-av" type="button" aria-label="${escapeHtml(comment.author)}">
-                    <img src="${escapeHtml(comment.avatar || "")}" alt="">
+                    <img src="${escapeHtml(comment.avatar || "/images/favicon.png")}" alt="" onerror="this.onerror=null;this.src='/images/favicon.png';">
                 </button>
                 <div class="cm-bd">
                     <div class="cm-hd">
@@ -767,7 +761,6 @@ function bindPageInteractions(page, data) {
     const commentsButton = page.querySelector('[data-role="comments-button"]');
     const pivotButton = page.querySelector('[data-role="pivot-button"]');
     const leftMeta = page.querySelector(".left-meta");
-    const channelBox = page.querySelector(".channel");
     const anchoredPanel = page.querySelector('[data-role="anchored-panel"]');
     const anchoredPanelClose = page.querySelector('[data-role="anchored-panel-close"]');
     const commentsPanel = page.querySelector('[data-role="comments-panel"]');
@@ -775,7 +768,6 @@ function bindPageInteractions(page, data) {
     const commentsList = page.querySelector('[data-role="comments-list"]');
     const commentInput = page.querySelector('[data-role="comment-input"]');
     const commentSubmit = page.querySelector('[data-role="comment-submit"]');
-    const commentComposerAvatar = page.querySelector(".cp-av");
     const pivotPanel = page.querySelector('[data-role="pivot-panel"]');
     const pivotPanelClose = page.querySelector('[data-role="pivot-panel-close"]');
     const pivotGalleryCover = page.querySelector('[data-role="pivot-gallery-cover"]');
@@ -789,11 +781,6 @@ function bindPageInteractions(page, data) {
     const shareLinkInput = page.querySelector('[data-role="share-link-input"]');
     const shareLinkCopy = page.querySelector('[data-role="share-link-copy"]');
     const shareModal = shareModalBackdrop?.querySelector(".work-share-modal");
-    const shareSearchInput = shareModalBackdrop?.querySelector('[data-share-search]') || shareModalBackdrop?.querySelector(".work-share-modal__search");
-    const shareList = shareModalBackdrop?.querySelector('[data-share-list]') || shareModalBackdrop?.querySelector(".work-share-modal__list");
-    const shareChips = shareModalBackdrop?.querySelector('[data-share-chips]') || shareModalBackdrop?.querySelector(".work-share-modal__chips");
-    const shareMessageInput = shareModalBackdrop?.querySelector('[data-share-message]') || shareModalBackdrop?.querySelector(".work-share-modal__message");
-    const shareSendButton = shareModalBackdrop?.querySelector('[data-share-send]') || shareModalBackdrop?.querySelector(".work-share-modal__send");
     const auctionModal = ensureAuctionModalShell();
     const auctionModalBackdrop = auctionModal.backdrop;
     const auctionModalClose = auctionModal.closeButton;
@@ -817,34 +804,6 @@ function bindPageInteractions(page, data) {
     const isOwner = Boolean(data.isOwner);
     let lastNonZeroVolume = 0.5;
     let isPaused = false;
-
-    const renderCommentComposerAvatar = () => {
-        if (!commentComposerAvatar) {
-            return;
-        }
-
-        if (workState.avatar) {
-            commentComposerAvatar.classList.add("has-image");
-            commentComposerAvatar.innerHTML = `<img src="${escapeHtml(workState.avatar)}" alt="${escapeHtml(workState.channel || "프로필")}">`;
-            return;
-        }
-
-        commentComposerAvatar.classList.remove("has-image");
-        commentComposerAvatar.textContent = workState.avatarText || "@";
-    };
-
-    renderCommentComposerAvatar();
-    const navigateToProfile = (event) => {
-        const target = event.currentTarget;
-        const profileUrl = target?.dataset?.profileUrl || data.profileUrl || "/profile";
-        if (!profileUrl) {
-            return;
-        }
-
-        event.preventDefault();
-        event.stopPropagation();
-        window.location.href = profileUrl;
-    };
 
     const updateVolumeUi = () => {
         if (!thumbVideo || !volumeButton || !volumeIconPath) {
@@ -891,7 +850,6 @@ function bindPageInteractions(page, data) {
         }
 
         auctionModalBackdrop.hidden = true;
-        syncResponsiveModalStyles(auctionModalBackdrop, auctionModalBackdrop.querySelector(".work-auction-modal"), false);
         page.classList.remove("panel-open", "panel-auction");
 
         if (activeAuctionPage === page) {
@@ -919,7 +877,6 @@ function bindPageInteractions(page, data) {
         activeAuctionPage = page;
         page.classList.add("panel-open", "panel-auction");
         auctionModalBackdrop.hidden = false;
-        syncResponsiveModalStyles(auctionModalBackdrop, auctionModalBackdrop.querySelector(".work-auction-modal"), true);
         window.AuctionEvent?.init();
     };
 
@@ -979,10 +936,6 @@ function bindPageInteractions(page, data) {
             event.stopPropagation();
             togglePlayback();
         });
-    }
-
-    if (channelBox) {
-        channelBox.addEventListener("click", navigateToProfile);
     }
 
     if (thumbVideo && !thumbVideo.hidden) {
@@ -1303,55 +1256,6 @@ function bindPageInteractions(page, data) {
         });
     }
 
-    const submitComment = async (content, options = {}) => {
-        const trimmedContent = String(content || "").trim();
-
-        if (!trimmedContent || !workState.id) {
-            return false;
-        }
-
-        try {
-            const detail = await apiRequest(`/api/works/${workState.id}/comments`, {
-                method: "POST",
-                body: JSON.stringify({ content: trimmedContent })
-            });
-            const normalizedComments = Array.isArray(detail.comments)
-                ? detail.comments.map(normalizeComment)
-                : workState.comments;
-            const nextCommentCount = detail.commentCount || normalizedComments.length || 0;
-
-            workState = {
-                ...workState,
-                comments: normalizedComments,
-                commentCount: formatDisplayCount(nextCommentCount)
-            };
-
-            renderCommentsList(commentsList, workState.comments);
-            updateCountFields(page, "commentCount", nextCommentCount, false);
-
-            if (typeof options.resetInput === "function") {
-                options.resetInput();
-            }
-
-            if (commentsList) {
-                commentsList.scrollTop = commentsList.scrollHeight;
-            }
-
-            if (mobilePanelShell && activeMobilePanelType === "comments") {
-                const mobileCommentsList = mobilePanelShell.querySelector('[data-role="mobile-comments-list"]');
-                if (mobileCommentsList) {
-                    mobileCommentsList.innerHTML = commentsList ? commentsList.innerHTML : "";
-                    mobileCommentsList.scrollTop = mobileCommentsList.scrollHeight;
-                }
-            }
-
-            return true;
-        } catch (error) {
-            window.alert(error.message || "댓글 등록에 실패했습니다.");
-            return false;
-        }
-    };
-
     if (commentInput && commentSubmit) {
         const syncCommentSubmitState = () => {
             commentSubmit.disabled = !commentInput.value.trim();
@@ -1370,19 +1274,36 @@ function bindPageInteractions(page, data) {
         commentSubmit.addEventListener("click", async () => {
             const content = commentInput.value.trim();
 
-            if (!content) {
+            if (!content || !workState.id) {
                 return;
             }
 
             commentSubmit.disabled = true;
-            const submitted = await submitComment(content, {
-                resetInput: () => {
-                    commentInput.value = "";
-                    syncCommentSubmitState();
-                }
-            });
 
-            if (!submitted) {
+            try {
+                const detail = await apiRequest(`/api/works/${workState.id}/comments`, {
+                    method: "POST",
+                    body: JSON.stringify({ content })
+                });
+                const normalizedComments = Array.isArray(detail.comments)
+                    ? detail.comments.map(normalizeComment)
+                    : workState.comments;
+                const nextCommentCount = detail.commentCount || normalizedComments.length || 0;
+
+                workState = {
+                    ...workState,
+                    comments: normalizedComments,
+                    commentCount: formatDisplayCount(nextCommentCount)
+                };
+                renderCommentsList(commentsList, workState.comments);
+                updateCountFields(page, "commentCount", nextCommentCount, false);
+                commentInput.value = "";
+                syncCommentSubmitState();
+                if (commentsList) {
+                    commentsList.scrollTop = commentsList.scrollHeight;
+                }
+            } catch (error) {
+                window.alert(error.message || "댓글 등록에 실패했습니다.");
                 syncCommentSubmitState();
             }
         });
@@ -1411,311 +1332,6 @@ function bindPageInteractions(page, data) {
         pivotGrid.innerHTML = (data.pivotItems || []).map(renderPivotCard).join("");
     }
 
-    let mobilePanelShell = null;
-    let activeMobilePanelType = "";
-
-    const ensureMobilePanelShell = () => {
-        if (mobilePanelShell) {
-            return mobilePanelShell;
-        }
-
-        const shell = document.createElement("div");
-        shell.className = "workdetail-mobile-panel-shell";
-        shell.style.position = "absolute";
-        shell.style.zIndex = "10050";
-        shell.style.display = "none";
-        shell.style.pointerEvents = "none";
-        shell.style.background = "transparent";
-        shell.style.padding = "0";
-        shell.innerHTML = `
-            <div class="workdetail-mobile-panel-sheet" style="position:absolute;left:50%;bottom:0;width:100%;height:min(70%, 560px);max-height:min(70%, 560px);background:#fff;border-radius:24px 24px 0 0;box-shadow:0 18px 40px rgba(0,0,0,.24);transform:translate(-50%, calc(100% + 32px));opacity:0;pointer-events:auto;display:flex;flex-direction:column;overflow:hidden;transition:transform .2s ease, opacity .2s ease;">
-                <div data-role="mobile-panel-content" style="flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow:hidden;"></div>
-            </div>
-        `;
-        shell.addEventListener("click", (event) => {
-            if (event.target === shell) {
-                hideMobileBottomSheet();
-            }
-        });
-        page.appendChild(shell);
-        mobilePanelShell = shell;
-        return shell;
-    };
-
-    const syncMobilePanelAnchor = () => {
-        if (!mobilePanelShell) {
-            return;
-        }
-
-        const sheet = mobilePanelShell.querySelector(".workdetail-mobile-panel-sheet");
-        if (!sheet) {
-            return;
-        }
-
-        const anchorTarget = card || mediaCluster || thumb || page;
-        const anchorRect = anchorTarget?.getBoundingClientRect();
-        const pageRect = page.getBoundingClientRect();
-
-        if (!anchorRect || !pageRect) {
-            mobilePanelShell.style.left = "0";
-            mobilePanelShell.style.top = "0";
-            mobilePanelShell.style.width = "100%";
-            mobilePanelShell.style.height = "100%";
-            sheet.style.left = "50%";
-            sheet.style.bottom = `${MOBILE_CARD_OVERLAY_INSET}px`;
-            sheet.style.width = `calc(100% - ${MOBILE_CARD_OVERLAY_INSET * 2}px)`;
-            sheet.style.maxWidth = `calc(100% - ${MOBILE_CARD_OVERLAY_INSET * 2}px)`;
-            sheet.style.height = "min(70%, 560px)";
-            sheet.style.maxHeight = "min(70%, 560px)";
-            return;
-        }
-
-        const shellLeft = Math.round(anchorRect.left - pageRect.left);
-        const shellTop = Math.round(anchorRect.top - pageRect.top);
-        const shellWidth = Math.round(anchorRect.width);
-        const shellHeight = Math.round(anchorRect.height);
-        const desiredHeight = Math.round(anchorRect.height * 0.7);
-        const maxSheetHeight = Math.min(
-            640,
-            Math.max(320, desiredHeight)
-        );
-
-        mobilePanelShell.style.left = `${shellLeft}px`;
-        mobilePanelShell.style.top = `${shellTop}px`;
-        mobilePanelShell.style.width = `${shellWidth}px`;
-        mobilePanelShell.style.height = `${shellHeight}px`;
-
-        sheet.style.left = "50%";
-        sheet.style.bottom = `${MOBILE_CARD_OVERLAY_INSET}px`;
-        sheet.style.width = `calc(100% - ${MOBILE_CARD_OVERLAY_INSET * 2}px)`;
-        sheet.style.maxWidth = `calc(100% - ${MOBILE_CARD_OVERLAY_INSET * 2}px)`;
-        const boundedSheetHeight = Math.min(maxSheetHeight, Math.max(240, shellHeight - (MOBILE_CARD_OVERLAY_INSET * 2)));
-        sheet.style.height = `${boundedSheetHeight}px`;
-        sheet.style.maxHeight = `${boundedSheetHeight}px`;
-    };
-
-    const hideMobileBottomSheet = () => {
-        if (!mobilePanelShell) {
-            activeMobilePanelType = "";
-            return;
-        }
-
-        const sheet = mobilePanelShell.querySelector(".workdetail-mobile-panel-sheet");
-        if (sheet) {
-            sheet.style.opacity = "0";
-            sheet.style.transform = "translate(-50%, calc(100% + 32px))";
-        }
-        mobilePanelShell.style.pointerEvents = "none";
-        activeMobilePanelType = "";
-        window.setTimeout(() => {
-            if (mobilePanelShell && !activeMobilePanelType) {
-                mobilePanelShell.style.display = "none";
-            }
-        }, 200);
-    };
-
-    const renderMobileDescriptionSheet = () => {
-        return `
-            <div style="display:flex;align-items:center;justify-content:center;padding:8px 0 2px;">
-                <div style="width:40px;height:4px;border-radius:999px;background:#d4d4d8;"></div>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #ececf1;">
-                <strong style="font-size:20px;font-weight:800;color:#111;">설명</strong>
-                <button type="button" data-role="mobile-panel-close" style="border:0;background:transparent;font-size:28px;line-height:1;color:#111;cursor:pointer;">×</button>
-            </div>
-            <div style="flex:1 1 auto;min-height:0;overflow:auto;padding:18px;background:#fff;">
-                <p style="margin:0 0 10px;font-size:22px;font-weight:800;line-height:1.35;color:#111;">${escapeHtml(workState.headline || "")}</p>
-                <p style="margin:0 0 18px;font-size:15px;line-height:1.7;color:#3f3f46;white-space:pre-wrap;">${escapeHtml(workState.desc || "")}</p>
-                <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;">
-                    <div style="padding:14px 10px;border-radius:12px;background:#f6f7e8;text-align:center;">
-                        <strong style="display:block;font-size:24px;font-weight:800;color:#3f3f46;">${escapeHtml(workState.likeCount || "0")}</strong>
-                        <span style="font-size:12px;color:#71717a;">좋아요</span>
-                    </div>
-                    <div style="padding:14px 10px;border-radius:12px;background:#f6f7e8;text-align:center;">
-                        <strong style="display:block;font-size:24px;font-weight:800;color:#3f3f46;">${escapeHtml(workState.viewCount || "0")}</strong>
-                        <span style="font-size:12px;color:#71717a;">조회수</span>
-                    </div>
-                    <div style="padding:14px 10px;border-radius:12px;background:#f6f7e8;text-align:center;">
-                        <strong style="display:block;font-size:18px;font-weight:800;color:#3f3f46;">${escapeHtml(workState.publishedDate || "")}</strong>
-                        <span style="font-size:12px;color:#71717a;">${escapeHtml(workState.publishedYear || "")}</span>
-                    </div>
-                </div>
-            </div>
-        `;
-    };
-
-    const renderMobileCommentsSheet = () => {
-        const commentsHtml = commentsList ? commentsList.innerHTML : "";
-        const mobileAvatarMarkup = workState.avatar
-            ? `<img src="${escapeHtml(workState.avatar)}" alt="${escapeHtml(workState.channel || "프로필")}" style="width:100%;height:100%;display:block;object-fit:cover;border-radius:999px;">`
-            : escapeHtml(workState.avatarText || "e");
-        return `
-            <div style="display:flex;align-items:center;justify-content:center;padding:8px 0 2px;">
-                <div style="width:40px;height:4px;border-radius:999px;background:#d4d4d8;"></div>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #ececf1;">
-                <strong style="font-size:20px;font-weight:800;color:#111;">댓글 ${escapeHtml(workState.commentCount || "")}</strong>
-                <button type="button" data-role="mobile-panel-close" style="border:0;background:transparent;font-size:28px;line-height:1;color:#111;cursor:pointer;">×</button>
-            </div>
-            <div style="padding:14px 16px;border-bottom:1px solid #ececf1;background:#fff;">
-                <div style="display:flex;gap:10px;align-items:flex-start;">
-                    <div style="width:36px;height:36px;border-radius:999px;background:${workState.avatar ? "transparent" : "#2563eb"};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;overflow:hidden;">${mobileAvatarMarkup}</div>
-                    <div style="flex:1;display:flex;gap:8px;align-items:center;">
-                        <input type="text" data-role="mobile-comment-input" placeholder="댓글 추가..." style="flex:1;height:44px;border:1px solid #e4e4e7;border-radius:12px;padding:0 14px;font-size:14px;outline:none;">
-                        <button type="button" data-role="mobile-comment-submit" style="height:44px;padding:0 14px;border:0;border-radius:12px;background:#111;color:#fff;font-size:14px;font-weight:700;cursor:pointer;" disabled>등록</button>
-                    </div>
-                </div>
-            </div>
-            <div data-role="mobile-comments-list" style="flex:1 1 auto;min-height:0;overflow:auto;padding:0 16px 18px;background:#fff;">${commentsHtml}</div>
-        `;
-    };
-
-    const syncMobilePanelStyles = (panel, isOpen) => {
-        return { panel, isOpen };
-    };
-
-    const syncResponsiveModalStyles = (backdrop, dialog, isOpen) => {
-        if (!backdrop) {
-            return;
-        }
-
-        const isAuctionBackdrop = backdrop.classList.contains("work-auction-modal-backdrop");
-        const isShareBackdrop = backdrop.classList.contains("work-share-modal-overlay");
-
-        if (!isMobileShortsViewport()) {
-            [
-                "position",
-                "inset",
-                "left",
-                "top",
-                "width",
-                "height",
-                "display",
-                "alignItems",
-                "justifyContent",
-                "padding",
-                "background",
-                "zIndex"
-            ].forEach((property) => backdrop.style.removeProperty(property));
-
-            if (dialog) {
-                [
-                "width",
-                "maxWidth",
-                "height",
-                "maxHeight",
-                "margin",
-                "position",
-                "left",
-                "top",
-                "bottom",
-                "width",
-                "height",
-                "borderRadius",
-                "overflow",
-                "boxShadow",
-                "transform"
-            ].forEach((property) => dialog.style.removeProperty(property));
-            }
-            return;
-        }
-
-        if (isAuctionBackdrop || isShareBackdrop) {
-            const anchorTarget = card || mediaCluster || thumb || page;
-            const anchorRect = anchorTarget?.getBoundingClientRect();
-            const pageRect = page.getBoundingClientRect();
-            const useFixedViewportAnchor = false;
-
-            backdrop.style.setProperty("display", isOpen ? "flex" : "none", "important");
-            backdrop.style.setProperty("position", useFixedViewportAnchor ? "fixed" : "absolute", "important");
-            backdrop.style.setProperty("inset", "auto", "important");
-            backdrop.style.setProperty("align-items", "stretch", "important");
-            backdrop.style.setProperty("justify-content", "center", "important");
-            backdrop.style.setProperty("padding", "0", "important");
-            backdrop.style.setProperty("background", "transparent", "important");
-            backdrop.style.setProperty("z-index", "10035", "important");
-            backdrop.style.setProperty("opacity", isOpen ? "1" : "0", "important");
-            backdrop.style.setProperty("visibility", isOpen ? "visible" : "hidden", "important");
-            backdrop.style.setProperty("pointer-events", isOpen ? "auto" : "none", "important");
-            backdrop.style.setProperty("transform", "none", "important");
-
-            if (!dialog) {
-                return;
-            }
-
-            if (!anchorRect || !pageRect) {
-                dialog.style.setProperty("position", "absolute", "important");
-                dialog.style.setProperty("left", "50%", "important");
-                dialog.style.setProperty("top", "auto", "important");
-                dialog.style.setProperty("bottom", `${MOBILE_CARD_OVERLAY_INSET}px`, "important");
-                dialog.style.setProperty("width", `calc(100% - ${MOBILE_CARD_OVERLAY_INSET * 2}px)`, "important");
-                dialog.style.setProperty("max-width", `calc(100% - ${MOBILE_CARD_OVERLAY_INSET * 2}px)`, "important");
-                dialog.style.setProperty("height", isShareBackdrop ? "auto" : "min(70%, 560px)", "important");
-                dialog.style.setProperty("max-height", isShareBackdrop ? "min(70%, 560px)" : "min(70%, 560px)", "important");
-                dialog.style.setProperty("margin", "0", "important");
-                dialog.style.setProperty("border-radius", "24px 24px 0 0", "important");
-                dialog.style.setProperty("overflow", "hidden", "important");
-                dialog.style.setProperty("box-shadow", "0 18px 40px rgba(0, 0, 0, 0.24)", "important");
-                dialog.style.setProperty("transform", "translate(-50%, 0)", "important");
-                return;
-            }
-
-            const shellLeft = Math.round(anchorRect.left - pageRect.left);
-            const shellTop = Math.round(anchorRect.top - pageRect.top);
-            const shellWidth = Math.round(anchorRect.width);
-            const shellHeight = Math.round(anchorRect.height);
-            const desiredHeight = Math.round(anchorRect.height * 0.7);
-            const modalHeight = Math.min(640, Math.max(320, desiredHeight), Math.max(240, shellHeight - (MOBILE_CARD_OVERLAY_INSET * 2)));
-
-            backdrop.style.setProperty("left", `${shellLeft}px`, "important");
-            backdrop.style.setProperty("top", `${shellTop}px`, "important");
-            backdrop.style.setProperty("width", `${shellWidth}px`, "important");
-            backdrop.style.setProperty("height", `${shellHeight}px`, "important");
-
-            dialog.style.setProperty("position", "absolute", "important");
-            dialog.style.setProperty("left", isShareBackdrop ? "0" : "50%", "important");
-            dialog.style.setProperty("top", "auto", "important");
-            dialog.style.setProperty("bottom", isShareBackdrop ? "0" : `${MOBILE_CARD_OVERLAY_INSET}px`, "important");
-            dialog.style.setProperty("width", isShareBackdrop ? "100%" : `calc(100% - ${MOBILE_CARD_OVERLAY_INSET * 2}px)`, "important");
-            dialog.style.setProperty("max-width", isShareBackdrop ? "100%" : `calc(100% - ${MOBILE_CARD_OVERLAY_INSET * 2}px)`, "important");
-            dialog.style.setProperty("height", isShareBackdrop ? "auto" : `${modalHeight}px`, "important");
-            dialog.style.setProperty("max-height", isShareBackdrop ? `${modalHeight}px` : `${modalHeight}px`, "important");
-            dialog.style.setProperty("margin", "0", "important");
-            dialog.style.setProperty("border-radius", "24px 24px 0 0", "important");
-            dialog.style.setProperty("overflow", "hidden", "important");
-            dialog.style.setProperty("box-shadow", "0 18px 40px rgba(0, 0, 0, 0.24)", "important");
-            dialog.style.setProperty("transform", isShareBackdrop ? "none" : "translate(-50%, 0)", "important");
-            return;
-        }
-
-        backdrop.style.position = "fixed";
-        backdrop.style.inset = "0";
-        backdrop.style.setProperty("display", isOpen ? "flex" : "none", "important");
-        backdrop.style.alignItems = "flex-end";
-        backdrop.style.justifyContent = "center";
-        backdrop.style.padding = "12px";
-        backdrop.style.background = "transparent";
-        backdrop.style.zIndex = "10035";
-
-        if (!dialog) {
-            return;
-        }
-
-        dialog.style.position = "fixed";
-        dialog.style.left = "50%";
-        dialog.style.top = "auto";
-        dialog.style.bottom = "12px";
-        dialog.style.width = "min(92vw, 360px)";
-        dialog.style.maxWidth = "92vw";
-        dialog.style.height = "auto";
-        dialog.style.maxHeight = "min(62dvh, 520px)";
-        dialog.style.margin = "0";
-        dialog.style.borderRadius = "20px";
-        dialog.style.overflow = "hidden";
-        dialog.style.boxShadow = "0 18px 40px rgba(0, 0, 0, 0.24)";
-        dialog.style.transform = "translate(-50%, 0)";
-    };
-
     if (shareLinkInput) {
         shareLinkInput.value = data.shareUrl || "https://localhost:10000/profile/ttt?galleryId=9";
     }
@@ -1723,12 +1339,12 @@ function bindPageInteractions(page, data) {
     if (marketButton && data.marketType === "trade") {
         marketButton.addEventListener("click", (event) => {
             event.stopPropagation();
-            window.location.href = `/payment/pay?workId=${data.id}`;
+            window.location.href = `/payment/pay-api?workId=${data.id}`;
         });
     }
 
     if (marketButton && auctionModalBackdrop && data.marketType === "auction") {
-            marketButton.addEventListener("click", (event) => {
+            marketButton.addEventListener("click", async (event) => {
                 event.stopPropagation();
                 const isAuctionOpen =
                     page.classList.contains("panel-open") &&
@@ -1740,6 +1356,13 @@ function bindPageInteractions(page, data) {
                     return;
                 }
 
+                await AuctionService.getAuctionInfo(data.id, (auction) => {
+                    openAuctionPanelForPage();
+                    AuctionLayout.init(auction);
+                    AuctionEvent.setAuctionId(auction.id);
+                    AuctionEvent.bindEvents();
+                    AuctionSocket.connect(auction.id, auction.loginMemberId);
+                });
                 openAuctionPanelForPage();
             });
 
@@ -1781,21 +1404,6 @@ function bindPageInteractions(page, data) {
 
         const openSnackbar = () => {
             window.clearTimeout(snackbarTimerId);
-            if (isMobileShortsViewport()) {
-                const anchorTarget = card || mediaCluster || thumb || page;
-                const anchorRect = anchorTarget?.getBoundingClientRect();
-                if (anchorRect) {
-                    workSnackbar.style.left = `${Math.round(anchorRect.left + (anchorRect.width / 2))}px`;
-                    workSnackbar.style.bottom = `${Math.max(12, Math.round(window.innerHeight - anchorRect.bottom + 12))}px`;
-                    workSnackbar.style.width = `${Math.min(Math.round(anchorRect.width - 24), 360)}px`;
-                    workSnackbar.style.transform = "translateX(-50%)";
-                }
-            } else {
-                workSnackbar.style.removeProperty("left");
-                workSnackbar.style.removeProperty("bottom");
-                workSnackbar.style.removeProperty("width");
-                workSnackbar.style.removeProperty("transform");
-            }
             workSnackbar.hidden = false;
             snackbarTimerId = window.setTimeout(() => {
                 workSnackbar.hidden = true;
@@ -1828,7 +1436,7 @@ function bindPageInteractions(page, data) {
         shareModalBackdrop.style.inset = "0";
         shareModalBackdrop.style.zIndex = "9999";
         shareModalBackdrop.style.display = "none";
-        shareModalBackdrop.style.setProperty("background", "transparent", "important");
+        shareModalBackdrop.style.background = "rgba(15, 23, 42, 0.42)";
         shareModalBackdrop.style.padding = "16px";
         shareModalBackdrop.style.alignItems = "center";
         shareModalBackdrop.style.justifyContent = "center";
@@ -1841,170 +1449,16 @@ function bindPageInteractions(page, data) {
             shareModal.style.zIndex = "10000";
         }
 
-        const demoShareUsers = [
-            { username: "diy_master", subtitle: "크리에이터 인증", avatar: "/images/sample/avatar_08.png" },
-            { username: "art_studio_kr", subtitle: "크리에이터 인증", avatar: "/images/sample/avatar_05.png" },
-            { username: "포토그래퍼은서", subtitle: "크리에이터 인증", avatar: "/images/sample/avatar_04.png" },
-            { username: "여행가수현", subtitle: "크리에이터 인증", avatar: "/images/sample/avatar_02.png" },
-            { username: "영상작가현우", subtitle: "크리에이터 인증", avatar: "/images/sample/avatar_09.png" },
-            { username: "요리하는지훈", subtitle: "일반 회원", avatar: "/images/sample/avatar_03.png" },
-            { username: "크리에이터지아", subtitle: "일반 회원", avatar: "/images/sample/avatar_10.png" },
-            { username: "디자인하는민지", subtitle: "크리에이터 인증", avatar: "/images/sample/avatar_01.png" },
-            { username: "인테리어소희", subtitle: "일반 회원", avatar: "/images/sample/avatar_06.png" },
-            { username: "패션블로거하늘", subtitle: "일반 회원", avatar: "/images/sample/avatar_07.png" }
-        ];
-        let selectedShareUsers = [];
-        const shareReceiverMap = new Map();
-
-        const requestJson = async (url, options = {}) => {
-            const response = await fetch(url, {
-                headers: {
-                    "Content-Type": "application/json",
-                    ...(options.headers || {})
-                },
-                credentials: "same-origin",
-                ...options
-            });
-
-            if (!response.ok) {
-                let message = "요청 처리 중 오류가 발생했습니다.";
-
-                try {
-                    const errorBody = await response.json();
-                    message = errorBody.message || message;
-                } catch (_) {
-                    try {
-                        const text = await response.text();
-                        if (text) {
-                            message = text;
-                        }
-                    } catch (_) {
-                    }
-                }
-
-                throw new Error(message);
-            }
-
-            if (response.status === 204) {
-                return null;
-            }
-
-            const contentType = response.headers.get("content-type") || "";
-            if (!contentType.includes("application/json")) {
-                return null;
-            }
-
-            return response.json();
-        };
-
-        const resolveShareNickname = () => {
-            const profileUrl = String(workState.profileUrl || "").trim();
-            if (profileUrl.startsWith("/profile/")) {
-                return decodeURIComponent(profileUrl.slice("/profile/".length));
-            }
-
-            return String(workState.channel || "").replace(/^@/, "").trim();
-        };
-
-        const renderShareChips = () => {
-            if (!shareChips) {
-                return;
-            }
-
-            shareChips.innerHTML = selectedShareUsers.map((username) => `
-                <button type="button" class="work-share-chip" data-share-chip="${escapeHtml(username)}">
-                    <span class="work-share-chip__text">${escapeHtml(username)}</span>
-                    <span class="work-share-chip__remove" aria-hidden="true">×</span>
-                </button>
-            `).join("");
-
-            if (shareList) {
-                shareList.querySelectorAll("[data-share-user]").forEach((node) => {
-                    const username = node.getAttribute("data-share-user") || "";
-                    node.classList.toggle("is-selected", selectedShareUsers.includes(username));
-                });
-            }
-        };
-
-        const renderShareList = (keyword = "") => {
-            if (!shareList) {
-                return;
-            }
-
-            const normalizedKeyword = String(keyword || "").trim().toLowerCase();
-            const filtered = demoShareUsers.filter((user) => !normalizedKeyword || user.username.toLowerCase().includes(normalizedKeyword));
-
-            shareList.innerHTML = filtered.map((user) => `
-                <button type="button" class="work-share-user" data-share-user="${escapeHtml(user.username)}">
-                    <img src="${escapeHtml(user.avatar)}" alt="${escapeHtml(user.username)} 프로필 이미지">
-                    <span class="work-share-user__meta">
-                        <strong>${escapeHtml(user.username)}</strong>
-                        <small>${escapeHtml(user.subtitle)}</small>
-                    </span>
-                </button>
-            `).join("");
-        };
-
-        const searchShareUsers = async (keyword = "") => {
-            const profileNickname = resolveShareNickname();
-
-            if (!profileNickname || !shareList) {
-                renderShareList(keyword);
-                return;
-            }
-
-            try {
-                const users = await requestJson(`/api/profile/${encodeURIComponent(profileNickname)}/share/receivers?keyword=${encodeURIComponent(keyword || "")}`);
-                const safeUsers = Array.isArray(users) ? users : [];
-
-                shareReceiverMap.clear();
-                safeUsers.forEach((user) => {
-                    if (user?.nickname) {
-                        shareReceiverMap.set(user.nickname, user);
-                    }
-                });
-
-                if (!safeUsers.length) {
-                    shareList.innerHTML = '<div class="followManageEmpty">검색 결과가 없습니다.</div>';
-                    return;
-                }
-
-                shareList.innerHTML = safeUsers.map((user) => `
-                    <button type="button" class="work-share-user" data-share-user="${escapeHtml(user.nickname)}">
-                        ${user.profileImage ? `<img src="${escapeHtml(user.profileImage)}" alt="${escapeHtml(user.nickname)} 프로필 이미지">` : `<span class="work-share-user__avatar">${escapeHtml((user.nickname || "N").charAt(0))}</span>`}
-                        <span class="work-share-user__meta">
-                            <strong>${escapeHtml(user.nickname)}</strong>
-                            <small>${escapeHtml(user.creatorVerified ? "크리에이터 인증" : "일반 회원")}</small>
-                        </span>
-                    </button>
-                `).join("");
-            } catch (_) {
-                renderShareList(keyword);
-            }
-        };
-
         const openShareModal = () => {
-            if (isMobileShortsViewport()) {
-                if (shareModalBackdrop.parentElement !== page) {
-                    page.appendChild(shareModalBackdrop);
-                }
-            } else if (shareModalBackdrop.parentElement !== document.body) {
-                document.body.appendChild(shareModalBackdrop);
-            }
-
-            searchShareUsers(shareSearchInput ? shareSearchInput.value : "");
-            renderShareChips();
             shareModalBackdrop.hidden = false;
             shareModalBackdrop.setAttribute("aria-hidden", "false");
             shareModalBackdrop.style.display = "flex";
-            syncResponsiveModalStyles(shareModalBackdrop, shareModal, true);
         };
 
         const closeShareModal = () => {
             shareModalBackdrop.hidden = true;
             shareModalBackdrop.setAttribute("aria-hidden", "true");
             shareModalBackdrop.style.display = "none";
-            syncResponsiveModalStyles(shareModalBackdrop, shareModal, false);
         };
 
         shareButton.addEventListener("click", async (event) => {
@@ -2013,6 +1467,21 @@ function bindPageInteractions(page, data) {
             if (!shareModalBackdrop.hidden) {
                 closeShareModal();
                 return;
+            }
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: workState.headline || document.title,
+                        text: workState.desc || "",
+                        url: workState.shareUrl || window.location.href
+                    });
+                    return;
+                } catch (error) {
+                    if (error?.name === "AbortError") {
+                        return;
+                    }
+                }
             }
 
             openShareModal();
@@ -2056,75 +1525,6 @@ function bindPageInteractions(page, data) {
                 shareLinkInput.select();
             }
         });
-
-        shareSearchInput?.addEventListener("input", () => {
-            searchShareUsers(shareSearchInput.value);
-        });
-
-        shareList?.addEventListener("click", (event) => {
-            const userButton = event.target.closest("[data-share-user]");
-            const username = userButton?.getAttribute("data-share-user");
-
-            if (!username) {
-                return;
-            }
-
-            if (selectedShareUsers.includes(username)) {
-                selectedShareUsers = selectedShareUsers.filter((item) => item !== username);
-            } else {
-                selectedShareUsers = selectedShareUsers.concat(username);
-            }
-
-            renderShareChips();
-
-            if (shareSearchInput) {
-                shareSearchInput.value = "";
-                searchShareUsers("");
-            }
-        });
-
-        shareChips?.addEventListener("click", (event) => {
-            const chip = event.target.closest("[data-share-chip]");
-            const username = chip?.getAttribute("data-share-chip");
-
-            if (!username) {
-                return;
-            }
-
-            selectedShareUsers = selectedShareUsers.filter((item) => item !== username);
-            renderShareChips();
-        });
-
-        shareSendButton?.addEventListener("click", () => {
-            const receiverIds = selectedShareUsers
-                .map((username) => shareReceiverMap.get(username)?.id)
-                .filter(Boolean);
-            const shareNickname = resolveShareNickname();
-
-            if (!receiverIds.length || !shareNickname) {
-                window.alert("받는 사람을 선택해 주세요.");
-                return;
-            }
-
-            requestJson(`/api/profile/${encodeURIComponent(shareNickname)}/share`, {
-                method: "POST",
-                body: JSON.stringify({
-                    receiverIds,
-                    shareUrl: workState.shareUrl || window.location.href,
-                    message: (shareMessageInput?.value || "").trim()
-                })
-            }).then(() => {
-                closeShareModal();
-                selectedShareUsers = [];
-                renderShareChips();
-                if (shareMessageInput) {
-                    shareMessageInput.value = "";
-                }
-                window.alert("작품을 공유했습니다.");
-            }).catch((error) => {
-                window.alert(error.message || "작품 공유에 실패했습니다.");
-            });
-        });
     }
 
     if (reportButton && reportModalBackdrop) {
@@ -2154,29 +1554,24 @@ function bindPageInteractions(page, data) {
             }
             syncReportNextButton();
             reportModalBackdrop.hidden = false;
-            syncResponsiveModalStyles(reportModalBackdrop, reportModalBackdrop.querySelector(".report-modal-dialog"), true);
             if (reportConfirmationBackdrop) {
                 reportConfirmationBackdrop.hidden = true;
-                syncResponsiveModalStyles(reportConfirmationBackdrop, reportConfirmationBackdrop.querySelector(".report-modal-dialog"), false);
             }
         };
 
         const closeReportModal = () => {
             reportModalBackdrop.hidden = true;
-            syncResponsiveModalStyles(reportModalBackdrop, reportModalBackdrop.querySelector(".report-modal-dialog"), false);
         };
 
         const openReportConfirmationModal = () => {
             if (reportConfirmationBackdrop) {
                 reportConfirmationBackdrop.hidden = false;
-                syncResponsiveModalStyles(reportConfirmationBackdrop, reportConfirmationBackdrop.querySelector(".report-modal-dialog"), true);
             }
         };
 
         const closeReportConfirmationModal = () => {
             if (reportConfirmationBackdrop) {
                 reportConfirmationBackdrop.hidden = true;
-                syncResponsiveModalStyles(reportConfirmationBackdrop, reportConfirmationBackdrop.querySelector(".report-modal-dialog"), false);
             }
         };
 
@@ -2227,346 +1622,17 @@ function bindPageInteractions(page, data) {
         });
     }
 
-        if (anchoredPanel) {
-            let closePanelTimer;
-            syncMobilePanelStyles(anchoredPanel, false);
-            syncMobilePanelStyles(commentsPanel, false);
-        const openMobileSheet = (panelType) => {
-            if (!isMobileShortsViewport()) {
-                return false;
-            }
-
-            window.clearTimeout(closePanelTimer);
-            closeAuctionPanelForPage();
-            page.classList.remove("panel-open", "panel-comments", "panel-pivot", "panel-auction");
-            const shell = ensureMobilePanelShell();
-            const sheet = shell.querySelector(".workdetail-mobile-panel-sheet");
-            const content = shell.querySelector('[data-role="mobile-panel-content"]');
-
-            if (!sheet || !content) {
-                return false;
-            }
-
-            content.innerHTML = panelType === "comments"
-                ? renderMobileCommentsSheet()
-                : renderMobileDescriptionSheet();
-
-            content.querySelector('[data-role="mobile-panel-close"]')?.addEventListener("click", () => {
-                activeMobilePanelType = "";
-                hideMobileBottomSheet();
-            });
-
-            if (panelType === "comments") {
-                const mobileCommentInput = content.querySelector('[data-role="mobile-comment-input"]');
-                const mobileCommentSubmit = content.querySelector('[data-role="mobile-comment-submit"]');
-                const mobileCommentsList = content.querySelector('[data-role="mobile-comments-list"]');
-                const syncMobileCommentState = () => {
-                    if (!mobileCommentInput || !mobileCommentSubmit) {
-                        return;
-                    }
-                    mobileCommentSubmit.disabled = !mobileCommentInput.value.trim();
-                };
-
-                mobileCommentInput?.addEventListener("input", syncMobileCommentState);
-                mobileCommentInput?.addEventListener("keydown", (event) => {
-                    if (event.key === "Enter" && !event.shiftKey) {
-                        event.preventDefault();
-                        mobileCommentSubmit?.click();
-                    }
-                });
-                mobileCommentSubmit?.addEventListener("click", async () => {
-                    if (!mobileCommentInput || !mobileCommentSubmit) {
-                        return;
-                    }
-
-                    const contentValue = mobileCommentInput.value.trim();
-                    if (!contentValue) {
-                        return;
-                    }
-
-                    mobileCommentSubmit.disabled = true;
-                    const submitted = await submitComment(contentValue, {
-                        resetInput: () => {
-                            mobileCommentInput.value = "";
-                            syncMobileCommentState();
-                        }
-                    });
-
-                    if (!submitted) {
-                        syncMobileCommentState();
-                    }
-                });
-
-                if (mobileCommentsList) {
-                    const closeMobileCommentMenus = () => {
-                        mobileCommentsList.querySelectorAll('[data-role="comment-action-menu"]').forEach((menu) => {
-                            menu.hidden = true;
-                        });
-                        mobileCommentsList.querySelectorAll('[data-role="comment-menu-toggle"]').forEach((button) => {
-                            button.setAttribute("aria-expanded", "false");
-                        });
-                    };
-
-                    const closeMobileInlineEditors = () => {
-                        mobileCommentsList.querySelectorAll('[data-role="comment-inline-editor"]').forEach((editor) => {
-                            editor.remove();
-                        });
-                        mobileCommentsList.querySelectorAll(".cm-tx, .rp-tx").forEach((textNode) => {
-                            textNode.hidden = false;
-                        });
-                    };
-
-                    mobileCommentsList.addEventListener("click", (event) => {
-                        const toggle = event.target.closest('[data-role="reply-toggle"]');
-                        if (!toggle) {
-                            return;
-                        }
-
-                        const wrap = toggle.closest(".cm-rp");
-                        const list = wrap?.querySelector(".cm-rp-ls");
-                        if (!list) {
-                            return;
-                        }
-
-                        const willOpen = list.hidden;
-                        list.hidden = !willOpen;
-                        toggle.setAttribute("aria-expanded", willOpen ? "true" : "false");
-                        toggle.textContent = willOpen ? "답글 숨기기" : `답글 ${list.children.length}개`;
-                    });
-
-                    mobileCommentsList.addEventListener("click", (event) => {
-                        const menuToggle = event.target.closest('[data-role="comment-menu-toggle"]');
-                        if (!menuToggle) {
-                            if (!event.target.closest('[data-role="comment-action-menu"]')) {
-                                closeMobileCommentMenus();
-                            }
-                            return;
-                        }
-
-                        event.stopPropagation();
-                        const menu = menuToggle.closest(".comment-action-wrap")?.querySelector('[data-role="comment-action-menu"]');
-                        if (!menu) {
-                            return;
-                        }
-
-                        const willOpen = menu.hidden;
-                        closeMobileCommentMenus();
-                        menu.hidden = !willOpen;
-                        menuToggle.setAttribute("aria-expanded", willOpen ? "true" : "false");
-                    });
-
-                    mobileCommentsList.addEventListener("click", async (event) => {
-                        const voteButton = event.target.closest('[data-vote]');
-                        if (!voteButton || voteButton.dataset.vote !== "like") {
-                            return;
-                        }
-
-                        const commentItem = voteButton.closest("[data-comment-id]");
-                        const commentId = Number(commentItem?.dataset.commentId || "0");
-                        const voteWrap = voteButton.closest(".cm-hd, .rp-hd, .cm-ft, .rp-ft");
-                        if (!voteWrap || !commentId) {
-                            return;
-                        }
-
-                        try {
-                            const result = await apiRequest(`/api/comments/${commentId}/likes`, {
-                                method: "POST"
-                            });
-                            const likeButton = voteWrap.querySelector('[data-vote="like"]');
-                            const dislikeButton = voteWrap.querySelector('[data-vote="dislike"]');
-                            const countNode = commentItem.querySelector('[data-role="comment-like-count"]');
-
-                            updateVoteButtonState(likeButton, Boolean(result.liked));
-                            updateVoteButtonState(dislikeButton, false);
-
-                            if (countNode) {
-                                countNode.dataset.baseCount = String(result.likeCount || 0);
-                                countNode.textContent = result.likeCount ? `좋아요 ${formatDisplayCount(result.likeCount)}` : "";
-                            }
-                        } catch (error) {
-                            window.alert(error.message || "댓글 좋아요 처리에 실패했습니다.");
-                        }
-                    });
-
-                    mobileCommentsList.addEventListener("click", async (event) => {
-                        const editButton = event.target.closest('[data-role="comment-edit"]');
-                        const deleteButton = event.target.closest('[data-role="comment-delete"]');
-                        const editSaveButton = event.target.closest('[data-role="comment-edit-save"]');
-                        const editCancelButton = event.target.closest('[data-role="comment-edit-cancel"]');
-                        const commentItem = event.target.closest("[data-comment-id]");
-                        const commentId = Number(commentItem?.dataset.commentId || "0");
-
-                        if (!commentId) {
-                            return;
-                        }
-
-                        if (editCancelButton) {
-                            closeMobileInlineEditors();
-                            return;
-                        }
-
-                        if (editSaveButton) {
-                            closeMobileCommentMenus();
-                            const editor = commentItem.querySelector('[data-role="comment-inline-editor"]');
-                            const input = editor?.querySelector('[data-role="comment-inline-input"]');
-                            const textNode = commentItem.querySelector(".cm-tx, .rp-tx");
-                            const currentText = textNode?.textContent?.trim() || "";
-                            const normalizedText = input?.value?.trim() || "";
-
-                            if (!normalizedText || normalizedText === currentText) {
-                                closeMobileInlineEditors();
-                                return;
-                            }
-
-                            try {
-                                const updated = await apiRequest(`/api/comments/${commentId}`, {
-                                    method: "PUT",
-                                    body: JSON.stringify({ content: normalizedText })
-                                });
-
-                                workState.comments = updateCommentTree(workState.comments, commentId, (comment) => ({
-                                    ...comment,
-                                    text: updated.content || normalizedText,
-                                    time: formatRelativeTime(updated.updatedDatetime || updated.createdDatetime)
-                                }));
-                                renderCommentsList(commentsList, workState.comments);
-                                mobileCommentsList.innerHTML = commentsList ? commentsList.innerHTML : "";
-                            } catch (error) {
-                                window.alert(error.message || "댓글 수정에 실패했습니다.");
-                            }
-
-                            return;
-                        }
-
-                        if (editButton) {
-                            closeMobileCommentMenus();
-                            const textNode = commentItem.querySelector(".cm-tx, .rp-tx");
-                            const currentText = textNode?.textContent?.trim() || "";
-                            const anchorNode =
-                                commentItem.querySelector(".cm-ft, .rp-ft")
-                                || commentItem.querySelector(".cm-rp")
-                                || textNode;
-
-                            if (!textNode || !anchorNode) {
-                                return;
-                            }
-
-                            closeMobileInlineEditors();
-                            textNode.hidden = true;
-                            anchorNode.insertAdjacentHTML("beforebegin", `
-                                <div class="comment-inline-editor" data-role="comment-inline-editor">
-                                    <textarea class="comment-inline-input" data-role="comment-inline-input">${escapeHtml(currentText)}</textarea>
-                                    <div class="comment-inline-actions">
-                                        <button class="comment-inline-button comment-inline-button--ghost" type="button" data-role="comment-edit-cancel">취소</button>
-                                        <button class="comment-inline-button comment-inline-button--primary" type="button" data-role="comment-edit-save">저장</button>
-                                    </div>
-                                </div>
-                            `);
-                            commentItem.querySelector('[data-role="comment-inline-input"]')?.focus();
-                            return;
-                        }
-
-                        if (deleteButton) {
-                            closeMobileCommentMenus();
-                            if (!window.confirm("댓글을 삭제하시겠습니까?")) {
-                                return;
-                            }
-
-                            try {
-                                await apiRequest(`/api/comments/${commentId}`, {
-                                    method: "DELETE"
-                                });
-
-                                workState.comments = removeCommentTree(workState.comments, commentId);
-                                workState.commentCount = Math.max(0, parseDisplayCount(workState.commentCount) - 1);
-                                renderCommentsList(commentsList, workState.comments);
-                                updateCountFields(page, "commentCount", workState.commentCount);
-                                mobileCommentsList.innerHTML = commentsList ? commentsList.innerHTML : "";
-                            } catch (error) {
-                                window.alert(error.message || "댓글 삭제에 실패했습니다.");
-                            }
-                        }
-                    });
-
-                    document.addEventListener("click", closeMobileCommentMenus);
-                }
-
-                syncMobileCommentState();
-            }
-
-            shell.style.display = "flex";
-            shell.style.pointerEvents = "auto";
-            syncMobilePanelAnchor();
-            sheet.style.opacity = "1";
-            sheet.style.transform = "translate(-50%, 0)";
-            activeMobilePanelType = panelType;
-
-            return true;
-        };
-
-        const closeMobileSheets = () => {
-            if (!isMobileShortsViewport()) {
-                return false;
-            }
-
-            if (mobilePanelShell) {
-                const sheet = mobilePanelShell.querySelector(".workdetail-mobile-panel-sheet");
-                if (sheet) {
-                    sheet.style.opacity = "0";
-                    sheet.style.transform = "translate(-50%, calc(100% + 32px))";
-                }
-                mobilePanelShell.style.pointerEvents = "none";
-                window.setTimeout(() => {
-                    if (mobilePanelShell && !activeMobilePanelType) {
-                        mobilePanelShell.style.display = "none";
-                    }
-                }, 200);
-            }
-            activeMobilePanelType = "";
-
-            return true;
-        };
-
-        window.addEventListener("resize", () => {
-            if (isMobileShortsViewport()) {
-                if (activeMobilePanelType) {
-                    syncMobilePanelAnchor();
-                }
-                if (
-                    activeAuctionPage === page &&
-                    auctionModalBackdrop &&
-                    !auctionModalBackdrop.hidden
-                ) {
-                    syncResponsiveModalStyles(
-                        auctionModalBackdrop,
-                        auctionModalBackdrop.querySelector(".work-auction-modal"),
-                        true
-                    );
-                }
-                return;
-            }
-
-            if (mobilePanelShell) {
-                mobilePanelShell.style.display = "none";
-                mobilePanelShell.style.pointerEvents = "none";
-            }
-            activeMobilePanelType = "";
-        });
+    if (anchoredPanel) {
+        let closePanelTimer;
 
         const openPanel = (panelType) => {
-            if (openMobileSheet(panelType)) {
-                return;
-            }
-
             window.clearTimeout(closePanelTimer);
             closeAuctionPanelForPage();
             if (anchoredPanel) {
                 anchoredPanel.hidden = panelType !== "description";
-                syncMobilePanelStyles(anchoredPanel, panelType === "description");
             }
             if (commentsPanel) {
                 commentsPanel.hidden = panelType !== "comments";
-                syncMobilePanelStyles(commentsPanel, panelType === "comments");
             }
             if (pivotPanel) {
                 pivotPanel.hidden = panelType !== "pivot";
@@ -2580,10 +1646,6 @@ function bindPageInteractions(page, data) {
         };
 
         const closePanel = () => {
-            if (closeMobileSheets()) {
-                return;
-            }
-
             closeAuctionPanelForPage();
             page.classList.remove("panel-open");
             page.classList.remove("panel-comments");
@@ -2593,11 +1655,9 @@ function bindPageInteractions(page, data) {
                 if (!page.classList.contains("panel-open")) {
                     if (anchoredPanel) {
                         anchoredPanel.hidden = true;
-                        syncMobilePanelStyles(anchoredPanel, false);
                     }
                     if (commentsPanel) {
                         commentsPanel.hidden = true;
-                        syncMobilePanelStyles(commentsPanel, false);
                     }
                     if (pivotPanel) {
                         pivotPanel.hidden = true;
@@ -2627,14 +1687,11 @@ function bindPageInteractions(page, data) {
             commentsButton.addEventListener("click", (event) => {
                 event.stopPropagation();
 
-                const isCommentsOpen = isMobileShortsViewport()
-                    ? activeMobilePanelType === "comments"
-                    : Boolean(
-                        page.classList.contains("panel-open") &&
-                        page.classList.contains("panel-comments") &&
-                        commentsPanel &&
-                        !commentsPanel.hidden
-                    );
+                const isCommentsOpen =
+                    page.classList.contains("panel-open") &&
+                    page.classList.contains("panel-comments") &&
+                    commentsPanel &&
+                    !commentsPanel.hidden;
 
                 if (isCommentsOpen) {
                     closePanel();
@@ -2834,6 +1891,11 @@ function bindPageInteractions(page, data) {
                 moreButton.setAttribute("aria-expanded", "false");
             }
             if (workState.id) {
+                if (typeof window.openComposeModal === "function") {
+                    window.openComposeModal(`/work/work-edit/${workState.id}`);
+                    return;
+                }
+
                 window.location.href = `/work/work-edit/${workState.id}`;
             }
         });
@@ -2889,7 +1951,7 @@ function getCurrentPageIndex() {
 }
 
 // 상하 네비게이션 이동
-function scrollToPage(index, behavior = "smooth") {
+function scrollToPage(index) {
     if (!pageStack) {
         return;
     }
@@ -2898,56 +1960,8 @@ function scrollToPage(index, behavior = "smooth") {
     const targetPage = pages[index];
 
     if (targetPage) {
-        targetPage.scrollIntoView({ behavior, block: "start" });
+        targetPage.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-}
-
-function isMobileShortsViewport() {
-    return typeof window !== "undefined" && window.matchMedia("(max-width: 820px)").matches;
-}
-
-function syncMobileShortsLayout() {
-    const pages = pageStack ? Array.from(pageStack.querySelectorAll(".page")) : [];
-
-    if (!pageStack || !isMobileShortsViewport()) {
-        document.body.removeAttribute("data-mobile-shorts");
-        document.body.style.removeProperty("--mobile-stage-height");
-        pages.forEach((page) => {
-            page.style.removeProperty("height");
-            page.style.removeProperty("min-height");
-            page.style.removeProperty("flex-basis");
-        });
-        return;
-    }
-
-    const viewportHeight = window.visualViewport && window.visualViewport.height
-        ? window.visualViewport.height
-        : window.innerHeight;
-    const usableHeight = Math.max(Math.round(viewportHeight), 320);
-
-    document.body.setAttribute("data-mobile-shorts", "true");
-    document.body.style.setProperty("--mobile-stage-height", `${usableHeight}px`);
-
-    pages.forEach((page) => {
-        page.style.height = `${usableHeight}px`;
-        page.style.minHeight = `${usableHeight}px`;
-        page.style.flexBasis = `${usableHeight}px`;
-    });
-}
-
-function scheduleMobilePageSnap() {
-    if (!pageStack || !isMobileShortsViewport()) {
-        return;
-    }
-
-    if (mobileSnapTimeoutId) {
-        window.clearTimeout(mobileSnapTimeoutId);
-    }
-
-    mobileSnapTimeoutId = window.setTimeout(() => {
-        const currentIndex = getCurrentPageIndex();
-        scrollToPage(currentIndex, "auto");
-    }, 120);
 }
 
 // 전체화면 대상 페이지 표시 동기화
@@ -3040,21 +2054,9 @@ function resetInactivePages() {
 
         if (anchoredPanel) {
             anchoredPanel.hidden = true;
-            anchoredPanel.classList.remove("mobile-sheet-open");
-            anchoredPanel.style.removeProperty("display");
-            anchoredPanel.style.removeProperty("visibility");
-            anchoredPanel.style.removeProperty("opacity");
-            anchoredPanel.style.removeProperty("pointer-events");
-            anchoredPanel.style.removeProperty("transform");
         }
         if (commentsPanel) {
             commentsPanel.hidden = true;
-            commentsPanel.classList.remove("mobile-sheet-open");
-            commentsPanel.style.removeProperty("display");
-            commentsPanel.style.removeProperty("visibility");
-            commentsPanel.style.removeProperty("opacity");
-            commentsPanel.style.removeProperty("pointer-events");
-            commentsPanel.style.removeProperty("transform");
         }
         if (pivotPanel) {
             pivotPanel.hidden = true;
@@ -3075,6 +2077,80 @@ function resetInactivePages() {
     });
 }
 
+// 정규화된 작품 데이터를 page-stack에 페이지 단위로 렌더링한다.
+async function appendWorkPage(detail) {
+    if (!detail || !pageStack || !workPageTemplate) {
+        return;
+    }
+    if (detail.id != null) {
+        if (feedState.seenIds.has(detail.id)) {
+            return;
+        }
+        feedState.seenIds.add(detail.id);
+    }
+
+    const normalized = await normalizeWorkDetail(detail);
+    const fragment = workPageTemplate.content.cloneNode(true);
+    const page = fragment.querySelector(".page");
+
+    bindPageData(page, normalized);
+    bindPageInteractions(page, normalized);
+    pageStack.appendChild(fragment);
+    workDetails.push(normalized);
+}
+
+// 추천 피드 batch — 쇼츠 알고리즘처럼 다음 작품 N개를 가져와 stack에 append
+async function loadFeedBatch(limit = 5) {
+    if (feedState.isLoading || feedState.exhausted) {
+        return;
+    }
+    feedState.isLoading = true;
+
+    try {
+        const params = new URLSearchParams();
+        params.set("limit", String(limit));
+        feedState.seenIds.forEach((id) => params.append("excludeIds", id));
+
+        const list = await apiRequest(`/api/works/feed?${params.toString()}`);
+        const items = Array.isArray(list) ? list : [];
+        if (!items.length) {
+            feedState.exhausted = true;
+            return;
+        }
+
+        for (const item of items) {
+            if (item == null || item.id == null || feedState.seenIds.has(item.id)) {
+                continue;
+            }
+            try {
+                const detail = await apiRequest(`/api/works/${item.id}`);
+                await appendWorkPage(detail);
+            } catch (_) {
+                // 단건 실패는 무시하고 다음 추천으로 진행
+            }
+        }
+    } catch (_) {
+        // 추천 실패 시 다음 스크롤에서 재시도
+    } finally {
+        feedState.isLoading = false;
+        updateNavigationState();
+    }
+}
+
+// 마지막에서 2번째 페이지 진입 시 다음 batch prefetch
+async function maybePrefetchFeed() {
+    if (!isFeedMode() || !pageStack) {
+        return;
+    }
+
+    const pages = pageStack.querySelectorAll(".page");
+    const currentIndex = getCurrentPageIndex();
+    const remaining = pages.length - 1 - currentIndex;
+    if (remaining <= 1) {
+        await loadFeedBatch(5);
+    }
+}
+
 async function initializeWorkDetailPage() {
     if (!pageStack || !workPageTemplate) {
         return;
@@ -3088,20 +2164,19 @@ async function initializeWorkDetailPage() {
 
     try {
         const detail = await apiRequest(`/api/works/${workId}`);
-        const detailPages = await loadScrollableWorkDetails(detail);
+        const initialPages = isFeedMode() ? [detail] : await loadScrollableWorkDetails(detail);
 
         pageStack.innerHTML = "";
         workDetails.length = 0;
+        feedState.seenIds.clear();
+        feedState.exhausted = false;
 
-        for (const item of detailPages) {
-            const normalized = await normalizeWorkDetail(item);
-            const fragment = workPageTemplate.content.cloneNode(true);
-            const page = fragment.querySelector(".page");
+        for (const item of initialPages) {
+            await appendWorkPage(item);
+        }
 
-            bindPageData(page, normalized);
-            bindPageInteractions(page, normalized);
-            pageStack.appendChild(fragment);
-            workDetails.push(normalized);
+        if (isFeedMode()) {
+            await loadFeedBatch(4);
         }
 
         if (navigationButtonUp && navigationButtonDown) {
@@ -3120,16 +2195,14 @@ async function initializeWorkDetailPage() {
             pageStack.addEventListener("scroll", () => {
                 updateNavigationState();
                 resetInactivePages();
-                scheduleMobilePageSnap();
                 if (document.querySelector(".workdetail-stage")?.classList.contains("stage-fullscreen")) {
                     syncFullscreenActivePage();
                 }
+                maybePrefetchFeed();
             }, { passive: true });
             window.addEventListener("resize", updateNavigationState);
-            window.addEventListener("resize", syncMobileShortsLayout);
             resetInactivePages();
             updateNavigationState();
-            syncMobileShortsLayout();
             syncFullscreenActivePage();
         }
     } catch (error) {

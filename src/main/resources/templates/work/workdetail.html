@@ -9,13 +9,17 @@
     <link rel="stylesheet" href="/css/common/font.css" th:href="@{/css/common/font.css}">
     <link rel="stylesheet" href="/css/work/workdetail.css" th:href="@{/css/work/workdetail.css}">
     <link rel="stylesheet" href="/css/auction/auction.css" th:href="@{/css/auction/auction.css}">
-    <link rel="stylesheet" href="/templates/work/pay-api.css" th:href="@{/templates/work/pay-api.css}">
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/pay/pay-api.css" th:href="@{/css/pay/pay-api.css}">
+    <link rel="shortcut icon" href="/images/favicon.png" type="image/png">
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js" defer></script>
  </head>
 <body class="workdetail-page" id="section">
     <div th:replace="~{layout/layout :: ytShellChrome('workdetail')}"></div>
 
-    <main class="bd-shell__page-content workdetail-shell" aria-label="작품 상세">
+    <main class="bd-shell__page-content workdetail-shell" aria-label="작품 상세"
+          th:attr="data-feed-mode=${(feedMode != null and feedMode) ? 'true' : 'false'},
+                   data-seed-work-id=${(work != null) ? work.id : ''}">
         <section class="workdetail-stage">
             <main class="page-stack" id="page-stack"></main>
             <nav class="shorts-navigation" aria-label="쇼츠 탐색">
@@ -419,6 +423,15 @@
                     <!-- 입찰 채팅 스크롤 영역 -->
                     <div class="Auction-BidHistory-List" id="bidHistoryList">
 
+                        <!-- 입찰이 없을 경우 표시되는 div -->
+                        <div class="Auction-BidHistory-Empty" id="bidHistoryEmpty">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 8v4m0 4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                            </svg>
+                            <p>아직 입찰 내역이 없습니다.</p>
+                        </div>
+
                         <div class="Auction-Bid-Item">
                             <div class="Auction-Bid-Avatar">
                                 <div class="Auction-Bid-AvatarCircle"></div>
@@ -499,12 +512,31 @@
             </aside>
         </main>
 
+        <!-- 입찰 확인 모달 -->
+        <div class="Auction-Modal-Backdrop off" id="bidConfirmBackdrop">
+            <div class="Auction-Modal">
+                <div class="Auction-Modal-Body">
+                    <p class="Auction-Modal-Message">입찰을 진행하시겠습니까?</p>
+                </div>
+                <div class="Auction-Modal-Footer">
+                    <button class="Auction-Modal-Btn Auction-Modal-Btn--cancel" id="bidConfirmCancel">취소</button>
+                    <button class="Auction-Modal-Btn Auction-Modal-Btn--confirm" id="bidConfirmOk">확인</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 토스트 -->
+        <div class="Auction-Toast off" id="auctionToast">
+            <span class="Auction-Toast-Message" id="auctionToastMessage"></span>
+        </div>
+
     </div>
 </div>
     <script src="/js/work/workdetail.js" th:src="@{/js/work/workdetail.js}"></script>
+    <script src="/js/auction/event.js" th:src="@{/js/auction/socket.js}"></script>
+    <script src="/js/auction/event.js" th:src="@{/js/auction/event.js}"></script>
     <script src="/js/auction/service.js" th:src="@{/js/auction/service.js}"></script>
     <script src="/js/auction/layout.js" th:src="@{/js/auction/layout.js}"></script>
-    <script src="/js/auction/event.js" th:src="@{/js/auction/event.js}"></script>
     <th:block th:replace="~{layout/layout :: ytShellScripts()}"></th:block>
 </body>
 </html>

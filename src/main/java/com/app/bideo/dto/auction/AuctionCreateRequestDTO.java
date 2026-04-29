@@ -9,10 +9,10 @@ import lombok.*;
 @Builder
 public class AuctionCreateRequestDTO {
     private Long workId;
-    private Integer askingPrice;
-    private Integer startingPrice;
-    private Integer estimateLow;
-    private Integer estimateHigh;
-    private Integer bidIncrement;
+    private Long askingPrice;
+    private Long startingPrice;
+    private Long estimateLow;
+    private Long estimateHigh;
+    private Long bidIncrement;
     private Integer deadlineHours;
 }

@@ -1,8 +1,6 @@
 -- ----------------------------------------------------------
 -- 1. 회원 (tbl_member)
 -- ----------------------------------------------------------
-drop table if exists tbl_member cascade;
-
 create table tbl_member
 (
     id                  bigint generated always as identity primary key,
@@ -12,6 +10,7 @@ create table tbl_member
     real_name           varchar(255) null,
     birth_date          date         null,
     bio                 varchar(255) null,
+    banner_image        varchar(255) null,
     profile_image       varchar(255) null,
     role                varchar(255) not null default 'USER',
     creator_verified    boolean      not null default false,
@@ -32,6 +31,8 @@ create table tbl_member
     constraint chk_member_status check (status in ('ACTIVE', 'SUSPENDED', 'BANNED'))
 );
 
+drop table if exists tbl_member cascade;
+
 comment on table tbl_member is '회원';
 comment on column tbl_member.id is '회원 번호 (PK)';
 comment on column tbl_member.email is '이메일 (로그인 + 아이디찾기)';
@@ -40,6 +41,7 @@ comment on column tbl_member.nickname is '닉네임';
 comment on column tbl_member.real_name is '실명';
 comment on column tbl_member.birth_date is '생년월일';
 comment on column tbl_member.bio is '자기소개';
+comment on column tbl_member.banner_image is '프로필 배너 이미지 URL';
 comment on column tbl_member.profile_image is '프로필 이미지 URL';
 comment on column tbl_member.role is '권한 (USER / ADMIN)';
 comment on column tbl_member.creator_verified is '크리에이터 인증 여부';

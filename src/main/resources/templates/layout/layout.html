@@ -93,7 +93,9 @@
             </a>
           </li>
           <li class="bd-shell__guide-item">
-            <a class="bd-shell__guide-link" href="/" title="작품">
+            <a class="bd-shell__guide-link"
+               th:classappend="${activeItemKey == 'workdetail' or activeItemKey == 'gallery' or activeItemKey == 'work-register'} ? ' is-active'"
+               href="/work/feed" title="작품">
               <svg class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path
                         d="M21 3H3a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2ZM3 19V5h18v14H3Zm3.5-8.5 3 3.5 4-5 5.5 7H5l1.5-5.5Z"
@@ -103,7 +105,9 @@
             </a>
           </li>
           <li class="bd-shell__guide-item">
-            <a class="bd-shell__guide-link" href="/contest/list" title="공모전">
+            <a class="bd-shell__guide-link"
+               th:classappend="${activeItemKey == 'contest'} ? ' is-active'"
+               href="/contest/list" title="공모전">
               <svg class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path
                         d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2Zm0 3.34L9.92 9.53l-4.56.66 3.3 3.22-.78 4.54L12 15.77l4.12 2.17-.78-4.54 3.3-3.22-4.56-.66L12 5.34Z"
@@ -133,12 +137,16 @@
       <section class="bd-shell__guide-section">
         <h2 class="bd-shell__section-title">보관함</h2>
         <ul class="bd-shell__guide-list">
-          <li class="bd-shell__guide-item"><a class="bd-shell__guide-link" href="/profile" title="내 페이지"><svg
+          <li class="bd-shell__guide-item"><a class="bd-shell__guide-link"
+                  th:classappend="${activeItemKey == 'profile'} ? ' is-active'"
+                  href="/profile" title="내 페이지"><svg
                   class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 12a4 4 0 1 0-4-4a4 4 0 0 0 4 4Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"
                   fill="currentColor" />
           </svg><span class="bd-shell__guide-copy">내 페이지</span></a></li>
-          <li class="bd-shell__guide-item"><a class="bd-shell__guide-link" href="/profile" title="찜한 작품"><svg
+          <li class="bd-shell__guide-item"><a class="bd-shell__guide-link"
+                  th:classappend="${activeItemKey == 'bookmark'} ? ' is-active'"
+                  href="/profile" title="찜한 작품"><svg
                   class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
             <path
                     d="M12 21.35 10.55 20C5.4 15.36 2 12.28 2 8.5A4.5 4.5 0 0 1 6.5 4A5.22 5.22 0 0 1 12 7.09A5.22 5.22 0 0 1 17.5 4A4.5 4.5 0 0 1 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35Z"
@@ -619,6 +627,14 @@
       <div class="bd-chat-panel__shell">
         <div class="bd-chat-panel__body">
           <aside class="bd-chat-sidebar" aria-label="채팅방 목록">
+            <div class="bd-chat-sidebar__topbar">
+              <h2 class="bd-chat-sidebar__title">채팅</h2>
+              <button class="bd-chat-mobile-close" type="button" aria-label="채팅 닫기" data-bd-chat-dismiss>
+                <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+                  <path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12Z" fill="currentColor"/>
+                </svg>
+              </button>
+            </div>
 
             <button class="bd-chat-sidebar__compose" type="button" data-bd-chat-compose-toggle>
                 <span class="bd-chat-sidebar__compose-icon" aria-hidden="true">

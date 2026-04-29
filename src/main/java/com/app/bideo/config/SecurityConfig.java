@@ -38,6 +38,9 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/dashboard", "/dashboard/**").authenticated()
+                        .requestMatchers("/api/dashboard", "/api/dashboard/**").authenticated()
+                        .requestMatchers("/api/cards", "/api/cards/**").authenticated()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/works/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/galleries", "/api/galleries/*", "/api/galleries/*/comments").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/gallery-register", "/gallery/gallery-register").permitAll()

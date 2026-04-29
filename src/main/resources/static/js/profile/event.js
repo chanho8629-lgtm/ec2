@@ -162,7 +162,7 @@ function escapeHtml(value) {
 // 프로필 아바타 마크업 생성
 function getAvatarMarkup(profileImage, nickname) {
   if (profileImage) {
-    return '<img src="' + escapeHtml(profileImage) + '" alt="' + escapeHtml(nickname || '프로필') + ' 프로필 이미지">';
+    return '<span class="work-share-user__avatar"><img src="' + escapeHtml(profileImage) + '" alt="' + escapeHtml(nickname || '프로필') + ' 프로필 이미지"></span>';
   }
 
   const source = (nickname || 'N').trim();
@@ -280,6 +280,8 @@ async function searchShareUsers(keyword) {
 // 프로필 이미지 임시 상태
 let pendingProfileAvatarImage = '';
 let pendingProfileAvatarMode = 'keep';
+let pendingProfileBannerImage = '';
+let pendingProfileBannerMode = 'keep';
 
 // 아바타 호버 마크업
 const avatarHoverMarkup =
@@ -324,11 +326,57 @@ function renderAvatarPreview(content) {
   preview.innerHTML = content;
 }
 
+function renderBannerPreview(imageUrl) {
+  const preview = document.querySelector('[data-profile-banner-preview]');
+  if (!preview) return;
+
+  if (imageUrl) {
+    preview.style.backgroundImage = 'linear-gradient(180deg, rgba(16, 24, 40, 0.16), rgba(16, 24, 40, 0.48)), url("' + imageUrl.replace(/"/g, '\\"') + '")';
+  } else {
+    preview.style.backgroundImage = '';
+  }
+}
+
+function renderBannerBackground(imageUrl) {
+  const banner = document.querySelector('.banner');
+  if (!banner) return;
+
+  if (imageUrl) {
+    banner.style.backgroundImage = 'linear-gradient(180deg, rgba(16, 24, 40, 0.16), rgba(16, 24, 40, 0.48)), url("' + imageUrl.replace(/"/g, '\\"') + '")';
+    banner.classList.add('has-image');
+    banner.classList.remove('is-hidden');
+  } else {
+    banner.style.backgroundImage = '';
+    banner.classList.remove('has-image');
+    banner.classList.add('is-hidden');
+  }
+}
+
 // 기본 아바타 렌더링
 function renderDefaultAvatar() {
   const defaultText = getDefaultAvatarText();
   renderAvatarButton('<span class="avatarValue" data-profile-avatar-value>' + defaultText + '</span>');
   renderAvatarPreview(defaultText);
+}
+
+function syncProfileAvatarModalPreview() {
+  const avatarOpen = document.querySelector('[data-profile-avatar-open]');
+  const fileInput = document.querySelector('[data-profile-edit-file]');
+  const currentImage = avatarOpen?.querySelector('img');
+
+  pendingProfileAvatarImage = '';
+  pendingProfileAvatarMode = 'keep';
+
+  if (fileInput) {
+    fileInput.value = '';
+  }
+
+  if (currentImage) {
+    renderAvatarPreview('<img src="' + currentImage.src + '" alt="프로필 이미지">');
+    return;
+  }
+
+  renderAvatarPreview(getDefaultAvatarText());
 }
 
 // 팔로우 관리 상태
@@ -628,6 +676,7 @@ document.addEventListener('click', async (event) => {
 
   if (profileEditOpen) {
     modalClose('profile-setting-modal');
+    syncProfileAvatarModalPreview();
     modalOpen('profile-edit-modal');
     return;
   }
@@ -663,6 +712,18 @@ document.addEventListener('click', async (event) => {
     modalClose('profile-setting-modal');
     await loadBadgeManageData();
     modalOpen('badge-manage-modal');
+    return;
+  }
+
+  const bannerEditOpen = event.target.closest('[data-banner-edit-open]');
+
+  if (bannerEditOpen) {
+    modalClose('profile-setting-modal');
+    pendingProfileBannerImage = '';
+    const currentImage = document.querySelector('.banner.has-image')?.style.backgroundImage || '';
+    const matched = currentImage.match(/url\("?(.*?)"?\)/);
+    renderBannerPreview(matched ? matched[1] : '');
+    modalOpen('banner-edit-modal');
     return;
   }
 
@@ -761,22 +822,7 @@ document.addEventListener('click', async (event) => {
   const profileAvatarOpen = event.target.closest('[data-profile-avatar-open]');
 
   if (profileAvatarOpen) {
-    const currentImage = profileAvatarOpen.querySelector('img');
-    const fileInput = document.querySelector('[data-profile-edit-file]');
-
-    pendingProfileAvatarImage = '';
-    pendingProfileAvatarMode = 'keep';
-
-    if (fileInput) {
-      fileInput.value = '';
-    }
-
-    if (currentImage) {
-      renderAvatarPreview('<img src="' + currentImage.src + '" alt="프로필 이미지">');
-    } else {
-      renderAvatarPreview(getDefaultAvatarText());
-    }
-
+    syncProfileAvatarModalPreview();
     modalOpen('profile-edit-modal');
     return;
   }
@@ -831,6 +877,61 @@ document.addEventListener('click', async (event) => {
       }
     } catch (error) {
       alert(error.message || '프로필 수정에 실패했습니다.');
+    }
+    return;
+  }
+
+  const profileBannerApply = event.target.closest('[data-profile-banner-apply]');
+
+  if (profileBannerApply) {
+    try {
+      let bannerUpdated = false;
+
+      if (pendingProfileBannerMode === 'image' && pendingProfileBannerImage) {
+        const fileInput = document.querySelector('[data-profile-banner-file]');
+        const selectedFile = fileInput?.files?.[0];
+
+        if (!selectedFile) {
+          alert('배너 이미지를 선택해 주세요.');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('bannerImageFile', selectedFile);
+        const updatedProfile = await requestFormData('/api/profile/me/banner-image', formData);
+        renderBannerBackground(updatedProfile?.bannerImage || '');
+        renderBannerPreview(updatedProfile?.bannerImage || '');
+        bannerUpdated = true;
+      }
+
+      pendingProfileBannerImage = '';
+      pendingProfileBannerMode = 'keep';
+      modalClose('banner-edit-modal');
+      if (bannerUpdated) {
+        showSuccessMessage('프로필 배너가 수정되었습니다.');
+      }
+    } catch (error) {
+      alert(error.message || '배너 수정에 실패했습니다.');
+    }
+    return;
+  }
+
+  const profileBannerRemove = event.target.closest('[data-profile-banner-remove]');
+
+  if (profileBannerRemove) {
+    try {
+      const updatedProfile = await requestJson('/api/profile/me/basic', {
+        method: 'PUT',
+        body: JSON.stringify({ bannerImage: '' }),
+      });
+      pendingProfileBannerImage = '';
+      pendingProfileBannerMode = 'keep';
+      renderBannerBackground(updatedProfile?.bannerImage || '');
+      renderBannerPreview(updatedProfile?.bannerImage || '');
+      modalClose('banner-edit-modal');
+      showSuccessMessage('프로필 배너가 제거되었습니다.');
+    } catch (error) {
+      alert(error.message || '배너 제거에 실패했습니다.');
     }
     return;
   }
@@ -1111,6 +1212,27 @@ document.addEventListener('change', (event) => {
     pendingProfileAvatarMode = 'image';
 
     renderAvatarPreview(imageTag);
+  };
+
+  reader.readAsDataURL(file);
+
+  return;
+});
+
+document.addEventListener('change', (event) => {
+  const fileInput = event.target.closest('[data-profile-banner-file]');
+
+  if (!fileInput || !fileInput.files || !fileInput.files[0]) return;
+
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+
+  reader.onload = ({ target }) => {
+    if (!target) return;
+
+    pendingProfileBannerImage = String(target.result || '');
+    pendingProfileBannerMode = 'image';
+    renderBannerPreview(pendingProfileBannerImage);
   };
 
   reader.readAsDataURL(file);

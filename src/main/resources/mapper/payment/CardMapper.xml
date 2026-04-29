@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.app.bideo.mapper.payment.CardMapper">
+
+    <select id="selectByMemberId" resultType="com.app.bideo.dto.payment.CardResponseDTO">
+        select
+            id,
+            card_company,
+            card_number_masked,
+            billing_key,
+            billing_receipt_id,
+            billing_method,
+            billing_status,
+            is_default,
+            created_datetime
+        from tbl_card
+        where member_id = #{memberId}
+          and deleted_datetime is null
+        order by is_default desc, created_datetime desc
+    </select>
+
+    <select id="selectById" resultType="com.app.bideo.dto.payment.CardResponseDTO">
+        select
+            id,
+            card_company,
+            card_number_masked,
+            billing_key,
+            billing_receipt_id,
+            billing_method,
+            billing_status,
+            is_default,
+            created_datetime
+        from tbl_card
+        where id = #{cardId}
+          and member_id = #{memberId}
+          and deleted_datetime is null
+    </select>
+
+    <select id="countActiveByMemberId" resultType="int">
+        select count(*)
+        from tbl_card
+        where member_id = #{memberId}
+          and deleted_datetime is null
+    </select>
+
+    <insert id="insert" parameterType="com.app.bideo.domain.payment.CardVO" useGeneratedKeys="true" keyProperty="id">
+        insert into tbl_card (
+            member_id, card_company, card_number_masked, billing_key, billing_receipt_id, billing_method, billing_status, is_default
+        ) values (
+            #{memberId}, #{cardCompany}, #{cardNumberMasked}, #{billingKey}, #{billingReceiptId}, #{billingMethod}, #{billingStatus}, #{isDefault}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.app.bideo.domain.payment.CardVO">
+        update tbl_card
+        set card_company = #{cardCompany},
+            card_number_masked = #{cardNumberMasked},
+            billing_key = #{billingKey},
+            billing_receipt_id = #{billingReceiptId},
+            billing_method = #{billingMethod},
+            billing_status = #{billingStatus},
+            is_default = #{isDefault}
+        where id = #{id}
+          and member_id = #{memberId}
+          and deleted_datetime is null
+    </update>
+
+    <update id="clearDefault">
+        update tbl_card
+        set is_default = false
+        where member_id = #{memberId}
+          and deleted_datetime is null
+          and is_default = true
+    </update>
+
+    <update id="markDefault">
+        update tbl_card
+        set is_default = true
+        where id = #{cardId}
+          and member_id = #{memberId}
+          and deleted_datetime is null
+    </update>
+
+    <update id="softDelete">
+        update tbl_card
+        set deleted_datetime = now(),
+            is_default = false
+        where id = #{cardId}
+          and member_id = #{memberId}
+          and deleted_datetime is null
+    </update>
+
+    <select id="selectLatestActiveCard" resultType="com.app.bideo.dto.payment.CardResponseDTO">
+        select
+            id,
+            card_company,
+            card_number_masked,
+            billing_key,
+            billing_receipt_id,
+            billing_method,
+            billing_status,
+            is_default,
+            created_datetime
+        from tbl_card
+        where member_id = #{memberId}
+          and deleted_datetime is null
+        order by created_datetime desc
+        limit 1
+    </select>
+
+    <select id="selectDefaultCard" resultType="com.app.bideo.dto.payment.CardResponseDTO">
+        select
+            id,
+            card_company,
+            card_number_masked,
+            billing_key,
+            billing_receipt_id,
+            billing_method,
+            billing_status,
+            is_default,
+            created_datetime
+        from tbl_card
+        where member_id = #{memberId}
+          and deleted_datetime is null
+          and is_default = true
+        limit 1
+    </select>
+
+</mapper>

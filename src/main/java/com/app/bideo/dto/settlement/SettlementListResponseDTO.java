@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class SettlementListResponseDTO {
     private Long id;
     private String paymentCode;
-    private Integer netAmount;
+    private Long netAmount;
     private String status;
     private LocalDateTime createdDatetime;
 }

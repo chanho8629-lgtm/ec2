@@ -25,7 +25,7 @@ public class AdminWorkDetailResponseDTO {
     private Integer fileHeight;
     private Long fileSize;
     private String auctionStatus;
-    private Integer currentHighBid;
+    private Long currentHighBid;
     private Integer bidCount;
     private Integer reportCount;
     private String lastReportDate;

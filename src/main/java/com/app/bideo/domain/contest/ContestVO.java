@@ -21,7 +21,7 @@ public class ContestVO {
     private LocalDate entryEnd;
     private LocalDate resultDate;
     private String prizeInfo;
-    private Integer price;
+    private Long price;
     private String status;
     private Integer entryCount;
     private Integer viewCount;

@@ -13,7 +13,7 @@ public class OrderListResponseDTO {
     private String orderCode;
     private String workTitle;
     private String workThumbnail;
-    private Integer totalPrice;
+    private Long totalPrice;
     private String orderType;
     private String status;
     private LocalDateTime orderedAt;

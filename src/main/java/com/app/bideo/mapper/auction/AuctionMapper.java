@@ -27,7 +27,7 @@ public interface AuctionMapper {
     AuctionVO selectById(@Param("auctionId") Long auctionId);
 
     void updateCurrentPrice(@Param("auctionId") Long auctionId,
-                            @Param("currentPrice") Integer currentPrice,
+                            @Param("currentPrice") Long currentPrice,
                             @Param("bidCount") Integer bidCount);
 
     void updateStatus(@Param("auctionId") Long auctionId,

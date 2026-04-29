@@ -25,6 +25,7 @@ import com.app.bideo.service.notification.NotificationService;
 import com.app.bideo.repository.gallery.GalleryDAO;
 import com.app.bideo.repository.work.WorkDAO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.core.Authentication;
@@ -53,6 +54,7 @@ public class WorkService {
     private final S3FileService s3FileService;
 
     // 작품 등록 후 파일/태그까지 함께 저장한다.
+    @CacheEvict(value = {"dashboard", "profile"}, allEntries = true)
     public WorkCreateResponseDTO write(Long memberId, WorkCreateRequestDTO requestDTO, MultipartFile mediaFile, MultipartFile thumbnailFile) {
         Long resolvedMemberId = resolveMemberId(memberId);
         Long galleryId = requireGalleryId(requestDTO.getGalleryId());
@@ -107,6 +109,26 @@ public class WorkService {
                 .totalElements((long) total)
                 .totalPages(totalPages)
                 .build();
+    }
+
+    // 쇼츠형 추천 피드 — 좋아요/조회/댓글/최신성 + 약간의 랜덤성 기반 다음 작품 N개 반환
+    @Transactional(readOnly = true)
+    public List<WorkListResponseDTO> getFeed(List<Long> excludeIds, String category, Integer limit) {
+        int safeLimit = (limit == null || limit <= 0) ? 5 : Math.min(limit, 20);
+        List<Long> safeExcludeIds = excludeIds == null ? Collections.emptyList() : excludeIds;
+        List<WorkListResponseDTO> feed = workDAO.findFeed(safeExcludeIds, category, safeLimit);
+        applyThumbnailUrls(feed);
+        return feed;
+    }
+
+    // 추천 피드 진입 시드 작품 — 첫 화면에 띄울 작품 1개를 추천 정렬 기준으로 결정
+    @Transactional(readOnly = true)
+    public Long resolveFeedSeedId() {
+        List<WorkListResponseDTO> feed = workDAO.findFeed(Collections.emptyList(), null, 1);
+        if (feed == null || feed.isEmpty()) {
+            return null;
+        }
+        return feed.get(0).getId();
     }
 
     @Transactional(readOnly = true)
@@ -177,6 +199,7 @@ public class WorkService {
         return update(id, memberId, requestDTO, mediaFile, null);
     }
 
+    @CacheEvict(value = {"dashboard", "profile"}, allEntries = true)
     public WorkDetailResponseDTO update(Long id, Long memberId, WorkUpdateRequestDTO requestDTO, MultipartFile mediaFile, MultipartFile thumbnailFile) {
         Long resolvedMemberId = resolveMemberId(memberId);
         validateWorkOwner(id, resolvedMemberId);
@@ -291,6 +314,7 @@ public class WorkService {
     }
 
     // 파일/태그 연결을 먼저 정리하고 작품을 soft delete 한다.
+    @CacheEvict(value = {"dashboard", "profile"}, allEntries = true)
     public void delete(Long id) {
         Long resolvedMemberId = resolveMemberId(null);
         validateWorkOwner(id, resolvedMemberId);
@@ -392,7 +416,7 @@ public class WorkService {
         return keyword.trim().toLowerCase(Locale.ROOT);
     }
 
-    private void saveAuctionIfRequested(Long workId, Long sellerId, Integer askingPrice, Boolean auctionEnabled, Integer startingPrice, Integer deadlineHours) {
+    private void saveAuctionIfRequested(Long workId, Long sellerId, Long askingPrice, Boolean auctionEnabled, Long startingPrice, Integer deadlineHours) {
         if (!Boolean.TRUE.equals(auctionEnabled)) {
             auctionDAO.updateStatusByWorkId(workId, "CLOSED");
             return;
@@ -406,14 +430,14 @@ public class WorkService {
         if (deadlineHours == null || deadlineHours <= 0) {
             throw new IllegalArgumentException("입찰 마감기한을 선택해주세요.");
         }
-        int resolvedAskingPrice = askingPrice != null && askingPrice > 0 ? askingPrice : startingPrice;
+        long resolvedAskingPrice = askingPrice != null && askingPrice > 0 ? askingPrice : startingPrice;
         if (startingPrice > resolvedAskingPrice) {
             throw new IllegalArgumentException("입찰가는 작품 가격보다 클 수 없습니다.");
         }
 
         LocalDateTime startedAt = LocalDateTime.now();
-        int feeAmount = (int) Math.round(resolvedAskingPrice * 0.10d);
-        int settlementAmount = Math.max(0, resolvedAskingPrice - feeAmount);
+        long feeAmount = Math.round(resolvedAskingPrice * 0.10d);
+        long settlementAmount = Math.max(0, resolvedAskingPrice - feeAmount);
 
         auctionDAO.save(
                 AuctionVO.builder()
@@ -421,7 +445,7 @@ public class WorkService {
                         .sellerId(sellerId)
                         .askingPrice(resolvedAskingPrice)
                         .startingPrice(startingPrice)
-                        .bidIncrement(10000)
+                        .bidIncrement(10000L)
                         .currentPrice(startingPrice)
                         .bidCount(0)
                         .feeRate(0.10d)

@@ -30,15 +30,16 @@ public class NotificationSettingService {
                 .build();
     }
 
+    // dto에서 명시된(null 아닌) 필드만 적용 — 부분 업데이트로 not null 컬럼 보호
     public void updateSettings(Long memberId, NotificationSettingUpdateRequestDTO dto) {
         NotificationSettingVO vo = getOrCreateSetting(memberId);
-        vo.setFollowNotify(dto.getFollowNotify());
-        vo.setLikeBookmarkNotify(dto.getLikeBookmarkNotify());
-        vo.setCommentMentionNotify(dto.getCommentMentionNotify());
-        vo.setAuctionNotify(dto.getAuctionNotify());
-        vo.setPaymentSettlementNotify(dto.getPaymentSettlementNotify());
-        vo.setContestNotify(dto.getContestNotify());
-        vo.setPauseAll(dto.getPauseAll());
+        if (dto.getFollowNotify() != null) vo.setFollowNotify(dto.getFollowNotify());
+        if (dto.getLikeBookmarkNotify() != null) vo.setLikeBookmarkNotify(dto.getLikeBookmarkNotify());
+        if (dto.getCommentMentionNotify() != null) vo.setCommentMentionNotify(dto.getCommentMentionNotify());
+        if (dto.getAuctionNotify() != null) vo.setAuctionNotify(dto.getAuctionNotify());
+        if (dto.getPaymentSettlementNotify() != null) vo.setPaymentSettlementNotify(dto.getPaymentSettlementNotify());
+        if (dto.getContestNotify() != null) vo.setContestNotify(dto.getContestNotify());
+        if (dto.getPauseAll() != null) vo.setPauseAll(dto.getPauseAll());
         notificationSettingDAO.update(vo);
     }
 

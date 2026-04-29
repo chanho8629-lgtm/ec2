@@ -42,7 +42,7 @@ public class AuctionDAO {
         return auctionMapper.selectById(auctionId);
     }
 
-    public void updateCurrentPrice(Long auctionId, Integer currentPrice, Integer bidCount) {
+    public void updateCurrentPrice(Long auctionId, Long currentPrice, Integer bidCount) {
         auctionMapper.updateCurrentPrice(auctionId, currentPrice, bidCount);
     }
 

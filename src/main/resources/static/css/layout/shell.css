@@ -68,6 +68,10 @@
   height: 40px;
 }
 
+.bd-shell__icon-button[data-bd-shell-account-toggle] {
+  padding: 0;
+}
+
 .bd-shell__pill-button {
   min-height: 36px;
   padding: 0 14px;
@@ -379,7 +383,7 @@
   .bd-shell__header {
     grid-template-columns: auto 1fr auto;
     gap: 10px;
-    padding: 0 12px;
+    padding: 0 0;
   }
 
   .bd-shell__search {

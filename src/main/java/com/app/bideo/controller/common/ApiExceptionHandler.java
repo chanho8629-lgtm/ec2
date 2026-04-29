@@ -1,25 +1,29 @@
 package com.app.bideo.controller.common;
 
-import com.app.bideo.controller.gallery.GalleryAPIController;
-import com.app.bideo.controller.interaction.BookmarkAPIController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice(assignableTypes = {
-        GalleryAPIController.class,
-        BookmarkAPIController.class
-})
+import java.util.Map;
+
+@RestControllerAdvice(annotations = org.springframework.web.bind.annotation.RestController.class)
 public class ApiExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException exception) {
-        return ResponseEntity.badRequest().body(resolveMessage(exception, "bad request"));
+    public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException exception) {
+        return ResponseEntity.badRequest().body(Map.of("message", resolveMessage(exception, "bad request")));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Map<String, String>> handleAuthentication(AuthenticationException exception) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", resolveMessage(exception, "authentication failed")));
     }
 
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<String> handleIllegalState(IllegalStateException exception) {
+    public ResponseEntity<Map<String, String>> handleIllegalState(IllegalStateException exception) {
         String message = resolveMessage(exception, "request failed");
         HttpStatus status;
         if ("login required".equals(message)) {
@@ -33,13 +37,13 @@ public class ApiExceptionHandler {
         } else {
             status = HttpStatus.CONFLICT;
         }
-        return ResponseEntity.status(status).body(message);
+        return ResponseEntity.status(status).body(Map.of("message", message));
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntime(RuntimeException exception) {
+    public ResponseEntity<Map<String, String>> handleRuntime(RuntimeException exception) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(resolveMessage(exception, "internal server error"));
+                .body(Map.of("message", resolveMessage(exception, "internal server error")));
     }
 
     private String resolveMessage(RuntimeException exception, String fallback) {

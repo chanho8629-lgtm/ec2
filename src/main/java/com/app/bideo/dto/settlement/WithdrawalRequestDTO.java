@@ -9,5 +9,5 @@ import lombok.*;
 @Builder
 public class WithdrawalRequestDTO {
     private Long settlementId;
-    private Integer requestedAmount;
+    private Long requestedAmount;
 }

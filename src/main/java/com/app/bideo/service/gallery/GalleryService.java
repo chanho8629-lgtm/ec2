@@ -23,6 +23,7 @@ import com.app.bideo.service.common.S3FileService;
 import com.app.bideo.service.member.FollowService;
 import com.app.bideo.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,7 @@ public class GalleryService {
     private final S3FileService s3FileService;
 
     // 예술관 등록
+    @CacheEvict(value = {"dashboard", "profile"}, allEntries = true)
     public GalleryCreateResponseDTO write(Long memberId, GalleryCreateRequestDTO requestDTO, MultipartFile coverFile) {
         Long resolvedMemberId = resolveMemberId(memberId);
         requestDTO.setMemberId(resolvedMemberId);
@@ -175,6 +177,7 @@ public class GalleryService {
         return suggestions;
     }
 
+    @CacheEvict(value = {"dashboard", "profile"}, allEntries = true)
     public void update(Long id, Long memberId, GalleryUpdateRequestDTO requestDTO, MultipartFile coverFile) {
         Long resolvedMemberId = resolveMemberId(memberId);
         validateGalleryOwner(id, resolvedMemberId);
@@ -197,6 +200,7 @@ public class GalleryService {
         saveTags(id, requestDTO.getTagIds(), requestDTO.getTagNames());
     }
 
+    @CacheEvict(value = {"dashboard", "profile"}, allEntries = true)
     public void delete(Long id, Long memberId) {
         Long resolvedMemberId = resolveMemberId(memberId);
         validateGalleryOwner(id, resolvedMemberId);

@@ -1,100 +1,135 @@
 const AuctionEvent = (() => {
     let isBound = false;
+    let currentAuctionId = null;
 
-    function getElements(root = document) {
-        return {
-            bidSubmitBtn: root.getElementById("bidSubmitBtn"),
-            bidCustomInput: root.getElementById("bidCustomInput"),
-            bidNextAmountEl: root.getElementById("bidNextAmount"),
-            bidInfoBtn: root.getElementById("bidInfoBtn"),
-            bidInfoTooltip: root.getElementById("bidInfoTooltip")
-        };
-    }
+    // 토스트
+    const showToast = (message, type = "info") => {
+        const toast = document.getElementById("auctionToast");
+        const toastMessage = document.getElementById("auctionToastMessage");
+        if (!toast || !toastMessage) return;
 
-    function getMinAmount(elements) {
-        return parseInt(elements.bidNextAmountEl?.dataset.amount || "0", 10);
-    }
+        toastMessage.textContent = message;
+        toast.className = `Auction-Toast ${type}`;  // off 제거 + type 클래스
+        toast.classList.remove("off");
 
-    function setInputError(elements, isError) {
-        const bidInputWrapper = elements.bidCustomInput?.closest(".Auction-Bid-InputWrapper");
-        bidInputWrapper?.classList.toggle("is-error", isError);
-    }
+        setTimeout(() => {
+            toast.classList.add("off");
+        }, 3000);
+    };
 
-    function executeBid(elements) {
-        const minAmount = getMinAmount(elements);
-        const inputValue = elements.bidCustomInput?.value.trim();
-        const bidAmount = inputValue ? parseInt(inputValue, 10) : minAmount;
+    // 확인 모달
+    const showConfirm = (message, onConfirm) => {
+        const backdrop = document.getElementById("bidConfirmBackdrop");
+        const confirmMessage = backdrop?.querySelector(".Auction-Modal-Message");
+        const confirmOk = document.getElementById("bidConfirmOk");
+        const confirmCancel = document.getElementById("bidConfirmCancel");
 
-        if (Number.isNaN(bidAmount) || bidAmount < minAmount) {
-            setInputError(elements, true);
-            elements.bidCustomInput?.focus();
+        if (!backdrop || !confirmOk || !confirmCancel) {
+            // 모달 요소 없으면 바로 실행
+            onConfirm();
             return;
         }
 
-        setInputError(elements, false);
-        if (elements.bidCustomInput) {
-            elements.bidCustomInput.value = "";
-        }
-        if (elements.bidNextAmountEl) {
-            elements.bidNextAmountEl.textContent = `${minAmount.toLocaleString("ko-KR")}원으로 입찰하기`;
-        }
-    }
+        if (confirmMessage) confirmMessage.textContent = message;
+        backdrop.classList.remove("off");
 
-    function init(root = document) {
-        const elements = getElements(root);
+        const close = () => backdrop.classList.add("off");
+
+        const handleOk = () => {
+            close();
+            onConfirm();
+            confirmOk.removeEventListener("click", handleOk);
+            confirmCancel.removeEventListener("click", handleCancel);
+        };
+
+        const handleCancel = () => {
+            close();
+            confirmOk.removeEventListener("click", handleOk);
+            confirmCancel.removeEventListener("click", handleCancel);
+        };
+
+        confirmOk.addEventListener("click", handleOk);
+        confirmCancel.addEventListener("click", handleCancel);
+    };
+
+    const bindEvents = () => {
+        if (isBound) return;
+
+        const elements = AuctionLayout.getElements(document);
         const { bidSubmitBtn, bidCustomInput, bidNextAmountEl, bidInfoBtn, bidInfoTooltip } = elements;
 
-        if (!bidSubmitBtn || !bidNextAmountEl) {
-            return;
-        }
+        if (!bidSubmitBtn || !bidNextAmountEl) return;
 
-        if (!isBound) {
-            bidInfoBtn?.addEventListener("click", (event) => {
-                event.stopPropagation();
-                bidInfoTooltip?.classList.toggle("on");
-            });
+        bidInfoBtn?.addEventListener("click", (event) => {
+            event.stopPropagation();
+            bidInfoTooltip?.classList.toggle("on");
+        });
 
-            document.addEventListener("click", () => {
-                bidInfoTooltip?.classList.remove("on");
-            });
+        document.addEventListener("click", () => {
+            bidInfoTooltip?.classList.remove("on");
+        });
 
-            bidCustomInput?.addEventListener("input", () => {
-                bidCustomInput.value = bidCustomInput.value.replace(/[^0-9]/g, "");
+        bidCustomInput?.addEventListener("input", () => {
+            bidCustomInput.value = bidCustomInput.value.replace(/[^0-9]/g, "");
 
-                const minAmount = getMinAmount(elements);
-                const inputValue = bidCustomInput.value.trim();
+            const minAmount = AuctionLayout.getMinAmount(elements);
+            const inputValue = bidCustomInput.value.trim();
 
-                if (!inputValue) {
-                    bidNextAmountEl.textContent = `${minAmount.toLocaleString("ko-KR")}원으로 입찰하기`;
-                    setInputError(elements, false);
-                    return;
-                }
+            if (!inputValue) {
+                bidNextAmountEl.textContent = `${minAmount.toLocaleString("ko-KR")}원으로 입찰하기`;
+                AuctionLayout.setInputError(elements, false);
+                return;
+            }
 
-                const inputAmount = parseInt(inputValue, 10);
-                if (Number.isNaN(inputAmount) || inputAmount < minAmount) {
-                    setInputError(elements, true);
-                    return;
-                }
+            const inputAmount = parseInt(inputValue, 10);
+            if (Number.isNaN(inputAmount) || inputAmount < minAmount) {
+                AuctionLayout.setInputError(elements, true);
+                return;
+            }
 
-                bidNextAmountEl.textContent = `${inputAmount.toLocaleString("ko-KR")}원으로 입찰하기`;
-                setInputError(elements, false);
-            });
+            bidNextAmountEl.textContent = `${inputAmount.toLocaleString("ko-KR")}원으로 입찰하기`;
+            AuctionLayout.setInputError(elements, false);
+        });
 
-            bidSubmitBtn.addEventListener("click", () => {
-                executeBid(elements);
-            });
+        bidSubmitBtn.addEventListener("click", () => {
+            const instantCheck = document.getElementById("instantBidCheck");
 
-            isBound = true;
-        }
+            const minAmount = AuctionLayout.getMinAmount(elements);
+            const inputValue = bidCustomInput?.value.trim();
+            const bidAmount = inputValue ? parseInt(inputValue, 10) : minAmount;
 
-        AuctionLayout.init(root);
-    }
+            // 최소 금액 미만이면 토스트 후 return
+            if (Number.isNaN(bidAmount) || bidAmount < minAmount) {
+                AuctionLayout.setInputError(elements, true);
+                bidCustomInput?.focus();
+                showToast(`최소 입찰가(${minAmount.toLocaleString("ko-KR")}원) 이상으로 입찰해주세요.`, "error");
+                return;
+            }
 
-    if (document.readyState === "complete") {
-        init(document);
-    } else {
-        window.addEventListener("load", () => init(document), { once: true });
-    }
+            // 즉시 입찰 체크 시 확인 모달 없이 바로 입찰
+            if (instantCheck?.checked) {
+                AuctionLayout.executeBid(elements, currentAuctionId);
+                return;
+            }
 
-    return { init };
+            // 확인 모달 띄우기
+            showConfirm(
+                `${bidAmount.toLocaleString("ko-KR")}원으로 입찰하시겠습니까?`,
+                () => AuctionLayout.executeBid(elements, currentAuctionId)
+            );
+        });
+
+        isBound = true;
+    };
+
+    const setAuctionId = (id) => {
+        currentAuctionId = id;
+        isBound = false;
+    };
+
+    return {
+        bindEvents: bindEvents,
+        setAuctionId: setAuctionId,
+        showToast: showToast
+    };
 })();

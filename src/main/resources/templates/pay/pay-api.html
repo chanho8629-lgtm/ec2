@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/layout :: ytShellHead('결제하기')}"></th:block>
+    <link rel="stylesheet" href="/css/common/reset.css" th:href="@{/css/common/reset.css}">
+    <link rel="stylesheet" href="/css/common/global.css" th:href="@{/css/common/global.css}">
+    <link rel="stylesheet" href="/css/common/util.css" th:href="@{/css/common/util.css}">
+    <link rel="stylesheet" href="/css/common/common.css" th:href="@{/css/common/common.css}">
+    <link rel="stylesheet" href="/css/common/font.css" th:href="@{/css/common/font.css}">
+    <link rel="stylesheet" href="/css/pay/pay-api.css" th:href="@{/css/pay/pay-api.css}">
+    <link rel="icon" href="/images/BIDEO_LOGO/BIDEO_favicon.png">
+</head>
+<body>
+<div th:replace="~{layout/layout :: ytShellChrome('pay')}"></div>
+<main class="yt-shell__page-content">
+    <div class="overlay" onclick="history.back()"></div>
+
+    <section class="pay-modal" data-fee-rate="0.10">
+        <div class="pay-modal__handle"></div>
+
+        <header class="pay-modal__header">
+            <h1 class="pay-modal__title">결제하기</h1>
+            <button class="pay-modal__close" type="button" onclick="history.back()" aria-label="닫기">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 6L6 18M6 6l12 12"></path>
+                </svg>
+            </button>
+        </header>
+
+        <section class="pay-hero">
+            <p class="pay-hero__copy" id="paymentStatusText">등록된 카드가 있으면 바로 간편결제로 진행합니다.</p>
+        </section>
+
+        <section class="pay-product">
+            <div class="pay-product__thumb">
+                <img id="productImage" src="/images/BIDEO_LOGO/BIDEO.png" alt="작품 이미지">
+            </div>
+            <div class="pay-product__body">
+                <p class="pay-product__creator" id="creatorName">작가명</p>
+                <p class="pay-product__name" id="productName">작품명</p>
+                <p class="pay-product__license" id="licenseTypeLabel">라이선스 미정</p>
+            </div>
+        </section>
+
+        <section class="pay-status">
+            <div class="pay-status__item">
+                <span class="pay-status__label">거래 상태</span>
+                <strong class="pay-status__value" id="paymentStateLabel">결제 대기</strong>
+            </div>
+        </section>
+
+        <section class="pay-summary">
+            <div class="pay-summary__row">
+                <span class="pay-summary__label">작품 금액</span>
+                <span class="pay-summary__value" id="displayOriginalPrice">0원</span>
+            </div>
+            <div class="pay-summary__row">
+                <span class="pay-summary__label">수수료</span>
+                <span class="pay-summary__value pay-summary__value--fee" id="displayFeePrice">0원</span>
+            </div>
+            <div class="pay-summary__caption" id="displayFeeCaption">플랫폼 수수료 10%</div>
+            <div class="pay-summary__row pay-summary__row--total">
+                <span class="pay-summary__label">결제금액</span>
+                <span class="pay-summary__value" id="displayTotalPrice">0원</span>
+            </div>
+        </section>
+
+        <section class="pay-method">
+            <h2 class="pay-section-title">결제 방법</h2>
+            <div class="pay-method__list">
+                <button class="pay-method__option selected" id="method-bootpay" type="button" onclick="selectPayMethod('bootpay')">
+                    <span class="pay-method__radio" aria-hidden="true"></span>
+                    <span class="pay-method__copy">
+                        <span class="pay-method__name">등록 카드 간편결제</span>
+                        <span class="pay-method__desc">대시보드에 등록한 대표 카드로 바로 결제합니다.</span>
+                    </span>
+                    <span class="pay-method__chip">추천</span>
+                </button>
+            </div>
+        </section>
+
+        <section class="pay-note">
+            <h2 class="pay-section-title">안내</h2>
+            <ul class="pay-note__list">
+                <li>결제 전 대표 카드가 없으면 대시보드에서 먼저 카드를 등록해야 합니다.</li>
+                <li>결제가 완료되면 주문 상태가 즉시 갱신되고 구매 내역에서 확인할 수 있습니다.</li>
+            </ul>
+        </section>
+
+        <p class="pay-terms">
+            결제 시 <a href="#">이용약관</a> 및 <a href="#">개인정보 처리방침</a>에 동의한 것으로 간주됩니다.
+        </p>
+
+        <footer class="pay-footer">
+            <button class="pay-submit" id="paySubmitButton" type="button" onclick="submitPayment()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                    <path d="M2 10h20"></path>
+                </svg>
+                <span id="paySubmitLabel">0원 결제하기</span>
+            </button>
+        </footer>
+    </section>
+</main>
+
+<script src="/js/pay/pay-api.js" th:src="@{/js/pay/pay-api.js}"></script>
+<th:block th:replace="~{layout/layout :: ytShellScripts()}"></th:block>
+</body>
+</html>

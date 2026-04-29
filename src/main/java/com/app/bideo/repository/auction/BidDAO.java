@@ -2,7 +2,6 @@ package com.app.bideo.repository.auction;
 
 import com.app.bideo.domain.auction.BidVO;
 import com.app.bideo.dto.auction.BidResponseDTO;
-import com.app.bideo.dto.auction.MyBidHistoryResponseDTO;
 import com.app.bideo.mapper.auction.BidMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -34,9 +33,5 @@ public class BidDAO {
 
     public List<Long> findBidderIds(Long auctionId) {
         return bidMapper.selectBidderIds(auctionId);
-    }
-
-    public List<MyBidHistoryResponseDTO> findClosedBidHistoriesByMemberId(Long memberId) {
-        return bidMapper.selectClosedBidHistoriesByMemberId(memberId);
     }
 }

@@ -4,7 +4,7 @@
 
 <mapper namespace="com.app.bideo.mapper.auction.AuctionMapper">
 
-    <insert id="insertAuction" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         insert into tbl_auction (
             work_id,
             seller_id,
@@ -62,7 +62,6 @@
             a.status,
             a.winner_id,
             a.final_price,
-            false as is_wishlisted,
             a.created_datetime
         from tbl_auction a
         join tbl_work w on a.work_id = w.id
@@ -71,86 +70,6 @@
                                and wf.sort_order = 0
         where a.work_id = #{workId}
           and a.status = 'ACTIVE'
-        order by a.created_datetime desc, a.id desc
-        limit 1
-    </select>
-
-    <select id="selectAuctions" resultType="AuctionListResponseDTO" parameterType="AuctionSearchDTO">
-        SELECT
-            a.id,
-            w.title AS work_title,
-            wf.file_url AS work_thumbnail,
-            m.nickname AS seller_nickname,
-            a.current_price,
-            a.bid_count,
-            a.closing_at,
-            a.status
-        FROM tbl_auction a
-        JOIN tbl_work w ON a.work_id = w.id
-        JOIN tbl_member m ON a.seller_id = m.id
-        LEFT JOIN tbl_work_file wf ON wf.work_id = a.work_id AND wf.sort_order = 0
-        <where>
-            <if test="status != null and status != ''">
-                AND a.status = #{status}
-            </if>
-            <if test="sellerId != null">
-                AND a.seller_id = #{sellerId}
-            </if>
-            <if test="keyword != null and keyword != ''">
-                AND w.title ILIKE '%' || #{keyword} || '%'
-            </if>
-        </where>
-        ORDER BY a.created_datetime DESC
-        LIMIT #{size} OFFSET (#{page} - 1) * #{size}
-    </select>
-
-    <select id="countAuctions" resultType="int" parameterType="AuctionSearchDTO">
-        SELECT COUNT(*)
-        FROM tbl_auction a
-        JOIN tbl_work w ON a.work_id = w.id
-        <where>
-            <if test="status != null and status != ''">
-                AND a.status = #{status}
-            </if>
-            <if test="sellerId != null">
-                AND a.seller_id = #{sellerId}
-            </if>
-            <if test="keyword != null and keyword != ''">
-                AND w.title ILIKE '%' || #{keyword} || '%'
-            </if>
-        </where>
-    </select>
-
-    <select id="selectAuctionDetail" resultType="AuctionDetailResponseDTO">
-        SELECT
-            a.id,
-            a.work_id,
-            w.title AS work_title,
-            wf.file_url AS work_thumbnail,
-            a.seller_id,
-            m.nickname AS seller_nickname,
-            a.asking_price,
-            a.starting_price,
-            a.current_price,
-            a.bid_count,
-            a.bid_increment,
-            a.estimate_low,
-            a.estimate_high,
-            a.fee_rate,
-            a.deadline_hours,
-            a.started_at,
-            a.closing_at,
-            a.status,
-            a.winner_id,
-            a.final_price,
-            CASE WHEN aw.id IS NOT NULL THEN true ELSE false END AS is_wishlisted,
-            a.created_datetime
-        FROM tbl_auction a
-        JOIN tbl_work w ON a.work_id = w.id
-        JOIN tbl_member m ON a.seller_id = m.id
-        LEFT JOIN tbl_work_file wf ON wf.work_id = a.work_id AND wf.sort_order = 0
-        LEFT JOIN tbl_auction_wishlist aw ON aw.auction_id = a.id AND aw.member_id = #{memberId}
-        WHERE a.id = #{auctionId}
     </select>
 
     <select id="selectById" resultType="AuctionVO">
@@ -188,39 +107,4 @@
             updated_datetime = now()
         WHERE id = #{auctionId}
     </update>
-
-    <select id="existsWishlist" resultType="boolean">
-        SELECT EXISTS (
-            SELECT 1 FROM tbl_auction_wishlist
-            WHERE member_id = #{memberId}
-              AND auction_id = #{auctionId}
-        )
-    </select>
-
-    <insert id="insertWishlist">
-        INSERT INTO tbl_auction_wishlist (member_id, auction_id)
-        VALUES (#{memberId}, #{auctionId})
-    </insert>
-
-    <delete id="deleteWishlist">
-        DELETE FROM tbl_auction_wishlist
-        WHERE member_id = #{memberId}
-          AND auction_id = #{auctionId}
-    </delete>
-
-    <select id="selectMyWishlist" resultType="map">
-        SELECT
-            aw.id,
-            'AUCTION' AS "targetType",
-            aw.auction_id AS "targetId",
-            aw.created_datetime AS "createdDatetime",
-            w.title AS "title",
-            (SELECT wf.file_url FROM tbl_work_file wf WHERE wf.work_id = a.work_id AND wf.sort_order = 0 LIMIT 1) AS "thumbnail"
-        FROM tbl_auction_wishlist aw
-        JOIN tbl_auction a ON aw.auction_id = a.id
-        JOIN tbl_work w ON a.work_id = w.id
-        WHERE aw.member_id = #{memberId}
-        ORDER BY aw.created_datetime DESC
-    </select>
-
 </mapper>

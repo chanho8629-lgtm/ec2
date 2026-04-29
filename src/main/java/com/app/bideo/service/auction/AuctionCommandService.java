@@ -48,7 +48,7 @@ public class AuctionCommandService {
             throw new IllegalStateException("이미 진행 중인 경매가 있습니다.");
         }
 
-        int resolvedAskingPrice = requestDTO.getAskingPrice() != null && requestDTO.getAskingPrice() > 0
+        long resolvedAskingPrice = requestDTO.getAskingPrice() != null && requestDTO.getAskingPrice() > 0
                 ? requestDTO.getAskingPrice()
                 : requestDTO.getStartingPrice();
         if (requestDTO.getStartingPrice() > resolvedAskingPrice) {
@@ -56,8 +56,8 @@ public class AuctionCommandService {
         }
 
         LocalDateTime startedAt = LocalDateTime.now();
-        int feeAmount = (int) Math.round(resolvedAskingPrice * 0.10d);
-        int settlementAmount = Math.max(0, resolvedAskingPrice - feeAmount);
+        long feeAmount = (int) Math.round(resolvedAskingPrice * 0.10d);
+        long settlementAmount = Math.max(0, resolvedAskingPrice - feeAmount);
 
         auctionDAO.save(
                 AuctionVO.builder()
@@ -82,46 +82,5 @@ public class AuctionCommandService {
         );
 
         return auctionQueryService.getActiveAuctionByWorkId(requestDTO.getWorkId());
-    }
-
-    public Map<String, Object> toggleWishlist(Long memberId, Long auctionId) {
-        boolean exists = auctionDAO.existsWishlist(memberId, auctionId);
-        if (exists) {
-            auctionDAO.deleteWishlist(memberId, auctionId);
-        } else {
-            auctionDAO.saveWishlist(memberId, auctionId);
-        }
-        return Map.of("wishlisted", !exists);
-    }
-
-    public void closeAuction(Long auctionId) {
-        AuctionVO auction = auctionDAO.findRawById(auctionId);
-        if (auction == null) {
-            throw new IllegalArgumentException("경매를 찾을 수 없습니다.");
-        }
-        if (!"ACTIVE".equals(auction.getStatus())) {
-            throw new IllegalStateException("이미 종료된 경매입니다.");
-        }
-
-        BidResponseDTO highestBid = bidDAO.findHighestBid(auctionId).orElse(null);
-        if (highestBid != null) {
-            auctionDAO.updateWinner(auctionId, highestBid.getMemberId(), highestBid.getBidPrice());
-
-            notificationService.createNotification(
-                    highestBid.getMemberId(), null, "AUCTION_END", "AUCTION",
-                    auction.getWorkId(), "축하합니다! 경매에서 낙찰되었습니다."
-            );
-            notificationService.createNotification(
-                    auction.getSellerId(), null, "AUCTION_END", "AUCTION",
-                    auction.getWorkId(), "경매가 종료되어 낙찰자가 결정되었습니다."
-            );
-            return;
-        }
-
-        auctionDAO.updateStatus(auctionId, "CLOSED");
-        notificationService.createNotification(
-                auction.getSellerId(), null, "AUCTION_END", "AUCTION",
-                auction.getWorkId(), "경매가 입찰 없이 종료되었습니다."
-        );
     }
 }

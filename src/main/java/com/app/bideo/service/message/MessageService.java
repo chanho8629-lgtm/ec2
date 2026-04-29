@@ -11,6 +11,7 @@ import com.app.bideo.dto.message.MessageRoomResponseDTO;
 import com.app.bideo.repository.member.MemberRepository;
 import com.app.bideo.repository.message.MessageDAO;
 import com.app.bideo.repository.message.MessageRoomDAO;
+import com.app.bideo.service.common.S3FileService;
 import com.app.bideo.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -34,12 +35,13 @@ public class MessageService {
     private final MemberRepository memberRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final NotificationService notificationService;
+    private final S3FileService s3FileService;
 
     @Transactional(readOnly = true)
     public List<MessageRoomResponseDTO> getMyRooms(Long memberId) {
         List<MessageRoomResponseDTO> rooms = messageRoomDAO.findRoomsByMemberId(memberId);
         for (MessageRoomResponseDTO room : rooms) {
-            room.setMembers(messageRoomDAO.findRoomMembers(room.getId(), memberId));
+            room.setMembers(normalizeMemberProfileImages(messageRoomDAO.findRoomMembers(room.getId(), memberId)));
         }
         return rooms;
     }
@@ -73,7 +75,9 @@ public class MessageService {
     @Transactional(readOnly = true)
     public List<MessageResponseDTO> getMessages(Long roomId, Long currentMemberId, int page) {
         validateRoomAccess(roomId, currentMemberId);
-        return messageDAO.findByRoomId(roomId, currentMemberId, page * PAGE_SIZE, PAGE_SIZE);
+        List<MessageResponseDTO> messages = messageDAO.findByRoomId(roomId, currentMemberId, page * PAGE_SIZE, PAGE_SIZE);
+        messages.forEach(this::normalizeMessageProfileImage);
+        return messages;
     }
 
     public MessageResponseDTO sendMessage(Long roomId, Long senderId, String content, Long replyToMessageId) {
@@ -177,7 +181,7 @@ public class MessageService {
 
     @Transactional(readOnly = true)
     public List<MemberListResponseDTO> searchMembers(String keyword, Long currentMemberId) {
-        return memberRepository.searchByKeyword(keyword, currentMemberId, 20);
+        return normalizeMemberProfileImages(memberRepository.searchByKeyword(keyword, currentMemberId, 20));
     }
 
     private void validateRoomAccess(Long roomId, Long memberId) {
@@ -215,8 +219,10 @@ public class MessageService {
     }
 
     private MessageResponseDTO loadMessageResponseOrThrow(Long messageId, Long memberId) {
-        return messageDAO.findResponseById(messageId, memberId)
+        MessageResponseDTO response = messageDAO.findResponseById(messageId, memberId)
                 .orElseThrow(() -> new IllegalArgumentException("메시지를 찾을 수 없습니다."));
+        normalizeMessageProfileImage(response);
+        return response;
     }
 
     private String normalizeContent(String content) {
@@ -244,7 +250,16 @@ public class MessageService {
     private MessageRoomResponseDTO buildRoomResponse(Long roomId, Long currentMemberId) {
         return MessageRoomResponseDTO.builder()
                 .id(roomId)
-                .members(messageRoomDAO.findRoomMembers(roomId, currentMemberId))
+                .members(normalizeMemberProfileImages(messageRoomDAO.findRoomMembers(roomId, currentMemberId)))
                 .build();
+    }
+
+    private List<MemberListResponseDTO> normalizeMemberProfileImages(List<MemberListResponseDTO> members) {
+        members.forEach(member -> member.setProfileImage(s3FileService.getPresignedUrl(member.getProfileImage())));
+        return members;
+    }
+
+    private void normalizeMessageProfileImage(MessageResponseDTO message) {
+        message.setSenderProfileImage(s3FileService.getPresignedUrl(message.getSenderProfileImage()));
     }
 }
