@@ -18,14 +18,19 @@ public class PaymentViewController {
 
     @GetMapping("/pay")
     public String pay(Model model) {
-        model.addAttribute("bootpayJsApplicationId", bootpayJsApplicationId);
-        model.addAttribute("bootpayPg", bootpayPg);
+        bindBootpayConfig(model);
         return "work/pay";
     }
 
     @GetMapping("/pay-api")
-    public String payApi() {
-        return "pay/pay-api";
+    public String payApi(Model model) {
+        bindBootpayConfig(model);
+        return "work/pay";
+    }
+
+    private void bindBootpayConfig(Model model) {
+        model.addAttribute("bootpayJsApplicationId", bootpayJsApplicationId);
+        model.addAttribute("bootpayPg", bootpayPg);
     }
 
     @GetMapping("/history")
