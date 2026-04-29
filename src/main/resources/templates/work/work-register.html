@@ -11,7 +11,7 @@
 <body class="work-register-page" id="section">
 <div th:if="${!embeddedMode}" th:replace="~{layout/layout :: ytShellChrome('work-register')}"></div>
 
-<main th:if="${!embeddedMode}" class="yt-shell__page-content">
+<main th:classappend="${!embeddedMode} ? ' yt-shell__page-content'">
     <div id="work-register-root" class="page-shell">
         <div id="work-register-state"
              th:attr="data-edit-mode=${editMode},
