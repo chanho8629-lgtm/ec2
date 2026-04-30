@@ -1,8 +1,10 @@
 package com.app.bideo.service.common;
 
 import com.app.bideo.dto.message.MessageRoomCreateRequestDTO;
+import com.app.bideo.dto.message.MessageResponseDTO;
 import com.app.bideo.repository.member.MemberRepository;
 import com.app.bideo.service.message.MessageService;
+import com.app.bideo.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,7 @@ public class ShareService {
 
     private final MemberRepository memberRepository;
     private final MessageService messageService;
+    private final NotificationService notificationService;
 
     /*
      * 사용 방법
@@ -109,7 +112,15 @@ public class ShareService {
                             .build())
                     .getId();
 
-            messageService.sendMessage(roomId, senderId, content, null);
+            MessageResponseDTO sentMessage = messageService.sendMessage(roomId, senderId, content, null);
+            notificationService.createNotification(
+                    receiverId,
+                    senderId,
+                    "SHARE",
+                    "MESSAGE",
+                    sentMessage.getId(),
+                    "공유하기 메시지를 받았습니다."
+            );
         }
     }
 }

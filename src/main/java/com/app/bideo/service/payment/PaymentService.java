@@ -59,6 +59,32 @@ public class PaymentService {
         return completePayment(pendingPayment.getId(), buyerId);
     }
 
+    public PaymentResponseDTO payPendingWithRegisteredCard(Long buyerId, Long paymentId) {
+        PaymentVO payment = paymentDAO.findRawById(paymentId)
+                .orElseThrow(() -> new IllegalArgumentException("결제를 찾을 수 없습니다."));
+        if (!payment.getBuyerId().equals(buyerId)) {
+            throw new IllegalArgumentException("결제 권한이 없습니다.");
+        }
+        if (!"PENDING".equals(payment.getStatus())) {
+            throw new IllegalStateException("대기 상태의 결제만 처리할 수 있습니다.");
+        }
+
+        CardResponseDTO targetCard = resolveTargetCard(buyerId, payment.getCardId());
+        if (targetCard.getBillingKey() == null || targetCard.getBillingKey().isBlank()) {
+            throw new IllegalStateException("등록된 카드의 빌링키가 없어 간편결제를 진행할 수 없습니다.");
+        }
+
+        BootpayPaymentResultDTO bootpayPayment = bootpayBillingService.requestCardPayment(
+                targetCard.getBillingKey(),
+                payment.getPaymentCode(),
+                payment.getAuctionId() != null ? "BIDEO 경매 낙찰 결제" : "BIDEO 작품 결제",
+                payment.getTotalPrice()
+        );
+
+        paymentDAO.updatePgReceiptId(payment.getId(), bootpayPayment.getReceiptId());
+        return completePayment(payment.getId(), buyerId);
+    }
+
     private PaymentResponseDTO createPendingPayment(Long buyerId, PaymentRequestDTO requestDTO, Long resolvedCardId) {
         OrderVO order = orderDAO.findByOrderCode(requestDTO.getOrderCode());
         if (order == null) {
@@ -122,14 +148,15 @@ public class PaymentService {
         OrderVO order = orderDAO.findByOrderCode(payment.getOrderCode());
         if (order != null) {
             orderDAO.updateStatus(order.getId(), "PAID");
-            if (order.getWorkId() != null) {
-                workDAO.updateStatus(order.getWorkId(), "SOLD");
-            }
 
             notificationService.createNotification(
                     order.getSellerId(), order.getBuyerId(), "PAYMENT", "ORDER",
                     order.getId(), "결제가 완료되었습니다."
             );
+
+            if (order.getWorkId() != null) {
+                workDAO.hardDeleteById(order.getWorkId());
+            }
         }
 
         return paymentDAO.findById(paymentId)

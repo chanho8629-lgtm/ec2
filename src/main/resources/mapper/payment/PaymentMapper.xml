@@ -16,7 +16,7 @@
     </insert>
 
     <select id="selectById" resultType="PaymentResponseDTO">
-        SELECT id, payment_code, order_code, total_price, total_fee,
+        SELECT id, payment_code, order_code, work_id, auction_id, original_amount, total_price, total_fee,
                payment_purpose, pay_method, pg_receipt_id, status, paid_at, created_datetime
         FROM tbl_payment
         WHERE id = #{paymentId}
@@ -31,14 +31,14 @@
     </select>
 
     <select id="selectByPaymentCode" resultType="PaymentResponseDTO">
-        SELECT id, payment_code, order_code, total_price, total_fee,
+        SELECT id, payment_code, order_code, work_id, auction_id, original_amount, total_price, total_fee,
                payment_purpose, pay_method, pg_receipt_id, status, paid_at, created_datetime
         FROM tbl_payment
         WHERE payment_code = #{paymentCode}
     </select>
 
     <select id="selectByBuyerId" resultType="PaymentResponseDTO">
-        SELECT id, payment_code, order_code, total_price, total_fee,
+        SELECT id, payment_code, order_code, work_id, auction_id, original_amount, total_price, total_fee,
                payment_purpose, pay_method, pg_receipt_id, status, paid_at, created_datetime
         FROM tbl_payment
         WHERE buyer_id = #{buyerId}

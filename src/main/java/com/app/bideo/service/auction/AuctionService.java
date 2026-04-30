@@ -100,6 +100,17 @@ public class AuctionService {
     }
 
     @LogStatusWithReturn
+    public AuctionDetailResponseDTO getAuctionDetailById(Long auctionId) {
+        AuctionDetailResponseDTO responseDTO = auctionDAO.findDetailById(auctionId)
+                .orElseThrow(() -> new IllegalArgumentException("경매를 찾을 수 없습니다."));
+
+        List<BidResponseDTO> bids = bidDAO.findByAuctionId(responseDTO.getId(), 0, 20);
+        responseDTO.setBids(bids);
+
+        return responseDTO;
+    }
+
+    @LogStatusWithReturn
     public AuctionVO getAuction(Long auctionId) {
         return auctionDAO.findRawById(auctionId);
     }

@@ -317,7 +317,7 @@ function initializeGalleryRegister() {
 
         chips = tags.map(function (tag, index) {
             return '<span class="tag-chip">' +
-                '<span>' + tag + '</span>' +
+                '<span>#' + tag + '</span>' +
                 '<button type="button" data-tag-index="' + index + '" aria-label="' + tag + ' 삭제">x</button>' +
                 '</span>';
         }).join("");
@@ -401,7 +401,7 @@ function initializeGalleryRegister() {
         tagSuggestions.innerHTML = suggestions.map(function (tag, index) {
             var tagName = escapeHtml(tag && tag.tagName ? tag.tagName : "");
             var activeClass = index === 0 ? " is-active" : "";
-            return '<button type="button" class="tag-suggestion-item' + activeClass + '" data-tag-name="' + tagName + '">' + tagName + '</button>';
+            return '<button type="button" class="tag-suggestion-item' + activeClass + '" data-tag-name="' + tagName + '">#' + tagName + '</button>';
         }).join("");
         tagSuggestions.hidden = false;
         activeTagSuggestionIndex = 0;

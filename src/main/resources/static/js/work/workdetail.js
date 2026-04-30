@@ -2,6 +2,7 @@ const workDetails = [];
 const workdetailShellEl = document.querySelector(".workdetail-shell");
 const seedWorkIdAttr = Number(workdetailShellEl?.dataset?.seedWorkId || "");
 const feedModeEnabled = workdetailShellEl?.dataset?.feedMode === "true";
+const feedTagFilter = (workdetailShellEl?.dataset?.feedTag || new URLSearchParams(window.location.search).get("tag") || "").trim().replace(/^#/, "");
 const pathWorkId = Number(window.location.pathname.split("/").filter(Boolean).pop() || "0");
 const currentWorkId = Number.isFinite(pathWorkId) && pathWorkId > 0
     ? pathWorkId
@@ -13,6 +14,161 @@ function getCurrentWorkId() {
 
 function isFeedMode() {
     return feedModeEnabled;
+}
+
+const workdetailSheetModeQuery = window.matchMedia?.("(max-width: 820px) and (pointer: coarse)");
+
+function isWorkdetailSheetMode() {
+    return Boolean(workdetailSheetModeQuery?.matches);
+}
+
+function placeWorkdetailSheetInPage(page, element) {
+    if (!page || !element || !isWorkdetailSheetMode()) {
+        return;
+    }
+
+    if (element.parentElement !== page) {
+        page.appendChild(element);
+    }
+}
+
+function setImportantStyle(element, property, value) {
+    element?.style?.setProperty(property, value, "important");
+}
+
+function clearWorkdetailSheetStyles(backdrop, dialog) {
+    [
+        "position",
+        "inset",
+        "width",
+        "height",
+        "max-height",
+        "display",
+        "align-items",
+        "justify-content",
+        "padding",
+        "overflow",
+        "transform",
+        "background"
+    ].forEach((property) => backdrop?.style?.removeProperty(property));
+
+    [
+        "position",
+        "left",
+        "right",
+        "top",
+        "bottom",
+        "width",
+        "max-width",
+        "height",
+        "max-height",
+        "margin",
+        "border-radius",
+        "overflow",
+        "transform",
+        "padding",
+        "background"
+    ].forEach((property) => dialog?.style?.removeProperty(property));
+}
+
+function syncWorkdetailSheetModal(page, backdrop, dialog, isOpen) {
+    if (!backdrop || !isWorkdetailSheetMode()) {
+        return;
+    }
+
+    placeWorkdetailSheetInPage(page, backdrop);
+    setImportantStyle(backdrop, "position", "absolute");
+    setImportantStyle(backdrop, "inset", "0");
+    setImportantStyle(backdrop, "width", "100vw");
+    setImportantStyle(backdrop, "height", "var(--mobile-stage-height)");
+    setImportantStyle(backdrop, "max-height", "var(--mobile-stage-height)");
+    setImportantStyle(backdrop, "display", isOpen ? "flex" : "none");
+    setImportantStyle(backdrop, "align-items", "flex-end");
+    setImportantStyle(backdrop, "justify-content", "center");
+    setImportantStyle(backdrop, "padding", "0");
+    setImportantStyle(backdrop, "overflow", "hidden");
+    setImportantStyle(backdrop, "transform", "none");
+    setImportantStyle(backdrop, "background", "rgba(0, 0, 0, 0.42)");
+
+    if (!dialog) {
+        return;
+    }
+
+    setImportantStyle(dialog, "position", "absolute");
+    setImportantStyle(dialog, "left", "0");
+    setImportantStyle(dialog, "right", "0");
+    setImportantStyle(dialog, "top", "auto");
+    setImportantStyle(dialog, "bottom", "0");
+    setImportantStyle(dialog, "width", "100vw");
+    setImportantStyle(dialog, "max-width", "100vw");
+    setImportantStyle(dialog, "height", "min(70dvh, var(--mobile-stage-height))");
+    setImportantStyle(dialog, "max-height", "70dvh");
+    setImportantStyle(dialog, "margin", "0");
+    setImportantStyle(dialog, "border-radius", "22px 22px 0 0");
+    setImportantStyle(dialog, "overflow", "hidden");
+    setImportantStyle(dialog, "transform", "translateY(0)");
+}
+
+function syncWorkdetailMobileLayout() {
+    if (!pageStack || !isWorkdetailSheetMode()) {
+        document.body.removeAttribute("data-mobile-shorts");
+        document.documentElement.style.removeProperty("--mobile-stage-height");
+        document.body.style.removeProperty("--mobile-stage-height");
+        pageStack?.querySelectorAll(".page").forEach((page) => {
+            page.style.removeProperty("height");
+            page.style.removeProperty("min-height");
+            page.style.removeProperty("max-height");
+            page.style.removeProperty("flex-basis");
+            page.querySelector('[data-role="anchored-panel"]')?.classList.remove("mobile-sheet-open");
+            page.querySelector('[data-role="comments-panel"]')?.classList.remove("mobile-sheet-open");
+            page.querySelector('[data-role="pivot-panel"]')?.classList.remove("mobile-sheet-open");
+
+            const shareBackdrop = page.querySelector('[data-role="share-modal-backdrop"]');
+            const reportBackdrop = page.querySelector('[data-role="report-modal-backdrop"]');
+            const reportConfirmBackdrop = page.querySelector('[data-role="report-confirmation-backdrop"]');
+            const auctionBackdrop = page.querySelector('[data-role="auction-modal-backdrop"]');
+            const tradeBackdrop = page.querySelector('[data-role="trade-modal-backdrop"]');
+
+            clearWorkdetailSheetStyles(shareBackdrop, shareBackdrop?.querySelector(".work-share-modal"));
+            clearWorkdetailSheetStyles(reportBackdrop, reportBackdrop?.querySelector(".report-modal-dialog"));
+            clearWorkdetailSheetStyles(reportConfirmBackdrop, reportConfirmBackdrop?.querySelector(".report-modal-dialog"));
+            clearWorkdetailSheetStyles(auctionBackdrop, auctionBackdrop?.querySelector(".work-auction-modal"));
+            clearWorkdetailSheetStyles(tradeBackdrop, tradeBackdrop?.querySelector(".work-trade-modal"));
+
+            if (shareBackdrop && shareBackdrop.parentElement !== document.body) {
+                document.body.appendChild(shareBackdrop);
+            }
+            if (reportBackdrop && reportBackdrop.parentElement !== document.body) {
+                document.body.appendChild(reportBackdrop);
+            }
+            if (reportConfirmBackdrop && reportConfirmBackdrop.parentElement !== document.body) {
+                document.body.appendChild(reportConfirmBackdrop);
+            }
+            if (tradeBackdrop && tradeBackdrop.parentElement !== document.body) {
+                document.body.appendChild(tradeBackdrop);
+            }
+        });
+
+        const composeModal = document.querySelector("[data-yt-compose-modal]");
+        clearWorkdetailSheetStyles(composeModal, composeModal?.querySelector(".yt-compose-modal__content"));
+        if (composeModal?.parentElement?.classList?.contains("page")) {
+            document.body.appendChild(composeModal);
+        }
+        return;
+    }
+
+    const viewportHeight = window.visualViewport?.height || window.innerHeight;
+    const height = `${Math.max(1, Math.round(viewportHeight))}px`;
+    document.body.dataset.mobileShorts = "true";
+    document.documentElement.style.setProperty("--mobile-stage-height", height);
+    document.body.style.setProperty("--mobile-stage-height", height);
+
+    pageStack.querySelectorAll(".page").forEach((page) => {
+        page.style.setProperty("height", height, "important");
+        page.style.setProperty("min-height", height, "important");
+        page.style.setProperty("max-height", height, "important");
+        page.style.setProperty("flex-basis", height, "important");
+    });
 }
 
 const feedState = {
@@ -60,6 +216,15 @@ function getMediaSource(detail) {
 function getAvatarText(nickname) {
     const base = String(nickname || "").replace(/^@/, "").trim();
     return base ? base.charAt(0).toUpperCase() : "@";
+}
+
+function getProfileUrl(nickname) {
+    const normalized = String(nickname || "").replace(/^@/, "").trim();
+    return normalized ? `/profile/${encodeURIComponent(normalized)}` : "/profile";
+}
+
+function isVideoType(fileType) {
+    return String(fileType || "").toLowerCase().startsWith("video/");
 }
 
 function isTruthyFlag(value) {
@@ -144,6 +309,8 @@ function normalizeComment(comment) {
     return {
         id: comment.id,
         author: `@${comment.memberNickname || "user"}`,
+        authorNickname: comment.memberNickname || "user",
+        authorProfileUrl: getProfileUrl(comment.memberNickname || "user"),
         avatar: comment.memberProfileImage || "",
         time: formatRelativeTime(comment.createdDatetime),
         text: comment.content || "",
@@ -170,6 +337,7 @@ function buildPivotData(galleryDetail, workId) {
         .filter((work) => work && work.id !== workId)
         .map((work) => ({
             image: work.thumbnailUrl || "",
+            mediaType: work.thumbnailFileType || "",
             meta: work.title || "",
             href: `/work/detail/${work.id}`
         }));
@@ -223,6 +391,7 @@ async function normalizeWorkDetail(detail) {
         thumbAlt: detail.title || "작품",
         caption: detail.title || "",
         likeCount: formatDisplayCount(detail.likeCount || 0, { compact: true }),
+        rawViewCount: Number(detail.viewCount || 0),
         viewCount: formatDisplayCount(detail.viewCount || 0),
         publishedDate: formatPublishedDate(createdDate),
         publishedYear: formatPublishedYear(createdDate),
@@ -231,7 +400,10 @@ async function normalizeWorkDetail(detail) {
         remixLabel: marketType === "auction" ? "경매하기" : marketType === "trade" ? "거래하기" : "",
         marketType,
         avatarText: getAvatarText(detail.memberNickname),
+        ownerAvatar: detail.memberProfileImage || "",
         channel: `@${detail.memberNickname || "artist"}`,
+        ownerNickname: detail.memberNickname || "",
+        ownerProfileUrl: getProfileUrl(detail.memberNickname || ""),
         isOwner: Boolean(detail.isOwner),
         subscribe: "팔로우",
         desc: detail.description || "",
@@ -239,6 +411,7 @@ async function normalizeWorkDetail(detail) {
         isBookmarked: Boolean(detail.isBookmarked),
         isLiked: Boolean(detail.isLiked),
         shareUrl: `${window.location.origin}/work/detail/${detail.id}`,
+        tags: Array.isArray(detail.tags) ? detail.tags : [],
         comments: Array.isArray(detail.comments) ? detail.comments.map(normalizeComment) : [],
         ...pivotData
     };
@@ -376,6 +549,46 @@ function bindPageData(page, data) {
             node.textContent = value;
         });
     });
+
+    const ownerAvatar = page.querySelector('[data-role="owner-avatar"]');
+    if (ownerAvatar) {
+        const avatarUrl = data.ownerAvatar || "";
+        if (avatarUrl) {
+            ownerAvatar.innerHTML = `<img src="${escapeHtml(avatarUrl)}" alt="" onerror="this.onerror=null;this.remove();">`;
+        } else {
+            ownerAvatar.textContent = data.avatarText || "@";
+        }
+    }
+
+    const ownerProfileUrl = data.ownerProfileUrl || getProfileUrl(data.ownerNickname);
+    const ownerName = page.querySelector('[data-field="channel"]');
+    [ownerAvatar, ownerName].forEach((node) => {
+        if (!node) {
+            return;
+        }
+        node.setAttribute("role", "link");
+        node.setAttribute("tabindex", "0");
+        node.dataset.profileUrl = ownerProfileUrl;
+        node.style.cursor = "pointer";
+    });
+
+    const tagsContainer = page.querySelector('[data-role="work-tags"]');
+    const tags = Array.isArray(data.tags) ? data.tags : [];
+    if (tagsContainer) {
+        if (tags.length) {
+            tagsContainer.innerHTML = tags.map((tag) => {
+                const tagName = String(tag?.tagName || tag || "").replace(/^#/, "").trim();
+                if (!tagName) {
+                    return "";
+                }
+                return `<a class="workdetail-tag" href="/main?tag=${encodeURIComponent(tagName)}">#${escapeHtml(tagName)}</a>`;
+            }).join("");
+            tagsContainer.hidden = false;
+        } else {
+            tagsContainer.innerHTML = "";
+            tagsContainer.hidden = true;
+        }
+    }
 
     const thumbVideo = page.querySelector('[data-role="thumb-video"]');
     const thumbImage = page.querySelector('[data-field="thumb"]');
@@ -578,15 +791,16 @@ function updateCountFields(page, fieldName, value, compact = false) {
 
 // 댓글 패널 마크업 렌더링
 function renderReplyItem(reply) {
+    const profileUrl = reply.authorProfileUrl || getProfileUrl(reply.authorNickname || reply.author);
     return `
         <article class="rp" data-comment-id="${escapeHtml(reply.id || "")}">
             <div class="rp-ln"></div>
-            <button class="rp-av" type="button" aria-label="${escapeHtml(reply.author)}">
+            <a class="rp-av" href="${escapeHtml(profileUrl)}" aria-label="${escapeHtml(reply.author)}">
                 <img src="${escapeHtml(reply.avatar || "/images/favicon.png")}" alt="" onerror="this.onerror=null;this.src='/images/favicon.png';">
-            </button>
+            </a>
             <div class="rp-bd">
                 <div class="rp-hd">
-                    <a class="rp-nm" href="#">${escapeHtml(reply.author)}</a>
+                    <a class="rp-nm" href="${escapeHtml(profileUrl)}">${escapeHtml(reply.author)}</a>
                     <a class="rp-tm" href="#">${escapeHtml(reply.time)}</a>
                     ${reply.isOwner ? `
                         <div class="comment-action-wrap">
@@ -615,16 +829,17 @@ function renderReplyItem(reply) {
 function renderCommentItem(comment) {
     const replies = comment.replies || [];
     const repliesHtml = replies.length ? replies.map(renderReplyItem).join("") : "";
+    const profileUrl = comment.authorProfileUrl || getProfileUrl(comment.authorNickname || comment.author);
 
     return `
         <article class="cm" data-comment-id="${escapeHtml(comment.id || "")}">
             <div class="cm-row">
-                <button class="cm-av" type="button" aria-label="${escapeHtml(comment.author)}">
+                <a class="cm-av" href="${escapeHtml(profileUrl)}" aria-label="${escapeHtml(comment.author)}">
                     <img src="${escapeHtml(comment.avatar || "/images/favicon.png")}" alt="" onerror="this.onerror=null;this.src='/images/favicon.png';">
-                </button>
+                </a>
                 <div class="cm-bd">
                     <div class="cm-hd">
-                        <a class="cm-nm" href="#">${escapeHtml(comment.author)}</a>
+                        <a class="cm-nm" href="${escapeHtml(profileUrl)}">${escapeHtml(comment.author)}</a>
                         <a class="cm-tm" href="#">${escapeHtml(comment.time)}</a>
                         ${comment.isOwner ? `
                             <div class="comment-action-wrap">
@@ -658,10 +873,14 @@ function renderCommentItem(comment) {
 }
 
 function renderPivotCard(item) {
+    const mediaHtml = isVideoType(item.mediaType)
+        ? `<video src="${escapeHtml(item.image || "")}" muted loop playsinline preload="metadata"></video>`
+        : `<img src="${escapeHtml(item.image || "")}" alt="" onerror="this.onerror=null;this.src='/images/logo.png';">`;
+
     return `
         <article class="pivot-card">
             <a class="pivot-card-link" href="${escapeHtml(item.href || "about:invalid#pivot-card")}">
-                <img src="${escapeHtml(item.image || "")}" alt="">
+                ${mediaHtml}
                 <div class="pivot-card-overlay">
                     <p class="pivot-card-meta">${escapeHtml(item.meta || "")}</p>
                 </div>
@@ -734,6 +953,61 @@ function ensureAuctionModalShell() {
 }
 
 let activeAuctionPage = null;
+let tradeModalShell = null;
+let activeTradePage = null;
+
+function ensureTradeModalShell() {
+    if (tradeModalShell) {
+        return tradeModalShell;
+    }
+
+    const existingBackdrop = document.querySelector('[data-role="trade-modal-backdrop"]');
+    if (existingBackdrop) {
+        tradeModalShell = {
+            backdrop: existingBackdrop,
+            dialog: existingBackdrop.querySelector(".work-trade-modal"),
+            closeButton: existingBackdrop.querySelector('[data-role="trade-modal-close"]')
+        };
+        return tradeModalShell;
+    }
+
+    const backdrop = document.createElement("div");
+    backdrop.className = "work-trade-modal-backdrop";
+    backdrop.hidden = true;
+    backdrop.dataset.role = "trade-modal-backdrop";
+
+    const dialog = document.createElement("div");
+    dialog.className = "work-trade-modal";
+    dialog.setAttribute("role", "dialog");
+    dialog.setAttribute("aria-modal", "true");
+    dialog.setAttribute("aria-labelledby", "work-trade-modal-title");
+
+    dialog.innerHTML = `
+        <div class="work-trade-modal__header">
+            <strong class="work-trade-modal__title" id="work-trade-modal-title">거래하기</strong>
+            <button class="work-trade-modal__close" type="button" data-role="trade-modal-close" aria-label="닫기">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 10-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 001.414 1.414L12 13.414l5.293 5.293a1 1 0 001.414-1.414L13.414 12l5.293-5.293a1 1 0 10-1.414-1.414Z"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="work-trade-modal__body">
+            <p class="work-trade-modal__copy">거래 결제 화면으로 이동합니다.</p>
+            <button class="work-trade-modal__action" type="button" data-role="trade-modal-action">거래 계속하기</button>
+        </div>
+    `;
+
+    backdrop.appendChild(dialog);
+    document.body.appendChild(backdrop);
+
+    tradeModalShell = {
+        backdrop,
+        dialog,
+        closeButton: dialog.querySelector('[data-role="trade-modal-close"]'),
+        actionButton: dialog.querySelector('[data-role="trade-modal-action"]')
+    };
+    return tradeModalShell;
+}
 
 // 페이지 단위 이벤트 바인딩
 function bindPageInteractions(page, data) {
@@ -781,9 +1055,18 @@ function bindPageInteractions(page, data) {
     const shareLinkInput = page.querySelector('[data-role="share-link-input"]');
     const shareLinkCopy = page.querySelector('[data-role="share-link-copy"]');
     const shareModal = shareModalBackdrop?.querySelector(".work-share-modal");
+    const shareSearchInput = shareModalBackdrop?.querySelector('[data-share-search]');
+    const shareList = shareModalBackdrop?.querySelector('[data-share-list]');
+    const shareChips = shareModalBackdrop?.querySelector('[data-share-chips]');
+    const shareMessageInput = shareModalBackdrop?.querySelector('[data-share-message]');
+    const shareSendButton = shareModalBackdrop?.querySelector('[data-share-send]');
     const auctionModal = ensureAuctionModalShell();
     const auctionModalBackdrop = auctionModal.backdrop;
     const auctionModalClose = auctionModal.closeButton;
+    const tradeModal = ensureTradeModalShell();
+    const tradeModalBackdrop = tradeModal.backdrop;
+    const tradeModalDialog = tradeModal.dialog;
+    const tradeModalAction = tradeModal.actionButton || tradeModalBackdrop?.querySelector('[data-role="trade-modal-action"]');
     const workSnackbar = page.querySelector('[data-role="work-snackbar"]');
     const workSnackbarUndo = page.querySelector('[data-role="work-snackbar-undo"]');
     const reportModalBackdrop = page.querySelector('[data-role="report-modal-backdrop"]');
@@ -804,6 +1087,42 @@ function bindPageInteractions(page, data) {
     const isOwner = Boolean(data.isOwner);
     let lastNonZeroVolume = 0.5;
     let isPaused = false;
+    let shareSearchTimer = 0;
+    let descriptionViewIncremented = false;
+    const shareState = {
+        selectedUsers: [],
+        receiverMap: new Map()
+    };
+
+    page.querySelectorAll("[data-profile-url]").forEach((node) => {
+        const openProfile = () => {
+            const profileUrl = node.dataset.profileUrl;
+            if (profileUrl) {
+                window.location.href = profileUrl;
+            }
+        };
+
+        node.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            openProfile();
+        });
+
+        node.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                openProfile();
+            }
+        });
+    });
+
+    const placeTransientSheets = () => {
+        placeWorkdetailSheetInPage(page, shareModalBackdrop);
+        placeWorkdetailSheetInPage(page, reportModalBackdrop);
+        placeWorkdetailSheetInPage(page, reportConfirmationBackdrop);
+        placeWorkdetailSheetInPage(page, tradeModalBackdrop);
+        placeWorkdetailSheetInPage(page, moreMenu);
+    };
 
     const updateVolumeUi = () => {
         if (!thumbVideo || !volumeButton || !volumeIconPath) {
@@ -844,12 +1163,32 @@ function bindPageInteractions(page, data) {
         volumePanel.hidden = false;
         volumeButton.setAttribute("aria-expanded", "true");
     };
+
+    const increaseDescriptionViewCount = async () => {
+        if (descriptionViewIncremented || !workState.id) {
+            return;
+        }
+
+        descriptionViewIncremented = true;
+        try {
+            await apiRequest(`/api/works/${workState.id}/views`, {
+                method: "POST"
+            });
+            workState.rawViewCount = Number(workState.rawViewCount || 0) + 1;
+            workState.viewCount = formatDisplayCount(workState.rawViewCount);
+            updateCountFields(page, "viewCount", workState.rawViewCount);
+        } catch (_) {
+            descriptionViewIncremented = false;
+        }
+    };
+
     const closeAuctionPanelForPage = () => {
         if (!auctionModalBackdrop) {
             return;
         }
 
         auctionModalBackdrop.hidden = true;
+        syncWorkdetailSheetModal(page, auctionModalBackdrop, auctionModalBackdrop.querySelector(".work-auction-modal"), false);
         page.classList.remove("panel-open", "panel-auction");
 
         if (activeAuctionPage === page) {
@@ -876,8 +1215,51 @@ function bindPageInteractions(page, data) {
 
         activeAuctionPage = page;
         page.classList.add("panel-open", "panel-auction");
+        syncWorkdetailSheetModal(page, auctionModalBackdrop, auctionModalBackdrop.querySelector(".work-auction-modal"), true);
         auctionModalBackdrop.hidden = false;
         window.AuctionEvent?.init();
+    };
+
+    const closeTradeModalForPage = () => {
+        if (!tradeModalBackdrop) {
+            return;
+        }
+
+        syncWorkdetailSheetModal(page, tradeModalBackdrop, tradeModalDialog, false);
+        tradeModalBackdrop.hidden = true;
+        page.classList.remove("panel-trade");
+
+        if (activeTradePage === page) {
+            activeTradePage = null;
+        }
+    };
+
+    const openTradeModalForPage = () => {
+        if (!tradeModalBackdrop) {
+            window.location.href = `/payment/pay-api?workId=${data.id}`;
+            return;
+        }
+
+        if (isWorkdetailSheetMode()) {
+            placeWorkdetailSheetInPage(page, tradeModalBackdrop);
+        } else if (tradeModalBackdrop.parentElement !== document.body) {
+            document.body.appendChild(tradeModalBackdrop);
+            clearWorkdetailSheetStyles(tradeModalBackdrop, tradeModalDialog);
+        }
+
+        if (activeTradePage && activeTradePage !== page) {
+            activeTradePage.classList.remove("panel-trade");
+        }
+
+        activeTradePage = page;
+        page.classList.add("panel-trade");
+        if (tradeModalAction) {
+            tradeModalAction.onclick = () => {
+                window.location.href = `/payment/pay-api?workId=${data.id}`;
+            };
+        }
+        tradeModalBackdrop.hidden = false;
+        syncWorkdetailSheetModal(page, tradeModalBackdrop, tradeModalDialog, true);
     };
 
     const setMenuItemVisibility = (button, visible) => {
@@ -1330,16 +1712,126 @@ function bindPageInteractions(page, data) {
     }
     if (pivotGrid) {
         pivotGrid.innerHTML = (data.pivotItems || []).map(renderPivotCard).join("");
+        pivotGrid.querySelectorAll(".pivot-card").forEach((card) => {
+            const video = card.querySelector("video");
+            if (!video) {
+                return;
+            }
+
+            video.pause();
+            video.currentTime = 0;
+            card.addEventListener("mouseenter", () => {
+                video.play().catch(() => {});
+            });
+            card.addEventListener("mouseleave", () => {
+                video.pause();
+                video.currentTime = 0;
+            });
+        });
     }
 
     if (shareLinkInput) {
         shareLinkInput.value = data.shareUrl || "https://localhost:10000/profile/ttt?galleryId=9";
     }
 
+    const renderShareAvatar = (user) => {
+        const nickname = user?.nickname || "user";
+        const profileImage = user?.profileImage || user?.profileImageUrl || user?.memberProfileImage || "";
+        if (profileImage) {
+            return `<span class="work-share-user__avatar"><img src="${escapeHtml(profileImage)}" alt="${escapeHtml(nickname)} 프로필 이미지"></span>`;
+        }
+        return `<span class="work-share-user__avatar">${escapeHtml(getAvatarText(nickname))}</span>`;
+    };
+
+    const renderShareChips = () => {
+        if (shareChips) {
+            shareChips.innerHTML = shareState.selectedUsers
+                .map((nickname) => `<span class="work-share-chip">${escapeHtml(nickname)}<button type="button" data-share-remove="${escapeHtml(nickname)}">×</button></span>`)
+                .join("");
+        }
+
+        shareList?.querySelectorAll("[data-share-user]").forEach((button) => {
+            const nickname = button.dataset.shareUser || "";
+            button.classList.toggle("is-selected", shareState.selectedUsers.includes(nickname));
+        });
+    };
+
+    const searchShareUsers = async (keyword = "") => {
+        if (!shareList) {
+            return;
+        }
+
+        const ownerNickname = workState.ownerNickname || data.ownerNickname || "";
+        if (!ownerNickname) {
+            shareList.innerHTML = '<div class="followManageEmpty">공유 대상을 불러올 수 없습니다.</div>';
+            return;
+        }
+
+        shareList.innerHTML = '<div class="followManageEmpty">공유 대상을 불러오는 중입니다.</div>';
+        const users = await apiRequest(`/api/profile/${encodeURIComponent(ownerNickname)}/share/receivers?keyword=${encodeURIComponent(keyword || "")}`);
+        const safeUsers = Array.isArray(users) ? users : [];
+        shareState.receiverMap = new Map();
+
+        safeUsers.forEach((user) => {
+            if (user?.nickname) {
+                shareState.receiverMap.set(user.nickname, user);
+            }
+        });
+
+        if (!safeUsers.length) {
+            shareList.innerHTML = '<div class="followManageEmpty">검색 결과가 없습니다.</div>';
+            renderShareChips();
+            return;
+        }
+
+        shareList.innerHTML = safeUsers.map((user) => {
+            const nickname = user?.nickname || "user";
+            return `
+                <button type="button" class="work-share-user" data-share-user="${escapeHtml(nickname)}">
+                    ${renderShareAvatar(user)}
+                    <span class="work-share-user__meta">
+                        <strong>${escapeHtml(nickname)}</strong>
+                        <small>${escapeHtml(user?.creatorVerified ? "크리에이터 인증" : "일반 회원")}</small>
+                    </span>
+                </button>
+            `;
+        }).join("");
+        renderShareChips();
+    };
+
     if (marketButton && data.marketType === "trade") {
         marketButton.addEventListener("click", (event) => {
             event.stopPropagation();
-            window.location.href = `/payment/pay-api?workId=${data.id}`;
+            openTradeModalForPage();
+        });
+    }
+
+    if (tradeModalBackdrop && !tradeModalBackdrop.dataset.workdetailTradeBound) {
+        tradeModalBackdrop.dataset.workdetailTradeBound = "true";
+        tradeModalBackdrop.addEventListener("click", (event) => {
+            if (event.target !== tradeModalBackdrop && !event.target.closest('[data-role="trade-modal-close"]')) {
+                return;
+            }
+
+            if (activeTradePage) {
+                syncWorkdetailSheetModal(activeTradePage, tradeModalBackdrop, tradeModalDialog, false);
+                activeTradePage.classList.remove("panel-trade");
+                activeTradePage = null;
+            }
+            tradeModalBackdrop.hidden = true;
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key !== "Escape" || tradeModalBackdrop.hidden) {
+                return;
+            }
+
+            if (activeTradePage) {
+                syncWorkdetailSheetModal(activeTradePage, tradeModalBackdrop, tradeModalDialog, false);
+                activeTradePage.classList.remove("panel-trade");
+                activeTradePage = null;
+            }
+            tradeModalBackdrop.hidden = true;
         });
     }
 
@@ -1428,7 +1920,7 @@ function bindPageInteractions(page, data) {
     }
 
     if (shareButton && shareModalBackdrop) {
-        if (shareModalBackdrop.parentElement !== document.body) {
+        if (!isWorkdetailSheetMode() && shareModalBackdrop.parentElement !== document.body) {
             document.body.appendChild(shareModalBackdrop);
         }
 
@@ -1450,38 +1942,31 @@ function bindPageInteractions(page, data) {
         }
 
         const openShareModal = () => {
+            placeTransientSheets();
+            syncWorkdetailSheetModal(page, shareModalBackdrop, shareModal, true);
             shareModalBackdrop.hidden = false;
             shareModalBackdrop.setAttribute("aria-hidden", "false");
             shareModalBackdrop.style.display = "flex";
+            searchShareUsers(shareSearchInput?.value?.trim() || "").catch(() => {
+                if (shareList) {
+                    shareList.innerHTML = '<div class="followManageEmpty">공유 대상을 불러오지 못했습니다.</div>';
+                }
+            });
         };
 
         const closeShareModal = () => {
+            syncWorkdetailSheetModal(page, shareModalBackdrop, shareModal, false);
             shareModalBackdrop.hidden = true;
             shareModalBackdrop.setAttribute("aria-hidden", "true");
             shareModalBackdrop.style.display = "none";
         };
 
-        shareButton.addEventListener("click", async (event) => {
+        shareButton.addEventListener("click", (event) => {
             event.stopPropagation();
 
             if (!shareModalBackdrop.hidden) {
                 closeShareModal();
                 return;
-            }
-
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: workState.headline || document.title,
-                        text: workState.desc || "",
-                        url: workState.shareUrl || window.location.href
-                    });
-                    return;
-                } catch (error) {
-                    if (error?.name === "AbortError") {
-                        return;
-                    }
-                }
             }
 
             openShareModal();
@@ -1525,13 +2010,91 @@ function bindPageInteractions(page, data) {
                 shareLinkInput.select();
             }
         });
+
+        shareSearchInput?.addEventListener("input", () => {
+            window.clearTimeout(shareSearchTimer);
+            shareSearchTimer = window.setTimeout(() => {
+                searchShareUsers(shareSearchInput.value.trim()).catch(() => {
+                    if (shareList) {
+                        shareList.innerHTML = '<div class="followManageEmpty">공유 대상을 불러오지 못했습니다.</div>';
+                    }
+                });
+            }, 180);
+        });
+
+        shareList?.addEventListener("click", (event) => {
+            const shareUser = event.target.closest("[data-share-user]");
+            if (!shareUser) {
+                return;
+            }
+
+            const nickname = shareUser.dataset.shareUser || "";
+            if (!nickname) {
+                return;
+            }
+
+            if (shareState.selectedUsers.includes(nickname)) {
+                shareState.selectedUsers = shareState.selectedUsers.filter((item) => item !== nickname);
+            } else {
+                shareState.selectedUsers.push(nickname);
+            }
+            renderShareChips();
+        });
+
+        shareChips?.addEventListener("click", (event) => {
+            const removeButton = event.target.closest("[data-share-remove]");
+            if (!removeButton) {
+                return;
+            }
+
+            const nickname = removeButton.dataset.shareRemove || "";
+            shareState.selectedUsers = shareState.selectedUsers.filter((item) => item !== nickname);
+            renderShareChips();
+        });
+
+        shareSendButton?.addEventListener("click", async () => {
+            if (!shareState.selectedUsers.length) {
+                window.alert("받는 사람을 선택해 주세요.");
+                return;
+            }
+
+            const ownerNickname = workState.ownerNickname || data.ownerNickname || "";
+            if (!ownerNickname) {
+                window.alert("공유 대상을 확인하지 못했습니다.");
+                return;
+            }
+
+            const receiverIds = shareState.selectedUsers
+                .map((nickname) => shareState.receiverMap.get(nickname)?.id)
+                .filter(Boolean);
+
+            try {
+                await apiRequest(`/api/profile/${encodeURIComponent(ownerNickname)}/share`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        receiverIds,
+                        shareUrl: shareLinkInput?.value || workState.shareUrl || window.location.href,
+                        message: shareMessageInput?.value?.trim() || ""
+                    })
+                });
+
+                shareState.selectedUsers = [];
+                renderShareChips();
+                if (shareMessageInput) {
+                    shareMessageInput.value = "";
+                }
+                closeShareModal();
+            } catch (error) {
+                window.alert(error.message || "공유에 실패했습니다.");
+            }
+        });
     }
 
     if (reportButton && reportModalBackdrop) {
-        if (reportModalBackdrop.parentElement !== document.body) {
+        if (!isWorkdetailSheetMode() && reportModalBackdrop.parentElement !== document.body) {
             document.body.appendChild(reportModalBackdrop);
         }
-        if (reportConfirmationBackdrop && reportConfirmationBackdrop.parentElement !== document.body) {
+        if (!isWorkdetailSheetMode() && reportConfirmationBackdrop && reportConfirmationBackdrop.parentElement !== document.body) {
             document.body.appendChild(reportConfirmationBackdrop);
         }
 
@@ -1549,28 +2112,35 @@ function bindPageInteractions(page, data) {
         };
 
         const openReportModal = () => {
+            placeTransientSheets();
             if (reportStepReasons) {
                 reportStepReasons.hidden = false;
             }
             syncReportNextButton();
+            syncWorkdetailSheetModal(page, reportModalBackdrop, reportModalBackdrop.querySelector(".report-modal-dialog"), true);
             reportModalBackdrop.hidden = false;
             if (reportConfirmationBackdrop) {
+                syncWorkdetailSheetModal(page, reportConfirmationBackdrop, reportConfirmationBackdrop.querySelector(".report-modal-dialog"), false);
                 reportConfirmationBackdrop.hidden = true;
             }
         };
 
         const closeReportModal = () => {
+            syncWorkdetailSheetModal(page, reportModalBackdrop, reportModalBackdrop.querySelector(".report-modal-dialog"), false);
             reportModalBackdrop.hidden = true;
         };
 
         const openReportConfirmationModal = () => {
+            placeTransientSheets();
             if (reportConfirmationBackdrop) {
+                syncWorkdetailSheetModal(page, reportConfirmationBackdrop, reportConfirmationBackdrop.querySelector(".report-modal-dialog"), true);
                 reportConfirmationBackdrop.hidden = false;
             }
         };
 
         const closeReportConfirmationModal = () => {
             if (reportConfirmationBackdrop) {
+                syncWorkdetailSheetModal(page, reportConfirmationBackdrop, reportConfirmationBackdrop.querySelector(".report-modal-dialog"), false);
                 reportConfirmationBackdrop.hidden = true;
             }
         };
@@ -1628,14 +2198,21 @@ function bindPageInteractions(page, data) {
         const openPanel = (panelType) => {
             window.clearTimeout(closePanelTimer);
             closeAuctionPanelForPage();
+            closeTradeModalForPage();
+            if (panelType === "description") {
+                increaseDescriptionViewCount();
+            }
             if (anchoredPanel) {
                 anchoredPanel.hidden = panelType !== "description";
+                anchoredPanel.classList.toggle("mobile-sheet-open", panelType === "description" && isWorkdetailSheetMode());
             }
             if (commentsPanel) {
                 commentsPanel.hidden = panelType !== "comments";
+                commentsPanel.classList.toggle("mobile-sheet-open", panelType === "comments" && isWorkdetailSheetMode());
             }
             if (pivotPanel) {
                 pivotPanel.hidden = panelType !== "pivot";
+                pivotPanel.classList.toggle("mobile-sheet-open", panelType === "pivot" && isWorkdetailSheetMode());
             }
             window.requestAnimationFrame(() => {
                 page.classList.add("panel-open");
@@ -1647,9 +2224,13 @@ function bindPageInteractions(page, data) {
 
         const closePanel = () => {
             closeAuctionPanelForPage();
+            closeTradeModalForPage();
             page.classList.remove("panel-open");
             page.classList.remove("panel-comments");
             page.classList.remove("panel-pivot");
+            anchoredPanel?.classList.remove("mobile-sheet-open");
+            commentsPanel?.classList.remove("mobile-sheet-open");
+            pivotPanel?.classList.remove("mobile-sheet-open");
             window.clearTimeout(closePanelTimer);
             closePanelTimer = window.setTimeout(() => {
                 if (!page.classList.contains("panel-open")) {
@@ -1744,6 +2325,7 @@ function bindPageInteractions(page, data) {
 
     if (moreButton && moreMenu && card) {
         const positionMenu = () => {
+            placeTransientSheets();
             moreMenu.style.left = "378px";
             moreMenu.style.top = "48px";
         };
@@ -1892,7 +2474,13 @@ function bindPageInteractions(page, data) {
             }
             if (workState.id) {
                 if (typeof window.openComposeModal === "function") {
+                    const composeModal = document.querySelector("[data-yt-compose-modal]");
+                    placeWorkdetailSheetInPage(page, composeModal);
+                    syncWorkdetailSheetModal(page, composeModal, composeModal?.querySelector(".yt-compose-modal__content"), true);
                     window.openComposeModal(`/work/work-edit/${workState.id}`);
+                    window.requestAnimationFrame(() => {
+                        syncWorkdetailSheetModal(page, composeModal, composeModal?.querySelector(".yt-compose-modal__content"), true);
+                    });
                     return;
                 }
 
@@ -1960,7 +2548,10 @@ function scrollToPage(index) {
     const targetPage = pages[index];
 
     if (targetPage) {
-        targetPage.scrollIntoView({ behavior: "smooth", block: "start" });
+        pageStack.scrollTo({
+            top: targetPage.offsetTop,
+            behavior: "smooth"
+        });
     }
 }
 
@@ -2044,25 +2635,33 @@ function resetInactivePages() {
         page.classList.remove("panel-comments");
         page.classList.remove("panel-pivot");
         page.classList.remove("panel-auction");
+        page.classList.remove("panel-trade");
 
         const anchoredPanel = page.querySelector('[data-role="anchored-panel"]');
         const commentsPanel = page.querySelector('[data-role="comments-panel"]');
         const pivotPanel = page.querySelector('[data-role="pivot-panel"]');
         const auctionModalBackdrop = page.querySelector('[data-role="auction-modal-backdrop"]');
+        const tradeModalBackdrop = page.querySelector('[data-role="trade-modal-backdrop"]');
         const moreMenu = page.querySelector('[data-role="more-menu"]');
         const moreButton = page.querySelector('[data-role="more-button"]');
 
         if (anchoredPanel) {
             anchoredPanel.hidden = true;
+            anchoredPanel.classList.remove("mobile-sheet-open");
         }
         if (commentsPanel) {
             commentsPanel.hidden = true;
+            commentsPanel.classList.remove("mobile-sheet-open");
         }
         if (pivotPanel) {
             pivotPanel.hidden = true;
+            pivotPanel.classList.remove("mobile-sheet-open");
         }
         if (auctionModalBackdrop) {
             auctionModalBackdrop.hidden = true;
+        }
+        if (tradeModalBackdrop) {
+            tradeModalBackdrop.hidden = true;
         }
         if (moreMenu) {
             moreMenu.hidden = true;
@@ -2073,6 +2672,9 @@ function resetInactivePages() {
 
         if (activeAuctionPage === page) {
             activeAuctionPage = null;
+        }
+        if (activeTradePage === page) {
+            activeTradePage = null;
         }
     });
 }
@@ -2092,11 +2694,13 @@ async function appendWorkPage(detail) {
     const normalized = await normalizeWorkDetail(detail);
     const fragment = workPageTemplate.content.cloneNode(true);
     const page = fragment.querySelector(".page");
+    page.dataset.workId = String(normalized.id || "");
 
     bindPageData(page, normalized);
     bindPageInteractions(page, normalized);
     pageStack.appendChild(fragment);
     workDetails.push(normalized);
+    syncWorkdetailMobileLayout();
 }
 
 // 추천 피드 batch — 쇼츠 알고리즘처럼 다음 작품 N개를 가져와 stack에 append
@@ -2109,6 +2713,9 @@ async function loadFeedBatch(limit = 5) {
     try {
         const params = new URLSearchParams();
         params.set("limit", String(limit));
+        if (feedTagFilter) {
+            params.set("tag", feedTagFilter);
+        }
         feedState.seenIds.forEach((id) => params.append("excludeIds", id));
 
         const list = await apiRequest(`/api/works/feed?${params.toString()}`);
@@ -2139,7 +2746,7 @@ async function loadFeedBatch(limit = 5) {
 
 // 마지막에서 2번째 페이지 진입 시 다음 batch prefetch
 async function maybePrefetchFeed() {
-    if (!isFeedMode() || !pageStack) {
+    if (!pageStack) {
         return;
     }
 
@@ -2175,9 +2782,7 @@ async function initializeWorkDetailPage() {
             await appendWorkPage(item);
         }
 
-        if (isFeedMode()) {
-            await loadFeedBatch(4);
-        }
+        await loadFeedBatch(4);
 
         if (navigationButtonUp && navigationButtonDown) {
             navigationButtonUp.addEventListener("click", () => {
@@ -2200,8 +2805,13 @@ async function initializeWorkDetailPage() {
                 }
                 maybePrefetchFeed();
             }, { passive: true });
-            window.addEventListener("resize", updateNavigationState);
+            window.addEventListener("resize", () => {
+                syncWorkdetailMobileLayout();
+                updateNavigationState();
+            });
+            window.visualViewport?.addEventListener("resize", syncWorkdetailMobileLayout);
             resetInactivePages();
+            syncWorkdetailMobileLayout();
             updateNavigationState();
             syncFullscreenActivePage();
         }

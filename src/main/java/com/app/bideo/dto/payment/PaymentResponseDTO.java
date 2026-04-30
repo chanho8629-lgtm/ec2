@@ -12,6 +12,9 @@ public class PaymentResponseDTO {
     private Long id;
     private String paymentCode;
     private String orderCode;
+    private Long workId;
+    private Long auctionId;
+    private Long originalAmount;
     private Long totalPrice;
     private Long totalFee;
     private String paymentPurpose;

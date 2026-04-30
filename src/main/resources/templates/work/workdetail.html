@@ -19,7 +19,8 @@
 
     <main class="bd-shell__page-content workdetail-shell" aria-label="작품 상세"
           th:attr="data-feed-mode=${(feedMode != null and feedMode) ? 'true' : 'false'},
-                   data-seed-work-id=${(work != null) ? work.id : ''}">
+                   data-seed-work-id=${(work != null) ? work.id : ''},
+                   data-feed-tag=${feedTag != null ? feedTag : ''}">
         <section class="workdetail-stage">
             <main class="page-stack" id="page-stack"></main>
             <nav class="shorts-navigation" aria-label="쇼츠 탐색">
@@ -43,7 +44,7 @@
                 <section class="info">
                     <section class="channel-box">
                         <div class="channel">
-                            <span class="avatar" data-field="avatarText"></span>
+                            <span class="avatar" data-field="avatarText" data-role="owner-avatar"></span>
                             <strong class="name" data-field="channel"></strong>
                             <button class="sub" type="button" data-field="subscribe"></button>
                         </div>
@@ -216,6 +217,7 @@
                     <div class="desc-box">
                         <p class="anchored-panel-description" data-field="desc"></p>
                     </div>
+                    <div class="workdetail-tags" data-role="work-tags" hidden></div>
                     <section class="made">
                         <p class="made-title">콘텐츠 생성 방식</p>
                         <p class="made-head">변경되었거나 합성된 콘텐츠</p>
@@ -274,7 +276,7 @@
                         </div>
                     </section>
                     <div class="pivot-gallery-divider"></div>
-                    <div class="pivot-grid" data-role="pivot-grid"></div>
+                            <div class="pivot-grid" data-role="pivot-grid"></div>
                 </div>
             </aside>
 

@@ -31,11 +31,12 @@
                       data-price=${editMode and work != null and work.price != null ? work.price : ''},
                       data-has-active-auction=${editMode and work != null ? work.hasActiveAuction : false},
                       data-auction-starting-price=${editMode and activeAuction != null and activeAuction.startingPrice != null ? activeAuction.startingPrice : ''},
-                      data-auction-deadline-hours=${editMode and activeAuction != null and activeAuction.deadlineHours != null ? activeAuction.deadlineHours : 0},
-                      data-media-url=${editMode and work != null and work.files != null and !#lists.isEmpty(work.files) ? work.files[0].fileUrl : ''},
-                      data-media-type=${editMode and work != null and work.files != null and !#lists.isEmpty(work.files) ? work.files[0].fileType : ''},
-                      data-link-url=${editMode and work != null ? '/work/detail/' + work.id : ''},
-                      data-submit-label=${editMode ? '수정' : '등록'}"
+                       data-auction-deadline-hours=${editMode and activeAuction != null and activeAuction.deadlineHours != null ? activeAuction.deadlineHours : 0},
+                       data-media-url=${editMode and work != null and work.files != null and !#lists.isEmpty(work.files) ? work.files[0].fileUrl : ''},
+                       data-media-type=${editMode and work != null and work.files != null and !#lists.isEmpty(work.files) ? work.files[0].fileType : ''},
+                       data-link-url=${editMode and work != null ? '/work/detail/' + work.id : ''},
+                       data-tags=${editMode and work != null and work.tags != null ? #strings.listJoin(work.tags.![tagName], ',') : ''},
+                       data-submit-label=${editMode ? '수정' : '등록'}"
              hidden></div>
 
         <div th:class="${standalone} ? 'upload-dialog' : 'work-register-panel'">
@@ -77,7 +78,7 @@
                             </div>
                             <button type="button" class="ai-prompt-compose__tool" id="ai-prompt-tool-button" aria-label="추가" aria-expanded="false">+</button>
                             <input type="text" class="ai-prompt-compose__input" id="ai-prompt-input" placeholder="무엇이든 물어보세요" autocomplete="off">
-                            <button type="button" class="ai-prompt-compose__send" id="ai-prompt-send-button" aria-label="전송">전송</button>
+                            <button type="button" class="ai-prompt-compose__send" id="ai-prompt-send-button" aria-label="전송">+</button>
                         </div>
                     </div>
                 </div>
@@ -156,10 +157,6 @@
                                 <input type="file" id="thumbnail-file-input-1" accept="image/*" hidden>
                                 <span class="thumbnail-upload-text thumbnail-upload-button" data-target-input="thumbnail-file-input-1" role="button" tabindex="0">파일 업로드</span>
                             </div>
-                            <div class="thumbnail-placeholder">
-                                <input type="file" id="thumbnail-file-input-2" accept="image/*" hidden>
-                                <span class="thumbnail-upload-text thumbnail-upload-button" data-target-input="thumbnail-file-input-2" role="button" tabindex="0">자동 생성됨</span>
-                            </div>
                         </div>
 
                         <div class="art-list-section">
@@ -184,10 +181,14 @@
                         <div class="tags-section">
                             <div class="tags-label">태그</div>
                             <div class="tags-field">
-                                <input type="text" id="video-tags-input" class="tags-input" maxlength="500" placeholder="태그 추가">
+                                <div class="tag-box tags-box">
+                                    <div class="tag-list tags-list" id="video-tags-list"></div>
+                                    <input type="text" id="video-tags-input" class="tag-input tags-input" maxlength="500" placeholder="태그를 검색하세요">
+                                </div>
+                                <div class="tags-suggestions tag-suggestions" id="video-tags-suggestions" hidden></div>
                             </div>
                             <div class="tags-meta">
-                                <span>각 태그의 뒤에 쉼표를 입력하세요.</span>
+                                <span>추천 목록에서 태그를 선택하세요.</span>
                                 <span id="video-tags-count">0/500</span>
                             </div>
                         </div>

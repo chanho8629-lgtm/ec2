@@ -257,7 +257,23 @@
         <if test="keyword != null and keyword != ''">
             and (g.title ilike '%' || #{keyword} || '%'
               or g.description ilike '%' || #{keyword} || '%'
-              or m.nickname ilike '%' || #{keyword} || '%')
+              or m.nickname ilike '%' || #{keyword} || '%'
+              or exists (
+                    select 1
+                    from tbl_gallery_tag gt
+                    join tbl_tag t on gt.tag_id = t.id
+                    where gt.gallery_id = g.id
+                      and t.tag_name ilike '%' || #{keyword} || '%'
+              ))
+        </if>
+        <if test="tag != null and tag != ''">
+            and exists (
+                select 1
+                from tbl_gallery_tag gt_filter
+                join tbl_tag tag_filter on gt_filter.tag_id = tag_filter.id
+                where gt_filter.gallery_id = g.id
+                  and lower(tag_filter.tag_name) = lower(#{tag})
+            )
         </if>
         <if test="memberId != null">
             and g.member_id = #{memberId}
@@ -296,7 +312,23 @@
         <if test="keyword != null and keyword != ''">
             and (g.title ilike '%' || #{keyword} || '%'
               or g.description ilike '%' || #{keyword} || '%'
-              or m.nickname ilike '%' || #{keyword} || '%')
+              or m.nickname ilike '%' || #{keyword} || '%'
+              or exists (
+                    select 1
+                    from tbl_gallery_tag gt
+                    join tbl_tag t on gt.tag_id = t.id
+                    where gt.gallery_id = g.id
+                      and t.tag_name ilike '%' || #{keyword} || '%'
+              ))
+        </if>
+        <if test="tag != null and tag != ''">
+            and exists (
+                select 1
+                from tbl_gallery_tag gt_filter
+                join tbl_tag tag_filter on gt_filter.tag_id = tag_filter.id
+                where gt_filter.gallery_id = g.id
+                  and lower(tag_filter.tag_name) = lower(#{tag})
+            )
         </if>
         <choose>
             <when test="sort == 'popular'">
@@ -318,7 +350,23 @@
         <if test="keyword != null and keyword != ''">
             and (g.title ilike '%' || #{keyword} || '%'
               or g.description ilike '%' || #{keyword} || '%'
-              or m.nickname ilike '%' || #{keyword} || '%')
+              or m.nickname ilike '%' || #{keyword} || '%'
+              or exists (
+                    select 1
+                    from tbl_gallery_tag gt
+                    join tbl_tag t on gt.tag_id = t.id
+                    where gt.gallery_id = g.id
+                      and t.tag_name ilike '%' || #{keyword} || '%'
+              ))
+        </if>
+        <if test="tag != null and tag != ''">
+            and exists (
+                select 1
+                from tbl_gallery_tag gt_filter
+                join tbl_tag tag_filter on gt_filter.tag_id = tag_filter.id
+                where gt_filter.gallery_id = g.id
+                  and lower(tag_filter.tag_name) = lower(#{tag})
+            )
         </if>
         <if test="memberId != null">
             and g.member_id = #{memberId}

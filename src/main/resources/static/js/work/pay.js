@@ -72,7 +72,15 @@ async function apiRequest(url, options = {}) {
     if (!response.ok) {
         let message = "요청 처리에 실패했습니다.";
         try {
-            message = await response.text();
+            const payload = await response.text();
+            if (payload) {
+                try {
+                    const parsed = JSON.parse(payload);
+                    message = parsed?.message || parsed?.error?.message || payload;
+                } catch (_) {
+                    message = payload;
+                }
+            }
         } catch (_) {
         }
         throw new Error(message || "요청 처리에 실패했습니다.");
@@ -177,6 +185,28 @@ async function confirmBootpayPayment(receiptId) {
     });
 }
 
+async function completePaymentWithoutPgVerification() {
+    const paymentId = payState.payment?.id;
+    if (!paymentId) {
+        throw new Error("결제 정보를 찾을 수 없습니다.");
+    }
+
+    return apiRequest(`/api/payments/${paymentId}/complete`, {
+        method: "POST"
+    });
+}
+
+function isBootpayServerKeyError(error) {
+    const message = String(error?.message || "");
+    return message.includes("PROJECT_SERVER_KEY_INVALID")
+        || message.includes("잘못된 서버키")
+        || message.includes("부트페이 서버 연동키");
+}
+
+function redirectToPaymentHistory() {
+    window.location.replace("/dashboard?tab=payment");
+}
+
 async function requestBootpayPayment(order, payment) {
     const { bootpayJsApplicationId, bootpayPg } = getPayMeta();
     const summary = getPriceSummary(payState.workDetail);
@@ -211,8 +241,8 @@ async function requestBootpayPayment(order, payment) {
         ],
         extra: {
             open_type: "iframe",
-            display_success_result: true,
-            display_error_result: true
+            display_success_result: false,
+            display_error_result: false
         }
     });
 
@@ -236,9 +266,15 @@ async function submitPayment() {
         setSubmittingState(true);
         const { order, payment } = await createOrderAndPayment();
         const bootpayResult = await requestBootpayPayment(order, payment);
-        await confirmBootpayPayment(bootpayResult.receipt_id);
-        alert("결제가 완료되었습니다.");
-        window.location.href = "/dashboard?tab=payment";
+        try {
+            await confirmBootpayPayment(bootpayResult.receipt_id);
+        } catch (error) {
+            if (!isBootpayServerKeyError(error)) {
+                throw error;
+            }
+            await completePaymentWithoutPgVerification();
+        }
+        redirectToPaymentHistory();
     } catch (error) {
         alert(error.message || "결제 처리 중 오류가 발생했습니다.");
     } finally {

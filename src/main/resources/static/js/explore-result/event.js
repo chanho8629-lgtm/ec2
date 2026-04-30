@@ -275,7 +275,7 @@ window.onload = () => {
             btn.dataset.nickname = m.nickname;
             btn.innerHTML = `
               <div class="work-share-recipient__main">
-                <div class="work-share-recipient__avatar"><img src="${m.profileImage || '/images/default-profile.png'}" alt=""></div>
+                <div class="work-share-recipient__avatar"><img src="${m.profileImage || '/images/default-profile.svg'}" alt="" onerror="this.onerror=null;this.src='/images/default-profile.svg'"></div>
                 <div class="work-share-recipient__copy">
                   <span class="work-share-recipient__username">${m.nickname}</span>
                 </div>
@@ -390,15 +390,35 @@ window.onload = () => {
   };
 
   // 페이지 초기화
-  const keyword = new URLSearchParams(location.search).get("search_query") || "";
-  let currentType = "all";
-  let currentSort = "latest";
+  const params = new URLSearchParams(location.search);
+  const keyword = params.get("search_query") || params.get("tag") || "";
+  let currentType = params.get("type") || "all";
+  let currentSort = params.get("sort") || (params.get("tag") ? "popular" : "latest");
   let page = 1;
   let criteria = null;
   let checkScroll = true;
   console.log("들어옴2 keyword", keyword);
 
   const searchResults = document.getElementById("searchResults");
+
+  if (keyword.trim()) {
+    document.querySelectorAll('input[name="search_query"]').forEach((input) => {
+      input.value = keyword;
+    });
+    document.title = keyword + " - 검색 결과";
+  }
+
+  document.querySelectorAll(".chip").forEach((chip) => {
+    chip.classList.toggle("active", chip.dataset.filter === currentType);
+  });
+  document.querySelectorAll(".sort-filter-dropdown-item").forEach((item) => {
+    const isActive = item.dataset.sort === currentSort;
+    item.classList.toggle("active", isActive);
+    if (isActive) {
+      const text = document.querySelector(".sort-filter-text");
+      if (text) text.textContent = item.textContent;
+    }
+  });
 
   const doSearch = () => {
     if (!keyword.trim()) return;
