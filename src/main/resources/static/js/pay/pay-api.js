@@ -72,11 +72,45 @@ function getThumbnailUrl(work) {
     return imageFile?.fileUrl || "/images/BIDEO_LOGO/BIDEO.png";
 }
 
+function syncPaymentSummaryFromPayment() {
+    const payment = paymentContext.payment;
+    if (!payment) {
+        return false;
+    }
+
+    const originalPrice = Number(payment.originalAmount) || 0;
+    const feePrice = Number(payment.totalFee) || 0;
+    const totalPrice = Number(payment.totalPrice) || 0;
+
+    document.getElementById("productImage").src = payment.workThumbnail || "/images/BIDEO_LOGO/BIDEO.png";
+    document.getElementById("creatorName").textContent = payment.sellerNickname || "판매자";
+    document.getElementById("productName").textContent = payment.workTitle || "낙찰 작품";
+    document.getElementById("licenseTypeLabel").textContent = payment.auctionId
+        ? "경매 낙찰"
+        : (payment.licenseType || "라이선스 미정");
+    document.getElementById("displayOriginalPrice").textContent = formatCurrency(originalPrice);
+    document.getElementById("displayFeePrice").textContent = formatCurrency(feePrice);
+    document.getElementById("displayTotalPrice").textContent = formatCurrency(totalPrice);
+    document.getElementById("paySubmitLabel").textContent = `${formatCurrency(totalPrice)} 결제하기`;
+
+    const hasRegisteredCard = Array.isArray(paymentContext.cards) && paymentContext.cards.length > 0;
+    document.getElementById("paymentStatusText").textContent = hasRegisteredCard
+        ? "대표 카드가 있으면 부트페이 간편결제로 바로 승인 요청합니다."
+        : "대시보드에서 카드를 먼저 등록해야 간편결제를 진행할 수 있습니다.";
+
+    const submitButton = document.getElementById("paySubmitButton");
+    if (submitButton) {
+        submitButton.disabled = !hasRegisteredCard;
+    }
+
+    return true;
+}
+
 function syncPaymentSummary() {
     const work = paymentContext.work;
     const auction = paymentContext.auction;
     if (!work && !auction) {
-        return;
+        return syncPaymentSummaryFromPayment();
     }
 
     const originalPrice = paymentContext.auctionId
@@ -148,7 +182,7 @@ async function requestEasyPayment(order) {
 }
 
 async function submitPayment() {
-    if (!paymentContext.workId && !paymentContext.auctionId) {
+    if (!paymentContext.paymentId && !paymentContext.workId && !paymentContext.auctionId) {
         window.alert("결제할 정보를 찾을 수 없습니다.");
         return;
     }
@@ -176,7 +210,7 @@ async function submitPayment() {
             statusLabel.textContent = "결제 완료";
         }
         window.alert("등록 카드 간편결제가 완료되었습니다.");
-        window.location.href = "/payment/history";
+        window.location.href = "/dashboard?tab=payment";
     } catch (error) {
         if (statusLabel) {
             statusLabel.textContent = "결제 대기";
@@ -201,25 +235,53 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     try {
+        if (!paymentContext.paymentId && paymentContext.auctionId) {
+            try {
+                paymentContext.payment = await requestJson(`/api/payments/pending/auction/${paymentContext.auctionId}`);
+                paymentContext.paymentId = paymentContext.payment?.id || null;
+                paymentContext.workId = paymentContext.payment?.workId || paymentContext.workId;
+                syncPaymentSummaryFromPayment();
+            } catch (pendingError) {
+            }
+        }
+
         if (paymentContext.paymentId) {
             paymentContext.payment = await requestJson(`/api/payments/${paymentContext.paymentId}`);
             paymentContext.workId = paymentContext.payment?.workId || null;
             paymentContext.auctionId = paymentContext.payment?.auctionId || null;
+            syncPaymentSummaryFromPayment();
         }
 
-        const detailRequest = paymentContext.auctionId
-            ? requestJson(`/api/auction/id/${paymentContext.auctionId}`)
-            : requestJson(`/api/works/${paymentContext.workId}`);
-        const [detail, cards] = await Promise.all([detailRequest, requestJson("/api/cards")]);
-
-        if (paymentContext.auctionId) {
-            paymentContext.auction = detail;
-            paymentContext.workId = detail?.workId || null;
-        } else {
-            paymentContext.work = detail;
+        try {
+            paymentContext.cards = await requestJson("/api/cards");
+            paymentContext.cards = Array.isArray(paymentContext.cards) ? paymentContext.cards : [];
+        } catch (cardError) {
+            paymentContext.cards = [];
         }
-        paymentContext.cards = Array.isArray(cards) ? cards : [];
-        syncPaymentSummary();
+
+        if (paymentContext.paymentId) {
+            syncPaymentSummaryFromPayment();
+        }
+
+        if (paymentContext.auctionId || paymentContext.workId) {
+            try {
+                const detail = await (paymentContext.auctionId
+                    ? requestJson(`/api/auction/id/${paymentContext.auctionId}`)
+                    : requestJson(`/api/works/${paymentContext.workId}`));
+
+                if (paymentContext.auctionId) {
+                    paymentContext.auction = detail;
+                    paymentContext.workId = detail?.workId || paymentContext.workId;
+                } else {
+                    paymentContext.work = detail;
+                }
+                syncPaymentSummary();
+            } catch (detailError) {
+                if (!paymentContext.paymentId) {
+                    throw detailError;
+                }
+            }
+        }
     } catch (error) {
         window.alert(error.message || "결제 정보를 불러오지 못했습니다.");
     }

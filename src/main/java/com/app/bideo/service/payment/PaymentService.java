@@ -155,7 +155,7 @@ public class PaymentService {
             );
 
             if (order.getWorkId() != null) {
-                workDAO.hardDeleteById(order.getWorkId());
+                workDAO.delete(order.getWorkId());
             }
         }
 
@@ -229,6 +229,12 @@ public class PaymentService {
     public PaymentResponseDTO getPaymentDetail(Long paymentId) {
         return paymentDAO.findById(paymentId)
                 .orElseThrow(() -> new IllegalArgumentException("결제를 찾을 수 없습니다."));
+    }
+
+    @Transactional(readOnly = true)
+    public PaymentResponseDTO getPendingAuctionPayment(Long buyerId, Long auctionId) {
+        return paymentDAO.findPendingByBuyerAndAuction(buyerId, auctionId)
+                .orElseThrow(() -> new IllegalArgumentException("결제 대기 내역이 없습니다."));
     }
 
     @Transactional(readOnly = true)

@@ -79,7 +79,7 @@ public class AuctionService {
                         .settlementAmount(settlementAmount)
                         .deadlineHours(requestDTO.getDeadlineHours())
                         .startedAt(startedAt)
-                        .closingAt(startedAt.plusHours(requestDTO.getDeadlineHours()))
+                        .closingAt(startedAt.plusMinutes(requestDTO.getDeadlineHours()))
                         .cancelThreshold(0.70d)
                         .status("ACTIVE")
                         .build()

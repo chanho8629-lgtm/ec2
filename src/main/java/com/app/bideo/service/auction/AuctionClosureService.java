@@ -5,10 +5,12 @@ import com.app.bideo.domain.order.OrderVO;
 import com.app.bideo.domain.payment.PaymentVO;
 import com.app.bideo.dto.auction.BidBroadcastDTO;
 import com.app.bideo.dto.auction.BidResponseDTO;
+import com.app.bideo.dto.work.WorkDTO;
 import com.app.bideo.repository.auction.AuctionDAO;
 import com.app.bideo.repository.auction.BidDAO;
 import com.app.bideo.repository.order.OrderDAO;
 import com.app.bideo.repository.payment.PaymentDAO;
+import com.app.bideo.repository.work.WorkDAO;
 import com.app.bideo.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -27,6 +29,7 @@ public class AuctionClosureService {
     private final BidDAO bidDAO;
     private final OrderDAO orderDAO;
     private final PaymentDAO paymentDAO;
+    private final WorkDAO workDAO;
     private final NotificationService notificationService;
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -85,6 +88,8 @@ public class AuctionClosureService {
         long originalPrice = winningBid.getBidPrice();
         long feeAmount = Math.round(originalPrice * FEE_RATE);
         long totalPrice = originalPrice + feeAmount;
+        WorkDTO work = workDAO.findById(auction.getWorkId())
+                .orElseThrow(() -> new IllegalArgumentException("작품을 찾을 수 없습니다."));
 
         OrderVO order = OrderVO.builder()
                 .orderCode(createCode())
@@ -93,7 +98,7 @@ public class AuctionClosureService {
                 .workId(auction.getWorkId())
                 .auctionId(auction.getId())
                 .orderType("AUCTION")
-                .licenseType(null)
+                .licenseType(work.getLicenseType())
                 .originalPrice(originalPrice)
                 .discountAmount(0L)
                 .feeAmount(feeAmount)

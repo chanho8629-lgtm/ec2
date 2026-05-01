@@ -21,6 +21,10 @@ public class PaymentResponseDTO {
     private String payMethod;
     private String pgReceiptId;
     private String status;
+    private String workTitle;
+    private String workThumbnail;
+    private String sellerNickname;
+    private String licenseType;
     private LocalDateTime paidAt;
     private LocalDateTime createdDatetime;
 }

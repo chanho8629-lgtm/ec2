@@ -18,6 +18,7 @@ public class NotificationResponseDTO {
     private Long targetId;
     private Long messageRoomId;
     private String message;
+    private String paymentStatus;
     private Boolean isRead;
     private LocalDateTime createdDatetime;
 }

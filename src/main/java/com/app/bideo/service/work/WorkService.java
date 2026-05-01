@@ -462,7 +462,7 @@ public class WorkService {
                         .settlementAmount(settlementAmount)
                         .deadlineHours(deadlineHours)
                         .startedAt(startedAt)
-                        .closingAt(startedAt.plusHours(deadlineHours))
+                        .closingAt(startedAt.plusMinutes(deadlineHours))
                         .cancelThreshold(0.70d)
                         .status("ACTIVE")
                         .build()

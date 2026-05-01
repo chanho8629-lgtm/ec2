@@ -44,6 +44,13 @@ public class PaymentAPIController {
         return ResponseEntity.ok(paymentService.getPaymentDetail(id));
     }
 
+    @GetMapping("/pending/auction/{auctionId}")
+    public ResponseEntity<PaymentResponseDTO> getPendingAuctionPayment(
+            @PathVariable Long auctionId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(paymentService.getPendingAuctionPayment(userDetails.getId(), auctionId));
+    }
+
     @GetMapping("/my")
     public ResponseEntity<PageResponseDTO<PaymentResponseDTO>> getMyPayments(
             @AuthenticationPrincipal CustomUserDetails userDetails,

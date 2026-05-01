@@ -191,7 +191,6 @@
                 limit 1
             )
               and (latest.status != 'ACTIVE' or latest.closing_at <= now())
-              and (latest.winner_id is null or #{currentMemberId} is null or latest.winner_id != #{currentMemberId})
         )
         ]]>
     </select>
@@ -239,7 +238,6 @@
                   limit 1
               )
                 and (latest.status != 'ACTIVE' or latest.closing_at <= now())
-                and (latest.winner_id is null or #{currentMemberId} is null or latest.winner_id != #{currentMemberId})
           )
         ]]>
         <if test="galleryId != null">
@@ -339,7 +337,6 @@
                   limit 1
               )
                 and (latest.status != 'ACTIVE' or latest.closing_at <= now())
-                and (latest.winner_id is null or #{currentMemberId} is null or latest.winner_id != #{currentMemberId})
           )
         ]]>
         <if test="keyword != null and keyword != ''">
@@ -410,7 +407,6 @@
                   limit 1
               )
                 and (latest.status != 'ACTIVE' or latest.closing_at <= now())
-                and (latest.winner_id is null or #{currentMemberId} is null or latest.winner_id != #{currentMemberId})
           )
         ]]>
         <if test="excludeIds != null and excludeIds.size() > 0">
@@ -460,7 +456,6 @@
                   limit 1
               )
                 and (latest.status != 'ACTIVE' or latest.closing_at <= now())
-                and (latest.winner_id is null or #{currentMemberId} is null or latest.winner_id != #{currentMemberId})
           )
         ]]>
         <if test="galleryId != null">
@@ -516,26 +511,6 @@
 
     <delete id="hardDeleteWorkById">
         <![CDATA[
-        update tbl_payment
-        set work_id = null,
-            auction_id = null
-        where work_id = #{workId}
-           or auction_id in (
-            select id
-            from tbl_auction
-            where work_id = #{workId}
-        );
-
-        update tbl_order
-        set work_id = null,
-            auction_id = null
-        where work_id = #{workId}
-           or auction_id in (
-            select id
-            from tbl_auction
-            where work_id = #{workId}
-        );
-
         update tbl_comment
         set parent_id = null
         where target_type = 'WORK'

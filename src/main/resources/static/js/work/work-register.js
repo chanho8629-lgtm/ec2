@@ -683,20 +683,20 @@ function initializeWorkRegister() {
         }
     }
 
-    function formatAuctionDeadline(hours) {
-        if (hours <= 0) {
-            return "0시간";
+    function formatAuctionDeadline(minutes) {
+        if (minutes <= 0) {
+            return "0분";
         }
 
-        if (hours >= 24) {
-            if (hours % 24 === 0) {
-                return String(hours / 24) + "일";
-            }
-
-            return String(Math.floor(hours / 24)) + "일 " + String(hours % 24) + "시간";
+        if (minutes < 60) {
+            return String(minutes) + "분";
         }
 
-        return String(hours) + "시간";
+        if (minutes % 60 === 0) {
+            return String(minutes / 60) + "시간";
+        }
+
+        return String(Math.floor(minutes / 60)) + "시간 " + String(minutes % 60) + "분";
     }
 
     function formatAuctionPrice(value) {
@@ -1550,7 +1550,7 @@ function initializeWorkRegister() {
         }
 
         if (auctionDeadlineSelected) {
-            auctionDeadlineSelected.textContent = "0시간";
+            auctionDeadlineSelected.textContent = "0분";
         }
 
         if (auctionDeadlineHoursInput) {
@@ -1642,12 +1642,10 @@ function initializeWorkRegister() {
     if (auctionDeadlineButtons.length && auctionDeadlineSelected && auctionDeadlineHoursInput) {
         auctionDeadlineButtons.forEach(function (button) {
             button.addEventListener("click", function () {
-                var hours = Number(button.getAttribute("data-hours") || "0");
-                var currentHours = Number(auctionDeadlineHoursInput.value || "0");
-                var nextHours = currentHours + hours;
+                var minutes = Number(button.getAttribute("data-hours") || "0");
 
-                auctionDeadlineSelected.textContent = formatAuctionDeadline(nextHours);
-                auctionDeadlineHoursInput.value = String(nextHours);
+                auctionDeadlineSelected.textContent = formatAuctionDeadline(minutes);
+                auctionDeadlineHoursInput.value = String(minutes);
 
                 auctionDeadlineButtons.forEach(function (item) {
                     item.classList.remove("work-auction-config__deadline-btn--active");
@@ -1660,7 +1658,7 @@ function initializeWorkRegister() {
 
     if (auctionDeadlineReset && auctionDeadlineSelected && auctionDeadlineHoursInput) {
         auctionDeadlineReset.addEventListener("click", function () {
-            auctionDeadlineSelected.textContent = "0시간";
+            auctionDeadlineSelected.textContent = "0분";
             auctionDeadlineHoursInput.value = "0";
 
             auctionDeadlineButtons.forEach(function (item) {

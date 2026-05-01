@@ -1,7 +1,10 @@
 const payState = {
     selectedMethod: "bootpay",
+    paymentId: null,
     workId: null,
+    auctionId: null,
     workDetail: null,
+    paymentDetail: null,
     order: null,
     payment: null,
     submitting: false
@@ -19,6 +22,12 @@ function selectPayMethod(method) {
 
 function formatCurrency(value) {
     return `${Number(value || 0).toLocaleString("ko-KR")}원`;
+}
+
+function resolveLongParam(name) {
+    const params = new URLSearchParams(window.location.search);
+    const raw = Number(params.get(name));
+    return Number.isFinite(raw) && raw > 0 ? raw : null;
 }
 
 function getBootpayReceiptId(result) {
@@ -49,12 +58,20 @@ function getPayMeta() {
     };
 }
 
-function getPriceSummary(detail) {
+function getWorkPriceSummary(detail) {
     const { feeRate } = getPayMeta();
     const basePrice = Math.max(Number(detail?.price || 0), 0);
     const feePrice = Math.round(basePrice * feeRate);
     const totalPrice = basePrice + feePrice;
 
+    return { feeRate, basePrice, feePrice, totalPrice };
+}
+
+function getPaymentPriceSummary(payment) {
+    const feeRate = Number(document.querySelector(".pay-modal")?.dataset.feeRate || 0.1);
+    const basePrice = Math.max(Number(payment?.originalAmount || 0), 0);
+    const feePrice = Math.max(Number(payment?.totalFee || 0), 0);
+    const totalPrice = Math.max(Number(payment?.totalPrice || 0), 0);
     return { feeRate, basePrice, feePrice, totalPrice };
 }
 
@@ -94,7 +111,7 @@ async function apiRequest(url, options = {}) {
 }
 
 function renderPaymentPage(detail) {
-    const summary = getPriceSummary(detail);
+    const summary = getWorkPriceSummary(detail);
     const productImage = document.getElementById("productImage");
     const creatorName = document.getElementById("creatorName");
     const productName = document.getElementById("productName");
@@ -121,6 +138,36 @@ function renderPaymentPage(detail) {
     if (paymentStatusLabel) paymentStatusLabel.textContent = "결제 대기";
 }
 
+function renderPendingPaymentPage(payment) {
+    const summary = getPaymentPriceSummary(payment);
+    const productImage = document.getElementById("productImage");
+    const creatorName = document.getElementById("creatorName");
+    const productName = document.getElementById("productName");
+    const licenseTypeLabel = document.getElementById("licenseTypeLabel");
+    const displayOriginalPrice = document.getElementById("displayOriginalPrice");
+    const displayFeePrice = document.getElementById("displayFeePrice");
+    const displayTotalPrice = document.getElementById("displayTotalPrice");
+    const displayFeeCaption = document.getElementById("displayFeeCaption");
+    const paySubmitLabel = document.getElementById("paySubmitLabel");
+    const paymentStatusLabel = document.getElementById("paymentStatusLabel");
+
+    if (productImage) {
+        productImage.src = payment?.workThumbnail || "/images/BIDEO_LOGO/BIDEO.png";
+        productImage.alt = payment?.workTitle || "작품 이미지";
+    }
+    if (creatorName) creatorName.textContent = payment?.sellerNickname || "판매자";
+    if (productName) creatorName && (productName.textContent = payment?.workTitle || "낙찰 작품");
+    if (licenseTypeLabel) {
+        licenseTypeLabel.textContent = payment?.auctionId ? "경매 낙찰" : (payment?.licenseType || "라이선스 미정");
+    }
+    if (displayOriginalPrice) displayOriginalPrice.textContent = formatCurrency(summary.basePrice);
+    if (displayFeePrice) displayFeePrice.textContent = formatCurrency(summary.feePrice);
+    if (displayTotalPrice) displayTotalPrice.textContent = formatCurrency(summary.totalPrice);
+    if (displayFeeCaption) displayFeeCaption.textContent = `플랫폼 수수료 ${Math.round(summary.feeRate * 100)}%`;
+    if (paySubmitLabel) paySubmitLabel.textContent = `${formatCurrency(summary.totalPrice)} 결제하기`;
+    if (paymentStatusLabel) paymentStatusLabel.textContent = "결제 대기";
+}
+
 function setSubmittingState(isSubmitting) {
     payState.submitting = isSubmitting;
     const button = document.getElementById("paySubmitButton");
@@ -133,21 +180,48 @@ function setSubmittingState(isSubmitting) {
 }
 
 async function loadWorkForPayment() {
-    const params = new URLSearchParams(window.location.search);
-    const workId = params.get("workId");
+    const workId = resolveLongParam("workId");
 
     if (!workId) {
         throw new Error("결제할 작품 정보가 없습니다.");
     }
 
-    payState.workId = Number(workId);
+    payState.workId = workId;
 
     const detail = await apiRequest(`/api/works/${workId}`);
     payState.workDetail = detail;
     renderPaymentPage(detail);
 }
 
+async function loadPendingAuctionPayment() {
+    payState.paymentId = resolveLongParam("paymentId");
+    payState.auctionId = resolveLongParam("auctionId");
+
+    if (!payState.paymentId && payState.auctionId) {
+        const pendingPayment = await apiRequest(`/api/payments/pending/auction/${payState.auctionId}`);
+        payState.paymentId = Number(pendingPayment?.id || 0) || null;
+    }
+
+    if (!payState.paymentId) {
+        throw new Error("결제 대기 내역이 없습니다.");
+    }
+
+    const payment = await apiRequest(`/api/payments/${payState.paymentId}`);
+    payState.payment = payment;
+    payState.paymentDetail = payment;
+    payState.workId = payment?.workId || null;
+    payState.auctionId = payment?.auctionId || payState.auctionId;
+    renderPendingPaymentPage(payment);
+}
+
 async function createOrderAndPayment() {
+    if (payState.paymentId && payState.payment) {
+        return {
+            order: payState.order || { buyerId: null },
+            payment: payState.payment
+        };
+    }
+
     if (!payState.workId || !payState.workDetail) {
         throw new Error("결제 작품 정보가 없습니다.");
     }
@@ -209,7 +283,12 @@ function redirectToPaymentHistory() {
 
 async function requestBootpayPayment(order, payment) {
     const { bootpayJsApplicationId, bootpayPg } = getPayMeta();
-    const summary = getPriceSummary(payState.workDetail);
+    const summary = payState.paymentId
+        ? getPaymentPriceSummary(payment)
+        : getWorkPriceSummary(payState.workDetail);
+    const orderName = payState.paymentId
+        ? (payment?.workTitle || "낙찰 작품 결제")
+        : (payState.workDetail?.title || "작품 결제");
 
     if (!bootpayJsApplicationId) {
         throw new Error("부트페이 Javascript 키가 설정되지 않았습니다.");
@@ -222,7 +301,7 @@ async function requestBootpayPayment(order, payment) {
     const result = await Bootpay.requestPayment({
         application_id: bootpayJsApplicationId,
         price: summary.totalPrice,
-        order_name: payState.workDetail?.title || "작품 결제",
+        order_name: orderName,
         order_id: payment.paymentCode,
         pg: bootpayPg,
         method: "card",
@@ -233,8 +312,8 @@ async function requestBootpayPayment(order, payment) {
         },
         items: [
             {
-                id: String(payState.workId),
-                name: payState.workDetail?.title || "작품",
+                id: String(payState.workId || payState.auctionId || payment?.id || ""),
+                name: orderName,
                 qty: 1,
                 price: summary.totalPrice
             }
@@ -286,7 +365,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     selectPayMethod("bootpay");
 
     try {
-        await loadWorkForPayment();
+        if (resolveLongParam("paymentId") || resolveLongParam("auctionId")) {
+            await loadPendingAuctionPayment();
+        } else {
+            await loadWorkForPayment();
+        }
     } catch (error) {
         alert(error.message || "결제 작품 정보를 불러오지 못했습니다.");
     }

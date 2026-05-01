@@ -33,8 +33,18 @@ document.addEventListener("DOMContentLoaded", function () {
     if (noti.targetType === "MESSAGE" && noti.messageRoomId) return "#";
     if (noti.targetType === "WORK" && noti.targetId) return "/work/detail/" + noti.targetId;
     if (noti.targetType === "GALLERY" && noti.targetId) return "/gallery/" + noti.targetId;
-    if (noti.targetType === "AUCTION" && noti.targetId) return "/payment/pay-api?auctionId=" + noti.targetId;
-    if (noti.targetType === "PAYMENT" && noti.targetId) return "/payment/pay-api?paymentId=" + noti.targetId;
+    if (noti.targetType === "AUCTION" && noti.targetId) {
+      if (noti.notiType === "AUCTION_END") {
+        return "/payment/pay-api?auctionId=" + noti.targetId;
+      }
+      return "#";
+    }
+    if (noti.targetType === "PAYMENT" && noti.targetId) {
+      if (noti.paymentStatus === "PENDING" || noti.paymentStatus === "AUTHORIZED") {
+        return "/payment/pay-api?paymentId=" + noti.targetId;
+      }
+      return "#";
+    }
     if (noti.targetType === "PAYMENT_HISTORY") return "/dashboard?tab=payment";
     if (noti.targetType === "CONTEST" && noti.targetId) return "/contest/" + noti.targetId;
     return "#";
