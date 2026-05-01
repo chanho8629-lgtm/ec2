@@ -32,9 +32,23 @@ public class PaymentAPIController {
         return ResponseEntity.ok(paymentService.payWithRegisteredCard(userDetails.getId(), requestDTO));
     }
 
+    @PostMapping("/{id}/easy")
+    public ResponseEntity<PaymentResponseDTO> payPendingWithRegisteredCard(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(paymentService.payPendingWithRegisteredCard(userDetails.getId(), id));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PaymentResponseDTO> getPaymentDetail(@PathVariable Long id) {
         return ResponseEntity.ok(paymentService.getPaymentDetail(id));
+    }
+
+    @GetMapping("/pending/auction/{auctionId}")
+    public ResponseEntity<PaymentResponseDTO> getPendingAuctionPayment(
+            @PathVariable Long auctionId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(paymentService.getPendingAuctionPayment(userDetails.getId(), auctionId));
     }
 
     @GetMapping("/my")

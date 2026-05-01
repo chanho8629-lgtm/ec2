@@ -66,10 +66,18 @@
                                                    th:text="|@${gallery.memberNickname}|">@artist</a>
 
 
-                                                <p class="hero-meta"
-                                                   th:text="|작품 ${gallery != null and gallery.workCount != null ? gallery.workCount : 0}개 · 조회수 ${gallery != null and gallery.viewCount != null ? gallery.viewCount : 0}회|">작품 0개 · 조회수 0회</p>
+                                                 <p class="hero-meta"
+                                                    th:text="|작품 ${gallery != null and gallery.workCount != null ? gallery.workCount : 0}개 · 조회수 ${gallery != null and gallery.viewCount != null ? gallery.viewCount : 0}회|">작품 0개 · 조회수 0회</p>
 
-                                                <!-- [추가] 시청하기 아래 썸네일 내비게이션 영역 -->
+                                                <div class="gallery-hero-tags"
+                                                     th:if="${gallery != null and gallery.tags != null and !#lists.isEmpty(gallery.tags)}">
+                                                    <a class="gallery-hero-tag"
+                                                       th:each="tag : ${gallery.tags}"
+                                                       th:href="@{/main(tag=${tag.tagName})}"
+                                                       th:text="'#' + ${tag.tagName}">#태그</a>
+                                                </div>
+
+                                                 <!-- [추가] 시청하기 아래 썸네일 내비게이션 영역 -->
                                                 <!-- <div id="pagination-thumbnails" class="style-scope ytd-carousel-item-renderer">
                                                     <button class="selected style-scope ytd-carousel-item-renderer">
                                                         <div class="thumb-img-wrapper">
@@ -114,11 +122,19 @@
                                         <a class="video-item"
                                            th:if="${gallery != null and !#lists.isEmpty(gallery.works)}"
                                            th:each="work : ${gallery.works}"
+                                           th:attr="data-work-id=${work.id}"
                                            th:href="@{/work/detail/{id}(id=${work.id})}">
                                             <div class="thumb">
                                                 <img th:if="${work.thumbnailUrl != null and !#strings.isEmpty(work.thumbnailUrl)}"
+                                                     th:unless="${work.thumbnailFileType != null and #strings.startsWith(work.thumbnailFileType, 'video/')}"
                                                      th:src="${work.thumbnailUrl}"
                                                      th:alt="${work.title}">
+                                                <video th:if="${work.thumbnailUrl != null and !#strings.isEmpty(work.thumbnailUrl) and work.thumbnailFileType != null and #strings.startsWith(work.thumbnailFileType, 'video/')}"
+                                                       th:src="${work.thumbnailUrl}"
+                                                       muted
+                                                       loop
+                                                       playsinline
+                                                       preload="metadata"></video>
                                             </div>
                                             <div class="item-meta">
                                                 <div class="item-avatar">
@@ -273,6 +289,43 @@
                     event.preventDefault();
                     event.stopPropagation();
                     window.location.href = profileUrl;
+                });
+            });
+
+            document.querySelectorAll(".video-item").forEach((item) => {
+                const workId = item.getAttribute("data-work-id");
+                const video = item.querySelector("video");
+
+                if (video) {
+                    video.pause();
+                    video.currentTime = 0;
+
+                    item.addEventListener("mouseenter", () => {
+                        video.play().catch(() => {});
+                    });
+
+                    item.addEventListener("mouseleave", () => {
+                        video.pause();
+                        video.currentTime = 0;
+                    });
+                }
+
+                item.addEventListener("click", async (event) => {
+                    const href = item.getAttribute("href");
+                    if (!workId || !href || event.defaultPrevented) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    try {
+                        await fetch(`/api/works/${workId}/views`, {
+                            method: "POST",
+                            keepalive: true
+                        });
+                    } catch (_) {
+                        // 조회수 반영 실패가 상세 이동을 막으면 안 된다.
+                    }
+                    window.location.href = href;
                 });
             });
         })();

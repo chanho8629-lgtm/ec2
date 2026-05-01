@@ -84,6 +84,16 @@
   min-height: 100vh;
 }
 
+.main-tag-heading {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  margin: 0 0 16px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f0f0f;
+}
+
 /* 카드 그리드 */
 .shelf-grid {
   display: grid;

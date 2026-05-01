@@ -17,6 +17,8 @@ public interface AuctionMapper {
 
     AuctionDetailResponseDTO selectActiveAuctionByWorkId(@Param("workId") Long workId);
 
+    AuctionDetailResponseDTO selectAuctionDetailById(@Param("auctionId") Long auctionId);
+
     List<AuctionListResponseDTO> selectAuctions(AuctionSearchDTO searchDTO);
 
     int countAuctions(AuctionSearchDTO searchDTO);
@@ -26,19 +28,30 @@ public interface AuctionMapper {
 
     AuctionVO selectById(@Param("auctionId") Long auctionId);
 
+    AuctionVO selectLatestByWorkId(@Param("workId") Long workId);
+
+    List<AuctionVO> selectExpiredActiveAuctions();
+
     void updateCurrentPrice(@Param("auctionId") Long auctionId,
                             @Param("currentPrice") Long currentPrice,
                             @Param("bidCount") Integer bidCount);
 
-    void updateStatus(@Param("auctionId") Long auctionId,
-                      @Param("status") String status);
+    int updateStatus(@Param("auctionId") Long auctionId,
+                     @Param("status") String status);
+
+    int updateStatusIfActive(@Param("auctionId") Long auctionId,
+                             @Param("status") String status);
 
     void updateStatusByWorkId(@Param("workId") Long workId,
                               @Param("status") String status);
 
-    void updateWinner(@Param("auctionId") Long auctionId,
-                      @Param("winnerId") Long winnerId,
-                      @Param("finalPrice") Integer finalPrice);
+    int updateWinner(@Param("auctionId") Long auctionId,
+                     @Param("winnerId") Long winnerId,
+                     @Param("finalPrice") Long finalPrice);
+
+    int updateWinnerIfActive(@Param("auctionId") Long auctionId,
+                             @Param("winnerId") Long winnerId,
+                             @Param("finalPrice") Long finalPrice);
 
     boolean existsWishlist(@Param("memberId") Long memberId,
                            @Param("auctionId") Long auctionId);

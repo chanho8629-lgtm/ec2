@@ -42,6 +42,9 @@
     <div th:replace="~{layout/layout :: ytShellChrome('home')}"></div>
     <main class="bd-shell__page-content">
     <div class="main-page">
+        <div class="main-tag-heading" th:if="${selectedTag != null and !#strings.isEmpty(selectedTag)}">
+            <span th:text="'#' + ${selectedTag}">#태그</span>
+        </div>
         <div class="shelf-grid" th:if="${galleries != null and !galleries.isEmpty()}">
             <div class="shelf-card" th:each="gallery : ${galleries}">
                 <a th:href="@{'/gallery/' + ${gallery.id}}">

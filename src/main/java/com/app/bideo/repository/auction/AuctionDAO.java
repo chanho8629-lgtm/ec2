@@ -26,6 +26,10 @@ public class AuctionDAO {
         return Optional.ofNullable(auctionMapper.selectActiveAuctionByWorkId(workId));
     }
 
+    public Optional<AuctionDetailResponseDTO> findDetailById(Long auctionId) {
+        return Optional.ofNullable(auctionMapper.selectAuctionDetailById(auctionId));
+    }
+
     public List<AuctionListResponseDTO> findAuctions(AuctionSearchDTO searchDTO) {
         return auctionMapper.selectAuctions(searchDTO);
     }
@@ -42,20 +46,36 @@ public class AuctionDAO {
         return auctionMapper.selectById(auctionId);
     }
 
+    public Optional<AuctionVO> findLatestByWorkId(Long workId) {
+        return Optional.ofNullable(auctionMapper.selectLatestByWorkId(workId));
+    }
+
+    public List<AuctionVO> findExpiredActiveAuctions() {
+        return auctionMapper.selectExpiredActiveAuctions();
+    }
+
     public void updateCurrentPrice(Long auctionId, Long currentPrice, Integer bidCount) {
         auctionMapper.updateCurrentPrice(auctionId, currentPrice, bidCount);
     }
 
-    public void updateStatus(Long auctionId, String status) {
-        auctionMapper.updateStatus(auctionId, status);
+    public int updateStatus(Long auctionId, String status) {
+        return auctionMapper.updateStatus(auctionId, status);
+    }
+
+    public int updateStatusIfActive(Long auctionId, String status) {
+        return auctionMapper.updateStatusIfActive(auctionId, status);
     }
 
     public void updateStatusByWorkId(Long workId, String status) {
         auctionMapper.updateStatusByWorkId(workId, status);
     }
 
-    public void updateWinner(Long auctionId, Long winnerId, Integer finalPrice) {
-        auctionMapper.updateWinner(auctionId, winnerId, finalPrice);
+    public int updateWinner(Long auctionId, Long winnerId, Long finalPrice) {
+        return auctionMapper.updateWinner(auctionId, winnerId, finalPrice);
+    }
+
+    public int updateWinnerIfActive(Long auctionId, Long winnerId, Long finalPrice) {
+        return auctionMapper.updateWinnerIfActive(auctionId, winnerId, finalPrice);
     }
 
     public boolean existsWishlist(Long memberId, Long auctionId) {

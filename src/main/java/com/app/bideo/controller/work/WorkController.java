@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/work")
@@ -63,14 +64,15 @@ public class WorkController {
 
     // 쇼츠형 추천 피드 진입 — 시드 작품으로 시작, 이후 클라이언트가 무한 스크롤로 다음 작품 로드
     @GetMapping("/feed")
-    public String feed(Model model) {
-        Long seedId = workService.resolveFeedSeedId();
+    public String feed(@RequestParam(required = false) String tag, Model model) {
+        Long seedId = workService.resolveFeedSeedId(tag);
         if (seedId == null) {
             return "redirect:/";
         }
         WorkDetailResponseDTO work = workService.getWorkDetail(seedId);
         model.addAttribute("work", work);
         model.addAttribute("feedMode", true);
+        model.addAttribute("feedTag", tag);
         return "work/workdetail";
     }
 

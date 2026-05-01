@@ -13,11 +13,16 @@ import java.time.LocalDateTime;
 @Builder
 public class BidBroadcastDTO {
     private Long auctionId;
+    private String status;
     private Long memberId;
     private String memberNickname;
     private Long bidPrice;
     private Long currentPrice;
     private Integer bidCount;
     private Long nextMinBid;      // currentPrice + bidIncrement
+    private Long winnerId;
+    private String winnerNickname;
+    private Long finalPrice;
+    private Long paymentId;
     private LocalDateTime createdDatetime;
 }

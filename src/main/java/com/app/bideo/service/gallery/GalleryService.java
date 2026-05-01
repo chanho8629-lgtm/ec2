@@ -224,11 +224,31 @@ public class GalleryService {
         List<CommentResponseDTO> comments = galleryDAO.findCommentsByGalleryId(id);
         Long memberId = resolveAuthenticatedMemberId();
         comments.forEach(comment -> {
-            comment.setMemberProfileImage(s3FileService.getPresignedUrl(comment.getMemberProfileImage()));
-            comment.setIsLiked(memberId != null && commentService.isLikedByCurrentMember(comment.getId()));
-            comment.setIsOwner(memberId != null && memberId.equals(comment.getMemberId()));
+            applyCommentProfileUrls(comment);
+            applyCommentState(comment, memberId);
         });
         return comments;
+    }
+
+    private void applyCommentProfileUrls(CommentResponseDTO comment) {
+        if (comment == null) {
+            return;
+        }
+        comment.setMemberProfileImage(s3FileService.getPresignedUrl(comment.getMemberProfileImage()));
+        if (comment.getReplies() != null) {
+            comment.getReplies().forEach(this::applyCommentProfileUrls);
+        }
+    }
+
+    private void applyCommentState(CommentResponseDTO comment, Long memberId) {
+        if (comment == null) {
+            return;
+        }
+        comment.setIsLiked(memberId != null && commentService.isLikedByCurrentMember(comment.getId()));
+        comment.setIsOwner(memberId != null && memberId.equals(comment.getMemberId()));
+        if (comment.getReplies() != null) {
+            comment.getReplies().forEach(reply -> applyCommentState(reply, memberId));
+        }
     }
 
     public List<CommentResponseDTO> writeComment(Long galleryId, Long memberId, String content) {
@@ -362,7 +382,7 @@ public class GalleryService {
                 .map(this::normalizeTagName)
                 .filter(Objects::nonNull)
                 .distinct()
-                .map(this::findOrCreateTagId)
+                .map(this::requireExistingTagId)
                 .toList();
     }
 
@@ -379,12 +399,8 @@ public class GalleryService {
         return normalized.isBlank() ? null : normalized;
     }
 
-    private Long findOrCreateTagId(String tagName) {
+    private Long requireExistingTagId(String tagName) {
         return galleryDAO.findTagIdByName(tagName)
-                .orElseGet(() -> {
-                    galleryDAO.saveTagName(tagName);
-                    return galleryDAO.findTagIdByName(tagName)
-                            .orElseThrow(() -> new IllegalStateException("tag save failed"));
-                });
+                .orElseThrow(() -> new IllegalArgumentException("등록된 태그만 선택할 수 있습니다: " + tagName));
     }
 }

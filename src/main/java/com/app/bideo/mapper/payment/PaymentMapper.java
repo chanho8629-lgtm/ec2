@@ -18,6 +18,9 @@ public interface PaymentMapper {
 
     PaymentResponseDTO selectByPaymentCode(@Param("paymentCode") String paymentCode);
 
+    PaymentResponseDTO selectPendingByBuyerAndAuction(@Param("buyerId") Long buyerId,
+                                                      @Param("auctionId") Long auctionId);
+
     List<PaymentResponseDTO> selectByBuyerId(@Param("buyerId") Long buyerId,
                                               @Param("offset") int offset,
                                               @Param("limit") int limit);

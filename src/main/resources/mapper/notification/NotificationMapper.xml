@@ -21,6 +21,7 @@
                 ELSE NULL
             END AS message_room_id,
             n.message,
+            payment_target.status AS payment_status,
             n.is_read,
             n.created_datetime
         FROM tbl_notification n
@@ -28,6 +29,9 @@
         LEFT JOIN tbl_message message_target
             ON n.target_type = 'MESSAGE'
            AND n.target_id = message_target.id
+        LEFT JOIN tbl_payment payment_target
+            ON n.target_type = 'PAYMENT'
+           AND n.target_id = payment_target.id
         WHERE n.member_id = #{memberId}
         ORDER BY n.created_datetime DESC
         LIMIT #{limit} OFFSET #{offset}
