@@ -1,5 +1,7 @@
 package com.app.bideo.service.admin;
 
+import com.app.bideo.aop.annotation.LogStatus;
+import com.app.bideo.aop.annotation.LogStatusWithReturn;
 import com.app.bideo.dto.admin.AdminSearchDTO;
 import com.app.bideo.dto.admin.AdminWorkDetailResponseDTO;
 import com.app.bideo.dto.admin.AdminWorkListResponseDTO;
@@ -25,18 +27,21 @@ public class AdminWorkService {
     @Transactional(readOnly = true)
     @Cacheable(value = "admin:works:list",
             key = "(#searchDTO?.keyword?:'')+'|'+(#searchDTO?.status?:'')+'|'+(#searchDTO?.page?:1)+'|'+(#searchDTO?.size?:30)")
+    @LogStatusWithReturn
     public List<AdminWorkListResponseDTO> getWorks(AdminSearchDTO searchDTO) {
         return adminWorkDAO.findAll(searchDTO);
     }
 
     @Transactional(readOnly = true)
     @Cacheable(value = "admin:works:detail", key = "#id")
+    @LogStatusWithReturn
     public AdminWorkDetailResponseDTO getWorkDetail(Long id) {
         return adminWorkDAO.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("work not found"));
     }
 
     @CacheEvict(value = {"admin:works:list", "admin:works:detail", "admin:works:count"}, allEntries = true)
+    @LogStatus
     public void updateWorkStatus(Long id, String status) {
         if (status == null || !VALID_WORK_STATUSES.contains(status)) {
             throw new IllegalArgumentException("invalid work status: " + status);
@@ -47,6 +52,7 @@ public class AdminWorkService {
     @Transactional(readOnly = true)
     @Cacheable(value = "admin:works:count",
             key = "(#searchDTO?.keyword?:'')+'|'+(#searchDTO?.status?:'')")
+    @LogStatusWithReturn
     public int getWorkCount(AdminSearchDTO searchDTO) {
         return adminWorkDAO.count(searchDTO);
     }

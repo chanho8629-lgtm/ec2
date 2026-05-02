@@ -20,7 +20,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin/restrictions")
 @RequiredArgsConstructor
-public class AdminRestrictionAPIController {
+public class AdminRestrictionAPIController implements AdminRestrictionAPIControllerDocs {
 
     private final AdminRestrictionService adminRestrictionService;
 

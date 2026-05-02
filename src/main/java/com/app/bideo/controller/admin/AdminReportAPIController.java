@@ -17,7 +17,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin/reports")
 @RequiredArgsConstructor
-public class AdminReportAPIController {
+public class AdminReportAPIController implements AdminReportAPIControllerDocs {
 
     private final AdminReportService adminReportService;
 
