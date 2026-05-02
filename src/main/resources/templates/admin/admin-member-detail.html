@@ -6,7 +6,6 @@
 <head>
     <meta charset="UTF-8">
     <title>회원 상세 - BIDEO Admin</title>
-    <link rel="stylesheet" href="/css/admin/admin-style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -21,6 +20,7 @@
             회원 상세
             <span th:if="${member.status == 'ACTIVE'}" class="status-badge status-active">활동</span>
             <span th:if="${member.status == 'SUSPENDED'}" class="status-badge status-urgent">정지</span>
+            <span th:if="${member.status == 'BANNED'}" class="status-badge status-urgent">차단</span>
         </h1>
         <div>
             <button th:if="${member.status == 'ACTIVE'}"
@@ -50,7 +50,8 @@
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">가입일</span>
-                    <span class="detail-field-value" th:text="${member.createdAt}">2024-01-01</span>
+                    <span class="detail-field-value"
+                          th:text="${member.createdAt != null} ? ${#temporals.format(member.createdAt, 'yyyy.MM.dd HH:mm')} : '-'">-</span>
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">회원 유형</span>
@@ -79,35 +80,36 @@
                 <div class="detail-field">
                     <span class="detail-field-label">회원 상태</span>
                     <span class="detail-field-value"
-                          th:text="${member.status == 'ACTIVE'} ? '활동' : '정지'">활동</span>
+                          th:with="statusLabel=${member.status == 'ACTIVE'} ? '활동' : (${member.status == 'SUSPENDED'} ? '정지' : (${member.status == 'BANNED'} ? '차단' : ${member.status}))"
+                          th:text="${statusLabel}">활동</span>
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">최종 로그인</span>
-                    <span class="detail-field-value" th:text="${member.lastLoginAt}">2024-01-01 12:00</span>
+                    <span class="detail-field-value"
+                          th:text="${member.lastLoginAt != null} ? ${#temporals.format(member.lastLoginAt, 'yyyy.MM.dd HH:mm')} : '-'">-</span>
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">최종 활동</span>
-                    <span class="detail-field-value" th:text="${member.lastActivityAt} ?: '-'">-</span>
+                    <span class="detail-field-value"
+                          th:text="${member.lastActivityAt != null} ? ${#temporals.format(member.lastActivityAt, 'yyyy.MM.dd HH:mm')} : '-'">-</span>
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">신고 횟수</span>
-                    <span class="detail-field-value"
-                          th:text="${member.reportCount} ?: '0건'"
+                    <span th:text="(${member.reportCount} ?: 0) + '건'"
                           th:class="'detail-field-value ' + (${member.reportCount != null and member.reportCount > 0} ? 'text-warn' : '')">0건</span>
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">결제 실패</span>
-                    <span class="detail-field-value"
-                          th:text="${member.failedPaymentCount} ?: '0회'"
+                    <span th:text="(${member.failedPaymentCount} ?: 0) + '회'"
                           th:class="'detail-field-value ' + (${member.failedPaymentCount != null and member.failedPaymentCount > 0} ? 'text-warn' : '')">0회</span>
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">환불</span>
-                    <span class="detail-field-value" th:text="${member.refundCount} ?: '0건'">0건</span>
+                    <span class="detail-field-value" th:text="(${member.refundCount} ?: 0) + '건'">0건</span>
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">정지 이력</span>
-                    <span class="detail-field-value" th:text="${member.suspensionCount} ?: '0회'">0회</span>
+                    <span class="detail-field-value" th:text="(${member.suspensionCount} ?: 0) + '회'">0회</span>
                 </div>
             </div>
         </div>
@@ -129,16 +131,16 @@
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">판매 작품</span>
-                    <span class="detail-field-value" th:text="${member.soldCount} ?: '0건'">0건</span>
+                    <span class="detail-field-value" th:text="(${member.soldCount} ?: 0) + '건'">0건</span>
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">경매 낙찰</span>
-                    <span class="detail-field-value" th:text="${member.auctionWinCount} ?: '0건'">0건</span>
+                    <span class="detail-field-value" th:text="(${member.auctionWinCount} ?: 0) + '건'">0건</span>
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">총 거래액</span>
                     <span class="detail-field-value text-info"
-                          th:text="${member.totalTransactionAmount != null} ? ${#numbers.formatInteger(member.totalTransactionAmount, 1, 'COMMA')} + '원' : '0원'">0원</span>
+                          th:text="${#numbers.formatInteger(member.totalTransactionAmount ?: 0, 0, 'COMMA')} + ' 원'">0 원</span>
                 </div>
             </div>
 
@@ -146,8 +148,7 @@
                 <h3 class="detail-section-title">출금 현황</h3>
                 <div class="detail-field">
                     <span class="detail-field-label">출금 대기</span>
-                    <span class="detail-field-value"
-                          th:text="${member.pendingWithdrawalCount} ?: '0건'"
+                    <span th:text="(${member.pendingWithdrawalCount} ?: 0) + '건'"
                           th:class="'detail-field-value ' + (${member.pendingWithdrawalCount != null and member.pendingWithdrawalCount > 0} ? 'text-warn' : '')">0건</span>
                 </div>
                 <div class="detail-field">
@@ -177,7 +178,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-outline" onclick="closeModal('suspendModal')">취소</button>
-                <button class="btn btn-primary">확인</button>
+                <button class="btn btn-primary" id="suspendConfirmBtn">확인</button>
             </div>
         </div>
     </div>
@@ -187,10 +188,79 @@
             <div class="modal-body">계정 정지를 해제합니다.</div>
             <div class="modal-footer">
                 <button class="btn btn-outline" onclick="closeModal('unsuspendModal')">취소</button>
-                <button class="btn btn-primary">확인</button>
+                <button class="btn btn-primary" id="unsuspendConfirmBtn">확인</button>
             </div>
         </div>
     </div>
 </div>
+<th:block layout:fragment="scripts">
+    <script th:inline="javascript">
+        (function() {
+            var memberId = /*[[${member.id}]]*/ 0;
+
+            function fail(btn, msg) {
+                showToast(msg);
+                if (btn) btn.disabled = false;
+            }
+
+            function reloadAfter(ms) {
+                setTimeout(function() { location.reload(); }, ms || 600);
+            }
+
+            var suspendBtn = document.getElementById('suspendConfirmBtn');
+            if (suspendBtn) {
+                suspendBtn.addEventListener('click', function() {
+                    var endDateInput = document.getElementById('suspendEndDate');
+                    var reasonInput = document.getElementById('suspendReason');
+                    var endDate = endDateInput ? endDateInput.value : '';
+                    var reason = reasonInput ? reasonInput.value.trim() : '';
+                    if (!endDate) { showToast('제한 종료일을 선택하세요'); endDateInput && endDateInput.focus(); return; }
+                    if (!reason) { showToast('제한 사유를 입력하세요'); reasonInput && reasonInput.focus(); return; }
+
+                    suspendBtn.disabled = true;
+                    fetch('/api/admin/restrictions', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({
+                            memberId: memberId,
+                            restrictionType: 'LIMIT',
+                            reason: reason,
+                            endDatetime: endDate + 'T23:59:59'
+                        })
+                    }).then(function(r) {
+                        if (r.ok) { showToast('정지 처리되었습니다'); reloadAfter(); }
+                        else { fail(suspendBtn, '처리 실패'); }
+                    }).catch(function() { fail(suspendBtn, '네트워크 오류'); });
+                });
+            }
+
+            var unsuspendBtn = document.getElementById('unsuspendConfirmBtn');
+            if (unsuspendBtn) {
+                unsuspendBtn.addEventListener('click', function() {
+                    unsuspendBtn.disabled = true;
+                    fetch('/api/admin/restrictions/active/member/' + memberId)
+                        .then(function(r) {
+                            if (r.status === 204) {
+                                return fetch('/api/admin/members/' + memberId + '/status', {
+                                    method: 'PATCH',
+                                    headers: {'Content-Type': 'application/json'},
+                                    body: JSON.stringify({ status: 'ACTIVE' })
+                                });
+                            }
+                            if (!r.ok) throw new Error('lookup failed');
+                            return r.json().then(function(restriction) {
+                                return fetch('/api/admin/restrictions/' + restriction.id + '/release', { method: 'PATCH' });
+                            });
+                        })
+                        .then(function(r) {
+                            if (r && r.ok) { showToast('해제되었습니다'); reloadAfter(); }
+                            else { fail(unsuspendBtn, '처리 실패'); }
+                        })
+                        .catch(function() { fail(unsuspendBtn, '네트워크 오류'); });
+                });
+            }
+        })();
+    </script>
+</th:block>
 </body>
 </html>

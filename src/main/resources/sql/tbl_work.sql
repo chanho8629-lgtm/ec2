@@ -16,6 +16,7 @@ create table tbl_work (
     allow_comment boolean        not null default true,
     show_similar  boolean        not null default true,
     link_url      varchar(255)   null,
+    thumbnail     varchar(500)   null,
     view_count    int        not null default 0,
     like_count    int        not null default 0,
     save_count    int        not null default 0,
@@ -42,6 +43,7 @@ comment on column tbl_work.is_tradable is '거래 가능 여부';
 comment on column tbl_work.allow_comment is '댓글 허용';
 comment on column tbl_work.show_similar is '비슷한 작품 표시';
 comment on column tbl_work.link_url is '외부 링크 URL';
+comment on column tbl_work.thumbnail is '썸네일 이미지 URL';
 comment on column tbl_work.view_count is '조회수 (비정규화)';
 comment on column tbl_work.like_count is '좋아요 수 (비정규화)';
 comment on column tbl_work.save_count is '저장 수 (비정규화)';

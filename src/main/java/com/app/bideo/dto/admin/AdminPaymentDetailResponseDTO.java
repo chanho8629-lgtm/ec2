@@ -2,6 +2,8 @@ package com.app.bideo.dto.admin;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -9,19 +11,21 @@ import lombok.*;
 @Builder
 public class AdminPaymentDetailResponseDTO {
     private Long id;
-    private String orderCode;
-    private String workTitle;
-    private String sellerName;
+    private String orderNumber;
+    private String artworkTitle;
+    private String artistNickname;
     private Long sellerId;
-    private String orderType;
-    private Long totalPrice;
-    private Long totalFee;
+    private String type;
+    private Long price;
+    private Long commissionAmount;
     private Long settlementAmount;
+    private Long totalAmount;
     private String buyerName;
     private String buyerEmail;
-    private String payMethod;
+    private String buyerPhone;
+    private String paymentMethod;
     private String cardNumber;
-    private String paidAt;
-    private String paymentCode;
+    private LocalDateTime paidAt;
+    private String approvalNumber;
     private String status;
 }

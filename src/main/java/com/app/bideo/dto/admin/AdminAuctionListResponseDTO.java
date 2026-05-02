@@ -10,12 +10,13 @@ import lombok.*;
 public class AdminAuctionListResponseDTO {
     private Long id;
     private String auctionCode;
-    private String workTitle;
-    private String artistName;
-    private String winnerName;
-    private Long startingPrice;
-    private Long finalPrice;
+    private String artworkTitle;
+    private String artistNickname;
+    private Long winnerId;
+    private String winnerNickname;
+    private Long startPrice;
+    private Long winningPrice;
     private Integer bidCount;
-    private String closingAt;
+    private String endAt;
     private String status;
 }

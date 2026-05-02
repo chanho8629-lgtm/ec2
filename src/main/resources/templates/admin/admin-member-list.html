@@ -6,7 +6,6 @@
 <head>
     <meta charset="UTF-8">
     <title>회원관리 - BIDEO Admin</title>
-    <link rel="stylesheet" href="/css/admin/admin-style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -32,14 +31,14 @@
     <table class="data-table">
         <thead>
         <tr>
-            <th style="width:50px">번호</th>
-            <th style="width:200px">이메일</th>
-            <th style="width:100px">닉네임</th>
-            <th style="width:70px">유형</th>
-            <th style="width:80px">상태</th>
-            <th style="width:90px">가입일</th>
-            <th style="width:60px">신고</th>
-            <th style="width:80px">거래건수</th>
+            <th style="width:60px">번호</th>
+            <th style="width:220px">이메일</th>
+            <th style="width:130px">닉네임</th>
+            <th style="width:80px">유형</th>
+            <th style="width:90px">상태</th>
+            <th style="width:110px">가입일</th>
+            <th style="width:70px">신고</th>
+            <th style="width:90px">거래건수</th>
         </tr>
         </thead>
         <tbody id="memberTableBody">
@@ -53,8 +52,9 @@
             <td>
                 <span th:if="${member.status == 'ACTIVE'}" class="status-badge status-active">활동</span>
                 <span th:if="${member.status == 'SUSPENDED'}" class="status-badge status-urgent">정지</span>
+                <span th:if="${member.status == 'BANNED'}" class="status-badge status-urgent">차단</span>
             </td>
-            <td th:text="${#temporals.format(member.createdAt, 'yy.MM.dd')}" th:if="${member.createdAt != null}">24.01.01</td>
+            <td th:text="${#temporals.format(member.createdAt, 'yyyy.MM.dd')}" th:if="${member.createdAt != null}">2024.01.01</td>
             <td th:if="${member.createdAt == null}">-</td>
             <td th:text="${member.reportCount} ?: 0"
                 th:style="${member.reportCount != null and member.reportCount > 0} ? 'color:var(--admin-error);font-weight:500' : ''">0</td>
@@ -67,12 +67,12 @@
         <div class="page-size-group">
             <span>페이지당 행 수:</span>
             <div class="page-size-trigger" onclick="this.classList.toggle('open'); this.querySelector('.page-size-menu').classList.toggle('open')">
-                <span class="trigger-text">30</span>
+                <span class="trigger-text">100</span>
                 <svg class="trigger-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.707 8.793a1 1 0 00-1.414 0L12 14.086 6.707 8.793a1 1 0 10-1.414 1.414L12 16.914l6.707-6.707a1 1 0 000-1.414Z"/></svg>
                 <div class="page-size-menu">
-                    <div class="page-size-menu-item selected" data-value="30">30</div>
+                    <div class="page-size-menu-item" data-value="30">30</div>
                     <div class="page-size-menu-item" data-value="50">50</div>
-                    <div class="page-size-menu-item" data-value="100">100</div>
+                    <div class="page-size-menu-item selected" data-value="100">100</div>
                 </div>
             </div>
         </div>
@@ -84,10 +84,6 @@
             <button class="page-nav-btn" disabled title="이전 페이지">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.793 5.293 7.086 12l6.707 6.707a1 1 0 101.414-1.414L9.914 12l5.293-5.293a1 1 0 10-1.414-1.414Z"/></svg>
             </button>
-            <!-- 페이지 번호 버튼 (active = 현재 페이지) -->
-            <!--<button class="page-num-btn active">1</button>-->
-            <!--<button class="page-num-btn">2</button>-->
-            <!--<button class="page-num-btn">3</button>-->
             <button class="page-nav-btn" title="다음 페이지">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.793 5.293a1 1 0 000 1.414L14.086 12l-5.293 5.293a1 1 0 101.414 1.414L16.914 12l-6.707-6.707a1 1 0 00-1.414 0Z"/></svg>
             </button>

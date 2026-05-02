@@ -48,12 +48,12 @@ public class AdminWithdrawalAPIController {
     }
 
     @PatchMapping("/{id}/approve")
-    public ResponseEntity<Map<String, String>> approve(@PathVariable Long id) {
+    public ResponseEntity<?> approve(@PathVariable Long id) {
+        Long adminId = getCurrentAdminId();
+        if (adminId == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "관리자 인증 정보가 없습니다."));
+        }
         try {
-            Long adminId = getCurrentAdminId();
-            if (adminId == null) {
-                return ResponseEntity.badRequest().body(Map.of("error", "관리자 인증 정보가 없습니다."));
-            }
             adminWithdrawalService.approveWithdrawal(id, adminId);
             return ResponseEntity.ok().build();
         } catch (IllegalArgumentException | IllegalStateException e) {
@@ -62,13 +62,17 @@ public class AdminWithdrawalAPIController {
     }
 
     @PatchMapping("/{id}/reject")
-    public ResponseEntity<Map<String, String>> reject(@PathVariable Long id, @RequestBody Map<String, String> body) {
+    public ResponseEntity<?> reject(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        Long adminId = getCurrentAdminId();
+        if (adminId == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "관리자 인증 정보가 없습니다."));
+        }
+        String reason = body == null ? null : body.get("reason");
+        if (reason == null || reason.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "반려 사유가 필요합니다."));
+        }
         try {
-            Long adminId = getCurrentAdminId();
-            if (adminId == null) {
-                return ResponseEntity.badRequest().body(Map.of("error", "관리자 인증 정보가 없습니다."));
-            }
-            adminWithdrawalService.rejectWithdrawal(id, body.get("reason"), adminId);
+            adminWithdrawalService.rejectWithdrawal(id, reason, adminId);
             return ResponseEntity.ok().build();
         } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

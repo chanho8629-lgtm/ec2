@@ -11,6 +11,9 @@ create table tbl_withdrawal_request (
     requested_amount   int             not null,
     fee                int             not null default 0,
     net_amount         int             not null,
+    bank_name          varchar(255)    null,
+    account_number     varchar(255)    null,
+    account_holder     varchar(255)    null,
     status             varchar(255)    not null default 'PENDING',
     admin_id           bigint          null,
     rejected_reason    varchar(255)    null,
@@ -38,6 +41,9 @@ comment on column tbl_withdrawal_request.settlement_id      is '연관 정산 FK
 comment on column tbl_withdrawal_request.requested_amount   is '신청 금액';
 comment on column tbl_withdrawal_request.fee                is '수수료';
 comment on column tbl_withdrawal_request.net_amount         is '실수령액';
+comment on column tbl_withdrawal_request.bank_name          is '은행명';
+comment on column tbl_withdrawal_request.account_number     is '계좌번호';
+comment on column tbl_withdrawal_request.account_holder     is '예금주명';
 comment on column tbl_withdrawal_request.status             is '상태 (PENDING/APPROVED/REJECTED/PAID)';
 comment on column tbl_withdrawal_request.admin_id           is '처리 관리자 FK';
 comment on column tbl_withdrawal_request.rejected_reason    is '반려 사유';

@@ -24,6 +24,7 @@ public class AdminInquiryAPIController {
 
     @GetMapping
     public List<InquiryResponseDTO> list(InquirySearchDTO searchDTO) {
+        searchDTO.normalize();
         return adminInquiryService.getInquiries(searchDTO);
     }
 
@@ -34,7 +35,11 @@ public class AdminInquiryAPIController {
 
     @PatchMapping("/{id}/reply")
     public ResponseEntity<Void> reply(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        adminInquiryService.replyInquiry(id, body.get("reply"));
+        String reply = body == null ? null : body.get("reply");
+        if (reply == null || reply.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        adminInquiryService.replyInquiry(id, reply);
         return ResponseEntity.ok().build();
     }
 }

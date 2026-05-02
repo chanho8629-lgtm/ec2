@@ -13,3 +13,11 @@ front
 .idea
 .gstack/
 certs
+
+### Agent skills (matt-pocock) ###
+AGENTS.md
+docs/agents/
+
+# setting file
+.yml
+.yaml

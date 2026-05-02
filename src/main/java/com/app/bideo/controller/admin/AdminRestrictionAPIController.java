@@ -26,6 +26,7 @@ public class AdminRestrictionAPIController {
 
     @GetMapping
     public List<AdminRestrictionResponseDTO> list(AdminRestrictionSearchDTO searchDTO) {
+        searchDTO.normalize();
         return adminRestrictionService.getRestrictions(searchDTO);
     }
 

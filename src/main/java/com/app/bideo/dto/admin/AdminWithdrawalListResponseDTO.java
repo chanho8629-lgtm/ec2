@@ -2,6 +2,8 @@ package com.app.bideo.dto.admin;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -11,10 +13,10 @@ public class AdminWithdrawalListResponseDTO {
     private Long id;
     private String withdrawalCode;
     private String artistName;
-    private Integer requestedAmount;
-    private Integer netAmount;
+    private Long requestAmount;
+    private Long actualAmount;
     private String bankName;
-    private String requestedAt;
-    private Integer remainingBalance;
+    private LocalDateTime requestedAt;
+    private Long remainingBalance;
     private String status;
 }

@@ -9,22 +9,25 @@
             wr.id,
             wr.withdrawal_code,
             m.nickname as artist_name,
-            wr.requested_amount,
-            wr.net_amount,
+            wr.requested_amount as request_amount,
+            wr.net_amount as actual_amount,
             wr.bank_name,
-            to_char(wr.requested_at, 'MM.DD') as requested_at,
-            coalesce((
-                select sum(s.net_amount)
-                from tbl_settlement s
-                where s.member_id = wr.member_id
-                  and s.status = 'PAID'
-            ), 0)
-            - coalesce((
-                select sum(wr2.net_amount)
-                from tbl_withdrawal_request wr2
-                where wr2.member_id = wr.member_id
-                  and wr2.status in ('APPROVED', 'PAID')
-            ), 0) as remaining_balance,
+            wr.requested_at,
+            greatest(
+                coalesce((
+                    select sum(s.net_amount)
+                    from tbl_settlement s
+                    where s.member_id = wr.member_id
+                      and s.status = 'PAID'
+                ), 0)
+                - coalesce((
+                    select sum(wr2.net_amount)
+                    from tbl_withdrawal_request wr2
+                    where wr2.member_id = wr.member_id
+                      and wr2.status in ('APPROVED', 'PAID')
+                ), 0),
+                0
+            ) as remaining_balance,
             wr.status
         from tbl_withdrawal_request wr
         join tbl_member m on wr.member_id = m.id
@@ -47,61 +50,68 @@
         select
             wr.id,
             wr.withdrawal_code,
-            m.nickname as artist_name,
+            m.nickname as artist_nickname,
             m.email as artist_email,
             m.id as artist_id,
-            m.status as member_status,
+            m.status as artist_status,
             coalesce((
                 select sum(o.total_price)
                 from tbl_order o
                 where o.seller_id = m.id
                   and o.status = 'COMPLETED'
-            ), 0) as total_sales_amount,
+            ), 0) as total_transaction_amount,
             (
-                select count(*)
-                from tbl_withdrawal_request wr2
-                where wr2.member_id = m.id
-            ) as withdrawal_history_count,
-            coalesce((
-                select sum(wr3.net_amount)
-                from tbl_withdrawal_request wr3
-                where wr3.member_id = m.id
-                  and wr3.status in ('APPROVED', 'PAID')
-            ), 0) as withdrawal_history_total,
+                (select count(*)
+                 from tbl_withdrawal_request wr2
+                 where wr2.member_id = m.id) || '회 (총 ' ||
+                coalesce((
+                    select sum(wr3.net_amount)
+                    from tbl_withdrawal_request wr3
+                    where wr3.member_id = m.id
+                      and wr3.status in ('APPROVED', 'PAID')
+                ), 0) || '원)'
+            ) as withdrawal_history,
             wr.bank_name,
             wr.account_number,
             wr.account_holder,
-            wr.requested_amount,
-            wr.fee,
+            wr.account_verified,
+            wr.requested_amount as request_amount,
+            wr.fee as commission_amount,
             wr.net_amount,
-            coalesce((
-                select sum(s.net_amount)
-                from tbl_settlement s
-                where s.member_id = m.id
-                  and s.status = 'PAID'
-            ), 0)
-            - coalesce((
-                select sum(wr4.net_amount)
-                from tbl_withdrawal_request wr4
-                where wr4.member_id = m.id
-                  and wr4.status in ('APPROVED', 'PAID')
-            ), 0) as current_balance,
-            coalesce((
-                select sum(s2.net_amount)
-                from tbl_settlement s2
-                where s2.member_id = m.id
-                  and s2.status = 'PAID'
-            ), 0)
-            - coalesce((
-                select sum(wr5.net_amount)
-                from tbl_withdrawal_request wr5
-                where wr5.member_id = m.id
-                  and wr5.status in ('APPROVED', 'PAID')
-            ), 0)
-            - wr.net_amount as after_balance,
-            to_char(wr.requested_at, 'YY.MM.DD HH24:MI') as requested_at,
-            am.nickname as approver_name,
-            to_char(wr.approved_at, 'YY.MM.DD HH24:MI') as approved_at,
+            greatest(
+                coalesce((
+                    select sum(s.net_amount)
+                    from tbl_settlement s
+                    where s.member_id = m.id
+                      and s.status = 'PAID'
+                ), 0)
+                - coalesce((
+                    select sum(wr4.net_amount)
+                    from tbl_withdrawal_request wr4
+                    where wr4.member_id = m.id
+                      and wr4.status in ('APPROVED', 'PAID')
+                ), 0),
+                0
+            ) as current_balance,
+            greatest(
+                coalesce((
+                    select sum(s2.net_amount)
+                    from tbl_settlement s2
+                    where s2.member_id = m.id
+                      and s2.status = 'PAID'
+                ), 0)
+                - coalesce((
+                    select sum(wr5.net_amount)
+                    from tbl_withdrawal_request wr5
+                    where wr5.member_id = m.id
+                      and wr5.status in ('APPROVED', 'PAID')
+                ), 0)
+                - case when wr.status = 'PENDING' then wr.net_amount else 0 end,
+                0
+            ) as balance_after,
+            wr.requested_at,
+            am.nickname as approver,
+            wr.approved_at,
             wr.rejected_reason,
             wr.status
         from tbl_withdrawal_request wr

@@ -12,6 +12,7 @@ create table tbl_report (
     detail      varchar(255) null,
     status      varchar(255)  not null default 'PENDING',
     resolved_at timestamp    null,
+    resolved_memo varchar(500) null,
     created_datetime  timestamp    not null default now(),
     updated_datetime  timestamp    not null default now(),
 
@@ -34,6 +35,7 @@ comment on column tbl_report.reason is '위반 사항 (SENSITIVE/IMPERSONATION/H
 comment on column tbl_report.detail is '상세 내용';
 comment on column tbl_report.status is '상태 (PENDING/REVIEWING/RESOLVED/CANCELLED)';
 comment on column tbl_report.resolved_at is '처리 완료 일시';
+comment on column tbl_report.resolved_memo is '관리자 처리 메모';
 
 create index idx_report_reporter on tbl_report (reporter_id);
 create index idx_report_target on tbl_report (target_type, target_id);

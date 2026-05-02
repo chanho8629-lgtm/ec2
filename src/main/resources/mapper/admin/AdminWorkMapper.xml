@@ -9,7 +9,16 @@
             w.id,
             w.title,
             m.nickname as artist_name,
-            w.category,
+            case w.category
+                when 'DIGITAL_ART'   then '디지털 아트'
+                when 'MOTION'        then '모션그래픽'
+                when '3D_ANIMATION'  then '3D 애니메이션'
+                when 'CINEMATIC'     then '시네마틱'
+                when 'EXPERIMENTAL'  then '실험'
+                when 'LOOP'          then '루프'
+                when 'AI_GENERATED'  then 'AI 생성'
+                else w.category
+            end as category,
             case
                 when exists (
                     select 1 from tbl_auction a where a.work_id = w.id
@@ -17,8 +26,17 @@
                 else '거래'
             end as sale_type,
             w.status,
-            to_char(w.created_datetime, 'YY.MM.DD') as created_datetime,
+            w.created_datetime as created_at,
             w.view_count,
+            w.price,
+            w.thumbnail as thumbnail_url,
+            (
+                select wf.file_url
+                from tbl_work_file wf
+                where wf.work_id = w.id
+                  and wf.file_type = 'VIDEO'
+                limit 1
+            ) as video_url,
             (
                 select count(*)
                 from tbl_report r
@@ -48,8 +66,18 @@
             w.id,
             w.title,
             m.nickname as artist_name,
+            m.nickname as artist_nickname,
             m.id as artist_id,
-            w.category,
+            case w.category
+                when 'DIGITAL_ART'   then '디지털 아트'
+                when 'MOTION'        then '모션그래픽'
+                when '3D_ANIMATION'  then '3D 애니메이션'
+                when 'CINEMATIC'     then '시네마틱'
+                when 'EXPERIMENTAL'  then '실험'
+                when 'LOOP'          then '루프'
+                when 'AI_GENERATED'  then 'AI 생성'
+                else w.category
+            end as category,
             case
                 when exists (
                     select 1 from tbl_auction a where a.work_id = w.id
@@ -57,18 +85,25 @@
                 else '거래'
             end as sale_type,
             w.status,
-            to_char(w.created_datetime, 'YY.MM.DD') as created_datetime,
+            w.created_datetime as created_at,
             w.view_count,
-            w.save_count,
-            wf.file_url as thumbnail_url,
+            w.like_count,
+            w.price,
+            coalesce(w.thumbnail, wf.file_url) as thumbnail_url,
             vf.file_url as video_url,
             coalesce(vf.file_type, wf.file_type) as file_type,
             coalesce(vf.width, wf.width) as file_width,
             coalesce(vf.height, wf.height) as file_height,
             coalesce(vf.file_size, wf.file_size) as file_size,
+            case
+                when coalesce(vf.width, wf.width) is not null
+                    and coalesce(vf.height, wf.height) is not null
+                    then coalesce(vf.width, wf.width) || ' x ' || coalesce(vf.height, wf.height)
+                else null
+            end as resolution,
             a.status as auction_status,
-            a.current_price as current_high_bid,
-            a.bid_count as bid_count,
+            a.current_price as current_price,
+            a.bid_count,
             (
                 select count(*)
                 from tbl_report r
@@ -76,15 +111,25 @@
                   and r.target_id = w.id
             ) as report_count,
             (
-                select to_char(max(r2.created_datetime), 'YY.MM.DD')
+                select max(r2.created_datetime)
                 from tbl_report r2
                 where r2.target_type = 'WORK'
                   and r2.target_id = w.id
             ) as last_report_date
         from tbl_work w
         join tbl_member m on w.member_id = m.id
-        left join tbl_work_file wf on wf.work_id = w.id and wf.file_type = 'THUMBNAIL'
-        left join tbl_work_file vf on vf.work_id = w.id and vf.file_type = 'VIDEO'
+        left join lateral (
+            select * from tbl_work_file wf2
+            where wf2.work_id = w.id and wf2.file_type = 'THUMBNAIL'
+            order by wf2.sort_order, wf2.id
+            limit 1
+        ) wf on true
+        left join lateral (
+            select * from tbl_work_file vf2
+            where vf2.work_id = w.id and vf2.file_type = 'VIDEO'
+            order by vf2.sort_order, vf2.id
+            limit 1
+        ) vf on true
         left join lateral (
             select *
             from tbl_auction a2
