@@ -1,5 +1,6 @@
 package com.app.bideo.service.admin;
 
+import com.app.bideo.aop.annotation.LogStatusWithReturn;
 import com.app.bideo.dto.admin.AdminPaymentDetailResponseDTO;
 import com.app.bideo.dto.admin.AdminPaymentListResponseDTO;
 import com.app.bideo.dto.admin.AdminSearchDTO;
@@ -21,12 +22,14 @@ public class AdminPaymentService {
     @Transactional(readOnly = true)
     @Cacheable(value = "admin:payments:list",
             key = "(#searchDTO?.keyword?:'')+'|'+(#searchDTO?.status?:'')+'|'+(#searchDTO?.page?:1)+'|'+(#searchDTO?.size?:30)")
+    @LogStatusWithReturn
     public List<AdminPaymentListResponseDTO> getPayments(AdminSearchDTO searchDTO) {
         return adminPaymentDAO.findAll(searchDTO);
     }
 
     @Transactional(readOnly = true)
     @Cacheable(value = "admin:payments:detail", key = "#id")
+    @LogStatusWithReturn
     public AdminPaymentDetailResponseDTO getPaymentDetail(Long id) {
         return adminPaymentDAO.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("payment not found"));
@@ -35,6 +38,7 @@ public class AdminPaymentService {
     @Transactional(readOnly = true)
     @Cacheable(value = "admin:payments:count",
             key = "(#searchDTO?.keyword?:'')+'|'+(#searchDTO?.status?:'')")
+    @LogStatusWithReturn
     public int getPaymentCount(AdminSearchDTO searchDTO) {
         return adminPaymentDAO.count(searchDTO);
     }

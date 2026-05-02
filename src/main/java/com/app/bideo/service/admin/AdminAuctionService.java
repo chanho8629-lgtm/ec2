@@ -1,5 +1,6 @@
 package com.app.bideo.service.admin;
 
+import com.app.bideo.aop.annotation.LogStatusWithReturn;
 import com.app.bideo.dto.admin.AdminAuctionDetailResponseDTO;
 import com.app.bideo.dto.admin.AdminAuctionListResponseDTO;
 import com.app.bideo.dto.admin.AdminSearchDTO;
@@ -21,12 +22,14 @@ public class AdminAuctionService {
     @Transactional(readOnly = true)
     @Cacheable(value = "admin:auctions:list",
             key = "(#searchDTO?.keyword?:'')+'|'+(#searchDTO?.status?:'')+'|'+(#searchDTO?.page?:1)+'|'+(#searchDTO?.size?:30)")
+    @LogStatusWithReturn
     public List<AdminAuctionListResponseDTO> getAuctions(AdminSearchDTO searchDTO) {
         return adminAuctionDAO.findAll(searchDTO);
     }
 
     @Transactional(readOnly = true)
     @Cacheable(value = "admin:auctions:detail", key = "#id")
+    @LogStatusWithReturn
     public AdminAuctionDetailResponseDTO getAuctionDetail(Long id) {
         return adminAuctionDAO.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("auction not found"));
@@ -35,6 +38,7 @@ public class AdminAuctionService {
     @Transactional(readOnly = true)
     @Cacheable(value = "admin:auctions:count",
             key = "(#searchDTO?.keyword?:'')+'|'+(#searchDTO?.status?:'')")
+    @LogStatusWithReturn
     public int getAuctionCount(AdminSearchDTO searchDTO) {
         return adminAuctionDAO.count(searchDTO);
     }

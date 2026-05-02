@@ -18,7 +18,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin/inquiries")
 @RequiredArgsConstructor
-public class AdminInquiryAPIController {
+public class AdminInquiryAPIController implements AdminInquiryAPIControllerDocs {
 
     private final AdminInquiryService adminInquiryService;
 

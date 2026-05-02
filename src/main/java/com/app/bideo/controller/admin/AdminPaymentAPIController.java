@@ -15,7 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin/payments")
 @RequiredArgsConstructor
-public class AdminPaymentAPIController {
+public class AdminPaymentAPIController implements AdminPaymentAPIControllerDocs {
 
     private final AdminPaymentService adminPaymentService;
 

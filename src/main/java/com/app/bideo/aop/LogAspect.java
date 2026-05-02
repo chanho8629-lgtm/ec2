@@ -33,10 +33,10 @@ public class LogAspect {
         log.info("Return: {}", returnValue);
     }
 
-    @Pointcut("@annotation(com.app.app.aop.annotation.LogStatus)")
+    @Pointcut("@annotation(com.app.bideo.aop.annotation.LogStatus)")
     public void logStatusAnnotated(){}
 
-    @Pointcut("@annotation(com.app.app.aop.annotation.LogStatusWithReturn)")
+    @Pointcut("@annotation(com.app.bideo.aop.annotation.LogStatusWithReturn)")
     public void logStatusWithReturnAnnotated(){}
 }
 

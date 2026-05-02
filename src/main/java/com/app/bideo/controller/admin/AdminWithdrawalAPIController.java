@@ -22,7 +22,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin/withdrawals")
 @RequiredArgsConstructor
-public class AdminWithdrawalAPIController {
+public class AdminWithdrawalAPIController implements AdminWithdrawalAPIControllerDocs {
 
     private final AdminWithdrawalService adminWithdrawalService;
 

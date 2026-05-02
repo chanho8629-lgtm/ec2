@@ -1,5 +1,7 @@
 package com.app.bideo.service.admin;
 
+import com.app.bideo.aop.annotation.LogStatus;
+import com.app.bideo.aop.annotation.LogStatusWithReturn;
 import com.app.bideo.dto.admin.InquiryResponseDTO;
 import com.app.bideo.dto.admin.InquirySearchDTO;
 import com.app.bideo.repository.admin.AdminInquiryDAO;
@@ -17,16 +19,19 @@ public class AdminInquiryService {
     private final AdminInquiryDAO adminInquiryDAO;
 
     @Transactional(readOnly = true)
+    @LogStatusWithReturn
     public List<InquiryResponseDTO> getInquiries(InquirySearchDTO searchDTO) {
         return adminInquiryDAO.findAll(searchDTO);
     }
 
     @Transactional(readOnly = true)
+    @LogStatusWithReturn
     public InquiryResponseDTO getInquiryDetail(Long id) {
         return adminInquiryDAO.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("inquiry not found"));
     }
 
+    @LogStatus
     public void replyInquiry(Long id, String reply) {
         if (reply == null || reply.trim().isEmpty()) {
             throw new IllegalArgumentException("reply content is required");
@@ -35,6 +40,7 @@ public class AdminInquiryService {
     }
 
     @Transactional(readOnly = true)
+    @LogStatusWithReturn
     public int getInquiryCount(InquirySearchDTO searchDTO) {
         return adminInquiryDAO.count(searchDTO);
     }
