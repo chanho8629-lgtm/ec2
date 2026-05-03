@@ -17,4 +17,6 @@ public class DashboardListItemDTO {
     private String title;
     private String description;
     private String amount;
+    private String detailUrl;
+    private Long downloadWorkId;
 }

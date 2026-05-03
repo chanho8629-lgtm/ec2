@@ -61,16 +61,14 @@ public class DashboardService {
         int hostedContestCount = nullSafe(dashboardMapper.selectHostedContestCount(memberId));
         int registeredCardCount = nullSafe(dashboardMapper.selectRegisteredCardCount(memberId));
 
-        LocalDate endDate = LocalDate.now().minusDays(1);
+        LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusDays(MAX_LOOKBACK_DAYS - 1L);
 
-        Map<LocalDate, Long> viewDailyMap = toDailyMap(dashboardMapper.selectDailyViewCounts(memberId, startDate, endDate));
         Map<LocalDate, Long> bookmarkedDailyMap = toDailyMap(dashboardMapper.selectDailyBookmarkedWorkCounts(memberId, startDate, endDate));
         Map<LocalDate, Long> createdWorkDailyMap = toDailyMap(dashboardMapper.selectDailyCreatedWorkCounts(memberId, startDate, endDate));
         Map<LocalDate, Long> createdGalleryDailyMap = toDailyMap(dashboardMapper.selectDailyCreatedGalleryCounts(memberId, startDate, endDate));
 
         Map<String, DashboardMetricSeriesDTO> analyticsMetrics = new LinkedHashMap<>();
-        analyticsMetrics.put("views", buildMetricSeries("views", "조회수 추이", formatCompactNumber(nullSafe(summary.getTotalViews())), viewDailyMap, false, "조회", "회", endDate));
         analyticsMetrics.put("favorites", buildMetricSeries("favorites", "찜한 작품 추이", String.valueOf(bookmarkedWorkCount), bookmarkedDailyMap, true, "찜한 작품", "개", endDate));
         analyticsMetrics.put("works", buildMetricSeries("works", "내가 만든 작품 추이", String.valueOf(ownedWorkCount), createdWorkDailyMap, true, "내 작품", "개", endDate));
         analyticsMetrics.put("galleries", buildMetricSeries("galleries", "내가 만든 예술관 추이", String.valueOf(ownedGalleryCount), createdGalleryDailyMap, true, "내 예술관", "개", endDate));
@@ -81,7 +79,7 @@ public class DashboardService {
                 .activeAuctionsText(formatTwoDigits(nullSafe(summary.getActiveAuctionCount())))
                 .participatingContestsText(formatTwoDigits(nullSafe(summary.getParticipatingContestCount())))
                 .pendingPaymentsText(formatCurrencyCompact(nullSafe(summary.getPendingPaymentAmount())))
-                .overviewTitle("어제까지의 운영 현황을 한 화면에서 확인하세요.")
+                .overviewTitle("오늘까지의 운영 현황을 한 화면에서 확인하세요.")
                 .overviewDescription(creatorName + "님의 조회 반응, 찜, 작품/예술관 등록 흐름과 거래 상태를 대시보드에서 바로 확인할 수 있습니다.")
                 .attentionCountText(nullSafe(summary.getClosingSoonAuctionCount()) + nullSafe(summary.getPendingPaymentCount()) + nullSafe(summary.getPendingSettlementCount()) + nullSafe(summary.getUnreadNotificationCount()) + "건")
                 .analyticsMetrics(analyticsMetrics)
@@ -95,7 +93,6 @@ public class DashboardService {
                 .participatingContests(withFallback(dashboardMapper.selectParticipatingContestItems(memberId), "참여 중인 공모전이 없습니다.", "출품한 공모전이 생기면 진행 상태가 이곳에 표시됩니다."))
                 .galleries(withFallback(dashboardMapper.selectGalleryItems(memberId), "예술관이 없습니다.", "예술관을 만들면 전시 상태가 이곳에 표시됩니다."))
                 .soldWorks(withFallback(dashboardMapper.selectSoldWorkItems(memberId), "판매한 작품이 없습니다.", "판매가 완료된 작품이 생기면 이곳에 표시됩니다."))
-                .purchasedWorks(withFallback(dashboardMapper.selectPurchasedWorkItems(memberId), "구매한 작품이 없습니다.", "구매가 완료된 작품이 생기면 이곳에 표시됩니다."))
                 .storedWorks(withFallback(dashboardMapper.selectStoredWorkItems(memberId), "보관 중인 작품이 없습니다.", "구매 이후 보관 또는 이관 상태의 작품이 이곳에 표시됩니다."))
                 .paymentHistory(withFallback(dashboardMapper.selectPaymentHistoryItems(memberId), "결제 이력이 없습니다.", "구매 또는 판매 결제가 발생하면 이곳에 표시됩니다."))
                 .settlements(withFallback(dashboardMapper.selectSettlementItems(memberId), "정산 이력이 없습니다.", "정산 대상 결제가 생기면 이곳에 표시됩니다."))
@@ -233,7 +230,9 @@ public class DashboardService {
         tables.add(DashboardSummaryTableDTO.builder().title("작품/예술관 요약").description("지난 28일 기준 작품 및 전시 현황").items(List.of(
                 item("등록 작품 수", formatCount(ownedWorkCount)),
                 item("찜한 작품", formatCount(bookmarkedWorkCount)),
-                item("예술관 섹션 수", ownedGalleryCount + "개")
+                item("예술관 섹션 수", ownedGalleryCount + "개"),
+                item("누적 조회수", formatNumber(nullSafe(summary.getTotalViews())) + "회"),
+                item("안내", "※작품+예술관 조회수 합산입니다.")
         )).build());
         tables.add(DashboardSummaryTableDTO.builder().title("출금/결제 요약").description("지난 28일 기준 정산 및 결제 현황").items(List.of(
                 item("출금 완료", formatCount(nullSafe(summary.getCompletedWithdrawalCount()))),

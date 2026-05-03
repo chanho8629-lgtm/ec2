@@ -18,6 +18,14 @@
                 where w.member_id = #{memberId}
                   and w.deleted_datetime is null
                   and w.status != 'DELETED'
+            ), 0)
+            +
+            coalesce((
+                select sum(g.view_count)
+                from tbl_gallery g
+                where g.member_id = #{memberId}
+                  and g.deleted_datetime is null
+                  and g.status != 'DELETED'
             ), 0) as total_views,
             coalesce((
                 select count(*)
@@ -139,14 +147,27 @@
         )
         select
             d.day,
-            coalesce((
-                select sum(w.view_count)
-                from tbl_work w
-                where w.member_id = #{memberId}
-                  and w.deleted_datetime is null
-                  and w.status != 'DELETED'
-                  and w.created_datetime::date = d.day
-            ), 0) as view_count,
+            (
+                coalesce((
+                    select count(*)
+                    from tbl_work_view wv
+                    join tbl_work w on wv.work_id = w.id
+                    where w.member_id = #{memberId}
+                      and w.deleted_datetime is null
+                      and w.status != 'DELETED'
+                      and wv.viewed_at::date = d.day
+                ), 0)
+                +
+                coalesce((
+                    select count(*)
+                    from tbl_gallery_view gv
+                    join tbl_gallery g on gv.gallery_id = g.id
+                    where g.member_id = #{memberId}
+                      and g.deleted_datetime is null
+                      and g.status != 'DELETED'
+                      and gv.viewed_at::date = d.day
+                ), 0)
+            ) as view_count,
             coalesce((
                 select count(*)
                 from tbl_like l
@@ -175,6 +196,7 @@
     <select id="selectMyAuctionItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
         select
             w.title,
+            '/work/detail/' || w.id as detail_url,
             case
                 when a.status = 'ACTIVE' then
                     '입찰 ' || a.bid_count || '건 · 현재 최고가 ₩' || to_char(coalesce(a.current_price, a.starting_price), 'FM999,999,999')
@@ -198,6 +220,7 @@
     <select id="selectParticipatingAuctionItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
         select
             w.title,
+            '/work/detail/' || w.id as detail_url,
             case
                 when bid.is_winning then
                     '최고 입찰 유지 · 현재가 ₩' || to_char(coalesce(a.current_price, bid.bid_price), 'FM999,999,999')
@@ -227,7 +250,8 @@
             false as gold_tag,
             w.title,
             '작가 ' || writer.nickname || ' · 저장일 ' || to_char(b.created_datetime, 'YYYY.MM.DD') as description,
-            null as amount
+            null as amount,
+            '/work/detail/' || w.id as detail_url
         from tbl_bookmark b
         join tbl_work w on b.target_type = 'WORK' and b.target_id = w.id
         join tbl_member writer on w.member_id = writer.id
@@ -244,7 +268,8 @@
             false as gold_tag,
             w.title,
             '조회수 ' || w.view_count || ' · 좋아요 ' || w.like_count as description,
-            null as amount
+            null as amount,
+            '/work/detail/' || w.id as detail_url
         from tbl_work w
         where w.member_id = #{memberId}
           and w.deleted_datetime is null
@@ -256,6 +281,7 @@
     <select id="selectHostedContestItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
         select
             c.title,
+            '/contest/list' as detail_url,
             case
                 when c.entry_end &gt;= current_date then
                     '참여작 ' || c.entry_count || '개 · 접수 마감 ' || to_char(c.entry_end, 'MM.DD')
@@ -275,6 +301,7 @@
     <select id="selectParticipatingContestItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
         select
             c.title,
+            '/contest/list' as detail_url,
             case
                 when c.result_date is not null then
                     '출품 완료 · 결과 발표 ' || to_char(c.result_date, 'MM.DD')
@@ -295,6 +322,7 @@
             '작품' as tag,
             true as gold_tag,
             g.title,
+            '/gallery/' || g.id as detail_url,
             case
                 when g.status = 'EXHIBITING' then
                     '전시중 · 작품 ' || g.work_count || '개'
@@ -325,7 +353,8 @@
             end as tag,
             w.title,
             to_char(coalesce(p.paid_at, p.created_datetime), 'YYYY.MM.DD') || ' · 판매가 ₩' || to_char(p.total_price, 'FM999,999,999') as description,
-            '₩' || to_char(p.total_price, 'FM999,999,999') as amount
+            '₩' || to_char(p.total_price, 'FM999,999,999') as amount,
+            '/work/detail/' || w.id as detail_url
         from tbl_payment p
         join tbl_work w on p.work_id = w.id
         where p.seller_id = #{memberId}
@@ -342,10 +371,13 @@
                 else p.status
             end as tag,
             w.title,
-            to_char(coalesce(p.paid_at, p.created_datetime), 'YYYY.MM.DD') || ' · 구매가 ₩' || to_char(p.total_price, 'FM999,999,999') as description,
-            '₩' || to_char(p.total_price, 'FM999,999,999') as amount
+            '작가 ' || seller.nickname || ' · 구매일 ' || to_char(coalesce(p.paid_at, p.created_datetime), 'YYYY.MM.DD') || ' · 결제금액 ₩' || to_char(p.total_price, 'FM999,999,999') as description,
+            '₩' || to_char(p.total_price, 'FM999,999,999') as amount,
+            '/work/detail/' || w.id as detail_url,
+            w.id as download_work_id
         from tbl_payment p
         join tbl_work w on p.work_id = w.id
+        join tbl_member seller on p.seller_id = seller.id
         where p.buyer_id = #{memberId}
         order by coalesce(p.paid_at, p.created_datetime) desc
         limit 5
@@ -358,12 +390,23 @@
                 else '보관'
             end as tag,
             w.title,
-            to_char(coalesce(p.paid_at, p.created_datetime), 'YYYY.MM.DD') || ' · 보관가 ₩' || to_char(p.total_price, 'FM999,999,999') as description,
-            '₩' || to_char(p.total_price, 'FM999,999,999') as amount
-        from tbl_payment p
+            '작가 ' || seller.nickname || ' · 보관일 ' || to_char(coalesce(p.paid_at, p.created_datetime), 'YYYY.MM.DD') || ' · 결제금액 ₩' || to_char(p.total_price, 'FM999,999,999') as description,
+            '₩' || to_char(p.total_price, 'FM999,999,999') as amount,
+            '/work/detail/' || w.id as detail_url,
+            w.id as download_work_id
+        from (
+            select p.*,
+                   row_number() over (
+                       partition by p.buyer_id, p.work_id
+                       order by coalesce(p.paid_at, p.created_datetime) desc, p.id desc
+                   ) as rn
+            from tbl_payment p
+            where p.buyer_id = #{memberId}
+              and p.status in ('COMPLETED', 'REFUNDED')
+        ) p
         join tbl_work w on p.work_id = w.id
-        where p.buyer_id = #{memberId}
-          and p.status in ('COMPLETED', 'REFUNDED')
+        join tbl_member seller on p.seller_id = seller.id
+        where p.rn = 1
         order by coalesce(p.paid_at, p.created_datetime) desc
         limit 5
     </select>
@@ -381,11 +424,27 @@
                 else w.title || ' 판매'
             end as title,
             to_char(coalesce(p.paid_at, p.created_datetime), 'YYYY.MM.DD') || ' · ' || p.pay_method || ' · ' || p.status as description,
-            '₩' || to_char(p.total_price, 'FM999,999,999') as amount
-        from tbl_payment p
+            '₩' || to_char(p.total_price, 'FM999,999,999') as amount,
+            '/work/detail/' || w.id as detail_url
+        from (
+            select p.*,
+                   row_number() over (
+                       partition by p.work_id,
+                                    case when p.buyer_id = #{memberId} then 'BUY' else 'SELL' end
+                       order by case
+                                    when p.status = 'COMPLETED' then 0
+                                    when p.status = 'REFUNDED' then 1
+                                    else 2
+                                end,
+                                coalesce(p.paid_at, p.created_datetime) desc,
+                                p.id desc
+                   ) as rn
+            from tbl_payment p
+            where p.buyer_id = #{memberId}
+               or p.seller_id = #{memberId}
+        ) p
         join tbl_work w on p.work_id = w.id
-        where p.buyer_id = #{memberId}
-           or p.seller_id = #{memberId}
+        where p.rn = 1
         order by coalesce(p.paid_at, p.created_datetime) desc
         limit 5
     </select>
@@ -393,6 +452,7 @@
     <select id="selectSettlementItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
         select
             to_char(s.created_datetime, 'MM') || '월 정산' as title,
+            '/dashboard?tab=payment' as detail_url,
             case
                 when s.status = 'PAID' then
                     '정산 완료 · 지급일 ' || to_char(s.paid_at, 'MM.DD')
@@ -473,20 +533,6 @@
         from tbl_card
         where member_id = #{memberId}
           and deleted_datetime is null
-    </select>
-
-    <select id="selectDailyViewCounts" resultType="com.app.bideo.dto.dashboard.DashboardDailyMetricPointDTO">
-        select
-            wv.viewed_at::date as day,
-            count(*)::bigint as count
-        from tbl_work_view wv
-        join tbl_work w on wv.work_id = w.id
-        where w.member_id = #{memberId}
-          and w.deleted_datetime is null
-          and w.status != 'DELETED'
-          and wv.viewed_at::date between #{startDate} and #{endDate}
-        group by wv.viewed_at::date
-        order by day asc
     </select>
 
     <select id="selectDailyBookmarkedWorkCounts" resultType="com.app.bideo.dto.dashboard.DashboardDailyMetricPointDTO">
