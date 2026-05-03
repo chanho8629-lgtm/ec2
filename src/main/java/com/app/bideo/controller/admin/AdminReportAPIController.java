@@ -17,7 +17,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin/reports")
 @RequiredArgsConstructor
-public class AdminReportAPIController {
+public class AdminReportAPIController implements AdminReportAPIControllerDocs {
 
     private final AdminReportService adminReportService;
 
@@ -36,7 +36,12 @@ public class AdminReportAPIController {
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        adminReportService.updateReportStatus(id, body.get("status"), body.get("memo"));
+        String status = body == null ? null : body.get("status");
+        if (status == null || status.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        String memo = body.get("memo");
+        adminReportService.updateReportStatus(id, status, memo);
         return ResponseEntity.ok().build();
     }
 }

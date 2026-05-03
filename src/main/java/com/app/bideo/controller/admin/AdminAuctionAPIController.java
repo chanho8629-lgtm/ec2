@@ -15,7 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin/auctions")
 @RequiredArgsConstructor
-public class AdminAuctionAPIController {
+public class AdminAuctionAPIController implements AdminAuctionAPIControllerDocs {
 
     private final AdminAuctionService adminAuctionService;
 

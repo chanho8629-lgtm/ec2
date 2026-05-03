@@ -6,7 +6,6 @@
 <head>
     <meta charset="UTF-8">
     <title>출금승인관리 - BIDEO Admin</title>
-    <link rel="stylesheet" href="/css/admin/admin-style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -25,10 +24,10 @@
     </div>
     <table class="data-table">
         <thead><tr>
-            <th style="width:100px">요청번호</th><th style="width:140px">아티스트</th>
+            <th style="width:120px">요청번호</th><th style="width:140px">아티스트</th>
             <th style="width:130px">신청 금액</th><th style="width:130px">실 수령액</th>
-            <th style="width:110px">은행</th><th style="width:100px">신청일</th>
-            <th style="width:130px">잔여잔액</th><th style="width:90px">상태</th>
+            <th style="width:120px">은행</th><th style="width:110px">신청일</th>
+            <th style="width:130px">잔여잔액</th><th style="width:110px">상태</th>
         </tr></thead>
         <tbody>
         <tr th:each="wd, iter : ${withdrawalList}" th:onclick="|location.href='@{/admin/withdrawals/{id}(id=${wd.id})}'|" style="cursor:pointer">
@@ -37,7 +36,7 @@
             <td th:text="${#numbers.formatInteger(wd.requestAmount, 0, 'COMMA')} + ' 원'">₩500,000</td>
             <td class="fw-500" style="color:var(--admin-status-active)" th:text="${#numbers.formatInteger(wd.actualAmount, 0, 'COMMA')} + ' 원'">₩467,000</td>
             <td th:text="${wd.bankName}">신한은행</td>
-            <td th:text="${#temporals.format(wd.requestedAt, 'yy.MM.dd')}">26.04.01</td>
+            <td th:text="${wd.requestedAt != null} ? ${#temporals.format(wd.requestedAt, 'yyyy.MM.dd')} : '-'">-</td>
             <td th:text="${#numbers.formatInteger(wd.remainingBalance, 0, 'COMMA')} + ' 원'">₩1,000,000</td>
             <td>
                 <span th:if="${wd.status == 'PENDING'}" class="status-badge status-pending">승인대기</span>
@@ -48,15 +47,11 @@
         </tbody>
     </table>
     <div class="table-footer">
-        <div class="page-size-group"><span>페이지당 행 수:</span><div class="page-size-trigger" onclick="this.classList.toggle('open'); this.querySelector('.page-size-menu').classList.toggle('open')"><span class="trigger-text">30</span><svg class="trigger-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.707 8.793a1 1 0 00-1.414 0L12 14.086 6.707 8.793a1 1 0 10-1.414 1.414L12 16.914l6.707-6.707a1 1 0 000-1.414Z"/></svg><div class="page-size-menu"><div class="page-size-menu-item selected" data-value="30">30</div><div class="page-size-menu-item" data-value="50">50</div><div class="page-size-menu-item" data-value="100">100</div></div></div></div>
+        <div class="page-size-group"><span>페이지당 행 수:</span><div class="page-size-trigger" onclick="this.classList.toggle('open'); this.querySelector('.page-size-menu').classList.toggle('open')"><span class="trigger-text">100</span><svg class="trigger-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.707 8.793a1 1 0 00-1.414 0L12 14.086 6.707 8.793a1 1 0 10-1.414 1.414L12 16.914l6.707-6.707a1 1 0 000-1.414Z"/></svg><div class="page-size-menu"><div class="page-size-menu-item" data-value="30">30</div><div class="page-size-menu-item" data-value="50">50</div><div class="page-size-menu-item selected" data-value="100">100</div></div></div></div>
         <span class="page-description" th:text="${totalCount} ? |${totalCount}개 중 1~${totalCount > 30 ? 30 : totalCount}| : '0개'">0개</span>
         <div class="page-nav">
             <button class="page-nav-btn" disabled title="첫 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.293 4.293 10.586 12l7.707 7.707a1 1 0 101.414-1.414L13.414 12l6.293-6.293a1 1 0 10-1.414-1.414ZM6 4a1 1 0 00-1 1v14a1 1 0 102 0V5a1 1 0 00-1-1Z"/></svg></button>
             <button class="page-nav-btn" disabled title="이전 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.793 5.293 7.086 12l6.707 6.707a1 1 0 101.414-1.414L9.914 12l5.293-5.293a1 1 0 10-1.414-1.414Z"/></svg></button>
-            <!-- 페이지 번호 버튼 (active = 현재 페이지) -->
-            <!--<button class="page-num-btn active">1</button>-->
-            <!--<button class="page-num-btn">2</button>-->
-            <!--<button class="page-num-btn">3</button>-->
             <button class="page-nav-btn" title="다음 페이지"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.793 5.293a1 1 0 000 1.414L14.086 12l-5.293 5.293a1 1 0 101.414 1.414L16.914 12l-6.707-6.707a1 1 0 00-1.414 0Z"/></svg></button>
         </div>
     </div>

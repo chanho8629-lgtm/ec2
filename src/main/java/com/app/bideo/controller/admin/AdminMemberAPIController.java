@@ -18,7 +18,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin/members")
 @RequiredArgsConstructor
-public class AdminMemberAPIController {
+public class AdminMemberAPIController implements AdminMemberAPIControllerDocs {
 
     private final AdminMemberService adminMemberService;
 
@@ -37,7 +37,11 @@ public class AdminMemberAPIController {
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        adminMemberService.updateMemberStatus(id, body.get("status"));
+        String status = body == null ? null : body.get("status");
+        if (status == null || status.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        adminMemberService.updateMemberStatus(id, status);
         return ResponseEntity.ok().build();
     }
 }

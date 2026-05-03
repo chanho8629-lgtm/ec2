@@ -18,4 +18,9 @@ public class AdminSearchDTO {
     public int getOffset() {
         return (page - 1) * size;
     }
+
+    public void normalize() {
+        if (page == null || page < 1) page = 1;
+        if (size == null || size < 1 || (size != 30 && size != 50 && size != 100)) size = 30;
+    }
 }

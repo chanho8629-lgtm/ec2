@@ -1,3 +1,81 @@
-/gradlew text eol=lf
+# 기본: 모든 텍스트 파일은 저장소에 LF로 저장, 체크아웃 시 OS 자동 변환
+* text=auto eol=lf
+
+# ===== 텍스트 파일 명시 =====
+*.java       text
+*.kt         text
+*.groovy     text
+*.gradle     text
+*.gradle.kts text
+*.xml        text
+*.properties text
+*.yml        text
+*.yaml       text
+*.json       text
+*.md         text
+*.txt        text
+*.html       text
+*.css        text
+*.scss       text
+*.js         text
+*.ts         text
+*.tsx        text
+*.jsx        text
+*.sql        text
+*.toml       text
+*.ini        text
+.gitignore     text
+.gitattributes text
+.editorconfig  text
+
+# ===== Unix 스크립트(LF 강제) =====
+*.sh    text eol=lf
+gradlew text eol=lf
+
+# ===== Windows 스크립트(CRLF 강제) =====
 *.bat text eol=crlf
-*.jar binary
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# ===== 바이너리(변환 금지) =====
+*.jar   binary
+*.war   binary
+*.ear   binary
+*.class binary
+*.so    binary
+*.dll   binary
+*.exe   binary
+*.zip   binary
+*.tar   binary
+*.gz    binary
+*.7z    binary
+*.rar   binary
+
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.bmp  binary
+*.ico  binary
+*.webp binary
+
+*.pdf  binary
+*.xls  binary
+*.xlsx binary
+*.doc  binary
+*.docx binary
+*.ppt  binary
+*.pptx binary
+
+*.mp3 binary
+*.mp4 binary
+*.mov binary
+*.wav binary
+
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.eot   binary
+
+gradle/wrapper/gradle-wrapper.jar binary

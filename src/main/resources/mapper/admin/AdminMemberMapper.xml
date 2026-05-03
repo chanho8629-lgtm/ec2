@@ -9,13 +9,13 @@
             m.id,
             m.email,
             m.nickname,
-            m.real_name as real_name,
+            m.real_name,
             m.role,
             m.status,
-            m.creator_verified as creator_verified,
-            m.creator_tier as creator_tier,
-            m.follower_count as follower_count,
-            m.created_datetime as created_datetime,
+            m.creator_verified,
+            m.creator_tier,
+            m.follower_count,
+            m.created_datetime as created_at,
             case
                 when m.creator_verified = true then '작가'
                 else '컬렉터'
@@ -31,9 +31,10 @@
                 from tbl_order o
                 where o.buyer_id = m.id
                    or o.seller_id = m.id
-            ) as trade_count
+            ) as transaction_count
         from tbl_member m
         <where>
+            m.deleted_datetime is null
             <if test="keyword != null and keyword != ''">
                 and (
                     m.email ilike '%' || #{keyword} || '%'
@@ -60,28 +61,47 @@
             m.id,
             m.email,
             m.nickname,
-            m.real_name as real_name,
-            m.birth_date as birth_date,
+            m.real_name,
+            m.birth_date,
             m.bio,
-            m.profile_image as profile_image,
+            m.profile_image,
             m.role,
             m.status,
-            m.creator_verified as creator_verified,
-            m.seller_verified as seller_verified,
-            m.creator_tier as creator_tier,
-            m.follower_count as follower_count,
-            m.following_count as following_count,
-            m.gallery_count as gallery_count,
-            m.phone_number as phone_number,
-            m.last_login_datetime as last_login_datetime,
-            m.created_datetime as created_datetime,
-            m.updated_datetime as updated_datetime,
+            m.creator_verified,
+            m.seller_verified,
+            m.creator_tier,
+            m.follower_count,
+            m.following_count,
+            m.gallery_count,
+            m.phone_number as phone,
+            m.last_login_datetime as last_login_at,
+            m.last_activity_datetime as last_activity_at,
+            m.created_datetime as created_at,
+            m.updated_datetime,
             (
                 select o.provider
                 from tbl_oauth o
                 where o.member_id = m.id
                 limit 1
-            ) as oauth_provider,
+            ) as social_provider,
+            case
+                when m.creator_verified = true then '작가'
+                else '컬렉터'
+            end as member_type,
+            m.email_verified,
+            m.phone_verified,
+            (
+                select count(*)
+                from tbl_report r
+                where r.target_type = 'MEMBER'
+                  and r.target_id = m.id
+            ) as report_count,
+            (
+                select count(*)
+                from tbl_payment p
+                where p.buyer_id = m.id
+                  and p.status = 'CANCELLED'
+            ) as failed_payment_count,
             (
                 select count(*)
                 from tbl_work w
@@ -89,10 +109,11 @@
                   and w.deleted_datetime is null
             ) as work_count,
             (
-                select count(distinct b.auction_id)
-                from tbl_bid b
-                where b.member_id = m.id
-            ) as auction_participate_count,
+                select count(*)
+                from tbl_auction a
+                where a.winner_id = m.id
+                  and a.status = 'SOLD'
+            ) as auction_win_count,
             (
                 select count(*)
                 from tbl_order o2
@@ -104,7 +125,7 @@
                 from tbl_order o3
                 where o3.seller_id = m.id
                   and o3.status = 'COMPLETED'
-            ), 0) as total_trade_amount,
+            ), 0) as total_transaction_amount,
             (
                 select count(*)
                 from tbl_withdrawal_request wr
@@ -112,7 +133,7 @@
                   and wr.status = 'PENDING'
             ) as pending_withdrawal_count,
             (
-                select to_char(max(o4.completed_at), 'YY.MM.DD')
+                select to_char(max(o4.completed_at), 'YYYY.MM.DD HH24:MI')
                 from tbl_order o4
                 where o4.buyer_id = m.id
                    or o4.seller_id = m.id
@@ -127,7 +148,7 @@
                 select count(*)
                 from tbl_member_restriction mr
                 where mr.member_id = m.id
-            ) as restriction_history_count
+            ) as suspension_count
 
         from tbl_member m
         where m.id = #{id}
@@ -144,6 +165,7 @@
         select count(*)
         from tbl_member m
         <where>
+            m.deleted_datetime is null
             <if test="keyword != null and keyword != ''">
                 and (
                     m.email ilike '%' || #{keyword} || '%'

@@ -30,7 +30,7 @@
             </if>
         </where>
         order by i.created_datetime desc
-        limit #{size} offset (#{page} - 1) * #{size}
+        limit #{size} offset #{offset}
     </select>
 
     <select id="selectInquiryDetail" resultType="com.app.bideo.dto.admin.InquiryResponseDTO">

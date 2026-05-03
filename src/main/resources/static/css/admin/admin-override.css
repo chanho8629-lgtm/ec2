@@ -311,105 +311,26 @@ nav.ytcp-navigation-drawer * {
 
 /* ============================================
    SECTION 5: Filter Bar
+   Search bar uses YouTube Studio style (full-width, underline).
+   Tabs keep base pill style from admin-style.css.
    ============================================ */
 
-/* YouTube Studio style: tabs with sliding selection bar */
 .filter-bar {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 0;
-    padding: 0;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+    margin-bottom: 16px !important;
+    padding-bottom: 0 !important;
+    border-bottom: none !important;
 }
 
-/* Tabs wrapper */
-.tabs-wrapper {
-    display: flex;
-    align-items: center;
-    height: 48px;
-    padding: 0;
-    overflow: hidden;
-    order: -1;
-}
-
-/* Tabs container: relative for selection bar */
-.tabs-container {
-    position: relative;
-    display: flex;
-    height: 48px;
-}
-
-/* Selection bar hidden — using ::after underlines instead */
-.selection-bar {
-    display: none;
-}
-
-/* Individual tab button */
-.filter-tab {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    height: 48px;
-    padding: 0;
-    margin-left: 8px;
-    margin-right: 32px;
-    cursor: pointer;
-    user-select: none;
-    background: none;
-    border: none;
-    outline: none;
-    font-size: 14px;
-    font-weight: 500;
-    font-family: var(--admin-font);
-    color: var(--admin-text-secondary);
-    white-space: nowrap;
-    transition: opacity 0.1s cubic-bezier(0.4, 0, 1, 1);
-    line-height: 1;
-}
-
-.filter-tab:first-child {
-    margin-left: 0;
-}
-
-/* Underline: hidden by default, visible on hover and active */
-.filter-tab::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: transparent;
-    border-radius: 2px 2px 0 0;
-}
-
-.filter-tab:hover {
-    color: var(--admin-text-primary);
-}
-
-.filter-tab:hover::after {
-    background: #c0c0c0;
-}
-
-.filter-tab.active {
-    color: var(--admin-text-primary);
-    background: transparent;
-    border: none;
-}
-
-.filter-tab.active::after {
-    background: var(--admin-text-secondary);
-}
-
-/* Legacy filter-tabs wrapper (now replaced by tabs-wrapper/tabs-container in HTML) */
-.filter-tabs {
-    display: none;
-}
-
-/* Search row: full-width, below tabs, above table */
 .filter-search {
-    position: relative;
-    border-bottom: 1px solid var(--admin-border);
+    position: relative !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    height: 48px !important;
+    border-bottom: 1px solid var(--admin-border) !important;
 }
 
 .filter-search input {
@@ -430,13 +351,14 @@ nav.ytcp-navigation-drawer * {
 }
 
 .filter-search-icon {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
+    position: absolute !important;
+    left: 16px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
     color: var(--admin-text-disabled);
-    width: 20px;
-    height: 20px;
+    width: 20px !important;
+    height: 20px !important;
+    display: block !important;
     pointer-events: none;
 }
 
@@ -876,13 +798,14 @@ nav.ytcp-navigation-drawer * {
 }
 
 .modal-header {
-    width: 576px;
-    height: 64px;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
+    padding: 24px 32px 8px;
     margin: 0;
     box-sizing: border-box;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 28px;
+    color: var(--admin-text-primary);
+    font-family: 'Roboto', 'Noto Sans KR', sans-serif;
 }
 
 .modal-header-title {
@@ -891,9 +814,7 @@ nav.ytcp-navigation-drawer * {
     line-height: 28px;
     color: var(--admin-text-primary);
     font-family: 'Roboto', 'Noto Sans KR', sans-serif;
-    padding: 7px 8px 5px;
-    margin: 12px 16px;
-    display: flex;
+    display: block;
 }
 
 .modal-body {

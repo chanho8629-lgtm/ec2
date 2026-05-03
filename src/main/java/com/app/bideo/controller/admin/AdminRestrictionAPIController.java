@@ -20,12 +20,13 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin/restrictions")
 @RequiredArgsConstructor
-public class AdminRestrictionAPIController {
+public class AdminRestrictionAPIController implements AdminRestrictionAPIControllerDocs {
 
     private final AdminRestrictionService adminRestrictionService;
 
     @GetMapping
     public List<AdminRestrictionResponseDTO> list(AdminRestrictionSearchDTO searchDTO) {
+        searchDTO.normalize();
         return adminRestrictionService.getRestrictions(searchDTO);
     }
 

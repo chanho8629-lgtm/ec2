@@ -7,13 +7,13 @@
     <select id="selectPaymentList" resultType="com.app.bideo.dto.admin.AdminPaymentListResponseDTO">
         select
             p.id,
-            o.order_code,
-            bm.nickname as buyer_name,
-            sm.nickname as seller_name,
-            o.order_type,
-            w.title as work_title,
-            p.total_price,
-            to_char(p.paid_at, 'MM.DD') as paid_at,
+            o.order_code as order_number,
+            bm.nickname as payer_name,
+            sm.nickname as artist_nickname,
+            o.order_type as type,
+            w.title as artwork_title,
+            p.total_price as amount,
+            p.paid_at,
             p.status
         from tbl_payment p
         join tbl_order o on p.order_code = o.order_code
@@ -39,20 +39,22 @@
     <select id="selectPaymentDetail" resultType="com.app.bideo.dto.admin.AdminPaymentDetailResponseDTO">
         select
             p.id,
-            o.order_code,
-            w.title as work_title,
-            sm.nickname as seller_name,
+            o.order_code as order_number,
+            w.title as artwork_title,
+            sm.nickname as artist_nickname,
             sm.id as seller_id,
-            o.order_type,
-            p.total_price,
-            p.total_fee,
+            o.order_type as type,
+            p.total_price as price,
+            p.total_fee as commission_amount,
             p.total_price - p.total_fee as settlement_amount,
+            p.total_price as total_amount,
             bm.nickname as buyer_name,
             bm.email as buyer_email,
-            p.pay_method,
+            bm.phone_number as buyer_phone,
+            p.pay_method as payment_method,
             c.card_number_masked as card_number,
-            to_char(p.paid_at, 'YY.MM.DD HH24:MI') as paid_at,
-            p.payment_code,
+            p.paid_at,
+            p.payment_code as approval_number,
             p.status
         from tbl_payment p
         join tbl_order o on p.order_code = o.order_code

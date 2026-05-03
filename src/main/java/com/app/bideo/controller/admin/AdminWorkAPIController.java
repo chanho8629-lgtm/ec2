@@ -18,7 +18,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin/works")
 @RequiredArgsConstructor
-public class AdminWorkAPIController {
+public class AdminWorkAPIController implements AdminWorkAPIControllerDocs {
 
     private final AdminWorkService adminWorkService;
 

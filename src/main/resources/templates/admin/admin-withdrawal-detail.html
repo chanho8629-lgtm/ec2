@@ -6,7 +6,6 @@
 <head>
     <meta charset="UTF-8">
     <title>출금 상세 - BIDEO Admin</title>
-    <link rel="stylesheet" href="/css/admin/admin-style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -17,9 +16,10 @@
     </a>
     <div class="detail-header">
         <h1 class="page-title">출금 상세
-            <span th:if="${withdrawal.status == 'PENDING'}" class="status-badge badge-pending">승인대기</span>
-            <span th:if="${withdrawal.status == 'APPROVED'}" class="status-badge badge-active">승인완료</span>
-            <span th:if="${withdrawal.status == 'REJECTED'}" class="status-badge badge-urgent">반려</span>
+            <span th:if="${withdrawal.status == 'PENDING'}" class="status-badge status-pending">승인대기</span>
+            <span th:if="${withdrawal.status == 'APPROVED'}" class="status-badge status-active">승인완료</span>
+            <span th:if="${withdrawal.status == 'REJECTED'}" class="status-badge status-urgent">반려</span>
+            <span th:if="${withdrawal.status == 'PAID'}" class="status-badge status-active">지급완료</span>
         </h1>
         <div th:if="${withdrawal.status == 'PENDING'}">
             <button class="btn-action-sm btn-primary" onclick="openModal('approveModal')">승인</button>
@@ -77,19 +77,17 @@
         <div class="detail-col">
             <div class="detail-section">
                 <h3 class="detail-section-title">출금 금액</h3>
-                <div class="detail-amount-card">
-                    <div class="detail-field">
-                        <span class="detail-field-label">신청금액</span>
-                        <span class="detail-field-value" th:text="${#numbers.formatInteger(withdrawal.requestAmount, 0, 'COMMA')} + ' 원'">500,000 원</span>
-                    </div>
-                    <div class="detail-field">
-                        <span class="detail-field-label">수수료 (3.3%)</span>
-                        <span class="detail-field-value text-warn" th:text="'- ' + ${#numbers.formatInteger(withdrawal.commissionAmount, 0, 'COMMA')} + ' 원'">- 16,500 원</span>
-                    </div>
-                    <div class="detail-field">
-                        <span class="detail-field-label">실수령액</span>
-                        <span class="detail-field-value text-info" style="font-size:1.15rem;font-weight:700" th:text="${#numbers.formatInteger(withdrawal.netAmount, 0, 'COMMA')} + ' 원'">483,500 원</span>
-                    </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">신청금액</span>
+                    <span class="detail-field-value" th:text="${#numbers.formatInteger(withdrawal.requestAmount, 0, 'COMMA')} + ' 원'">500,000 원</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">수수료 (3.3%)</span>
+                    <span class="detail-field-value text-warn" th:text="'- ' + ${#numbers.formatInteger(withdrawal.commissionAmount, 0, 'COMMA')} + ' 원'">- 16,500 원</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">실수령액</span>
+                    <span class="detail-field-value text-info" th:text="${#numbers.formatInteger(withdrawal.netAmount, 0, 'COMMA')} + ' 원'">483,500 원</span>
                 </div>
             </div>
             <div class="detail-section">
@@ -119,8 +117,60 @@
     </div>
 </div>
 <div layout:fragment="modals">
-    <div class="modal-overlay" id="approveModal"><div class="modal"><div class="modal-header">출금 승인</div><div class="modal-body">이 출금 요청을 승인합니다.</div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('approveModal')">취소</button><button class="btn btn-primary">승인</button></div></div></div>
-    <div class="modal-overlay" id="rejectModal"><div class="modal"><div class="modal-header">출금 반려</div><div class="modal-body"><label>반려 사유</label><textarea placeholder="반려 사유를 입력하세요"></textarea></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('rejectModal')">취소</button><button class="btn btn-danger">반려</button></div></div></div>
+    <div class="modal-overlay" id="approveModal"><div class="modal"><div class="modal-header">출금 승인</div><div class="modal-body">이 출금 요청을 승인합니다.</div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('approveModal')">취소</button><button class="btn btn-primary" id="approveConfirmBtn">승인</button></div></div></div>
+    <div class="modal-overlay" id="rejectModal"><div class="modal"><div class="modal-header">출금 반려</div><div class="modal-body"><label>반려 사유</label><textarea id="rejectReason" placeholder="반려 사유를 입력하세요"></textarea></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('rejectModal')">취소</button><button class="btn btn-danger" id="rejectConfirmBtn">반려</button></div></div></div>
 </div>
+<th:block layout:fragment="scripts">
+    <script th:inline="javascript">
+        (function() {
+            var withdrawalId = /*[[${withdrawal.id}]]*/ 0;
+            var approveBtn = document.getElementById('approveConfirmBtn');
+            if (approveBtn) {
+                approveBtn.addEventListener('click', function() {
+                    approveBtn.disabled = true;
+                    fetch('/api/admin/withdrawals/' + withdrawalId + '/approve', {
+                        method: 'PATCH',
+                        headers: {'Content-Type': 'application/json'}
+                    }).then(function(r) {
+                        if (r.ok) {
+                            showToast('승인되었습니다');
+                            setTimeout(function() { location.reload(); }, 600);
+                        } else {
+                            r.json().then(function(j) { showToast(j.error || '승인 실패'); });
+                            approveBtn.disabled = false;
+                        }
+                    }).catch(function() {
+                        showToast('네트워크 오류');
+                        approveBtn.disabled = false;
+                    });
+                });
+            }
+            var rejectBtn = document.getElementById('rejectConfirmBtn');
+            if (rejectBtn) {
+                rejectBtn.addEventListener('click', function() {
+                    var reason = document.getElementById('rejectReason').value.trim();
+                    if (!reason) { showToast('반려 사유를 입력하세요'); return; }
+                    rejectBtn.disabled = true;
+                    fetch('/api/admin/withdrawals/' + withdrawalId + '/reject', {
+                        method: 'PATCH',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ reason: reason })
+                    }).then(function(r) {
+                        if (r.ok) {
+                            showToast('반려되었습니다');
+                            setTimeout(function() { location.reload(); }, 600);
+                        } else {
+                            r.json().then(function(j) { showToast(j.error || '반려 실패'); });
+                            rejectBtn.disabled = false;
+                        }
+                    }).catch(function() {
+                        showToast('네트워크 오류');
+                        rejectBtn.disabled = false;
+                    });
+                });
+            }
+        })();
+    </script>
+</th:block>
 </body>
 </html>

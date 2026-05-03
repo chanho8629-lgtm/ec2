@@ -6,7 +6,6 @@
 <head>
     <meta charset="UTF-8">
     <title>작품 상세 - BIDEO Admin</title>
-    <link rel="stylesheet" href="/css/admin/admin-style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -17,12 +16,27 @@
     </a>
     <div class="detail-header">
         <h1 class="page-title">작품 상세
-            <span th:if="${artwork.status == 'DISPLAY'}" class="status-badge status-active">전시중</span>
+            <span th:if="${artwork.status == 'ACTIVE'}" class="status-badge status-active">전시중</span>
             <span th:if="${artwork.status == 'HIDDEN'}" class="status-badge status-urgent">숨김</span>
         </h1>
-        <button th:if="${artwork.status == 'DISPLAY'}" class="btn-action-sm btn-primary" onclick="openModal('hideModal')">중단</button>
+        <button th:if="${artwork.status == 'ACTIVE'}" class="btn-action-sm btn-primary" onclick="openModal('hideModal')">중단</button>
         <button th:if="${artwork.status == 'HIDDEN'}" class="btn-action-sm btn-primary" onclick="openModal('displayModal')">재개</button>
     </div>
+
+    <div class="detail-section" th:if="${artwork.videoUrl != null or artwork.thumbnailUrl != null}">
+        <h3 class="detail-section-title">작품 미리보기</h3>
+        <div style="display:flex;justify-content:center;background:#000;border-radius:8px;padding:16px;">
+            <video th:if="${artwork.videoUrl != null}"
+                   th:src="${artwork.videoUrl}"
+                   th:poster="${artwork.thumbnailUrl}"
+                   controls autoplay muted loop playsinline preload="metadata"
+                   style="max-width:100%;max-height:480px;width:auto;height:auto;background:#000;"></video>
+            <img th:if="${artwork.videoUrl == null and artwork.thumbnailUrl != null}"
+                 th:src="${artwork.thumbnailUrl}" alt="thumbnail"
+                 style="max-width:100%;max-height:480px;background:#000;"/>
+        </div>
+    </div>
+
     <div class="detail-columns">
         <div class="detail-col">
             <div class="detail-section">
@@ -46,7 +60,7 @@
                 <div class="detail-field">
                     <span class="detail-field-label">등록일</span>
                     <span class="detail-field-value"
-                          th:text="${artwork.createdAt != null} ? ${#temporals.format(artwork.createdAt, 'yy.MM.dd')} : '-'">-</span>
+                          th:text="${artwork.createdAt != null} ? ${#temporals.format(artwork.createdAt, 'yyyy.MM.dd HH:mm')} : '-'">-</span>
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">조회수</span>
@@ -64,8 +78,13 @@
                     <span class="detail-field-value" th:text="${artwork.resolution} ?: '-'">-</span>
                 </div>
                 <div class="detail-field">
+                    <span class="detail-field-label">파일유형</span>
+                    <span class="detail-field-value" th:text="${artwork.fileType} ?: '-'">-</span>
+                </div>
+                <div class="detail-field">
                     <span class="detail-field-label">용량</span>
-                    <span class="detail-field-value" th:text="${artwork.fileSize} ?: '-'">-</span>
+                    <span class="detail-field-value"
+                          th:text="${artwork.fileSize != null} ? ${#numbers.formatInteger(artwork.fileSize, 0, 'COMMA')} + ' bytes' : '-'">-</span>
                 </div>
             </div>
         </div>
@@ -78,11 +97,17 @@
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">현재최고가</span>
-                    <span class="detail-field-value text-info" th:text="${artwork.currentPrice} ?: '-'">-</span>
+                    <span class="detail-field-value text-info"
+                          th:text="${artwork.currentPrice != null} ? ${#numbers.formatInteger(artwork.currentPrice, 0, 'COMMA')} + ' 원' : '-'">-</span>
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">입찰수</span>
                     <span class="detail-field-value" th:text="${artwork.bidCount} ?: '0'">0</span>
+                </div>
+                <div class="detail-field">
+                    <span class="detail-field-label">판매가</span>
+                    <span class="detail-field-value"
+                          th:text="${artwork.price != null} ? ${#numbers.formatInteger(artwork.price, 0, 'COMMA')} + ' 원' : '-'">-</span>
                 </div>
             </div>
             <div class="detail-section">
@@ -94,15 +119,47 @@
                 <div class="detail-field">
                     <span class="detail-field-label">최근신고</span>
                     <span class="detail-field-value text-muted"
-                          th:text="${artwork.lastReportDate != null} ? ${#temporals.format(artwork.lastReportDate, 'yy.MM.dd')} : '-'">-</span>
+                          th:text="${artwork.lastReportDate != null} ? ${#temporals.format(artwork.lastReportDate, 'yyyy.MM.dd HH:mm')} : '-'">-</span>
                 </div>
             </div>
         </div>
     </div>
 </div>
 <div layout:fragment="modals">
-    <div class="modal-overlay" id="hideModal"><div class="modal"><div class="modal-header">전시 중단 처리</div><div class="modal-body"><label>중단 사유</label><textarea placeholder="사유를 상세히 입력하세요 (예: 작가 요청, 부적절한 콘텐츠 등)"></textarea></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('hideModal')">취소</button><button class="btn btn-danger">중단 처리</button></div></div></div>
-    <div class="modal-overlay" id="displayModal"><div class="modal"><div class="modal-header">전시 재개</div><div class="modal-body">이 작품의 전시를 재개합니다.</div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('displayModal')">취소</button><button class="btn btn-primary">확인</button></div></div></div>
+    <div class="modal-overlay" id="hideModal"><div class="modal"><div class="modal-header">전시 중단 처리</div><div class="modal-body"><label>중단 사유</label><textarea id="hideReason" placeholder="사유를 상세히 입력하세요 (예: 작가 요청, 부적절한 콘텐츠 등)"></textarea></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('hideModal')">취소</button><button class="btn btn-danger" id="hideConfirmBtn">중단 처리</button></div></div></div>
+    <div class="modal-overlay" id="displayModal"><div class="modal"><div class="modal-header">전시 재개</div><div class="modal-body">이 작품의 전시를 재개합니다.</div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('displayModal')">취소</button><button class="btn btn-primary" id="displayConfirmBtn">확인</button></div></div></div>
 </div>
+<th:block layout:fragment="scripts">
+    <script th:inline="javascript">
+        (function() {
+            var workId = /*[[${artwork.id}]]*/ 0;
+            function patchStatus(status, btnId, modalId) {
+                var btn = document.getElementById(btnId);
+                if (!btn) return;
+                btn.addEventListener('click', function() {
+                    btn.disabled = true;
+                    fetch('/api/admin/works/' + workId + '/status', {
+                        method: 'PATCH',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ status: status })
+                    }).then(function(r) {
+                        if (r.ok) {
+                            showToast('처리되었습니다');
+                            setTimeout(function() { location.reload(); }, 600);
+                        } else {
+                            showToast('처리 실패');
+                            btn.disabled = false;
+                        }
+                    }).catch(function() {
+                        showToast('네트워크 오류');
+                        btn.disabled = false;
+                    });
+                });
+            }
+            patchStatus('HIDDEN', 'hideConfirmBtn', 'hideModal');
+            patchStatus('ACTIVE', 'displayConfirmBtn', 'displayModal');
+        })();
+    </script>
+</th:block>
 </body>
 </html>

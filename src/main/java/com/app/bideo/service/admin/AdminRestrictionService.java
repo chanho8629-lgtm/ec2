@@ -1,5 +1,7 @@
 package com.app.bideo.service.admin;
 
+import com.app.bideo.aop.annotation.LogStatus;
+import com.app.bideo.aop.annotation.LogStatusWithReturn;
 import com.app.bideo.dto.admin.AdminRestrictionResponseDTO;
 import com.app.bideo.dto.admin.AdminRestrictionSearchDTO;
 import com.app.bideo.dto.admin.AdminRestrictionUpsertRequestDTO;
@@ -24,6 +26,7 @@ public class AdminRestrictionService {
     private final AdminRestrictionDAO adminRestrictionDAO;
     private final AdminMemberDAO adminMemberDAO;
 
+    @LogStatusWithReturn
     public List<AdminRestrictionResponseDTO> getRestrictions(AdminRestrictionSearchDTO searchDTO) {
         syncExpiredRestrictions();
         if (searchDTO != null && (searchDTO.getStatus() == null || searchDTO.getStatus().isBlank())) {
@@ -32,17 +35,20 @@ public class AdminRestrictionService {
         return adminRestrictionDAO.findAll(searchDTO);
     }
 
+    @LogStatusWithReturn
     public AdminRestrictionResponseDTO getRestriction(Long id) {
         syncExpiredRestrictions();
         return getRestrictionOrThrow(id);
     }
 
     @Transactional(readOnly = true)
+    @LogStatusWithReturn
     public Optional<AdminRestrictionResponseDTO> getActiveRestrictionByMemberId(Long memberId) {
         syncExpiredRestrictions();
         return adminRestrictionDAO.findActiveByMemberId(memberId);
     }
 
+    @LogStatusWithReturn
     public Long createRestriction(AdminRestrictionUpsertRequestDTO requestDTO) {
         syncExpiredRestrictions();
         validateRequest(requestDTO);
@@ -57,6 +63,7 @@ public class AdminRestrictionService {
         return requestDTO.getId();
     }
 
+    @LogStatus
     public void updateRestriction(Long id, AdminRestrictionUpsertRequestDTO requestDTO) {
         syncExpiredRestrictions();
         AdminRestrictionResponseDTO existing = getRestrictionOrThrow(id);
@@ -69,6 +76,7 @@ public class AdminRestrictionService {
         adminMemberDAO.updateStatus(existing.getMemberId(), toMemberStatus(existing.getRestrictionType()));
     }
 
+    @LogStatus
     public void releaseRestriction(Long id) {
         syncExpiredRestrictions();
         AdminRestrictionResponseDTO existing = getRestrictionOrThrow(id);

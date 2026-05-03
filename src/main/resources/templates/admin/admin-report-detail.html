@@ -6,7 +6,6 @@
 <head>
     <meta charset="UTF-8">
     <title>신고 상세 - BIDEO Admin</title>
-    <link rel="stylesheet" href="/css/admin/admin-style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -18,12 +17,12 @@
 
     <div class="detail-header">
         <h1 class="page-title">신고 상세
-            <span th:if="${report.status == 'RECEIVED'}"  class="status-badge badge-pending">접수</span>
-            <span th:if="${report.status == 'REVIEWING'}" class="status-badge badge-pending">검토중</span>
-            <span th:if="${report.status == 'COMPLETED'}" class="status-badge badge-active">처리완료</span>
-            <span th:if="${report.status == 'CANCELLED'}" class="status-badge badge-muted">취소</span>
+            <span th:if="${report.status == 'PENDING'}"   class="status-badge status-pending">접수</span>
+            <span th:if="${report.status == 'REVIEWING'}" class="status-badge status-pending">검토중</span>
+            <span th:if="${report.status == 'RESOLVED'}"  class="status-badge status-active">처리완료</span>
+            <span th:if="${report.status == 'CANCELLED'}" class="status-badge status-muted">취소</span>
         </h1>
-        <div th:if="${report.status == 'RECEIVED' or report.status == 'REVIEWING'}">
+        <div th:if="${report.status == 'PENDING' or report.status == 'REVIEWING'}">
             <button class="btn-action-sm btn-primary" onclick="openModal('resolveModal')">처리</button>
             <button class="btn-action-sm btn-danger" onclick="openModal('cancelModal')">취소</button>
         </div>
@@ -44,7 +43,8 @@
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">접수일</span>
-                    <span class="detail-field-value" th:text="${report.createdAt}">2024-01-01</span>
+                    <span class="detail-field-value"
+                          th:text="${report.createdAt != null} ? ${#temporals.format(report.createdAt, 'yyyy.MM.dd HH:mm')} : '-'">-</span>
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">신고자 이력</span>
@@ -74,7 +74,9 @@
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">대상</span>
-                    <a th:href="@{/admin/members/{id}(id=${report.targetAuthorId})}" class="detail-field-value text-link" th:text="${report.targetName}">대상명</a>
+                    <a th:if="${report.targetAuthorId != null}"
+                       th:href="@{/admin/members/{id}(id=${report.targetAuthorId})}" class="detail-field-value text-link" th:text="${report.targetName}">대상명</a>
+                    <span th:if="${report.targetAuthorId == null}" class="detail-field-value" th:text="${report.targetName} ?: '-'">-</span>
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">대상 상태</span>
@@ -88,7 +90,9 @@
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">작성자</span>
-                    <a th:href="@{/admin/members/{id}(id=${report.targetAuthorId})}" class="detail-field-value text-link" th:text="${report.targetAuthor}">-</a>
+                    <a th:if="${report.targetAuthorId != null}"
+                       th:href="@{/admin/members/{id}(id=${report.targetAuthorId})}" class="detail-field-value text-link" th:text="${report.targetAuthor} ?: '-'">-</a>
+                    <span th:if="${report.targetAuthorId == null}" class="detail-field-value" th:text="${report.targetAuthor} ?: '-'">-</span>
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">작성자 상태</span>
@@ -103,15 +107,49 @@
                 </div>
                 <div class="detail-field">
                     <span class="detail-field-label">처리 일시</span>
-                    <span class="detail-field-value" th:text="${report.processedAt}">-</span>
+                    <span class="detail-field-value"
+                          th:text="${report.processedAt != null} ? ${#temporals.format(report.processedAt, 'yyyy.MM.dd HH:mm')} : '-'">-</span>
                 </div>
             </div>
         </div>
     </div>
 </div>
 <div layout:fragment="modals">
-    <div class="modal-overlay" id="resolveModal"><div class="modal"><div class="modal-header">신고 처리 완료</div><div class="modal-body">이 신고를 처리 완료로 변경합니다.</div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('resolveModal')">취소</button><button class="btn btn-primary">확인</button></div></div></div>
-    <div class="modal-overlay" id="cancelModal"><div class="modal"><div class="modal-header">신고 취소</div><div class="modal-body">이 신고를 취소 처리합니다.</div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('cancelModal')">취소</button><button class="btn btn-danger">확인</button></div></div></div>
+    <div class="modal-overlay" id="resolveModal"><div class="modal"><div class="modal-header">신고 처리 완료</div><div class="modal-body"><label>처리 메모</label><textarea id="resolveMemo" placeholder="처리 사유를 입력하세요"></textarea></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('resolveModal')">취소</button><button class="btn btn-primary" id="resolveConfirmBtn">확인</button></div></div></div>
+    <div class="modal-overlay" id="cancelModal"><div class="modal"><div class="modal-header">신고 취소</div><div class="modal-body"><label>취소 사유</label><textarea id="cancelMemo" placeholder="취소 사유를 입력하세요"></textarea></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('cancelModal')">취소</button><button class="btn btn-danger" id="cancelConfirmBtn">확인</button></div></div></div>
 </div>
+<th:block layout:fragment="scripts">
+    <script th:inline="javascript">
+        (function() {
+            var reportId = /*[[${report.id}]]*/ 0;
+            function patchStatus(status, btnId, memoFieldId) {
+                var btn = document.getElementById(btnId);
+                if (!btn) return;
+                btn.addEventListener('click', function() {
+                    var memo = document.getElementById(memoFieldId);
+                    btn.disabled = true;
+                    fetch('/api/admin/reports/' + reportId + '/status', {
+                        method: 'PATCH',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ status: status, memo: memo ? memo.value : '' })
+                    }).then(function(r) {
+                        if (r.ok) {
+                            showToast('처리되었습니다');
+                            setTimeout(function() { location.reload(); }, 600);
+                        } else {
+                            showToast('처리 실패');
+                            btn.disabled = false;
+                        }
+                    }).catch(function() {
+                        showToast('네트워크 오류');
+                        btn.disabled = false;
+                    });
+                });
+            }
+            patchStatus('RESOLVED', 'resolveConfirmBtn', 'resolveMemo');
+            patchStatus('CANCELLED', 'cancelConfirmBtn', 'cancelMemo');
+        })();
+    </script>
+</th:block>
 </body>
 </html>

@@ -23,8 +23,8 @@ public class AdminMemberListResponseDTO {
     private Boolean creatorVerified;
     private String creatorTier;
     private Integer followerCount;
-    private LocalDateTime createdDatetime;
+    private LocalDateTime createdAt;
     private String memberType;
     private Integer reportCount;
-    private Integer tradeCount;
+    private Integer transactionCount;
 }

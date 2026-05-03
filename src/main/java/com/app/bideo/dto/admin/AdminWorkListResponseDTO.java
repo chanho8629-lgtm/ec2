@@ -2,6 +2,8 @@ package com.app.bideo.dto.admin;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,7 +16,10 @@ public class AdminWorkListResponseDTO {
     private String category;
     private String saleType;
     private String status;
-    private String createdDatetime;
+    private LocalDateTime createdAt;
     private Integer viewCount;
     private Integer reportCount;
+    private Long price;
+    private String thumbnailUrl;
+    private String videoUrl;
 }

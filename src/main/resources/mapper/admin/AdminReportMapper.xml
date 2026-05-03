@@ -7,15 +7,30 @@
     <select id="selectReportList" resultType="com.app.bideo.dto.admin.ReportResponseDTO">
         select
             r.id,
-            r.reporter_id as reporter_id,
+            r.reporter_id,
             m.nickname as reporter_nickname,
-            r.target_type as target_type,
-            r.target_id as target_id,
-            r.reason,
+            case r.target_type
+                when 'WORK'    then '작품'
+                when 'MEMBER'  then '회원'
+                when 'COMMENT' then '댓글'
+                when 'GALLERY' then '예술관'
+                else r.target_type
+            end as category,
+            r.target_type,
+            r.target_id,
+            case r.reason
+                when 'SENSITIVE'     then '음란/선정'
+                when 'IMPERSONATION' then '사칭'
+                when 'HARASSMENT'    then '괴롭힘'
+                when 'COPYRIGHT'     then '저작권'
+                else r.reason
+            end as reason,
+            r.detail as reason_detail,
             r.detail,
             r.status,
-            r.resolved_at as resolved_at,
-            r.created_datetime as created_datetime,
+            r.resolved_at,
+            r.resolved_at as processed_at,
+            r.created_datetime as created_at,
             case
                 when r.target_type = 'WORK' then (
                     select w.title from tbl_work w where w.id = r.target_id
@@ -25,6 +40,13 @@
                 )
                 else 'unknown'
             end as target_name,
+            case
+                when r.target_type = 'WORK' then (
+                    select w.member_id from tbl_work w where w.id = r.target_id
+                )
+                when r.target_type = 'MEMBER' then r.target_id
+                else null
+            end as target_author_id,
             (
                 select count(*)
                 from tbl_report r2
@@ -51,22 +73,38 @@
             </if>
         </where>
         order by r.created_datetime desc
-        limit #{size} offset (#{page} - 1) * #{size}
+        limit #{size} offset #{offset}
     </select>
 
     <select id="selectReportDetail" resultType="com.app.bideo.dto.admin.ReportResponseDTO">
         select
             r.id,
-            r.reporter_id as reporter_id,
+            r.reporter_id,
             m.nickname as reporter_nickname,
-            r.target_type as target_type,
-            r.target_id as target_id,
-            r.reason,
+            case r.target_type
+                when 'WORK'    then '작품'
+                when 'MEMBER'  then '회원'
+                when 'COMMENT' then '댓글'
+                when 'GALLERY' then '예술관'
+                else r.target_type
+            end as category,
+            r.target_type,
+            r.target_id,
+            case r.reason
+                when 'SENSITIVE'     then '음란/선정'
+                when 'IMPERSONATION' then '사칭'
+                when 'HARASSMENT'    then '괴롭힘'
+                when 'COPYRIGHT'     then '저작권'
+                else r.reason
+            end as reason,
+            r.detail as reason_detail,
             r.detail,
             r.status,
-            r.resolved_at as resolved_at,
-            r.created_datetime as created_datetime,
-            r.resolved_memo as resolved_memo,
+            r.resolved_at,
+            r.resolved_at as processed_at,
+            r.created_datetime as created_at,
+            r.resolved_memo,
+            r.resolved_memo as process_memo,
             case
                 when r.target_type = 'WORK' then (
                     select w.title from tbl_work w where w.id = r.target_id
@@ -76,6 +114,19 @@
                 )
                 else 'unknown'
             end as target_name,
+            case
+                when r.target_type = 'WORK' then (
+                    select w.member_id from tbl_work w where w.id = r.target_id
+                )
+                when r.target_type = 'MEMBER' then r.target_id
+                else null
+            end as target_author_id,
+            (
+                select count(*)
+                from tbl_report r4
+                where r4.target_type = r.target_type
+                  and r4.target_id = r.target_id
+            ) as target_report_count,
             case
                 when r.target_type = 'WORK' then (
                     select w2.status from tbl_work w2 where w2.id = r.target_id
@@ -89,8 +140,20 @@
                 when r.target_type = 'WORK' then (
                     select tm.nickname from tbl_work w3 join tbl_member tm on w3.member_id = tm.id where w3.id = r.target_id
                 )
+                when r.target_type = 'MEMBER' then (
+                    select m4.nickname from tbl_member m4 where m4.id = r.target_id
+                )
                 else null
             end as target_author_name,
+            case
+                when r.target_type = 'WORK' then (
+                    select tm.nickname from tbl_work w5 join tbl_member tm on w5.member_id = tm.id where w5.id = r.target_id
+                )
+                when r.target_type = 'MEMBER' then (
+                    select m5.nickname from tbl_member m5 where m5.id = r.target_id
+                )
+                else null
+            end as target_author,
             case
                 when r.target_type = 'WORK' then (
                     select tm2.status from tbl_work w4 join tbl_member tm2 on w4.member_id = tm2.id where w4.id = r.target_id
@@ -101,7 +164,12 @@
                 select count(*)
                 from tbl_report r3
                 where r3.reporter_id = r.reporter_id
-            ) as reporter_history_count
+            ) as reporter_history_count,
+            (
+                select count(*)
+                from tbl_report r6
+                where r6.reporter_id = r.reporter_id
+            ) as reporter_total_count
         from tbl_report r
         join tbl_member m on r.reporter_id = m.id
         where r.id = #{id}
