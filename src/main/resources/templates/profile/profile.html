@@ -82,8 +82,12 @@
           </nav>
         </div>
 
+        <div class="videoEmpty" th:if="${blockedProfile}">
+          차단 된 유저입니다.
+        </div>
+
         <!-- 작품 / 영상 리스트 영역 -->
-        <div class="videoSection">
+        <div class="videoSection" th:unless="${blockedProfile}">
           <!-- 정렬 필터 영역 -->
           <div class="filterRow">
             <button type="button" class="filterBtn is-active" data-video-filter>최신순</button>
