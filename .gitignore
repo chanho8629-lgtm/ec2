@@ -1,23 +1,102 @@
-HELP.md
-.gradle
+# =====================================================
+# OS 생성 파일
+# =====================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+.DocumentRevisions-V100
+.TemporaryItems
+.VolumeIcon.icns
+Icon?
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+*.stackdump
+
+# Linux
+*~
+.directory
+.Trash-*
+.nfs*
+
+# =====================================================
+# IDE / 에디터
+# =====================================================
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Eclipse / STS
+.project
+.classpath
+.settings/
+.springBeans
+.factorypath
+bin/
+
+# VS Code (공유 설정만 추적, 개인 설정은 무시)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# NetBeans
+nbproject/private/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# =====================================================
+# Java / Gradle / Spring Boot
+# =====================================================
+.gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar
-ex/
-key/
-*.zip
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+*.class
+*.log
+hs_err_pid*
+replay_pid*
+erl_crash.dump
+
+HELP.md
+
+# =====================================================
+# 보안/로컬 설정 (커밋 금지)
+# =====================================================
 application*
 src/main/resources/certs/
+certs
+key/
+*.zip
+
+# =====================================================
+# 프로젝트 전용
+# =====================================================
 .claude
 front
-### STS ###
-.idea
+ex/
 .gstack/
-certs
 
-### Agent skills (matt-pocock) ###
+# Agent skills (matt-pocock)
 AGENTS.md
 docs/agents/
-
-# setting file
-.yml
-.yaml
