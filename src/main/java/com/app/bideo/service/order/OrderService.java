@@ -51,6 +51,12 @@ public class OrderService {
             originalPrice = auction.getFinalPrice();
             requestDTO.setWorkId(auction.getWorkId());
         } else {
+            OrderVO existingPendingOrder = orderDAO.findLatestPendingByBuyerAndWork(buyerId, requestDTO.getWorkId(), requestDTO.getOrderType());
+            if (existingPendingOrder != null) {
+                return orderDAO.findById(existingPendingOrder.getId())
+                        .orElseThrow(() -> new IllegalStateException("기존 주문 조회 실패"));
+            }
+
             WorkDTO work = workDAO.findById(requestDTO.getWorkId())
                     .orElseThrow(() -> new IllegalArgumentException("작품을 찾을 수 없습니다."));
             if (work.getMemberId().equals(buyerId)) {

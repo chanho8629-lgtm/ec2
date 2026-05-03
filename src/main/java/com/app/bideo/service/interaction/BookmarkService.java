@@ -7,6 +7,7 @@ import com.app.bideo.repository.interaction.BookmarkDAO;
 import com.app.bideo.service.common.S3FileService;
 import com.app.bideo.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,8 @@ public class BookmarkService {
     private final S3FileService s3FileService;
     private final NotificationService notificationService;
 
+    // 북마크를 토글하고 대시보드 캐시를 함께 비운다.
+    @CacheEvict(value = {"dashboard"}, allEntries = true)
     public Map<String, Object> toggleBookmark(Long memberId, String targetType, Long targetId) {
         boolean exists = bookmarkDAO.exists(memberId, targetType, targetId);
         if (exists) {
@@ -47,11 +50,13 @@ public class BookmarkService {
         return Map.of("bookmarked", !exists);
     }
 
+    // 특정 대상의 북마크 여부를 조회한다.
     @Transactional(readOnly = true)
     public boolean isBookmarked(Long memberId, String targetType, Long targetId) {
         return bookmarkDAO.exists(memberId, targetType, targetId);
     }
 
+    // 내 북마크 목록을 최신순으로 반환한다.
     @Transactional(readOnly = true)
     public List<Map<String, Object>> getMySavedItems(Long memberId) {
         List<Map<String, Object>> result = new ArrayList<>();
@@ -73,6 +78,7 @@ public class BookmarkService {
         return result;
     }
 
+    // 알림 발송을 위한 북마크 대상 소유자를 조회한다.
     private Long resolveOwnerId(String targetType, Long targetId) {
         if ("GALLERY".equals(targetType)) {
             return galleryDAO.findMemberIdById(targetId).orElse(null);

@@ -10,8 +10,10 @@ import com.app.bideo.dto.work.WorkDetailResponseDTO;
 import com.app.bideo.dto.work.WorkListResponseDTO;
 import com.app.bideo.dto.work.WorkSearchDTO;
 import com.app.bideo.dto.work.WorkUpdateRequestDTO;
+import com.app.bideo.auth.member.CustomUserDetails;
 import com.app.bideo.service.work.WorkService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -72,8 +74,9 @@ public class WorkAPIController {
     }
 
     @PostMapping("/{id}/views")
-    public void increaseViewCount(@PathVariable Long id) {
-        workService.increaseViewCount(id);
+    public void increaseViewCount(@PathVariable Long id,
+                                  @AuthenticationPrincipal CustomUserDetails userDetails) {
+        workService.increaseViewCount(id, userDetails != null ? userDetails.getId() : null);
     }
 
     // 작품 수정
