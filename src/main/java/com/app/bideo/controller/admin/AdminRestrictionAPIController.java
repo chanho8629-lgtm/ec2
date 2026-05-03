@@ -43,20 +43,32 @@ public class AdminRestrictionAPIController implements AdminRestrictionAPIControl
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, Long>> create(@RequestBody AdminRestrictionUpsertRequestDTO requestDTO) {
-        Long id = adminRestrictionService.createRestriction(requestDTO);
-        return ResponseEntity.ok(Map.of("id", id));
+    public ResponseEntity<?> create(@RequestBody AdminRestrictionUpsertRequestDTO requestDTO) {
+        try {
+            Long id = adminRestrictionService.createRestriction(requestDTO);
+            return ResponseEntity.ok(Map.of("id", id));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody AdminRestrictionUpsertRequestDTO requestDTO) {
-        adminRestrictionService.updateRestriction(id, requestDTO);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody AdminRestrictionUpsertRequestDTO requestDTO) {
+        try {
+            adminRestrictionService.updateRestriction(id, requestDTO);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PatchMapping("/{id}/release")
-    public ResponseEntity<Void> release(@PathVariable Long id) {
-        adminRestrictionService.releaseRestriction(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> release(@PathVariable Long id) {
+        try {
+            adminRestrictionService.releaseRestriction(id);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 }

@@ -6,6 +6,19 @@ const safeJson = async (response) => {
     try { return JSON.parse(text); } catch { return {}; }
 };
 
+const throwServerError = async (response) => {
+    const text = await response.text();
+    let message = text;
+    try {
+        const parsed = JSON.parse(text);
+        message = parsed.error || parsed.message || text;
+    } catch { /* keep raw text */ }
+    if (!message || !message.trim()) {
+        message = '서버 응답 오류 (' + response.status + ')';
+    }
+    throw new Error(message);
+};
+
 /* =====================================================
    adminMemberService - 회원관리 API
    ===================================================== */
@@ -13,13 +26,13 @@ const adminMemberService = (() => {
     const getList = async (params) => {
         const query = new URLSearchParams(params).toString();
         const response = await fetch(`/api/admin/members?${query}`);
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await response.json();
     };
 
     const getDetail = async (id) => {
         const response = await fetch(`/api/admin/members/${id}`);
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await response.json();
     };
 
@@ -29,7 +42,7 @@ const adminMemberService = (() => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status })
         });
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await safeJson(response);
     };
 
@@ -45,7 +58,7 @@ const adminMemberService = (() => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
         });
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await safeJson(response);
     };
 
@@ -54,7 +67,7 @@ const adminMemberService = (() => {
         if (resp.ok && resp.status !== 204) {
             const restriction = await resp.json();
             const releaseResp = await fetch(`/api/admin/restrictions/${restriction.id}/release`, { method: 'PATCH' });
-            if (!releaseResp.ok) throw new Error(await releaseResp.text());
+            if (!releaseResp.ok) await throwServerError(releaseResp);
         } else {
             await updateStatus(memberId, 'ACTIVE');
         }
@@ -70,13 +83,13 @@ const adminReportService = (() => {
     const getList = async (params) => {
         const query = new URLSearchParams(params).toString();
         const response = await fetch(`/api/admin/reports?${query}`);
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await response.json();
     };
 
     const getDetail = async (id) => {
         const response = await fetch(`/api/admin/reports/${id}`);
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await response.json();
     };
 
@@ -86,7 +99,7 @@ const adminReportService = (() => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: 'RESOLVED', memo })
         });
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await safeJson(response);
     };
 
@@ -96,7 +109,7 @@ const adminReportService = (() => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: 'CANCELLED', memo })
         });
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await safeJson(response);
     };
 
@@ -110,13 +123,13 @@ const adminWorkService = (() => {
     const getList = async (params) => {
         const query = new URLSearchParams(params).toString();
         const response = await fetch(`/api/admin/works?${query}`);
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await response.json();
     };
 
     const getDetail = async (id) => {
         const response = await fetch(`/api/admin/works/${id}`);
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await response.json();
     };
 
@@ -126,7 +139,7 @@ const adminWorkService = (() => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: 'HIDDEN' })
         });
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await safeJson(response);
     };
 
@@ -136,7 +149,7 @@ const adminWorkService = (() => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: 'ACTIVE' })
         });
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await safeJson(response);
     };
 
@@ -150,13 +163,13 @@ const adminAuctionService = (() => {
     const getList = async (params) => {
         const query = new URLSearchParams(params).toString();
         const response = await fetch(`/api/admin/auctions?${query}`);
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await response.json();
     };
 
     const getDetail = async (id) => {
         const response = await fetch(`/api/admin/auctions/${id}`);
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await response.json();
     };
 
@@ -170,13 +183,13 @@ const adminWithdrawalService = (() => {
     const getList = async (params) => {
         const query = new URLSearchParams(params).toString();
         const response = await fetch(`/api/admin/withdrawals?${query}`);
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await response.json();
     };
 
     const getDetail = async (id) => {
         const response = await fetch(`/api/admin/withdrawals/${id}`);
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await response.json();
     };
 
@@ -185,7 +198,7 @@ const adminWithdrawalService = (() => {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' }
         });
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await safeJson(response);
     };
 
@@ -195,7 +208,7 @@ const adminWithdrawalService = (() => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ reason })
         });
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await safeJson(response);
     };
 
@@ -209,13 +222,13 @@ const adminPaymentService = (() => {
     const getList = async (params) => {
         const query = new URLSearchParams(params).toString();
         const response = await fetch(`/api/admin/payments?${query}`);
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await response.json();
     };
 
     const getDetail = async (id) => {
         const response = await fetch(`/api/admin/payments/${id}`);
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok) await throwServerError(response);
         return await response.json();
     };
 

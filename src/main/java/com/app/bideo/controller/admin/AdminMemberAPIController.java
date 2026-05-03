@@ -36,12 +36,16 @@ public class AdminMemberAPIController implements AdminMemberAPIControllerDocs {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Void> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String status = body == null ? null : body.get("status");
         if (status == null || status.isBlank()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(Map.of("error", "회원 상태가 필요합니다."));
         }
-        adminMemberService.updateMemberStatus(id, status);
-        return ResponseEntity.ok().build();
+        try {
+            adminMemberService.updateMemberStatus(id, status);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 }
