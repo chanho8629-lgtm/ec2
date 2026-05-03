@@ -37,5 +37,5 @@ public interface AdminMemberAPIControllerDocs {
             @ApiResponse(responseCode = "400", description = "status 누락 또는 허용값(ACTIVE / SUSPENDED / BANNED) 외"),
             @ApiResponse(responseCode = "403", description = "ROLE_ADMIN 권한 없음")
     })
-    ResponseEntity<Void> updateStatus(@Parameter(description = "회원 PK") Long id, Map<String, String> body);
+    ResponseEntity<?> updateStatus(@Parameter(description = "회원 PK") Long id, Map<String, String> body);
 }
