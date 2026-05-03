@@ -163,10 +163,13 @@ public class WorkService {
         return detail;
     }
 
-    public void increaseViewCount(Long id) {
+    public void increaseViewCount(Long id, Long viewerId) {
         workDAO.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("work not found"));
         workDAO.increaseViewCount(id);
+        if (viewerId != null) {
+            workDAO.saveViewLog(id, viewerId);
+        }
     }
 
     // 프로필 화면에 표시할 작성자 작품 목록 조회

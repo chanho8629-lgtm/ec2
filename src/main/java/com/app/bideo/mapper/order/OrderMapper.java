@@ -18,6 +18,10 @@ public interface OrderMapper {
 
     OrderVO selectByOrderCode(@Param("orderCode") String orderCode);
 
+    OrderVO selectLatestPendingByBuyerAndWork(@Param("buyerId") Long buyerId,
+                                              @Param("workId") Long workId,
+                                              @Param("orderType") String orderType);
+
     List<OrderListResponseDTO> selectByBuyerId(@Param("buyerId") Long buyerId,
                                                 @Param("offset") int offset,
                                                 @Param("limit") int limit);
@@ -31,4 +35,9 @@ public interface OrderMapper {
     int countBySellerId(@Param("sellerId") Long sellerId);
 
     void updateStatus(@Param("orderId") Long orderId, @Param("status") String status);
+
+    void updateOtherPendingByBuyerAndWork(@Param("buyerId") Long buyerId,
+                                          @Param("workId") Long workId,
+                                          @Param("excludeOrderId") Long excludeOrderId,
+                                          @Param("status") String status);
 }

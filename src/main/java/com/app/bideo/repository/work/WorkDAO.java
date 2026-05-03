@@ -48,6 +48,10 @@ public class WorkDAO {
         workMapper.increaseWorkViewCount(id);
     }
 
+    public void saveViewLog(Long workId, Long memberId) {
+        workMapper.insertWorkView(workId, memberId);
+    }
+
     public Optional<Long> findFirstMemberId() {
         return Optional.ofNullable(workMapper.selectFirstMemberId());
     }

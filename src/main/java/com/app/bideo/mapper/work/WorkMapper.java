@@ -36,6 +36,8 @@ public interface WorkMapper {
 
     int increaseWorkViewCount(@Param("id") Long id);
 
+    void insertWorkView(@Param("workId") Long workId, @Param("memberId") Long memberId);
+
     WorkDetailResponseDTO selectWorkDetail(@Param("id") Long id);
 
     List<WorkListResponseDTO> selectWorkList(WorkSearchDTO searchDTO);

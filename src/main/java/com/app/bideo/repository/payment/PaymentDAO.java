@@ -31,6 +31,10 @@ public class PaymentDAO {
         return Optional.ofNullable(paymentMapper.selectByPaymentCode(paymentCode));
     }
 
+    public Optional<PaymentVO> findLatestActiveByOrderCode(String orderCode) {
+        return Optional.ofNullable(paymentMapper.selectLatestActiveByOrderCode(orderCode));
+    }
+
     public List<PaymentResponseDTO> findByBuyerId(Long buyerId, int offset, int limit) {
         return paymentMapper.selectByBuyerId(buyerId, offset, limit);
     }
@@ -49,5 +53,9 @@ public class PaymentDAO {
 
     public void updatePgReceiptId(Long paymentId, String pgReceiptId) {
         paymentMapper.updatePgReceiptId(paymentId, pgReceiptId);
+    }
+
+    public void updateOtherOpenByBuyerAndWork(Long buyerId, Long workId, Long excludePaymentId, String status) {
+        paymentMapper.updateOtherOpenByBuyerAndWork(buyerId, workId, excludePaymentId, status);
     }
 }
