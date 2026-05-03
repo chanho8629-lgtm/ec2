@@ -29,6 +29,26 @@ document.addEventListener("DOMContentLoaded", function () {
   let cachedTrending = null;
   let cachedRecent = null;
 
+  function buildSearchResultsUrl(keyword) {
+    return "/results?search_query=" + encodeURIComponent((keyword || "").trim());
+  }
+
+  function submitSearch(keyword) {
+    let normalized = (keyword || "").trim();
+    if (!normalized) {
+      return;
+    }
+
+    fetch("/api/search/recent", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ keyword: normalized })
+    }).catch(function () {});
+
+    window.location.href = buildSearchResultsUrl(normalized);
+  }
+
   function escapeHtml(value) {
     return String(value)
       .replace(/&/g, "&amp;")
@@ -72,15 +92,98 @@ document.addEventListener("DOMContentLoaded", function () {
     return li;
   }
 
+  function createProfileItem(profile) {
+    let li = document.createElement("li");
+    let link = document.createElement("a");
+    let thumb = document.createElement("span");
+    let body = document.createElement("span");
+    let titleEl = document.createElement("span");
+    let metaEl = document.createElement("span");
+
+    link.className = "bd-search-result";
+    link.href = "/profile/" + encodeURIComponent(profile.nickname || "");
+
+    thumb.className = "bd-search-result__thumb";
+    if (profile.profileImage) {
+      let img = document.createElement("img");
+      img.src = profile.profileImage;
+      img.alt = profile.nickname || "";
+      img.onerror = function () {
+        this.onerror = null;
+        this.src = "/images/default-profile.svg";
+      };
+      thumb.appendChild(img);
+    } else {
+      let placeholder = document.createElement("span");
+      placeholder.className = "bd-search-result__duration";
+      placeholder.textContent = "PF";
+      thumb.appendChild(placeholder);
+    }
+
+    body.className = "bd-search-result__body";
+    titleEl.className = "bd-search-result__title";
+    titleEl.textContent = profile.nickname || "프로필";
+    metaEl.className = "bd-search-result__meta";
+    metaEl.textContent = "프로필";
+    body.appendChild(titleEl);
+    body.appendChild(metaEl);
+
+    link.appendChild(thumb);
+    link.appendChild(body);
+    li.appendChild(link);
+    return li;
+  }
+
+  function createWorkItem(work) {
+    let li = document.createElement("li");
+    let link = document.createElement("a");
+    let thumb = document.createElement("span");
+    let body = document.createElement("span");
+    let titleEl = document.createElement("span");
+    let metaEl = document.createElement("span");
+
+    link.className = "bd-search-result";
+    link.href = "/work/detail/" + work.id;
+
+    thumb.className = "bd-search-result__thumb";
+    if (work.thumbnailUrl) {
+      let img = document.createElement("img");
+      img.src = work.thumbnailUrl;
+      img.alt = work.title || "";
+      img.onerror = function () {
+        this.onerror = null;
+        this.src = "/images/logo.png";
+      };
+      thumb.appendChild(img);
+    } else {
+      let placeholder = document.createElement("span");
+      placeholder.className = "bd-search-result__duration";
+      placeholder.textContent = "WORK";
+      thumb.appendChild(placeholder);
+    }
+
+    body.className = "bd-search-result__body";
+    titleEl.className = "bd-search-result__title";
+    titleEl.textContent = work.title || "작품";
+    metaEl.className = "bd-search-result__meta";
+    metaEl.textContent = work.memberNickname || "작가";
+    body.appendChild(titleEl);
+    body.appendChild(metaEl);
+
+    link.appendChild(thumb);
+    link.appendChild(body);
+    li.appendChild(link);
+    return li;
+  }
+
   function createKeywordItem(keyword, type) {
     let li = document.createElement("li");
     let link = document.createElement("a");
     link.className = "bd-search-result";
-    link.href = "#";
+    link.href = buildSearchResultsUrl(keyword);
     link.addEventListener("click", function (e) {
       e.preventDefault();
-      portalInput.value = keyword;
-      renderSearchResults(keyword);
+      submitSearch(keyword);
     });
 
     let icon = document.createElement("span");
@@ -205,20 +308,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (searchDebounce) clearTimeout(searchDebounce);
     searchDebounce = setTimeout(function () {
-      fetch("/api/galleries?keyword=" + encodeURIComponent(normalized) + "&size=10", { credentials: "same-origin" })
-        .then(function (res) { return res.ok ? res.json() : { content: [] }; })
+      fetch("/api/search/1?keyword=" + encodeURIComponent(normalized) + "&type=all&sort=latest", { credentials: "same-origin" })
+        .then(function (res) { return res.ok ? res.json() : { profiles: [], galleries: [], works: [] }; })
         .then(function (data) {
-          let galleries = data.content || [];
+          let profiles = Array.isArray(data.profiles) ? data.profiles.slice(0, 2) : [];
+          let galleries = Array.isArray(data.galleries) ? data.galleries.slice(0, 3) : [];
+          let works = Array.isArray(data.works) ? data.works.slice(0, 3) : [];
           results.innerHTML = "";
           title.textContent = '"' + normalized + '" 검색 결과';
 
-          if (!galleries.length) {
+          if (!profiles.length && !galleries.length && !works.length) {
             renderEmpty();
             return;
           }
 
           let list = document.createElement("ul");
           list.className = "bd-search-results-list";
+          profiles.forEach(function (profile) {
+            list.appendChild(createProfileItem(profile));
+          });
           galleries.forEach(function (gallery) {
             list.appendChild(createGalleryItem({
               id: gallery.id,
@@ -226,7 +334,24 @@ document.addEventListener("DOMContentLoaded", function () {
               coverImageUrl: gallery.coverImage || null
             }));
           });
+          works.forEach(function (work) {
+            list.appendChild(createWorkItem(work));
+          });
           results.appendChild(list);
+
+          let submitLink = document.createElement("a");
+          submitLink.className = "bd-search-result";
+          submitLink.href = buildSearchResultsUrl(normalized);
+          submitLink.innerHTML =
+            '<span class="bd-search-result__thumb" style="display:flex;align-items:center;justify-content:center;font-size:1rem;">&#128269;</span>' +
+            '<span class="bd-search-result__body"><span class="bd-search-result__title">"' + escapeHtml(normalized) + '" 전체 검색 결과 보기</span></span>';
+          submitLink.addEventListener("click", function (event) {
+            event.preventDefault();
+            submitSearch(normalized);
+          });
+          let submitItem = document.createElement("div");
+          submitItem.appendChild(submitLink);
+          results.appendChild(submitItem);
         })
         .catch(function () {
           renderEmpty();
@@ -313,23 +438,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     event.preventDefault();
     let keyword = (portalInput.value || "").trim();
-    if (keyword) {
-      fetch("/api/search/recent", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ keyword: keyword })
-      }).catch(function () {});
+    if (activeSource) {
+      activeSource.input.value = portalInput.value;
     }
-    let source = activeSource;
-    let submitter = source.form.querySelector('[type="submit"]');
-    source.input.value = portalInput.value;
     closePortal();
-    if (source.form.requestSubmit) {
-      source.form.requestSubmit(submitter || undefined);
-      return;
-    }
-    source.form.submit();
+    submitSearch(keyword);
   });
 
   scrim.addEventListener("click", function () {

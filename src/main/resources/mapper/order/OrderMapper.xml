@@ -37,7 +37,14 @@
 
     <select id="selectByBuyerId" resultType="OrderListResponseDTO">
         SELECT o.id, o.order_code, o.total_price, o.order_type, o.status, o.ordered_at,
-               w.title AS work_title, w.thumbnail AS work_thumbnail
+               w.title AS work_title,
+               (
+                   SELECT wf.file_url
+                   FROM tbl_work_file wf
+                   WHERE wf.work_id = o.work_id
+                   ORDER BY CASE WHEN wf.file_type LIKE 'image/%' THEN 0 ELSE 1 END, wf.sort_order ASC, wf.id ASC
+                   LIMIT 1
+               ) AS work_thumbnail
         FROM tbl_order o
         LEFT JOIN tbl_work w ON o.work_id = w.id
         WHERE o.buyer_id = #{buyerId}
@@ -47,7 +54,14 @@
 
     <select id="selectBySellerId" resultType="OrderListResponseDTO">
         SELECT o.id, o.order_code, o.total_price, o.order_type, o.status, o.ordered_at,
-               w.title AS work_title, w.thumbnail AS work_thumbnail
+               w.title AS work_title,
+               (
+                   SELECT wf.file_url
+                   FROM tbl_work_file wf
+                   WHERE wf.work_id = o.work_id
+                   ORDER BY CASE WHEN wf.file_type LIKE 'image/%' THEN 0 ELSE 1 END, wf.sort_order ASC, wf.id ASC
+                   LIMIT 1
+               ) AS work_thumbnail
         FROM tbl_order o
         LEFT JOIN tbl_work w ON o.work_id = w.id
         WHERE o.seller_id = #{sellerId}

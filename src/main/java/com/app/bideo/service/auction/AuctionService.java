@@ -79,7 +79,7 @@ public class AuctionService {
                         .settlementAmount(settlementAmount)
                         .deadlineHours(requestDTO.getDeadlineHours())
                         .startedAt(startedAt)
-                        .closingAt(startedAt.plusHours(requestDTO.getDeadlineHours()))
+                        .closingAt(startedAt.plusMinutes(requestDTO.getDeadlineHours()))
                         .cancelThreshold(0.70d)
                         .status("ACTIVE")
                         .build()
@@ -92,6 +92,17 @@ public class AuctionService {
     public AuctionDetailResponseDTO getActiveAuctionByWorkId(Long workId) {
         AuctionDetailResponseDTO responseDTO = auctionDAO.findActiveByWorkId(workId)
                 .orElseThrow(() -> new IllegalArgumentException("활성 경매를 찾을 수 없습니다."));
+
+        List<BidResponseDTO> bids = bidDAO.findByAuctionId(responseDTO.getId(), 0, 20);
+        responseDTO.setBids(bids);
+
+        return responseDTO;
+    }
+
+    @LogStatusWithReturn
+    public AuctionDetailResponseDTO getAuctionDetailById(Long auctionId) {
+        AuctionDetailResponseDTO responseDTO = auctionDAO.findDetailById(auctionId)
+                .orElseThrow(() -> new IllegalArgumentException("경매를 찾을 수 없습니다."));
 
         List<BidResponseDTO> bids = bidDAO.findByAuctionId(responseDTO.getId(), 0, 20);
         responseDTO.setBids(bids);

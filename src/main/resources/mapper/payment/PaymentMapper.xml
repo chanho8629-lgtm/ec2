@@ -16,10 +16,23 @@
     </insert>
 
     <select id="selectById" resultType="PaymentResponseDTO">
-        SELECT id, payment_code, order_code, total_price, total_fee,
-               payment_purpose, pay_method, pg_receipt_id, status, paid_at, created_datetime
-        FROM tbl_payment
-        WHERE id = #{paymentId}
+        SELECT p.id, p.payment_code, p.order_code, p.work_id, p.auction_id, p.original_amount, p.total_price, p.total_fee,
+               p.payment_purpose, p.pay_method, p.pg_receipt_id, p.status, p.paid_at, p.created_datetime,
+               COALESCE(w.title, '삭제된 작품 결제') AS work_title,
+               (
+                   SELECT wf.file_url
+                   FROM tbl_work_file wf
+                   WHERE wf.work_id = p.work_id
+                   ORDER BY CASE WHEN wf.file_type LIKE 'image/%' THEN 0 ELSE 1 END, wf.sort_order ASC, wf.id ASC
+                   LIMIT 1
+               ) AS work_thumbnail,
+               s.nickname AS seller_nickname,
+               o.license_type
+        FROM tbl_payment p
+        LEFT JOIN tbl_order o ON p.order_code = o.order_code
+        LEFT JOIN tbl_work w ON p.work_id = w.id
+        LEFT JOIN tbl_member s ON p.seller_id = s.id
+        WHERE p.id = #{paymentId}
     </select>
 
     <select id="selectRawById" resultType="PaymentVO">
@@ -31,18 +44,68 @@
     </select>
 
     <select id="selectByPaymentCode" resultType="PaymentResponseDTO">
-        SELECT id, payment_code, order_code, total_price, total_fee,
-               payment_purpose, pay_method, pg_receipt_id, status, paid_at, created_datetime
-        FROM tbl_payment
-        WHERE payment_code = #{paymentCode}
+        SELECT p.id, p.payment_code, p.order_code, p.work_id, p.auction_id, p.original_amount, p.total_price, p.total_fee,
+               p.payment_purpose, p.pay_method, p.pg_receipt_id, p.status, p.paid_at, p.created_datetime,
+               COALESCE(w.title, '삭제된 작품 결제') AS work_title,
+               (
+                   SELECT wf.file_url
+                   FROM tbl_work_file wf
+                   WHERE wf.work_id = p.work_id
+                   ORDER BY CASE WHEN wf.file_type LIKE 'image/%' THEN 0 ELSE 1 END, wf.sort_order ASC, wf.id ASC
+                   LIMIT 1
+               ) AS work_thumbnail,
+               s.nickname AS seller_nickname,
+               o.license_type
+        FROM tbl_payment p
+        LEFT JOIN tbl_order o ON p.order_code = o.order_code
+        LEFT JOIN tbl_work w ON p.work_id = w.id
+        LEFT JOIN tbl_member s ON p.seller_id = s.id
+        WHERE p.payment_code = #{paymentCode}
+    </select>
+
+    <select id="selectPendingByBuyerAndAuction" resultType="PaymentResponseDTO">
+        SELECT p.id, p.payment_code, p.order_code, p.work_id, p.auction_id, p.original_amount, p.total_price, p.total_fee,
+               p.payment_purpose, p.pay_method, p.pg_receipt_id, p.status, p.paid_at, p.created_datetime,
+               COALESCE(w.title, '삭제된 작품 결제') AS work_title,
+               (
+                   SELECT wf.file_url
+                   FROM tbl_work_file wf
+                   WHERE wf.work_id = p.work_id
+                   ORDER BY CASE WHEN wf.file_type LIKE 'image/%' THEN 0 ELSE 1 END, wf.sort_order ASC, wf.id ASC
+                   LIMIT 1
+               ) AS work_thumbnail,
+               s.nickname AS seller_nickname,
+               o.license_type
+        FROM tbl_payment p
+        LEFT JOIN tbl_order o ON p.order_code = o.order_code
+        LEFT JOIN tbl_work w ON p.work_id = w.id
+        LEFT JOIN tbl_member s ON p.seller_id = s.id
+        WHERE p.buyer_id = #{buyerId}
+          AND p.auction_id = #{auctionId}
+          AND p.status = 'PENDING'
+        ORDER BY p.created_datetime DESC, p.id DESC
+        LIMIT 1
     </select>
 
     <select id="selectByBuyerId" resultType="PaymentResponseDTO">
-        SELECT id, payment_code, order_code, total_price, total_fee,
-               payment_purpose, pay_method, pg_receipt_id, status, paid_at, created_datetime
-        FROM tbl_payment
-        WHERE buyer_id = #{buyerId}
-        ORDER BY created_datetime DESC
+        SELECT p.id, p.payment_code, p.order_code, p.work_id, p.auction_id, p.original_amount, p.total_price, p.total_fee,
+               p.payment_purpose, p.pay_method, p.pg_receipt_id, p.status, p.paid_at, p.created_datetime,
+               COALESCE(w.title, '삭제된 작품 결제') AS work_title,
+               (
+                   SELECT wf.file_url
+                   FROM tbl_work_file wf
+                   WHERE wf.work_id = p.work_id
+                   ORDER BY CASE WHEN wf.file_type LIKE 'image/%' THEN 0 ELSE 1 END, wf.sort_order ASC, wf.id ASC
+                   LIMIT 1
+               ) AS work_thumbnail,
+               s.nickname AS seller_nickname,
+               o.license_type
+        FROM tbl_payment p
+        LEFT JOIN tbl_order o ON p.order_code = o.order_code
+        LEFT JOIN tbl_work w ON p.work_id = w.id
+        LEFT JOIN tbl_member s ON p.seller_id = s.id
+        WHERE p.buyer_id = #{buyerId}
+        ORDER BY p.created_datetime DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
 

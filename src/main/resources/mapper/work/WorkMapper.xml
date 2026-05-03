@@ -8,8 +8,8 @@
         insert into tbl_member (
             email, password, nickname, role, status, created_datetime, updated_datetime
         ) values (
-            #{email}, #{password}, #{nickname}, #{role}, #{status}, now(), now()
-        )
+                     #{email}, #{password}, #{nickname}, #{role}, #{status}, now(), now()
+                 )
     </insert>
 
     <select id="selectMemberIdByEmail" resultType="long">
@@ -62,10 +62,10 @@
             license_type, license_terms, is_tradable, allow_comment,
             show_similar, link_url, status
         ) values (
-            #{memberId}, #{title}, #{category}, #{description}, #{price},
-            #{licenseType}, #{licenseTerms}, coalesce(#{isTradable}, false), coalesce(#{allowComment}, true),
-            coalesce(#{showSimilar}, true), #{linkUrl}, coalesce(#{status}, 'ACTIVE')
-        )
+                     #{memberId}, #{title}, #{category}, #{description}, #{price},
+                     #{licenseType}, #{licenseTerms}, coalesce(#{isTradable}, false), coalesce(#{allowComment}, true),
+                     coalesce(#{showSimilar}, true), #{linkUrl}, coalesce(#{status}, 'ACTIVE')
+                 )
     </insert>
 
     <update id="updateWork">
@@ -142,6 +142,7 @@
     </update>
 
     <select id="selectWorkDetail" resultMap="workDetailMap">
+        <![CDATA[
         select
             w.id,
             (
@@ -175,13 +176,27 @@
             w.updated_datetime,
             w.deleted_datetime
         from tbl_work w
-        left join tbl_member m on w.member_id = m.id
+                 left join tbl_member m on w.member_id = m.id
         where w.id = #{id}
           and w.deleted_datetime is null
           and w.status = 'ACTIVE'
+          and not exists (
+            select 1
+            from tbl_auction latest
+            where latest.id = (
+                select a.id
+                from tbl_auction a
+                where a.work_id = w.id
+                order by a.created_datetime desc, a.id desc
+                limit 1
+            )
+              and (latest.status != 'ACTIVE' or latest.closing_at <= now())
+        )
+        ]]>
     </select>
 
     <select id="selectWorkList" resultType="WorkListResponseDTO">
+        <![CDATA[
         select
             w.id,
             w.member_id,
@@ -207,24 +222,44 @@
             select wf.file_url, wf.file_type, wf.width, wf.height
             from tbl_work_file wf
             where wf.work_id = w.id
-            order by wf.sort_order asc, wf.id asc
+            order by case when wf.file_type like 'image/%' then 0 else 1 end, wf.sort_order asc, wf.id asc
             limit 1
         ) t_file on true
         where w.deleted_datetime is null
           and w.status = 'ACTIVE'
+          and not exists (
+              select 1
+              from tbl_auction latest
+              where latest.id = (
+                  select a.id
+                  from tbl_auction a
+                  where a.work_id = w.id
+                  order by a.created_datetime desc, a.id desc
+                  limit 1
+              )
+                and (latest.status != 'ACTIVE' or latest.closing_at <= now())
+          )
+        ]]>
         <if test="galleryId != null">
             and exists (
-                select 1
-                from tbl_gallery_work gw
-                where gw.work_id = w.id
-                  and gw.gallery_id = #{galleryId}
+            select 1
+            from tbl_gallery_work gw
+            where gw.work_id = w.id
+            and gw.gallery_id = #{galleryId}
             )
         </if>
         <if test="keyword != null and keyword != ''">
             and (
-                w.title ilike '%' || #{keyword} || '%'
-                or w.description ilike '%' || #{keyword} || '%'
-                or m.nickname ilike '%' || #{keyword} || '%'
+            w.title ilike '%' || #{keyword} || '%'
+            or w.description ilike '%' || #{keyword} || '%'
+            or m.nickname ilike '%' || #{keyword} || '%'
+            or exists (
+            select 1
+            from tbl_work_tag wt
+            join tbl_tag t on wt.tag_id = t.id
+            where wt.work_id = w.id
+            and t.tag_name ilike '%' || #{keyword} || '%'
+            )
             )
         </if>
         <if test="category != null and category != ''">
@@ -260,6 +295,7 @@
     </select>
 
     <select id="selectSearchWorkList" resultType="WorkListResponseDTO">
+        <![CDATA[
         select
             w.id,
             w.member_id,
@@ -285,16 +321,36 @@
             select wf.file_url, wf.file_type, wf.width, wf.height
             from tbl_work_file wf
             where wf.work_id = w.id
-            order by wf.sort_order asc, wf.id asc
+            order by case when wf.file_type like 'image/%' then 0 else 1 end, wf.sort_order asc, wf.id asc
             limit 1
         ) t_file on true
         where w.deleted_datetime is null
           and w.status = 'ACTIVE'
+          and not exists (
+              select 1
+              from tbl_auction latest
+              where latest.id = (
+                  select a.id
+                  from tbl_auction a
+                  where a.work_id = w.id
+                  order by a.created_datetime desc, a.id desc
+                  limit 1
+              )
+                and (latest.status != 'ACTIVE' or latest.closing_at <= now())
+          )
+        ]]>
         <if test="keyword != null and keyword != ''">
             and (
-                w.title ilike '%' || #{keyword} || '%'
-                or w.description ilike '%' || #{keyword} || '%'
-                or m.nickname ilike '%' || #{keyword} || '%'
+            w.title ilike '%' || #{keyword} || '%'
+            or w.description ilike '%' || #{keyword} || '%'
+            or m.nickname ilike '%' || #{keyword} || '%'
+            or exists (
+            select 1
+            from tbl_work_tag wt
+            join tbl_tag t on wt.tag_id = t.id
+            where wt.work_id = w.id
+            and t.tag_name ilike '%' || #{keyword} || '%'
+            )
             )
         </if>
         <choose>
@@ -309,6 +365,7 @@
     </select>
 
     <select id="selectWorkFeed" resultType="WorkListResponseDTO">
+        <![CDATA[
         select
             w.id,
             w.member_id,
@@ -334,11 +391,24 @@
             select wf.file_url, wf.file_type, wf.width, wf.height
             from tbl_work_file wf
             where wf.work_id = w.id
-            order by wf.sort_order asc, wf.id asc
+            order by case when wf.file_type like 'image/%' then 0 else 1 end, wf.sort_order asc, wf.id asc
             limit 1
         ) t_file on true
         where w.deleted_datetime is null
           and w.status = 'ACTIVE'
+          and not exists (
+              select 1
+              from tbl_auction latest
+              where latest.id = (
+                  select a.id
+                  from tbl_auction a
+                  where a.work_id = w.id
+                  order by a.created_datetime desc, a.id desc
+                  limit 1
+              )
+                and (latest.status != 'ACTIVE' or latest.closing_at <= now())
+          )
+        ]]>
         <if test="excludeIds != null and excludeIds.size() > 0">
             and w.id not in
             <foreach item="excludeId" collection="excludeIds" open="(" separator="," close=")">
@@ -348,36 +418,59 @@
         <if test="category != null and category != ''">
             and w.category = #{category}
         </if>
+        <if test="tag != null and tag != ''">
+            and exists (
+            select 1
+            from tbl_work_tag wt
+            join tbl_tag tag_filter on wt.tag_id = tag_filter.id
+            where wt.work_id = w.id
+            and lower(tag_filter.tag_name) = lower(#{tag})
+            )
+        </if>
         order by (
-            coalesce(w.like_count, 0) * 3
-            + coalesce(w.comment_count, 0) * 2
-            + coalesce(w.view_count, 0)
-            + greatest(0, 30 - extract(day from (now() - w.created_datetime))) * 5
-            + (random() * 50)
+        coalesce(w.like_count, 0) * 3
+        + coalesce(w.comment_count, 0) * 2
+        + coalesce(w.view_count, 0)
+        + greatest(0, 30 - extract(day from (now() - w.created_datetime))) * 5
+        + (random() * 50)
         ) desc,
         w.id desc
         limit #{limit}
     </select>
 
     <select id="selectWorkCount" resultType="int">
+        <![CDATA[
         select count(*)
         from tbl_work w
         left join tbl_member m on w.member_id = m.id
         where w.deleted_datetime is null
           and w.status = 'ACTIVE'
+          and not exists (
+              select 1
+              from tbl_auction latest
+              where latest.id = (
+                  select a.id
+                  from tbl_auction a
+                  where a.work_id = w.id
+                  order by a.created_datetime desc, a.id desc
+                  limit 1
+              )
+                and (latest.status != 'ACTIVE' or latest.closing_at <= now())
+          )
+        ]]>
         <if test="galleryId != null">
             and exists (
-                select 1
-                from tbl_gallery_work gw
-                where gw.work_id = w.id
-                  and gw.gallery_id = #{galleryId}
+            select 1
+            from tbl_gallery_work gw
+            where gw.work_id = w.id
+            and gw.gallery_id = #{galleryId}
             )
         </if>
         <if test="keyword != null and keyword != ''">
             and (
-                w.title ilike '%' || #{keyword} || '%'
-                or w.description ilike '%' || #{keyword} || '%'
-                or m.nickname ilike '%' || #{keyword} || '%'
+            w.title ilike '%' || #{keyword} || '%'
+            or w.description ilike '%' || #{keyword} || '%'
+            or m.nickname ilike '%' || #{keyword} || '%'
             )
         </if>
         <if test="category != null and category != ''">
@@ -407,13 +500,76 @@
         insert into tbl_work_file (
             work_id, file_url, file_type, file_size, width, height, sort_order
         ) values (
-            #{workId}, #{fileUrl}, #{fileType}, #{fileSize}, #{width}, #{height}, coalesce(#{sortOrder}, 0)
-        )
+                     #{workId}, #{fileUrl}, #{fileType}, #{fileSize}, #{width}, #{height}, coalesce(#{sortOrder}, 0)
+                 )
     </insert>
 
     <delete id="deleteWorkFilesByWorkId">
         delete from tbl_work_file
         where work_id = #{workId}
+    </delete>
+
+    <delete id="hardDeleteWorkById">
+        <![CDATA[
+        update tbl_comment
+        set parent_id = null
+        where target_type = 'WORK'
+          and target_id = #{workId};
+
+        delete from tbl_comment_like
+        where comment_id in (
+            select id
+            from tbl_comment
+            where target_type = 'WORK'
+              and target_id = #{workId}
+        );
+
+        delete from tbl_comment
+        where target_type = 'WORK'
+          and target_id = #{workId};
+
+        delete from tbl_bookmark
+        where target_type = 'WORK'
+          and target_id = #{workId};
+
+        delete from tbl_gallery_work
+        where work_id = #{workId};
+
+        delete from tbl_contest_entry
+        where work_id = #{workId};
+
+        delete from tbl_work_like
+        where work_id = #{workId};
+
+        delete from tbl_work_view
+        where work_id = #{workId};
+
+        delete from tbl_work_tag
+        where work_id = #{workId};
+
+        delete from tbl_work_file
+        where work_id = #{workId};
+
+        delete from tbl_auction_wishlist
+        where auction_id in (
+            select id
+            from tbl_auction
+            where work_id = #{workId}
+        );
+
+        delete from tbl_bid
+        where auction_id in (
+            select id
+            from tbl_auction
+            where work_id = #{workId}
+        );
+
+        delete from tbl_auction
+        where work_id = #{workId};
+
+        delete from tbl_work
+        where id = #{workId};
+        ]]>
     </delete>
 
     <select id="selectWorkFilesByWorkId" resultType="WorkFileResponseDTO">
@@ -436,8 +592,8 @@
         insert into tbl_work_tag (
             work_id, tag_id
         ) values (
-            #{workId}, #{tagId}
-        )
+                     #{workId}, #{tagId}
+                 )
     </insert>
 
     <delete id="deleteWorkTagsByWorkId">
@@ -462,8 +618,8 @@
         insert into tbl_tag (
             tag_name
         ) values (
-            #{tagName}
-        )
+                     #{tagName}
+                 )
     </insert>
 
     <select id="selectTagSuggestions" resultType="TagResponseDTO">
@@ -484,7 +640,7 @@
             t.id,
             t.tag_name
         from tbl_work_tag wt
-        join tbl_tag t on wt.tag_id = t.id
+                 join tbl_tag t on wt.tag_id = t.id
         where wt.work_id = #{workId}
         order by t.tag_name asc
     </select>
@@ -493,8 +649,8 @@
         insert into tbl_comment (
             member_id, target_type, target_id, parent_id, content, is_pinned, like_count
         ) values (
-            #{memberId}, #{targetType}, #{targetId}, #{parentId}, #{content}, coalesce(#{isPinned}, false), coalesce(#{likeCount}, 0)
-        )
+                     #{memberId}, #{targetType}, #{targetId}, #{parentId}, #{content}, coalesce(#{isPinned}, false), coalesce(#{likeCount}, 0)
+                 )
     </insert>
 
     <update id="increaseWorkCommentCount">
@@ -531,7 +687,7 @@
             c.created_datetime,
             c.updated_datetime
         from tbl_comment c
-        left join tbl_member m on c.member_id = m.id
+                 left join tbl_member m on c.member_id = m.id
         where c.target_type = 'WORK'
           and c.target_id = #{workId}
           and c.parent_id is null
@@ -540,6 +696,7 @@
     </select>
 
     <select id="existsActiveAuctionByWorkId" resultType="boolean">
+        <![CDATA[
         select exists (
             select 1
             from tbl_auction
@@ -547,9 +704,11 @@
               and status = 'ACTIVE'
               and closing_at > now()
         )
+        ]]>
     </select>
 
     <select id="existsEndedLatestAuctionByWorkId" resultType="boolean">
+        <![CDATA[
         select exists (
             select 1
             from tbl_auction latest
@@ -560,8 +719,9 @@
                 order by a.created_datetime desc, a.id desc
                 limit 1
             )
-              and (latest.status != 'ACTIVE' or latest.closing_at &lt;= now())
+              and (latest.status != 'ACTIVE' or latest.closing_at <= now())
         )
+        ]]>
     </select>
 
     <select id="existsWorkLike" resultType="boolean">
@@ -577,8 +737,8 @@
         insert into tbl_work_like (
             member_id, work_id
         ) values (
-            #{memberId}, #{workId}
-        )
+                     #{memberId}, #{workId}
+                 )
     </insert>
 
     <delete id="deleteWorkLike">

@@ -33,9 +33,26 @@ document.addEventListener("DOMContentLoaded", function () {
     if (noti.targetType === "MESSAGE" && noti.messageRoomId) return "#";
     if (noti.targetType === "WORK" && noti.targetId) return "/work/detail/" + noti.targetId;
     if (noti.targetType === "GALLERY" && noti.targetId) return "/gallery/" + noti.targetId;
-    if (noti.targetType === "AUCTION" && noti.targetId) return "/work/" + noti.targetId;
+    if (noti.targetType === "AUCTION" && noti.targetId) {
+      if (noti.notiType === "AUCTION_END") {
+        return "/payment/pay-api?auctionId=" + noti.targetId;
+      }
+      return "#";
+    }
+    if (noti.targetType === "PAYMENT" && noti.targetId) {
+      if (noti.paymentStatus === "PENDING" || noti.paymentStatus === "AUTHORIZED") {
+        return "/payment/pay-api?paymentId=" + noti.targetId;
+      }
+      return "#";
+    }
+    if (noti.targetType === "PAYMENT_HISTORY") return "/dashboard?tab=payment";
     if (noti.targetType === "CONTEST" && noti.targetId) return "/contest/" + noti.targetId;
     return "#";
+  }
+
+  function normalizeImageSrc(value, fallback) {
+    var src = String(value || "").trim();
+    return src || fallback;
   }
 
   /* ── Badge ── */
@@ -71,12 +88,12 @@ document.addEventListener("DOMContentLoaded", function () {
     list.innerHTML = notifications.map(function (noti) {
       var unreadClass = noti.isRead ? "" : " is-unread";
       var href = buildNotificationLink(noti);
-      var avatarSrc = noti.senderProfileImage || "/images/default-profile.svg";
+      var avatarSrc = normalizeImageSrc(noti.senderProfileImage, "/images/default-profile.svg");
       var dotHtml = noti.isRead ? "" : '<div class="bd-shell__notification-dot"></div>';
 
       return (
           '<a class="bd-shell__notification-item' + unreadClass + '" href="' + escapeHtml(href) + '" data-noti-id="' + noti.id + '">' +
-          '<img class="bd-shell__notification-avatar" src="' + escapeHtml(avatarSrc) + '" alt="" />' +
+          '<img class="bd-shell__notification-avatar" src="' + escapeHtml(avatarSrc) + '" alt="" onerror="this.onerror=null;this.src=\'/images/default-profile.svg\'" />' +
           '<div class="bd-shell__notification-body">' +
           '<p class="bd-shell__notification-text">' + escapeHtml(noti.message) + '</p>' +
           '<span class="bd-shell__notification-time">' + formatTime(noti.createdDatetime) + '</span>' +

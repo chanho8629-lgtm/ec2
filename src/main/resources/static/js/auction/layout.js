@@ -17,6 +17,39 @@ const AuctionLayout = (() => {
         bidInputWrapper?.classList.toggle("is-error", isError);
     };
 
+    const setClosedState = (data = {}, root = document) => {
+        const cdDay = root.getElementById("cdDay");
+        const cdHour = root.getElementById("cdHour");
+        const cdMin = root.getElementById("cdMin");
+        const cdSec = root.getElementById("cdSec");
+        [cdDay, cdHour, cdMin, cdSec].forEach((el) => {
+            if (el) el.textContent = "00";
+        });
+
+        const auctionDeadlineDate = root.getElementById("auctionDeadlineDate");
+        if (auctionDeadlineDate) {
+            auctionDeadlineDate.textContent = "경매가 종료되었습니다.";
+        }
+
+        const elements = getElements(root);
+        if (elements.bidCustomInput) {
+            elements.bidCustomInput.disabled = true;
+            elements.bidCustomInput.value = "";
+        }
+
+        const instantBidCheck = root.getElementById("instantBidCheck");
+        if (instantBidCheck) {
+            instantBidCheck.disabled = true;
+        }
+
+        if (elements.bidSubmitBtn) {
+            elements.bidSubmitBtn.disabled = true;
+            elements.bidSubmitBtn.style.opacity = "0.4";
+            elements.bidSubmitBtn.style.cursor = "not-allowed";
+            elements.bidSubmitBtn.innerHTML = '<span class="Auction-Bid-SubmitBtn-Amount">경매 종료</span>';
+        }
+    };
+
     const executeBid = (elements, auctionId) => {
         const minAmount = getMinAmount(elements);
         const inputValue = elements.bidCustomInput?.value.trim();
@@ -78,6 +111,11 @@ const AuctionLayout = (() => {
             bidNextAmount.dataset.amount = minNextBid;
         }
 
+        if (auction.status && auction.status !== "ACTIVE") {
+            setClosedState(auction, root);
+            return;
+        }
+
         startCountdown(auction.closingAt, root);
     };
 
@@ -102,11 +140,7 @@ const AuctionLayout = (() => {
             const diff = endTime.getTime() - Date.now();
 
             if (diff <= 0) {
-                cdDay.textContent = "00";
-                cdHour.textContent = "00";
-                cdMin.textContent = "00";
-                cdSec.textContent = "00";
-                auctionDeadlineDate.textContent = "경매가 종료되었습니다.";
+                setClosedState({}, root);
                 window.clearInterval(countdownTimerId);
                 countdownTimerId = null;
                 return;
@@ -153,5 +187,6 @@ const AuctionLayout = (() => {
         getMinAmount: getMinAmount,
         setInputError: setInputError,
         executeBid: executeBid,
+        setClosedState: setClosedState,
     };
 })();

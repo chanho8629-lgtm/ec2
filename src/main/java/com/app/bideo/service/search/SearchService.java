@@ -8,6 +8,7 @@ import com.app.bideo.dto.work.WorkListResponseDTO;
 import com.app.bideo.repository.gallery.GalleryDAO;
 import com.app.bideo.repository.member.MemberRepository;
 import com.app.bideo.repository.work.WorkDAO;
+import com.app.bideo.service.common.S3FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ public class SearchService {
     private final MemberRepository memberRepository;
     private final GalleryDAO galleryDAO;
     private final WorkDAO workDAO;
+    private final S3FileService s3FileService;
 
     public SearchResultResponseDTO search(int page, String keyword, String type, String sort, Long currentMemberId) {
         Criteria criteria = new Criteria();
@@ -42,6 +44,7 @@ public class SearchService {
                 anyHasMore = true;
                 profiles.remove(profiles.size() - 1);
             }
+            profiles.forEach(profile -> profile.setProfileImage(s3FileService.getPresignedUrl(profile.getProfileImage())));
         }
 
         if ("all".equals(type) || "gallery".equals(type)) {
@@ -50,14 +53,19 @@ public class SearchService {
                 anyHasMore = true;
                 galleries.remove(galleries.size() - 1);
             }
+            galleries.forEach(gallery -> gallery.setCoverImage(s3FileService.getPresignedUrl(gallery.getCoverImage())));
         }
 
         if ("all".equals(type) || "work".equals(type)) {
-            works = new ArrayList<>(workDAO.findBySearch(criteria, keyword, sort));
+            works = new ArrayList<>(workDAO.findBySearch(criteria, keyword, sort, currentMemberId));
             if (works.size() > criteria.getRowCount()) {
                 anyHasMore = true;
                 works.remove(works.size() - 1);
             }
+            works.forEach(work -> {
+                work.setThumbnailUrl(s3FileService.getPresignedUrl(work.getThumbnailUrl()));
+                work.setMemberProfileImage(s3FileService.getPresignedUrl(work.getMemberProfileImage()));
+            });
         }
 
         criteria.setHasMore(anyHasMore);

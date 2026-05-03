@@ -75,7 +75,7 @@ const AuctionSocket = (() => {
 
     const onBidReceived = (data) => {
         // 경매 종료 처리
-        if (data.status === 'CLOSED') {
+        if (data.status === 'CLOSED' || data.status === 'SOLD') {
             onAuctionClosed(data);
             return;
         }
@@ -113,26 +113,29 @@ const AuctionSocket = (() => {
     };
 
     const onAuctionClosed = (data) => {
-        // 카운트다운 종료 표시
-        const auctionDeadlineDate = document.getElementById('auctionDeadlineDate');
-        if (auctionDeadlineDate) {
-            auctionDeadlineDate.textContent = '경매가 종료되었습니다.';
-        }
+        AuctionLayout.setClosedState(data);
 
         const bidSubmitBtn = document.getElementById('bidSubmitBtn');
         if (!bidSubmitBtn) return;
 
         if (data.winnerId === currentMemberId) {
-            // 낙찰자 — 구매하기 버튼으로 교체
+            // 낙찰자 - 결제 버튼으로 교체
+            bidSubmitBtn.disabled = false;
+            bidSubmitBtn.style.opacity = '1';
+            bidSubmitBtn.style.cursor = 'pointer';
             bidSubmitBtn.innerHTML = `
-            <span class="Auction-Bid-SubmitBtn-Amount">🎉 낙찰! 구매하기</span>
+            <span class="Auction-Bid-SubmitBtn-Amount">낙찰! 결제하기</span>
         `;
             bidSubmitBtn.onclick = () => {
+                if (data.paymentId) {
+                    window.location.href = `/payment/pay-api?paymentId=${data.paymentId}`;
+                    return;
+                }
                 window.location.href = `/payment/pay-api?auctionId=${data.auctionId}`;
             };
             AuctionEvent.showToast('축하합니다! 낙찰되었습니다.', 'success');
         } else {
-            // 낙찰자 아님 — 버튼 비활성화
+            // 낙찰자 아님 - 버튼 비활성화
             bidSubmitBtn.disabled = true;
             bidSubmitBtn.style.opacity = '0.4';
             bidSubmitBtn.style.cursor = 'not-allowed';

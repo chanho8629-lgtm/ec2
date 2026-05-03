@@ -178,6 +178,34 @@ ytd-default-promo-panel-renderer,
     color: #ffffff;
 }
 
+.gallery-hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 14px;
+}
+
+.gallery-hero-tag {
+    display: inline-flex;
+    align-items: center;
+    max-width: 180px;
+    min-height: 30px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.gallery-hero-tag:hover {
+    background: rgba(255, 255, 255, 0.24);
+}
+
 .hero-meta {
     margin: 0 0 24px;
     font-size: 15px;
@@ -333,10 +361,16 @@ button.selected .progress-bar::after {
     aspect-ratio: 9 / 16 !important;
 }
 
-.video-item .thumb img {
+.video-item .thumb img,
+.video-item .thumb video {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
+}
+
+.video-item .thumb video {
+    background: #000000;
 }
 
 .item-meta {
