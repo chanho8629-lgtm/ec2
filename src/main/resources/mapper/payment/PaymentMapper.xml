@@ -37,6 +37,17 @@
         WHERE payment_code = #{paymentCode}
     </select>
 
+    <select id="selectLatestActiveByOrderCode" resultType="PaymentVO">
+        SELECT id, payment_code, order_code, buyer_id, seller_id, work_id, auction_id,
+               original_amount, total_price, total_fee, payment_purpose, pay_method,
+               card_id, pg_receipt_id, status, paid_at, refunded_at, created_datetime
+        FROM tbl_payment
+        WHERE order_code = #{orderCode}
+          AND status IN ('PENDING', 'AUTHORIZED')
+        ORDER BY created_datetime DESC, id DESC
+        LIMIT 1
+    </select>
+
     <select id="selectByBuyerId" resultType="PaymentResponseDTO">
         SELECT id, payment_code, order_code, total_price, total_fee,
                payment_purpose, pay_method, pg_receipt_id, status, paid_at, created_datetime
@@ -66,6 +77,15 @@
         UPDATE tbl_payment
         SET pg_receipt_id = #{pgReceiptId}
         WHERE id = #{paymentId}
+    </update>
+
+    <update id="updateOtherOpenByBuyerAndWork">
+        UPDATE tbl_payment
+        SET status = #{status}
+        WHERE buyer_id = #{buyerId}
+          AND work_id = #{workId}
+          AND status IN ('PENDING', 'AUTHORIZED')
+          AND id != #{excludePaymentId}
     </update>
 
 </mapper>

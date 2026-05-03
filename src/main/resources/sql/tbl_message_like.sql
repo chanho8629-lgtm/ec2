@@ -10,10 +10,8 @@ create table tbl_message_like (
     created_datetime timestamp not null default now(),
 
     constraint uk_message_like unique (message_id, member_id),
-    constraint fk_message_like_message foreign key (message_id)
-        references tbl_message (id),
-    constraint fk_message_like_member foreign key (member_id)
-        references tbl_member (id)
+    constraint fk_message_like_message foreign key (message_id) references tbl_message (id),
+    constraint fk_message_like_member foreign key (member_id) references tbl_member (id)
 );
 
 comment on table tbl_message_like is '메시지 좋아요';

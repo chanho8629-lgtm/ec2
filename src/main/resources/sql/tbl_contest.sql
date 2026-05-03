@@ -51,7 +51,6 @@ create index idx_contest_member on tbl_contest (member_id);
 create index idx_contest_status on tbl_contest (status, entry_start);
 
 
-ALTER TABLE tbl_contest
-    ADD COLUMN winner_notified_at timestamp NULL;
+-- ALTER TABLE tbl_contest ADD COLUMN winner_notified_at timestamp NULL;
 
-COMMENT ON COLUMN tbl_contest.winner_notified_at IS '수상자 알림 발송 일시';
+-- COMMENT ON COLUMN tbl_contest.winner_notified_at IS '수상자 알림 발송 일시';

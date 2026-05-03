@@ -1,6 +1,8 @@
 -- ----------------------------------------------------------
 -- 1. 회원 (tbl_member)
 -- ----------------------------------------------------------
+drop table if exists tbl_member cascade;
+
 create table tbl_member
 (
     id                  bigint generated always as identity primary key,
@@ -30,8 +32,6 @@ create table tbl_member
     constraint uk_member_nickname unique (nickname),
     constraint chk_member_status check (status in ('ACTIVE', 'SUSPENDED', 'BANNED'))
 );
-
-drop table if exists tbl_member cascade;
 
 comment on table tbl_member is '회원';
 comment on column tbl_member.id is '회원 번호 (PK)';

@@ -1,9 +1,10 @@
 const payState = {
-    selectedMethod: "bootpay",
+    selectedMethod: "card",
     workId: null,
     workDetail: null,
     order: null,
     payment: null,
+    cards: [],
     submitting: false
 };
 
@@ -139,7 +140,16 @@ async function loadWorkForPayment() {
     renderPaymentPage(detail);
 }
 
-async function createOrderAndPayment() {
+async function loadRegisteredCards() {
+    try {
+        const cards = await apiRequest("/api/cards");
+        payState.cards = Array.isArray(cards) ? cards : [];
+    } catch (_) {
+        payState.cards = [];
+    }
+}
+
+async function createOrderAndPayment(payMethod) {
     if (!payState.workId || !payState.workDetail) {
         throw new Error("결제 작품 정보가 없습니다.");
     }
@@ -157,7 +167,7 @@ async function createOrderAndPayment() {
         method: "POST",
         body: {
             orderCode: order.orderCode,
-            payMethod: payState.selectedMethod === "bootpay" ? "BOOTPAY" : "CARD",
+            payMethod,
             paymentPurpose: "PURCHASE"
         }
     });
@@ -165,6 +175,18 @@ async function createOrderAndPayment() {
     payState.order = order;
     payState.payment = payment;
     return { order, payment };
+}
+
+async function requestEasyCardPayment(order) {
+    return apiRequest("/api/payments/easy", {
+        method: "POST",
+        body: {
+            orderCode: order.orderCode,
+            cardId: null,
+            payMethod: "BOOTPAY_BILLING",
+            paymentPurpose: "WORK_PURCHASE"
+        }
+    });
 }
 
 async function confirmBootpayPayment(receiptId) {
@@ -234,10 +256,29 @@ async function submitPayment() {
 
     try {
         setSubmittingState(true);
-        const { order, payment } = await createOrderAndPayment();
-        const bootpayResult = await requestBootpayPayment(order, payment);
-        await confirmBootpayPayment(bootpayResult.receipt_id);
-        alert("결제가 완료되었습니다.");
+        if (payState.selectedMethod === "bootpay") {
+            if (!Array.isArray(payState.cards) || payState.cards.length === 0) {
+                throw new Error("등록된 카드가 없습니다. 대시보드에서 카드를 먼저 등록해 주세요.");
+            }
+
+            const order = await apiRequest("/api/orders", {
+                method: "POST",
+                body: {
+                    workId: payState.workId,
+                    orderType: "TRADE",
+                    licenseType: payState.workDetail.licenseType || "STANDARD"
+                }
+            });
+
+            await requestEasyCardPayment(order);
+            alert("간편카드결제가 완료되었습니다.");
+        } else {
+            const { order, payment } = await createOrderAndPayment("CARD");
+            const bootpayResult = await requestBootpayPayment(order, payment);
+            await confirmBootpayPayment(bootpayResult.receipt_id);
+            alert("결제가 완료되었습니다.");
+        }
+
         window.location.href = "/dashboard?tab=payment";
     } catch (error) {
         alert(error.message || "결제 처리 중 오류가 발생했습니다.");
@@ -247,10 +288,11 @@ async function submitPayment() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-    selectPayMethod("bootpay");
+    selectPayMethod("card");
 
     try {
         await loadWorkForPayment();
+        await loadRegisteredCards();
     } catch (error) {
         alert(error.message || "결제 작품 정보를 불러오지 못했습니다.");
     }

@@ -35,6 +35,17 @@
         SELECT * FROM tbl_order WHERE order_code = #{orderCode}
     </select>
 
+    <select id="selectLatestPendingByBuyerAndWork" resultType="OrderVO">
+        SELECT *
+        FROM tbl_order
+        WHERE buyer_id = #{buyerId}
+          AND work_id = #{workId}
+          AND order_type = #{orderType}
+          AND status = 'PENDING_PAYMENT'
+        ORDER BY ordered_at DESC, id DESC
+        LIMIT 1
+    </select>
+
     <select id="selectByBuyerId" resultType="OrderListResponseDTO">
         SELECT o.id, o.order_code, o.total_price, o.order_type, o.status, o.ordered_at,
                w.title AS work_title, w.thumbnail AS work_thumbnail
@@ -69,6 +80,15 @@
             completed_at = CASE WHEN #{status} = 'COMPLETED' THEN NOW() ELSE completed_at END,
             refunded_at = CASE WHEN #{status} = 'REFUNDED' THEN NOW() ELSE refunded_at END
         WHERE id = #{orderId}
+    </update>
+
+    <update id="updateOtherPendingByBuyerAndWork">
+        UPDATE tbl_order
+        SET status = #{status}
+        WHERE buyer_id = #{buyerId}
+          AND work_id = #{workId}
+          AND status = 'PENDING_PAYMENT'
+          AND id != #{excludeOrderId}
     </update>
 
 </mapper>

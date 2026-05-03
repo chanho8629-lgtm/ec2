@@ -51,7 +51,7 @@ public class CardAPIController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long id) {
         cardService.delete(userDetails.getId(), id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/default")

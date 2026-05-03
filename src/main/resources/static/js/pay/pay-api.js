@@ -138,7 +138,7 @@ async function submitPayment() {
             statusLabel.textContent = "결제 완료";
         }
         window.alert("등록 카드 간편결제가 완료되었습니다.");
-        window.location.href = "/payment/history";
+        window.location.href = "/dashboard?tab=payment";
     } catch (error) {
         if (statusLabel) {
             statusLabel.textContent = "결제 대기";
