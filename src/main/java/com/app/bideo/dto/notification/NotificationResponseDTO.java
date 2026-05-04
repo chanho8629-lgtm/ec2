@@ -19,6 +19,7 @@ public class NotificationResponseDTO {
     private Long messageRoomId;
     private String message;
     private String paymentStatus;
+    private String targetImage;
     private Boolean isRead;
     private LocalDateTime createdDatetime;
 }

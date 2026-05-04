@@ -37,7 +37,7 @@ public class FollowService {
 
             notificationService.createNotification(
                     followingId, followerId, "FOLLOW", "MEMBER", followerId,
-                    "회원님을 팔로우하기 시작했습니다."
+                    "회원님을 팔로우했습니다."
             );
         }
 

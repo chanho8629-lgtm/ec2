@@ -32,6 +32,11 @@ document.addEventListener("DOMContentLoaded", function () {
   let composeOpen = false;
   let stompClient = null;
   let currentSubscription = null;
+  let userSubscription = null;
+  let currentUserId = (function () {
+    let meta = document.querySelector('meta[name="bd-current-user-id"]');
+    return meta ? meta.getAttribute("content") : null;
+  })();
   let backButton = document.querySelector("[data-bd-chat-back]");
   let panelBody = document.querySelector(".bd-chat-panel__body");
 
@@ -189,10 +194,21 @@ document.addEventListener("DOMContentLoaded", function () {
     stompClient = Stomp.over(socket);
     stompClient.debug = null;
     stompClient.connect({}, function () {
+      subscribeToUserChannel();
       if (activeRoomId) subscribeToRoom(activeRoomId);
     }, function () {
       stompClient = null;
+      userSubscription = null;
       setTimeout(connectWebSocket, 3000);
+    });
+  }
+
+  function subscribeToUserChannel() {
+    if (!stompClient || !stompClient.connected || !currentUserId) return;
+    if (userSubscription) return;
+    userSubscription = stompClient.subscribe('/topic/user.' + currentUserId, function () {
+      loadRooms();
+      updateBadge();
     });
   }
 
@@ -624,4 +640,5 @@ document.addEventListener("DOMContentLoaded", function () {
   setComposerPlaceholder(null);
   renderPeopleList("");
   updateBadge();
+  if (currentUserId) connectWebSocket();
 });

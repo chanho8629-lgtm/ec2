@@ -22,6 +22,45 @@
             END AS message_room_id,
             n.message,
             payment_target.status AS payment_status,
+            CASE
+                WHEN n.target_type IN ('FOLLOW','MEMBER','MESSAGE') THEN m.profile_image
+                WHEN n.target_type = 'WORK' THEN (
+                    SELECT wf.file_url FROM tbl_work_file wf
+                    WHERE wf.work_id = n.target_id
+                    ORDER BY CASE WHEN wf.file_type LIKE 'image/%' THEN 0 ELSE 1 END,
+                             wf.sort_order ASC, wf.id ASC
+                    LIMIT 1
+                )
+                WHEN n.target_type = 'GALLERY' THEN (
+                    SELECT g.cover_image FROM tbl_gallery g WHERE g.id = n.target_id
+                )
+                WHEN n.target_type = 'AUCTION' THEN (
+                    SELECT wf.file_url FROM tbl_work_file wf
+                    WHERE wf.work_id = n.target_id
+                    ORDER BY CASE WHEN wf.file_type LIKE 'image/%' THEN 0 ELSE 1 END,
+                             wf.sort_order ASC, wf.id ASC
+                    LIMIT 1
+                )
+                WHEN n.target_type = 'PAYMENT' THEN (
+                    SELECT wf.file_url FROM tbl_work_file wf
+                    WHERE wf.work_id = payment_target.work_id
+                    ORDER BY CASE WHEN wf.file_type LIKE 'image/%' THEN 0 ELSE 1 END,
+                             wf.sort_order ASC, wf.id ASC
+                    LIMIT 1
+                )
+                WHEN n.target_type = 'ORDER' THEN (
+                    SELECT wf.file_url FROM tbl_work_file wf
+                    JOIN tbl_order o ON o.id = n.target_id
+                    WHERE wf.work_id = o.work_id
+                    ORDER BY CASE WHEN wf.file_type LIKE 'image/%' THEN 0 ELSE 1 END,
+                             wf.sort_order ASC, wf.id ASC
+                    LIMIT 1
+                )
+                WHEN n.target_type = 'CONTEST' THEN (
+                    SELECT c.cover_image FROM tbl_contest c WHERE c.id = n.target_id
+                )
+                ELSE m.profile_image
+            END AS target_image,
             n.is_read,
             n.created_datetime
         FROM tbl_notification n

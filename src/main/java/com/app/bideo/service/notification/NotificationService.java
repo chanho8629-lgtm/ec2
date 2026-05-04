@@ -49,9 +49,10 @@ public class NotificationService {
     public List<NotificationResponseDTO> getNotifications(Long memberId, int page) {
         int offset = page * PAGE_SIZE;
         List<NotificationResponseDTO> notifications = notificationDAO.findByMemberId(memberId, offset, PAGE_SIZE);
-        notifications.forEach(notification ->
-                notification.setSenderProfileImage(s3FileService.getPresignedUrl(notification.getSenderProfileImage()))
-        );
+        notifications.forEach(notification -> {
+            notification.setSenderProfileImage(s3FileService.getPresignedUrl(notification.getSenderProfileImage()));
+            notification.setTargetImage(s3FileService.getPresignedUrl(notification.getTargetImage()));
+        });
         return notifications;
     }
 

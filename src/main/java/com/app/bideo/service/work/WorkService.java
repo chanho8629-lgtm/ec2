@@ -282,11 +282,12 @@ public class WorkService {
         );
         workDAO.increaseCommentCount(workId);
 
+        String snippet = normalizedContent.length() > 40
+                ? normalizedContent.substring(0, 40) + "..."
+                : normalizedContent;
         notificationService.createNotification(
                 workDetail.getMemberId(), resolvedMemberId, "COMMENT", "WORK", workId,
-                normalizedContent.length() > 50
-                        ? normalizedContent.substring(0, 50) + "..."
-                        : normalizedContent
+                "'" + workDetail.getTitle() + "' 작품에 댓글을 남겼습니다: " + snippet
         );
 
         return getWorkDetail(workId);

@@ -26,5 +26,7 @@ public interface MessageRoomMapper {
     boolean existsRoomMember(@Param("roomId") Long roomId,
                              @Param("memberId") Long memberId);
 
+    List<Long> selectRoomMemberIds(@Param("roomId") Long roomId);
+
     void updateRoomDatetime(@Param("roomId") Long roomId);
 }

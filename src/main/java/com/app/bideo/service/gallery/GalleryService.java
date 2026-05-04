@@ -277,11 +277,12 @@ public class GalleryService {
         );
         galleryDAO.increaseCommentCount(galleryId);
 
+        String galleryCommentSnippet = normalizedContent.length() > 40
+                ? normalizedContent.substring(0, 40) + "..."
+                : normalizedContent;
         notificationService.createNotification(
                 galleryOwnerId, resolvedMemberId, "COMMENT", "GALLERY", galleryId,
-                normalizedContent.length() > 50
-                        ? normalizedContent.substring(0, 50) + "..."
-                        : normalizedContent
+                "'" + galleryDetail.getTitle() + "' 예술관에 댓글을 남겼습니다: " + galleryCommentSnippet
         );
 
         return getComments(galleryId);

@@ -686,8 +686,8 @@ body:has(.artwork-dialog-backdrop:not([hidden]))::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 40px;
+  width: 37px;
+  height: 37px;
   border-radius: 50%;
   border: none;
   background: none;
@@ -715,6 +715,30 @@ body:has(.artwork-dialog-backdrop:not([hidden]))::after {
   width: 100%;
   height: 100%;
   fill: currentColor;
+}
+
+.bd-shell__notification-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bd-shell__notification-readall {
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  color: #0f0f0f;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.bd-shell__notification-readall:hover {
+  background: #f2f2f2;
+  border-color: #c8c8c8;
 }
 
 /* ── 스낵바 ── */
@@ -795,6 +819,10 @@ body:has(.artwork-dialog-backdrop:not([hidden]))::after {
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
+}
+
+.bd-shell__notification-avatar--square {
+  border-radius: 8px;
 }
 
 .bd-shell__notification-body {
