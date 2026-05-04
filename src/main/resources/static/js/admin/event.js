@@ -300,9 +300,9 @@ window.onload = () => {
             members: { '활동': 'ACTIVE', '정지': 'SUSPENDED' },
             reports: { '처리중': 'PENDING', '처리완료': 'RESOLVED', '취소됨': 'CANCELLED' },
             artworks: { '전시중': 'ACTIVE', '숨김': 'HIDDEN' },
-            auctions: { '낙찰': 'SOLD', '유찰': 'CLOSED' },
+            auctions: { '종료': 'FINISHED' },
             withdrawals: { '대기': 'PENDING', '승인': 'APPROVED', '반려': 'REJECTED' },
-            payments: { '결제완료': 'COMPLETED', '결제취소': 'CANCELLED' }
+            payments: { '결제완료': 'COMPLETED', '결제취소': 'CANCELLED', '처리중': 'PENDING' }
         };
         return (map[tabName] && map[tabName][filterVal]) || filterVal;
     };
@@ -413,6 +413,24 @@ window.onload = () => {
     });
 
     /* ========================================
+       회원 정지 버튼 - 모달 열기 전 대상자(닉네임) 자동 주입
+       ======================================== */
+    const btnMemberSuspend = document.getElementById('btn-member-suspend');
+    if (btnMemberSuspend) {
+        btnMemberSuspend.removeAttribute('onclick');
+        btnMemberSuspend.addEventListener('click', () => {
+            const nickEl = document.getElementById('d-member-nick');
+            const targetInput = document.getElementById('suspend-target-name');
+            const endDateInput = document.getElementById('suspend-end-date');
+            const reasonTa = document.querySelector('#modal-member-suspend textarea');
+            if (targetInput) targetInput.value = (nickEl && nickEl.textContent.trim()) || '';
+            if (endDateInput) endDateInput.value = '';
+            if (reasonTa) reasonTa.value = '';
+            window.openModal('modal-member-suspend');
+        });
+    }
+
+    /* ========================================
        Modal confirm actions (with server calls)
        ======================================== */
 
@@ -433,7 +451,7 @@ window.onload = () => {
             } catch (e) {
                 console.error(e);
                 closeModal('modal-member-suspend');
-                showToast('처리 중 오류가 발생했습니다.');
+                showToast(e && e.message ? e.message : '처리 중 오류가 발생했습니다.');
             }
         });
     }
@@ -453,7 +471,7 @@ window.onload = () => {
             } catch (e) {
                 console.error(e);
                 closeModal('modal-member-activate');
-                showToast('처리 중 오류가 발생했습니다.');
+                showToast(e && e.message ? e.message : '처리 중 오류가 발생했습니다.');
             }
         });
     }
@@ -474,7 +492,7 @@ window.onload = () => {
             } catch (e) {
                 console.error(e);
                 closeModal('modal-report-process');
-                showToast('처리 중 오류가 발생했습니다.');
+                showToast(e && e.message ? e.message : '처리 중 오류가 발생했습니다.');
             }
         });
     }
@@ -495,7 +513,7 @@ window.onload = () => {
             } catch (e) {
                 console.error(e);
                 closeModal('modal-report-cancel');
-                showToast('처리 중 오류가 발생했습니다.');
+                showToast(e && e.message ? e.message : '처리 중 오류가 발생했습니다.');
             }
         });
     }
@@ -515,7 +533,7 @@ window.onload = () => {
             } catch (e) {
                 console.error(e);
                 closeModal('modal-artwork-hide');
-                showToast('처리 중 오류가 발생했습니다.');
+                showToast(e && e.message ? e.message : '처리 중 오류가 발생했습니다.');
             }
         });
     }
@@ -535,7 +553,7 @@ window.onload = () => {
             } catch (e) {
                 console.error(e);
                 closeModal('modal-artwork-show');
-                showToast('처리 중 오류가 발생했습니다.');
+                showToast(e && e.message ? e.message : '처리 중 오류가 발생했습니다.');
             }
         });
     }
@@ -555,7 +573,7 @@ window.onload = () => {
             } catch (e) {
                 console.error(e);
                 closeModal('modal-wd-approve');
-                showToast('처리 중 오류가 발생했습니다.');
+                showToast(e && e.message ? e.message : '처리 중 오류가 발생했습니다.');
             }
         });
     }
@@ -576,7 +594,7 @@ window.onload = () => {
             } catch (e) {
                 console.error(e);
                 closeModal('modal-wd-reject');
-                showToast('처리 중 오류가 발생했습니다.');
+                showToast(e && e.message ? e.message : '처리 중 오류가 발생했습니다.');
             }
         });
     }

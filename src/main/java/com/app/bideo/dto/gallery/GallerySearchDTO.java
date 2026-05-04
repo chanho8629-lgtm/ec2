@@ -9,6 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 public class GallerySearchDTO extends PageRequestDTO {
     private String keyword;
+    private String tag;
     private Long memberId;
     private String status;
 }

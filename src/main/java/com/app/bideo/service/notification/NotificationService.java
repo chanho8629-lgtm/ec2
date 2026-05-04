@@ -5,6 +5,7 @@ import com.app.bideo.domain.notification.NotificationVO;
 import com.app.bideo.dto.notification.NotificationResponseDTO;
 import com.app.bideo.repository.notification.NotificationDAO;
 import com.app.bideo.repository.notification.NotificationSettingDAO;
+import com.app.bideo.service.common.S3FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ public class NotificationService {
 
     private final NotificationDAO notificationDAO;
     private final NotificationSettingDAO notificationSettingDAO;
+    private final S3FileService s3FileService;
 
     private static final int PAGE_SIZE = 20;
 
@@ -46,7 +48,11 @@ public class NotificationService {
     @Transactional(readOnly = true)
     public List<NotificationResponseDTO> getNotifications(Long memberId, int page) {
         int offset = page * PAGE_SIZE;
-        return notificationDAO.findByMemberId(memberId, offset, PAGE_SIZE);
+        List<NotificationResponseDTO> notifications = notificationDAO.findByMemberId(memberId, offset, PAGE_SIZE);
+        notifications.forEach(notification ->
+                notification.setSenderProfileImage(s3FileService.getPresignedUrl(notification.getSenderProfileImage()))
+        );
+        return notifications;
     }
 
     @Transactional(readOnly = true)

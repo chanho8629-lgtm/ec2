@@ -8,6 +8,8 @@ import com.app.bideo.dto.admin.AdminRestrictionUpsertRequestDTO;
 import com.app.bideo.repository.admin.AdminMemberDAO;
 import com.app.bideo.repository.admin.AdminRestrictionDAO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +50,11 @@ public class AdminRestrictionService {
         return adminRestrictionDAO.findActiveByMemberId(memberId);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "admin:members:detail", allEntries = true),
+            @CacheEvict(value = "admin:members:list", allEntries = true),
+            @CacheEvict(value = "admin:members:count", allEntries = true)
+    })
     @LogStatusWithReturn
     public Long createRestriction(AdminRestrictionUpsertRequestDTO requestDTO) {
         syncExpiredRestrictions();
@@ -55,7 +62,7 @@ public class AdminRestrictionService {
         requestDTO.setPreviousMemberStatus(getCurrentMemberStatus(requestDTO.getMemberId()));
 
         adminRestrictionDAO.findActiveByMemberId(requestDTO.getMemberId()).ifPresent(existing -> {
-            throw new IllegalArgumentException("active restriction already exists");
+            throw new IllegalArgumentException("이미 정지된 회원입니다. 먼저 정지 해제 후 다시 시도하세요.");
         });
 
         adminRestrictionDAO.insert(requestDTO);
@@ -63,6 +70,11 @@ public class AdminRestrictionService {
         return requestDTO.getId();
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "admin:members:detail", allEntries = true),
+            @CacheEvict(value = "admin:members:list", allEntries = true),
+            @CacheEvict(value = "admin:members:count", allEntries = true)
+    })
     @LogStatus
     public void updateRestriction(Long id, AdminRestrictionUpsertRequestDTO requestDTO) {
         syncExpiredRestrictions();
@@ -76,6 +88,11 @@ public class AdminRestrictionService {
         adminMemberDAO.updateStatus(existing.getMemberId(), toMemberStatus(existing.getRestrictionType()));
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "admin:members:detail", allEntries = true),
+            @CacheEvict(value = "admin:members:list", allEntries = true),
+            @CacheEvict(value = "admin:members:count", allEntries = true)
+    })
     @LogStatus
     public void releaseRestriction(Long id) {
         syncExpiredRestrictions();
@@ -87,16 +104,16 @@ public class AdminRestrictionService {
 
     private void validateRequest(AdminRestrictionUpsertRequestDTO requestDTO) {
         if (requestDTO == null || requestDTO.getMemberId() == null) {
-            throw new IllegalArgumentException("memberId is required");
+            throw new IllegalArgumentException("회원 정보가 필요합니다.");
         }
         if (requestDTO.getRestrictionType() == null || !VALID_RESTRICTION_TYPES.contains(requestDTO.getRestrictionType())) {
-            throw new IllegalArgumentException("invalid restriction type");
+            throw new IllegalArgumentException("정지 유형이 올바르지 않습니다.");
         }
         if (requestDTO.getReason() == null || requestDTO.getReason().isBlank()) {
-            throw new IllegalArgumentException("reason is required");
+            throw new IllegalArgumentException("정지 사유를 입력하세요.");
         }
         if ("LIMIT".equals(requestDTO.getRestrictionType()) && requestDTO.getEndDatetime() == null) {
-            throw new IllegalArgumentException("endDatetime is required for limit restriction");
+            throw new IllegalArgumentException("기간 제한 정지는 종료 일시가 필요합니다.");
         }
         if ("BLOCK".equals(requestDTO.getRestrictionType())) {
             requestDTO.setEndDatetime(null);

@@ -36,25 +36,28 @@ public interface WorkMapper {
 
     int increaseWorkViewCount(@Param("id") Long id);
 
-    void insertWorkView(@Param("workId") Long workId, @Param("memberId") Long memberId);
-
-    WorkDetailResponseDTO selectWorkDetail(@Param("id") Long id);
+    WorkDetailResponseDTO selectWorkDetail(@Param("id") Long id, @Param("currentMemberId") Long currentMemberId);
 
     List<WorkListResponseDTO> selectWorkList(WorkSearchDTO searchDTO);
 
     List<WorkListResponseDTO> selectSearchWorkList(@Param("criteria") Criteria criteria,
                                                     @Param("keyword") String keyword,
-                                                    @Param("sort") String sort);
+                                                    @Param("sort") String sort,
+                                                    @Param("currentMemberId") Long currentMemberId);
 
     int selectWorkCount(WorkSearchDTO searchDTO);
 
     List<WorkListResponseDTO> selectWorkFeed(@Param("excludeIds") List<Long> excludeIds,
                                              @Param("category") String category,
+                                             @Param("tag") String tag,
+                                             @Param("currentMemberId") Long currentMemberId,
                                              @Param("limit") int limit);
 
     void insertWorkFile(WorkFileVO workFileVO);
 
     int deleteWorkFilesByWorkId(@Param("workId") Long workId);
+
+    int hardDeleteWorkById(@Param("workId") Long workId);
 
     List<WorkFileResponseDTO> selectWorkFilesByWorkId(@Param("workId") Long workId);
 

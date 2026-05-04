@@ -85,7 +85,7 @@ public class WorkService {
         return WorkCreateResponseDTO.builder()
                 .id(workDTO.getId())
                 .galleryId(galleryId)
-                .redirectUrl("/profile?tab=works&galleryId=" + galleryId)
+                .redirectUrl("/profile?tab=works")
                 .build();
     }
 
@@ -96,6 +96,7 @@ public class WorkService {
         int size = searchDTO.getSize() != null ? searchDTO.getSize() : 10;
         searchDTO.setPage(page);
         searchDTO.setSize(size);
+        searchDTO.setCurrentMemberId(resolveAuthenticatedMemberId());
 
         List<WorkListResponseDTO> list = workDAO.findAll(searchDTO);
         applyThumbnailUrls(list);
@@ -113,18 +114,22 @@ public class WorkService {
 
     // 쇼츠형 추천 피드 — 좋아요/조회/댓글/최신성 + 약간의 랜덤성 기반 다음 작품 N개 반환
     @Transactional(readOnly = true)
-    public List<WorkListResponseDTO> getFeed(List<Long> excludeIds, String category, Integer limit) {
+    public List<WorkListResponseDTO> getFeed(List<Long> excludeIds, String category, String tag, Integer limit) {
         int safeLimit = (limit == null || limit <= 0) ? 5 : Math.min(limit, 20);
         List<Long> safeExcludeIds = excludeIds == null ? Collections.emptyList() : excludeIds;
-        List<WorkListResponseDTO> feed = workDAO.findFeed(safeExcludeIds, category, safeLimit);
+        String safeTag = normalizeTagName(tag);
+        Long currentMemberId = resolveAuthenticatedMemberId();
+        List<WorkListResponseDTO> feed = workDAO.findFeed(safeExcludeIds, category, safeTag, currentMemberId, safeLimit);
         applyThumbnailUrls(feed);
         return feed;
     }
 
     // 추천 피드 진입 시드 작품 — 첫 화면에 띄울 작품 1개를 추천 정렬 기준으로 결정
     @Transactional(readOnly = true)
-    public Long resolveFeedSeedId() {
-        List<WorkListResponseDTO> feed = workDAO.findFeed(Collections.emptyList(), null, 1);
+    public Long resolveFeedSeedId(String tag) {
+        String safeTag = normalizeTagName(tag);
+        Long currentMemberId = resolveAuthenticatedMemberId();
+        List<WorkListResponseDTO> feed = workDAO.findFeed(Collections.emptyList(), null, safeTag, currentMemberId, 1);
         if (feed == null || feed.isEmpty()) {
             return null;
         }
@@ -144,21 +149,16 @@ public class WorkService {
     // 작품 상세 화면에 필요한 정보를 한 번에 조회한다.
     @Transactional(readOnly = true)
     public WorkDetailResponseDTO getWorkDetail(Long id) {
-        WorkDetailResponseDTO detail = workDAO.findDetailById(id)
+        Long memberId = resolveAuthenticatedMemberId();
+        WorkDetailResponseDTO detail = workDAO.findDetailById(id, memberId)
                 .orElseThrow(() -> new IllegalArgumentException("work not found"));
         applyFileUrls(detail);
-        Long memberId = resolveAuthenticatedMemberId();
         detail.setIsLiked(memberId != null && workDAO.existsLike(memberId, id));
         detail.setIsBookmarked(memberId != null && bookmarkDAO.exists(memberId, "WORK", id));
         detail.setIsOwner(memberId != null && memberId.equals(detail.getMemberId()));
         detail.setHasActiveAuction(workDAO.existsActiveAuctionByWorkId(id));
         if (detail.getComments() != null) {
-            detail.getComments().forEach(comment ->
-                    {
-                        comment.setIsLiked(memberId != null && commentService.isLikedByCurrentMember(comment.getId()));
-                        comment.setIsOwner(memberId != null && memberId.equals(comment.getMemberId()));
-                    }
-            );
+            detail.getComments().forEach(comment -> applyCommentState(comment, memberId));
         }
         return detail;
     }
@@ -184,9 +184,10 @@ public class WorkService {
     public List<WorkListResponseDTO> getProfileWorks(Long memberId, Long galleryId) { // 이승민| 프로필 닉네임 경로 적용으로 인한 추가
         WorkSearchDTO searchDTO = new WorkSearchDTO();
         searchDTO.setMemberId(memberId);
+        searchDTO.setCurrentMemberId(resolveAuthenticatedMemberId());
         searchDTO.setGalleryId(galleryId);
         searchDTO.setPage(1);
-        searchDTO.setSize(50);
+        searchDTO.setSize(Math.max(workDAO.findTotal(searchDTO), 1));
         List<WorkListResponseDTO> works = workDAO.findAll(searchDTO);
         applyThumbnailUrls(works);
         return works;
@@ -333,6 +334,14 @@ public class WorkService {
         }
     }
 
+    @CacheEvict(value = {"dashboard", "profile"}, allEntries = true)
+    public void hardDeleteAfterPayment(Long id) {
+        if (id == null) {
+            return;
+        }
+        workDAO.hardDeleteById(id);
+    }
+
     private void validateWorkOwner(Long workId, Long memberId) {
         WorkDTO work = workDAO.findById(workId)
                 .orElseThrow(() -> new IllegalArgumentException("work not found"));
@@ -374,7 +383,7 @@ public class WorkService {
         ));
     }
 
-    // 입력된 태그명을 기준으로 기존 태그를 재사용하거나 새로 만든다.
+    // 입력된 태그명은 기존 태그만 연결한다.
     private List<Long> resolveTagIds(List<String> tagNames) {
         List<String> safeTagNames = tagNames == null ? Collections.emptyList() : tagNames;
 
@@ -382,7 +391,7 @@ public class WorkService {
                 .map(this::normalizeTagName)
                 .filter(Objects::nonNull)
                 .distinct()
-                .map(this::findOrCreateTagId)
+                .map(this::requireExistingTagId)
                 .toList();
     }
 
@@ -406,13 +415,9 @@ public class WorkService {
         return galleryId;
     }
 
-    private Long findOrCreateTagId(String tagName) {
+    private Long requireExistingTagId(String tagName) {
         return workDAO.findTagIdByName(tagName)
-                .orElseGet(() -> {
-                    workDAO.saveTagName(tagName);
-                    return workDAO.findTagIdByName(tagName)
-                            .orElseThrow(() -> new IllegalStateException("tag save failed"));
-                });
+                .orElseThrow(() -> new IllegalArgumentException("등록된 태그만 선택할 수 있습니다: " + tagName));
     }
 
     private String normalizeTagKeyword(String keyword) {
@@ -460,7 +465,7 @@ public class WorkService {
                         .settlementAmount(settlementAmount)
                         .deadlineHours(deadlineHours)
                         .startedAt(startedAt)
-                        .closingAt(startedAt.plusHours(deadlineHours))
+                        .closingAt(startedAt.plusMinutes(deadlineHours))
                         .cancelThreshold(0.70d)
                         .status("ACTIVE")
                         .build()
@@ -578,9 +583,30 @@ public class WorkService {
         }
 
         if (detail.getComments() != null) {
-            detail.getComments().forEach(comment ->
-                    comment.setMemberProfileImage(s3FileService.getPresignedUrl(comment.getMemberProfileImage()))
-            );
+            detail.getComments().forEach(this::applyCommentProfileUrls);
+        }
+    }
+
+    private void applyCommentProfileUrls(com.app.bideo.dto.interaction.CommentResponseDTO comment) {
+        if (comment == null) {
+            return;
+        }
+
+        comment.setMemberProfileImage(s3FileService.getPresignedUrl(comment.getMemberProfileImage()));
+        if (comment.getReplies() != null) {
+            comment.getReplies().forEach(this::applyCommentProfileUrls);
+        }
+    }
+
+    private void applyCommentState(com.app.bideo.dto.interaction.CommentResponseDTO comment, Long memberId) {
+        if (comment == null) {
+            return;
+        }
+
+        comment.setIsLiked(memberId != null && commentService.isLikedByCurrentMember(comment.getId()));
+        comment.setIsOwner(memberId != null && memberId.equals(comment.getMemberId()));
+        if (comment.getReplies() != null) {
+            comment.getReplies().forEach(reply -> applyCommentState(reply, memberId));
         }
     }
 

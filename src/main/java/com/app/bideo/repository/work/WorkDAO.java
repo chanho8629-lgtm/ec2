@@ -57,8 +57,8 @@ public class WorkDAO {
     }
 
     // 화면 표시용 상세 조회
-    public Optional<WorkDetailResponseDTO> findDetailById(Long id) {
-        return Optional.ofNullable(workMapper.selectWorkDetail(id));
+    public Optional<WorkDetailResponseDTO> findDetailById(Long id, Long currentMemberId) {
+        return Optional.ofNullable(workMapper.selectWorkDetail(id, currentMemberId));
     }
 
     // 조건별 작품 목록 조회
@@ -67,8 +67,8 @@ public class WorkDAO {
     }
 
     // 검색해서 목록 조회
-    public List<WorkListResponseDTO> findBySearch(Criteria criteria, String keyword, String sort) {
-        return workMapper.selectSearchWorkList(criteria, keyword, sort);
+    public List<WorkListResponseDTO> findBySearch(Criteria criteria, String keyword, String sort, Long currentMemberId) {
+        return workMapper.selectSearchWorkList(criteria, keyword, sort, currentMemberId);
     }
 
     // 목록 페이징용 전체 개수 조회
@@ -77,8 +77,8 @@ public class WorkDAO {
     }
 
     // 쇼츠형 추천 피드용 작품 목록 조회
-    public List<WorkListResponseDTO> findFeed(List<Long> excludeIds, String category, int limit) {
-        return workMapper.selectWorkFeed(excludeIds, category, limit);
+    public List<WorkListResponseDTO> findFeed(List<Long> excludeIds, String category, String tag, Long currentMemberId, int limit) {
+        return workMapper.selectWorkFeed(excludeIds, category, tag, currentMemberId, limit);
     }
 
     // 작품에 연결된 파일 목록 조회
@@ -168,6 +168,10 @@ public class WorkDAO {
     // 작품 파일 전체 삭제
     public void deleteFilesByWorkId(Long workId) {
         workMapper.deleteWorkFilesByWorkId(workId);
+    }
+
+    public void hardDeleteById(Long workId) {
+        workMapper.hardDeleteWorkById(workId);
     }
 
     // 작품 태그 전체 삭제

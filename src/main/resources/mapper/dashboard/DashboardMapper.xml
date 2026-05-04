@@ -413,6 +413,7 @@
 
     <select id="selectPaymentHistoryItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
         select
+            p.id as target_id,
             case
                 when p.buyer_id = #{memberId} and p.status in ('PENDING', 'AUTHORIZED') then '결제대기'
                 when p.auction_id is not null then '입찰결제'
@@ -420,31 +421,19 @@
                 else '판매정산대상'
             end as tag,
             case
-                when p.buyer_id = #{memberId} then w.title || ' 결제'
-                else w.title || ' 판매'
+                when p.buyer_id = #{memberId} then coalesce(w.title, '삭제된 작품') || ' 결제'
+                else coalesce(w.title, '삭제된 작품') || ' 판매'
             end as title,
             to_char(coalesce(p.paid_at, p.created_datetime), 'YYYY.MM.DD') || ' · ' || p.pay_method || ' · ' || p.status as description,
             '₩' || to_char(p.total_price, 'FM999,999,999') as amount,
-            '/work/detail/' || w.id as detail_url
-        from (
-            select p.*,
-                   row_number() over (
-                       partition by p.work_id,
-                                    case when p.buyer_id = #{memberId} then 'BUY' else 'SELL' end
-                       order by case
-                                    when p.status = 'COMPLETED' then 0
-                                    when p.status = 'REFUNDED' then 1
-                                    else 2
-                                end,
-                                coalesce(p.paid_at, p.created_datetime) desc,
-                                p.id desc
-                   ) as rn
-            from tbl_payment p
-            where p.buyer_id = #{memberId}
-               or p.seller_id = #{memberId}
-        ) p
-        join tbl_work w on p.work_id = w.id
-        where p.rn = 1
+            case
+                when p.buyer_id = #{memberId} and p.status in ('PENDING', 'AUTHORIZED') then '/payment/pay-api?paymentId=' || p.id
+                else null
+            end as action_url
+        from tbl_payment p
+        left join tbl_work w on p.work_id = w.id
+        where p.buyer_id = #{memberId}
+           or p.seller_id = #{memberId}
         order by coalesce(p.paid_at, p.created_datetime) desc
         limit 5
     </select>

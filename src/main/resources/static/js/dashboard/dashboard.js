@@ -441,11 +441,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     Array.from(body.querySelectorAll('[data-detail-row]')).forEach(function (row, index) {
       row.addEventListener('click', function () {
+        if (items[index] && items[index].actionUrl) {
+          window.location.href = items[index].actionUrl;
+          return;
+        }
         openDetail(items[index]);
       });
       row.addEventListener('keydown', function (event) {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
+          if (items[index] && items[index].actionUrl) {
+            window.location.href = items[index].actionUrl;
+            return;
+          }
           openDetail(items[index]);
         }
       });

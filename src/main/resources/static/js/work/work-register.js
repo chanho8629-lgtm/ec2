@@ -21,6 +21,7 @@ function initializeWorkRegister() {
     var videoTitleCount = document.getElementById("video-title-count");
     var videoDescriptionInput = document.getElementById("video-description-input");
     var videoDescriptionCount = document.getElementById("video-description-count");
+    var videoTagsList = document.getElementById("video-tags-list");
     var videoTagsInput = document.getElementById("video-tags-input");
     var videoTagsCount = document.getElementById("video-tags-count");
     var videoTagsSuggestions = document.getElementById("video-tags-suggestions");
@@ -75,6 +76,8 @@ function initializeWorkRegister() {
     var tagSuggestionAbortController = null;
     var tagSuggestionRequestSeq = 0;
     var activeTagSuggestionIndex = -1;
+    var selectedExistingTagNames = {};
+    var selectedTagNames = [];
 
     if (!modal || !dialogContent || !uploadScreen || !detailsScreen || !uploadPanel || !fileInput || !selectFileButton || !fileNameText) {
         return;
@@ -680,20 +683,20 @@ function initializeWorkRegister() {
         }
     }
 
-    function formatAuctionDeadline(hours) {
-        if (hours <= 0) {
-            return "0시간";
+    function formatAuctionDeadline(minutes) {
+        if (minutes <= 0) {
+            return "0분";
         }
 
-        if (hours >= 24) {
-            if (hours % 24 === 0) {
-                return String(hours / 24) + "일";
-            }
-
-            return String(Math.floor(hours / 24)) + "일 " + String(hours % 24) + "시간";
+        if (minutes < 60) {
+            return String(minutes) + "분";
         }
 
-        return String(hours) + "시간";
+        if (minutes % 60 === 0) {
+            return String(minutes / 60) + "시간";
+        }
+
+        return String(Math.floor(minutes / 60)) + "시간 " + String(minutes % 60) + "분";
     }
 
     function formatAuctionPrice(value) {
@@ -774,18 +777,62 @@ function initializeWorkRegister() {
         playlistDropdownText.textContent = galleryName || "선택";
     }
 
+    function normalizeSelectedTagName(tagName) {
+        var normalized = (tagName || "").trim();
+
+        if (normalized.indexOf("#") === 0) {
+            normalized = normalized.substring(1).trim();
+        }
+
+        return normalized;
+    }
+
+    function formatVisibleTagName(tagName) {
+        var normalized = normalizeSelectedTagName(tagName);
+        return normalized ? "#" + normalized : "";
+    }
+
     function extractTagNames(rawTags) {
+        if (selectedTagNames.length) {
+            return selectedTagNames.slice();
+        }
+
         if (!rawTags) {
             return [];
         }
 
         return rawTags.split(",")
             .map(function (tag) {
-                return tag.trim();
+                return normalizeSelectedTagName(tag);
             })
             .filter(function (tag) {
                 return !!tag;
             });
+    }
+
+    function renderSelectedTags() {
+        if (!videoTagsList) {
+            return;
+        }
+
+        videoTagsList.innerHTML = selectedTagNames.map(function (tagName, index) {
+            return '<span class="tag-chip">' +
+                '<span>#' + escapeHtml(tagName) + '</span>' +
+                '<button type="button" data-video-tag-index="' + index + '" aria-label="' + escapeHtml(tagName) + ' 삭제">x</button>' +
+                '</span>';
+        }).join("");
+    }
+
+    function addSelectedTag(tagName) {
+        var normalizedTagName = normalizeSelectedTagName(tagName);
+
+        if (!normalizedTagName || selectedTagNames.indexOf(normalizedTagName) > -1) {
+            return;
+        }
+
+        selectedExistingTagNames[normalizedTagName] = true;
+        selectedTagNames.push(normalizedTagName);
+        renderSelectedTags();
     }
 
     function getCurrentTagKeyword() {
@@ -800,7 +847,7 @@ function initializeWorkRegister() {
         rawValue = videoTagsInput.value || "";
         parts = rawValue.split(",");
         currentPart = parts.length ? parts[parts.length - 1] : rawValue;
-        return currentPart.trim();
+        return normalizeSelectedTagName(currentPart);
     }
 
     function closeTagSuggestions() {
@@ -828,32 +875,28 @@ function initializeWorkRegister() {
     }
 
     function applyTagSuggestion(tagName) {
-        var rawValue;
-        var parts;
-        var nextValue;
+        var normalizedTagName;
 
         if (!videoTagsInput || !tagName) {
             return;
         }
 
-        rawValue = videoTagsInput.value || "";
-        parts = rawValue.split(",");
-
-        if (!parts.length) {
-            parts = [tagName];
-        } else {
-            parts[parts.length - 1] = " " + tagName;
-        }
-
-        nextValue = parts.join(",").replace(/^ /, "");
-        if (!nextValue.endsWith(",")) {
-            nextValue += ", ";
-        }
-
-        videoTagsInput.value = nextValue;
+        normalizedTagName = normalizeSelectedTagName(tagName);
+        addSelectedTag(normalizedTagName);
+        videoTagsInput.value = "";
         updateTextCount(videoTagsInput, videoTagsCount, 500);
         closeTagSuggestions();
         videoTagsInput.focus();
+    }
+
+    function validateSelectedTags(tags) {
+        var invalidTag = tags.find(function (tagName) {
+            return !selectedExistingTagNames[tagName];
+        });
+
+        if (invalidTag) {
+            throw new Error("태그는 추천 목록에서 선택해주세요: " + invalidTag);
+        }
     }
 
     function renderTagSuggestions(tags) {
@@ -869,9 +912,9 @@ function initializeWorkRegister() {
         }
 
         videoTagsSuggestions.innerHTML = tags.map(function (tag, index) {
-            var tagName = escapeHtml(tag && tag.tagName ? tag.tagName : "");
+            var tagName = escapeHtml(normalizeSelectedTagName(tag && tag.tagName ? tag.tagName : ""));
             var activeClass = index === 0 ? " tags-suggestion-current" : "";
-            return '<button type="button" class="tags-suggestion-item' + activeClass + '" data-tag-name="' + tagName + '">' + tagName + '</button>';
+            return '<button type="button" class="tags-suggestion-item' + activeClass + '" data-tag-name="' + tagName + '">#' + tagName + '</button>';
         }).join("");
         videoTagsSuggestions.hidden = false;
         activeTagSuggestionIndex = 0;
@@ -964,6 +1007,8 @@ function initializeWorkRegister() {
         if (!selectedGalleryId) {
             throw new Error("예술관을 선택해주세요.");
         }
+
+        validateSelectedTags(tags);
 
         formData.append("galleryId", String(selectedGalleryId));
         formData.append("title", title);
@@ -1429,7 +1474,7 @@ function initializeWorkRegister() {
                     return;
                 }
 
-                if (event.key === "Enter" && activeTagSuggestionIndex >= 0) {
+                if ((event.key === "Enter" || event.key === ",") && activeTagSuggestionIndex >= 0) {
                     event.preventDefault();
                     activeButton = buttons[activeTagSuggestionIndex];
                     if (activeButton) {
@@ -1442,10 +1487,42 @@ function initializeWorkRegister() {
                     closeTagSuggestions();
                 }
             }
+
+            if (event.key === "Enter" || event.key === ",") {
+                event.preventDefault();
+                fetchTagSuggestions();
+            }
+
+            if (event.key === "Backspace" && !videoTagsInput.value && selectedTagNames.length) {
+                selectedTagNames.pop();
+                renderSelectedTags();
+            }
         });
 
         videoTagsInput.addEventListener("blur", function () {
             window.setTimeout(closeTagSuggestions, 120);
+        });
+    }
+
+    if (videoTagsList) {
+        videoTagsList.addEventListener("click", function (event) {
+            var button = event.target.closest("button[data-video-tag-index]");
+            var index;
+
+            if (!button) {
+                return;
+            }
+
+            index = Number(button.getAttribute("data-video-tag-index"));
+            if (Number.isNaN(index)) {
+                return;
+            }
+
+            selectedTagNames.splice(index, 1);
+            renderSelectedTags();
+            if (videoTagsInput) {
+                videoTagsInput.focus();
+            }
         });
     }
 
@@ -1473,7 +1550,7 @@ function initializeWorkRegister() {
         }
 
         if (auctionDeadlineSelected) {
-            auctionDeadlineSelected.textContent = "0시간";
+            auctionDeadlineSelected.textContent = "0분";
         }
 
         if (auctionDeadlineHoursInput) {
@@ -1565,12 +1642,10 @@ function initializeWorkRegister() {
     if (auctionDeadlineButtons.length && auctionDeadlineSelected && auctionDeadlineHoursInput) {
         auctionDeadlineButtons.forEach(function (button) {
             button.addEventListener("click", function () {
-                var hours = Number(button.getAttribute("data-hours") || "0");
-                var currentHours = Number(auctionDeadlineHoursInput.value || "0");
-                var nextHours = currentHours + hours;
+                var minutes = Number(button.getAttribute("data-hours") || "0");
 
-                auctionDeadlineSelected.textContent = formatAuctionDeadline(nextHours);
-                auctionDeadlineHoursInput.value = String(nextHours);
+                auctionDeadlineSelected.textContent = formatAuctionDeadline(minutes);
+                auctionDeadlineHoursInput.value = String(minutes);
 
                 auctionDeadlineButtons.forEach(function (item) {
                     item.classList.remove("work-auction-config__deadline-btn--active");
@@ -1583,7 +1658,7 @@ function initializeWorkRegister() {
 
     if (auctionDeadlineReset && auctionDeadlineSelected && auctionDeadlineHoursInput) {
         auctionDeadlineReset.addEventListener("click", function () {
-            auctionDeadlineSelected.textContent = "0시간";
+            auctionDeadlineSelected.textContent = "0분";
             auctionDeadlineHoursInput.value = "0";
 
             auctionDeadlineButtons.forEach(function (item) {
@@ -1660,6 +1735,22 @@ function initializeWorkRegister() {
         if (videoDescriptionInput) {
             videoDescriptionInput.value = registerState.getAttribute("data-description") || "";
             updateTextCount(videoDescriptionInput, videoDescriptionCount, 5000);
+        }
+
+        if (videoTagsInput) {
+            var initialTags = (registerState.getAttribute("data-tags") || "")
+                .split(",")
+                .map(function (tagName) {
+                    return normalizeSelectedTagName(tagName);
+                })
+                .filter(function (tagName) {
+                    return !!tagName;
+                });
+
+            selectedTagNames = [];
+            initialTags.forEach(addSelectedTag);
+            videoTagsInput.value = "";
+            updateTextCount(videoTagsInput, videoTagsCount, 500);
         }
 
         if (registerState.getAttribute("data-gallery-id")) {

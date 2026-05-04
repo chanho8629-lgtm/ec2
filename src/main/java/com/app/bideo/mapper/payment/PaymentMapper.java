@@ -18,7 +18,8 @@ public interface PaymentMapper {
 
     PaymentResponseDTO selectByPaymentCode(@Param("paymentCode") String paymentCode);
 
-    PaymentVO selectLatestActiveByOrderCode(@Param("orderCode") String orderCode);
+    PaymentResponseDTO selectPendingByBuyerAndAuction(@Param("buyerId") Long buyerId,
+                                                      @Param("auctionId") Long auctionId);
 
     List<PaymentResponseDTO> selectByBuyerId(@Param("buyerId") Long buyerId,
                                               @Param("offset") int offset,

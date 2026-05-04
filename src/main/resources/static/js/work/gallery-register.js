@@ -20,6 +20,7 @@ function initializeGalleryRegister() {
     var thumbError = document.getElementById("thumbError");
     var tagList = document.getElementById("tagList");
     var tagInput = document.getElementById("tagInput");
+    var tagSuggestions = document.getElementById("tagSuggestions");
     var galleryLinkUrl = document.getElementById("galleryLinkUrl");
     var galleryLinkCopyButton = document.getElementById("galleryLinkCopyButton");
     var thumbLinkMeta = document.getElementById("thumbLinkMeta");
@@ -53,6 +54,10 @@ function initializeGalleryRegister() {
     var previewUrl = "";
     var thumbOk = false;
     var tags = Array.isArray(initialGalleryData.tagNames) ? initialGalleryData.tagNames.slice() : [];
+    var selectedExistingTagNames = {};
+    var tagSuggestionAbortController = null;
+    var tagSuggestionRequestSeq = 0;
+    var activeTagSuggestionIndex = -1;
     var committedArtworkLinks = [];
 
     if (!titleBox || !descBox || !createBtn || !thumbInput) {
@@ -62,6 +67,10 @@ function initializeGalleryRegister() {
 
     modal.hidden = false;
     modal.style.display = "flex";
+
+    tags.forEach(function (tagName) {
+        selectedExistingTagNames[tagName] = true;
+    });
 
     if (modal.getAttribute("data-compose-embedded") === "true") {
         modal.style.position = "relative";
@@ -308,7 +317,7 @@ function initializeGalleryRegister() {
 
         chips = tags.map(function (tag, index) {
             return '<span class="tag-chip">' +
-                '<span>' + tag + '</span>' +
+                '<span>#' + tag + '</span>' +
                 '<button type="button" data-tag-index="' + index + '" aria-label="' + tag + ' 삭제">x</button>' +
                 '</span>';
         }).join("");
@@ -316,15 +325,151 @@ function initializeGalleryRegister() {
         tagList.innerHTML = chips;
     }
 
+    function escapeHtml(value) {
+        return String(value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/\"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+    function normalizeSelectedTagName(tagName) {
+        var normalized = (tagName || "").trim();
+
+        if (normalized.indexOf("#") === 0) {
+            normalized = normalized.substring(1).trim();
+        }
+
+        return normalized;
+    }
+
+    function closeTagSuggestions() {
+        if (!tagSuggestions) {
+            return;
+        }
+
+        activeTagSuggestionIndex = -1;
+        tagSuggestions.hidden = true;
+        tagSuggestions.innerHTML = "";
+    }
+
+    function getTagSuggestionButtons() {
+        if (!tagSuggestions) {
+            return [];
+        }
+
+        return Array.prototype.slice.call(tagSuggestions.querySelectorAll(".tag-suggestion-item"));
+    }
+
+    function highlightActiveTagSuggestion() {
+        getTagSuggestionButtons().forEach(function (button, index) {
+            button.classList.toggle("is-active", index === activeTagSuggestionIndex);
+        });
+    }
+
+    function moveActiveTagSuggestion(direction) {
+        var buttons = getTagSuggestionButtons();
+
+        if (!buttons.length) {
+            return;
+        }
+
+        activeTagSuggestionIndex += direction;
+        if (activeTagSuggestionIndex < 0) {
+            activeTagSuggestionIndex = buttons.length - 1;
+        }
+        if (activeTagSuggestionIndex >= buttons.length) {
+            activeTagSuggestionIndex = 0;
+        }
+
+        highlightActiveTagSuggestion();
+    }
+
+    function renderTagSuggestions(suggestions) {
+        if (!tagSuggestions) {
+            return;
+        }
+
+        if (!suggestions || !suggestions.length) {
+            tagSuggestions.innerHTML = '<div class="tag-suggestion-empty">일치하는 태그가 없습니다.</div>';
+            tagSuggestions.hidden = false;
+            activeTagSuggestionIndex = -1;
+            return;
+        }
+
+        tagSuggestions.innerHTML = suggestions.map(function (tag, index) {
+            var tagName = escapeHtml(tag && tag.tagName ? tag.tagName : "");
+            var activeClass = index === 0 ? " is-active" : "";
+            return '<button type="button" class="tag-suggestion-item' + activeClass + '" data-tag-name="' + tagName + '">#' + tagName + '</button>';
+        }).join("");
+        tagSuggestions.hidden = false;
+        activeTagSuggestionIndex = 0;
+    }
+
+    function fetchTagSuggestions() {
+        var keyword = tagInput ? normalizeSelectedTagName(tagInput.value) : "";
+        var requestSeq;
+
+        if (!tagSuggestions) {
+            return;
+        }
+
+        if (tagSuggestionAbortController) {
+            tagSuggestionAbortController.abort();
+            tagSuggestionAbortController = null;
+        }
+
+        if (!keyword) {
+            closeTagSuggestions();
+            return;
+        }
+
+        requestSeq = ++tagSuggestionRequestSeq;
+        tagSuggestionAbortController = new AbortController();
+
+        fetch("/api/works/tags/suggestions?keyword=" + encodeURIComponent(keyword), {
+            signal: tagSuggestionAbortController.signal
+        })
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error("tag suggestions failed");
+                }
+                return response.json();
+            })
+            .then(function (suggestions) {
+                if (requestSeq !== tagSuggestionRequestSeq) {
+                    return;
+                }
+                renderTagSuggestions(Array.isArray(suggestions) ? suggestions : []);
+            })
+            .catch(function (error) {
+                if (error && error.name === "AbortError") {
+                    return;
+                }
+                closeTagSuggestions();
+            });
+    }
+
     function addTag(rawValue) {
-        var value = (rawValue || "").trim();
+        var value = normalizeSelectedTagName(rawValue);
 
         if (!value || tags.indexOf(value) > -1) {
             return;
         }
 
+        selectedExistingTagNames[value] = true;
         tags.push(value);
         renderTags();
+    }
+
+    function applyTagSuggestion(tagName) {
+        addTag(tagName);
+        if (tagInput) {
+            tagInput.value = "";
+            tagInput.focus();
+        }
+        closeTagSuggestions();
     }
 
     function getSelectedWorkIds() {
@@ -555,11 +700,43 @@ function initializeGalleryRegister() {
     }
 
     if (tagInput && tagList) {
+        tagInput.addEventListener("input", fetchTagSuggestions);
+
         tagInput.addEventListener("keydown", function (event) {
+            var buttons = getTagSuggestionButtons();
+            var activeButton;
+
+            if (tagSuggestions && !tagSuggestions.hidden && buttons.length) {
+                if (event.key === "ArrowDown") {
+                    event.preventDefault();
+                    moveActiveTagSuggestion(1);
+                    return;
+                }
+
+                if (event.key === "ArrowUp") {
+                    event.preventDefault();
+                    moveActiveTagSuggestion(-1);
+                    return;
+                }
+
+                if ((event.key === "Enter" || event.key === ",") && activeTagSuggestionIndex >= 0) {
+                    event.preventDefault();
+                    activeButton = buttons[activeTagSuggestionIndex];
+                    if (activeButton) {
+                        applyTagSuggestion(activeButton.getAttribute("data-tag-name"));
+                    }
+                    return;
+                }
+
+                if (event.key === "Escape") {
+                    closeTagSuggestions();
+                    return;
+                }
+            }
+
             if (event.key === "Enter" || event.key === ",") {
                 event.preventDefault();
-                addTag(tagInput.value.replace(/,/g, ""));
-                tagInput.value = "";
+                fetchTagSuggestions();
             }
 
             if (event.key === "Backspace" && !tagInput.value && tags.length) {
@@ -569,10 +746,7 @@ function initializeGalleryRegister() {
         });
 
         tagInput.addEventListener("blur", function () {
-            if (tagInput.value.trim()) {
-                addTag(tagInput.value.replace(/,/g, ""));
-                tagInput.value = "";
-            }
+            window.setTimeout(closeTagSuggestions, 120);
         });
 
         tagList.addEventListener("click", function (event) {
@@ -592,6 +766,19 @@ function initializeGalleryRegister() {
             tags.splice(index, 1);
             renderTags();
             tagInput.focus();
+        });
+    }
+
+    if (tagSuggestions) {
+        tagSuggestions.addEventListener("mousedown", function (event) {
+            var button = event.target.closest(".tag-suggestion-item");
+
+            if (!button) {
+                return;
+            }
+
+            event.preventDefault();
+            applyTagSuggestion(button.getAttribute("data-tag-name"));
         });
     }
 

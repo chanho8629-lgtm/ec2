@@ -28,6 +28,7 @@ public class PaymentViewController {
         return "work/pay";
     }
 
+
     private void bindBootpayConfig(Model model) {
         model.addAttribute("bootpayJsApplicationId", bootpayJsApplicationId);
         model.addAttribute("bootpayPg", bootpayPg);

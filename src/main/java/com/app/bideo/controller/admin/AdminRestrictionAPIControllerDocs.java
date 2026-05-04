@@ -48,7 +48,7 @@ public interface AdminRestrictionAPIControllerDocs {
             @ApiResponse(responseCode = "400", description = "필수값 누락, 허용값 외 restrictionType, 또는 회원에 이미 활성 제재 존재"),
             @ApiResponse(responseCode = "403", description = "ROLE_ADMIN 권한 없음")
     })
-    ResponseEntity<Map<String, Long>> create(AdminRestrictionUpsertRequestDTO requestDTO);
+    ResponseEntity<?> create(AdminRestrictionUpsertRequestDTO requestDTO);
 
     @Operation(summary = "제재 수정",
             description = "ACTIVE 상태에서만 가능. memberId / restrictionType은 기존 값 강제 유지, reason / endDatetime만 적용.")
@@ -57,7 +57,7 @@ public interface AdminRestrictionAPIControllerDocs {
             @ApiResponse(responseCode = "400", description = "비활성 제재 수정 시도 또는 입력 검증 실패"),
             @ApiResponse(responseCode = "403", description = "ROLE_ADMIN 권한 없음")
     })
-    ResponseEntity<Void> update(@Parameter(description = "제재 PK") Long id, AdminRestrictionUpsertRequestDTO requestDTO);
+    ResponseEntity<?> update(@Parameter(description = "제재 PK") Long id, AdminRestrictionUpsertRequestDTO requestDTO);
 
     @Operation(summary = "제재 해제",
             description = "ACTIVE 상태에서만 가능. 회원 상태가 previousMemberStatus로 복원.")
@@ -66,5 +66,5 @@ public interface AdminRestrictionAPIControllerDocs {
             @ApiResponse(responseCode = "400", description = "비활성 제재 해제 시도"),
             @ApiResponse(responseCode = "403", description = "ROLE_ADMIN 권한 없음")
     })
-    ResponseEntity<Void> release(@Parameter(description = "제재 PK") Long id);
+    ResponseEntity<?> release(@Parameter(description = "제재 PK") Long id);
 }

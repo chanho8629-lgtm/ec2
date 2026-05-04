@@ -37,6 +37,18 @@ public class AuctionController {
         return ResponseEntity.ok(responseDTO);
     }
 
+    @GetMapping("/id/{auctionId}")
+    public ResponseEntity<?> getAuctionById(@PathVariable Long auctionId,
+                                            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        AuctionDetailResponseDTO responseDTO = auctionService.getAuctionDetailById(auctionId);
+
+        if (userDetails != null) {
+            responseDTO.setLoginMemberId(userDetails.getId());
+        }
+
+        return ResponseEntity.ok(responseDTO);
+    }
+
     // 경매 입찰 등록 및 변경 사항 전파
     @PostMapping("/{auctionId}/bid")
     public ResponseEntity<?> placeBid(

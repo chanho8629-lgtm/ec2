@@ -62,9 +62,10 @@ public class WorkAPIController {
     public List<WorkListResponseDTO> feed(
             @RequestParam(required = false) List<Long> excludeIds,
             @RequestParam(required = false) String category,
+            @RequestParam(required = false) String tag,
             @RequestParam(required = false) Integer limit
     ) {
-        return workService.getFeed(excludeIds, category, limit);
+        return workService.getFeed(excludeIds, category, tag, limit);
     }
 
     // 작품 상세 조회

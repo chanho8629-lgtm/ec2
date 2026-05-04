@@ -23,3 +23,22 @@ comment on column tbl_work_tag.tag_id is '태그 FK';
 create index idx_wt_tag on tbl_work_tag (tag_id);
 
 delete from tbl_work_tag;
+
+with works as (
+    select id, row_number() over (order by id) as rn
+    from tbl_work
+    where deleted_datetime is null
+    order by id
+    limit 40
+),
+tags as (
+    select id, row_number() over (order by id) as rn
+    from tbl_tag
+    order by id
+    limit 20
+)
+insert into tbl_work_tag (work_id, tag_id)
+select works.id, tags.id
+from works
+join tags on ((works.rn + tags.rn) % 4 = 0)
+on conflict (work_id, tag_id) do nothing;

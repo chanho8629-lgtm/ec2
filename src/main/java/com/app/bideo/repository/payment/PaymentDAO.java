@@ -31,8 +31,8 @@ public class PaymentDAO {
         return Optional.ofNullable(paymentMapper.selectByPaymentCode(paymentCode));
     }
 
-    public Optional<PaymentVO> findLatestActiveByOrderCode(String orderCode) {
-        return Optional.ofNullable(paymentMapper.selectLatestActiveByOrderCode(orderCode));
+    public Optional<PaymentResponseDTO> findPendingByBuyerAndAuction(Long buyerId, Long auctionId) {
+        return Optional.ofNullable(paymentMapper.selectPendingByBuyerAndAuction(buyerId, auctionId));
     }
 
     public List<PaymentResponseDTO> findByBuyerId(Long buyerId, int offset, int limit) {

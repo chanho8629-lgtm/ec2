@@ -13,12 +13,22 @@ const searchLayout = (() => {
     return div.innerHTML;
   };
 
+  const defaultProfileImage = "/images/default-profile.svg";
+  const defaultContentImage = "/images/logo.png";
+
+  const imageSrc = (value, fallback = defaultContentImage) => {
+    const src = String(value || "").trim();
+    return src || fallback;
+  };
+
+  const imageError = (fallback = defaultContentImage) => `this.onerror=null;this.src='${fallback}'`;
+
   const createProfileEl = (m) => {
     const el = document.createElement("div");
     el.className = "item-section-content profile-renderer";
     el.innerHTML = `
       <a href="/profile/${esc(m.nickname)}" class="channel-avatar">
-        <img class="avatar-circle" src="${m.profileImage || '/images/default-profile.png'}" alt="${esc(m.nickname)}">
+        <img class="avatar-circle" src="${imageSrc(m.profileImage, defaultProfileImage)}" alt="${esc(m.nickname)}" onerror="${imageError(defaultProfileImage)}">
       </a>
       <div class="channel-info">
         <div class="channel-header">
@@ -40,7 +50,7 @@ const searchLayout = (() => {
     el.className = "item-section-content gallery-renderer";
     el.innerHTML = `
       <a href="/gallery/${g.id}" class="gallery-thumbnail">
-        <img class="thumbnail-img" src="${g.coverImage || '/images/default-gallery.png'}">
+        <img class="thumbnail-img" src="${imageSrc(g.coverImage)}" onerror="${imageError()}">
       </a>
       <div class="gallery-info">
         <h3 class="gallery-title"><a href="/gallery/${g.id}">${esc(g.title)}</a></h3>
@@ -50,7 +60,7 @@ const searchLayout = (() => {
           <span>21시간 전</span>
         </div>
         <div class="gallery-channel">
-          <span class="gallery-channel-name">${esc(g.memberNickname)}</span>
+          <a class="gallery-channel-name" href="/profile/${encodeURIComponent(g.memberNickname || "")}">${esc(g.memberNickname)}</a>
         </div>
         ${g.description ? `<p class="gallery-description">${esc(g.description)}</p>` : ""}
       </div>
@@ -82,7 +92,7 @@ const searchLayout = (() => {
     el.className = "item-section-content work-renderer";
     el.innerHTML = `
       <a href="/work/detail/${w.id}" class="work-thumbnail">
-        <img class="thumbnail-img" src="${w.thumbnailUrl || '/images/default-work.png'}">
+        <img class="thumbnail-img" src="${imageSrc(w.thumbnailUrl)}" onerror="${imageError()}">
       </a>
       <div class="work-info">
         <h3 class="work-title"><a href="/work/detail/${w.id}">${esc(w.title)}</a></h3>
@@ -92,7 +102,7 @@ const searchLayout = (() => {
           <span>하루 전</span>
         </div>
         <div class="work-channel">
-          <span class="work-channel-name">${esc(w.memberNickname)}</span>
+          <a class="work-channel-name" href="/profile/${encodeURIComponent(w.memberNickname || "")}">${esc(w.memberNickname)}</a>
         </div>
       </div>
       <button class="work-more-btn" aria-label="작품더보기버튼">⋮</button>
