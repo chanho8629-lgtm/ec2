@@ -62,6 +62,32 @@ public class PaymentService {
         return completePayment(pendingPayment.getId(), buyerId);
     }
 
+    public PaymentResponseDTO payPendingWithRegisteredCard(Long buyerId, Long paymentId) {
+        PaymentVO payment = paymentDAO.findRawById(paymentId)
+                .orElseThrow(() -> new IllegalArgumentException("결제를 찾을 수 없습니다."));
+        if (!payment.getBuyerId().equals(buyerId)) {
+            throw new IllegalArgumentException("결제 권한이 없습니다.");
+        }
+        if (!"PENDING".equals(payment.getStatus())) {
+            throw new IllegalStateException("대기 상태의 결제만 처리할 수 있습니다.");
+        }
+
+        CardResponseDTO targetCard = resolveTargetCard(buyerId, payment.getCardId());
+        if (targetCard.getBillingKey() == null || targetCard.getBillingKey().isBlank()) {
+            throw new IllegalStateException("등록된 카드의 빌링키가 없어 간편결제를 진행할 수 없습니다.");
+        }
+
+        BootpayPaymentResultDTO bootpayPayment = bootpayService.requestCardPayment(
+                targetCard.getBillingKey(),
+                payment.getPaymentCode(),
+                payment.getAuctionId() != null ? "BIDEO 경매 낙찰 결제" : "BIDEO 작품 결제",
+                payment.getTotalPrice()
+        );
+
+        paymentDAO.updatePgReceiptId(payment.getId(), bootpayPayment.getReceiptId());
+        return completePayment(payment.getId(), buyerId);
+    }
+
     private PaymentResponseDTO createPendingPayment(Long buyerId, PaymentRequestDTO requestDTO, Long resolvedCardId) {
         OrderVO order = orderDAO.findByOrderCode(requestDTO.getOrderCode());
         if (order == null) {
@@ -218,6 +244,12 @@ public class PaymentService {
     public PaymentResponseDTO getPaymentDetail(Long paymentId) {
         return paymentDAO.findById(paymentId)
                 .orElseThrow(() -> new IllegalArgumentException("결제를 찾을 수 없습니다."));
+    }
+
+    @Transactional(readOnly = true)
+    public PaymentResponseDTO getPendingAuctionPayment(Long buyerId, Long auctionId) {
+        return paymentDAO.findPendingByBuyerAndAuction(buyerId, auctionId)
+                .orElseThrow(() -> new IllegalArgumentException("결제 대기 내역이 없습니다."));
     }
 
     @Transactional(readOnly = true)
