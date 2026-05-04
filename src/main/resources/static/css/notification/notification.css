@@ -17,7 +17,7 @@ body {
     margin: 0;
     background: var(--bg);
     color: var(--text);
-    font-family: "Pretendard", "Noto Sans KR", sans-serif;
+    font-family: "Pretendard", sans-serif;
 }
 
 button,

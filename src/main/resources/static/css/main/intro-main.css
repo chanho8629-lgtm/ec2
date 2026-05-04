@@ -22,7 +22,7 @@
   --color-footer-heading: #ffffff;
   --header-height: 64px;
   --max-width: 1280px;
-  --font-family: 'Noto Sans KR', 'Roboto', Arial, sans-serif;
+  --font-family: 'Roboto', sans-serif;
 }
 
 [data-theme="dark"] {

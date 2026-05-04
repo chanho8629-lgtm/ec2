@@ -39,7 +39,7 @@
     --admin-error: #cc0000;
 
     /* Typography */
-    --admin-font: 'Roboto', 'Noto Sans KR', sans-serif;
+    --admin-font: 'Roboto', sans-serif;
 
     /* Sizing */
     --admin-sidebar-width: 240px;

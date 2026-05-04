@@ -9,7 +9,7 @@
 body.gallery-register-page {
     margin: 0;
     min-height: 100%;
-    font-family: Roboto, "Noto Sans KR", "Malgun Gothic", sans-serif;
+    font-family: "Roboto", sans-serif;
     background: #f9f9f9;
     color: #0f0f0f;
 }
@@ -28,7 +28,7 @@ body.gallery-register-page::before {
 }
 
 #galleryModal.modal[data-compose-embedded="true"] {
-    font-family: Roboto, "Noto Sans KR", "Malgun Gothic", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 16px;
     color: #0f0f0f;
 }
