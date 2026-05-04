@@ -394,7 +394,7 @@ document.addEventListener('DOMContentLoaded', function () {
         triggerButton.textContent = '다운로드 중';
       }
 
-      triggerDirectDownload('/downloads/works/' + item.downloadWorkId);
+      triggerDirectDownload('/wish/works/' + item.downloadWorkId);
     } finally {
       if (triggerButton) {
         triggerButton.disabled = false;
@@ -410,7 +410,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    body.innerHTML = (items || []).map(function (item) {
+    body.innerHTML = (items || []).map(function (item, index) {
       var badge = item.tag ? '<span class="Dashboard-StatusBadge' + inferStatusClass(item.tag) + '">' + escapeHtml(item.tag) + '</span>' : '';
       var amount = item.amount ? '<span>' + escapeHtml(item.amount) + '</span>' : '';
       var usesModalDetail = name === 'paymentHistory' || name === 'settlements';
@@ -426,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ? '<div class="Dashboard-DataRowActions">' + detailAction + downloadAction + '</div>'
         : '';
       return '' +
-        '<article class="Dashboard-DataRow" tabindex="0" data-detail-row>' +
+        '<article class="Dashboard-DataRow" tabindex="0" data-detail-row data-item-index="' + index + '">' +
           '<div>' +
             '<strong>' + escapeHtml(item.title || '-') + '</strong>' +
             '<p>' + escapeHtml(item.description || '-') + '</p>' +
@@ -439,22 +439,14 @@ document.addEventListener('DOMContentLoaded', function () {
         '</article>';
     }).join('');
 
-    Array.from(body.querySelectorAll('[data-detail-row]')).forEach(function (row, index) {
+    Array.from(body.querySelectorAll('[data-detail-row]')).forEach(function (row) {
       row.addEventListener('click', function () {
-        if (items[index] && items[index].actionUrl) {
-          window.location.href = items[index].actionUrl;
-          return;
-        }
-        openDetail(items[index]);
+        openListItem(name, items[Number(row.dataset.itemIndex)]);
       });
       row.addEventListener('keydown', function (event) {
         if (event.key === 'Enter' || event.key === ' ') {
           event.preventDefault();
-          if (items[index] && items[index].actionUrl) {
-            window.location.href = items[index].actionUrl;
-            return;
-          }
-          openDetail(items[index]);
+          openListItem(name, items[Number(row.dataset.itemIndex)]);
         }
       });
     });
@@ -465,19 +457,39 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
 
-    Array.from(body.querySelectorAll('[data-open-detail]')).forEach(function (button, index) {
+    Array.from(body.querySelectorAll('[data-open-detail]')).forEach(function (button) {
       button.addEventListener('click', function (event) {
         event.stopPropagation();
-        openDetail(items[index]);
+        var row = button.closest('[data-detail-row]');
+        openDetail(items[Number(row.dataset.itemIndex)]);
       });
     });
 
-    Array.from(body.querySelectorAll('[data-download-work-id]')).forEach(function (button, index) {
+    Array.from(body.querySelectorAll('[data-download-work-id]')).forEach(function (button) {
       button.addEventListener('click', function (event) {
         event.stopPropagation();
-        downloadWorkAsset(items[index], button).catch(handleError);
+        var row = button.closest('[data-detail-row]');
+        downloadWorkAsset(items[Number(row.dataset.itemIndex)], button).catch(handleError);
       });
     });
+  }
+
+  function openListItem(name, item) {
+    if (!item) {
+      return;
+    }
+
+    if (name === 'paymentHistory' || name === 'settlements') {
+      openDetail(item);
+      return;
+    }
+
+    if (item.detailUrl) {
+      window.location.href = item.detailUrl;
+      return;
+    }
+
+    openDetail(item);
   }
 
   // 선택한 항목 정보를 상세 모달에 채운다.

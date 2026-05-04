@@ -186,20 +186,34 @@
         from tbl_work w
                  left join tbl_member m on w.member_id = m.id
         where w.id = #{id}
-          and w.deleted_datetime is null
-          and w.status = 'ACTIVE'
-          and not exists (
-            select 1
-            from tbl_auction latest
-            where latest.id = (
-                select a.id
-                from tbl_auction a
-                where a.work_id = w.id
-                order by a.created_datetime desc, a.id desc
-                limit 1
+          and (
+            (
+                w.deleted_datetime is null
+                and w.status = 'ACTIVE'
+                and not exists (
+                    select 1
+                    from tbl_auction latest
+                    where latest.id = (
+                        select a.id
+                        from tbl_auction a
+                        where a.work_id = w.id
+                        order by a.created_datetime desc, a.id desc
+                        limit 1
+                    )
+                      and (latest.status != 'ACTIVE' or latest.closing_at <= now())
+                )
             )
-              and (latest.status != 'ACTIVE' or latest.closing_at <= now())
-        )
+            or (
+                #{currentMemberId} is not null
+                and exists (
+                    select 1
+                    from tbl_payment p
+                    where p.work_id = w.id
+                      and p.buyer_id = #{currentMemberId}
+                      and p.status = 'COMPLETED'
+                )
+            )
+          )
         ]]>
     </select>
 

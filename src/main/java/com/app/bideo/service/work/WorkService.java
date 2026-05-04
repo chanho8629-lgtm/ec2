@@ -164,7 +164,7 @@ public class WorkService {
     }
 
     public void increaseViewCount(Long id, Long viewerId) {
-        workDAO.findById(id)
+        workDAO.findDetailById(id, viewerId)
                 .orElseThrow(() -> new IllegalArgumentException("work not found"));
         workDAO.increaseViewCount(id);
         if (viewerId != null) {
