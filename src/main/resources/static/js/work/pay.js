@@ -215,12 +215,17 @@ async function loadPendingAuctionPayment() {
     renderPendingPaymentPage(payment);
 }
 
-async function createOrderAndPayment() {
-    if (payState.paymentId && payState.payment) {
-        return {
-            order: payState.order || { buyerId: null },
-            payment: payState.payment
+async function createOrderIfNeeded() {
+    if (payState.order) {
+        return payState.order;
+    }
+
+    if (payState.paymentId && payState.payment?.orderCode) {
+        payState.order = {
+            orderCode: payState.payment.orderCode,
+            buyerId: null
         };
+        return payState.order;
     }
 
     if (!payState.workId || !payState.workDetail) {
@@ -231,27 +236,37 @@ async function createOrderAndPayment() {
         method: "POST",
         body: {
             workId: payState.workId,
-            orderType: "TRADE",
-            licenseType: payState.workDetail.licenseType || "STANDARD"
+            auctionId: payState.auctionId,
+            orderType: payState.auctionId ? "AUCTION" : "DIRECT",
+            licenseType: payState.workDetail.licenseType || null
         }
     });
+
+    payState.order = order;
+    return order;
+}
+
+async function createRegularPayment(order) {
+    if (payState.paymentId && payState.payment) {
+        return payState.payment;
+    }
 
     const payment = await apiRequest("/api/payments", {
         method: "POST",
         body: {
             orderCode: order.orderCode,
-            payMethod,
+            payMethod: "CARD",
             paymentPurpose: "PURCHASE"
         }
     });
 
-    payState.order = order;
     payState.payment = payment;
-    return { order, payment };
+    payState.paymentId = payment?.id || payState.paymentId;
+    return payment;
 }
 
 async function requestEasyCardPayment(order) {
-    return apiRequest("/api/payments/easy", {
+    const payment = await apiRequest("/api/payments/easy", {
         method: "POST",
         body: {
             orderCode: order.orderCode,
@@ -260,6 +275,9 @@ async function requestEasyCardPayment(order) {
             paymentPurpose: "WORK_PURCHASE"
         }
     });
+    payState.payment = payment;
+    payState.paymentId = payment?.id || payState.paymentId;
+    return payment;
 }
 
 async function confirmBootpayPayment(receiptId) {
@@ -294,6 +312,20 @@ function redirectToPaymentHistory() {
     window.location.replace("/dashboard?tab=payment");
 }
 
+function buildBootpayCustomerKey(order, payment) {
+    const source = String(
+        payment?.paymentCode ||
+        order?.orderCode ||
+        payState.workId ||
+        payState.auctionId ||
+        Date.now()
+    ).trim();
+
+    const normalized = source.replace(/[^A-Za-z0-9._=@-]/g, "");
+    const shortKey = normalized.slice(0, 12);
+    return shortKey.length >= 2 ? shortKey : `BD${Date.now().toString().slice(-10)}`;
+}
+
 async function requestBootpayPayment(order, payment) {
     const { bootpayJsApplicationId, bootpayPg } = getPayMeta();
     const summary = payState.paymentId
@@ -311,6 +343,8 @@ async function requestBootpayPayment(order, payment) {
         throw new Error("부트페이 스크립트를 불러오지 못했습니다.");
     }
 
+    const customerKey = buildBootpayCustomerKey(order, payment);
+
     const result = await Bootpay.requestPayment({
         application_id: bootpayJsApplicationId,
         price: summary.totalPrice,
@@ -320,7 +354,7 @@ async function requestBootpayPayment(order, payment) {
         method: "card",
         tax_free: 0,
         user: {
-            id: String(order.buyerId || ""),
+            id: customerKey,
             username: "구매자"
         },
         items: [
@@ -356,15 +390,21 @@ async function submitPayment() {
 
     try {
         setSubmittingState(true);
-        const { order, payment } = await createOrderAndPayment();
-        const bootpayResult = await requestBootpayPayment(order, payment);
-        try {
-            await confirmBootpayPayment(bootpayResult.receipt_id);
-        } catch (error) {
-            if (!isBootpayServerKeyError(error)) {
-                throw error;
+        const order = await createOrderIfNeeded();
+
+        if (payState.selectedMethod === "bootpay") {
+            await requestEasyCardPayment(order);
+        } else {
+            const payment = await createRegularPayment(order);
+            const bootpayResult = await requestBootpayPayment(order, payment);
+            try {
+                await confirmBootpayPayment(bootpayResult.receipt_id);
+            } catch (error) {
+                if (!isBootpayServerKeyError(error)) {
+                    throw error;
+                }
+                await completePaymentWithoutPgVerification();
             }
-            await completePaymentWithoutPgVerification();
         }
         redirectToPaymentHistory();
     } catch (error) {

@@ -15,6 +15,8 @@ import com.app.bideo.repository.work.WorkDAO;
 import com.app.bideo.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +35,7 @@ public class PaymentService {
     private final BootpayService bootpayService;
     private final WorkDAO workDAO;
     private final BootpayClient bootpayClient;
+    private final CacheManager cacheManager;
 
     private static final int PAGE_SIZE = 20;
     private static final double FEE_RATE = 0.10;
@@ -57,32 +60,6 @@ public class PaymentService {
 
         paymentDAO.updatePgReceiptId(pendingPayment.getId(), bootpayPayment.getReceiptId());
         return completePayment(pendingPayment.getId(), buyerId);
-    }
-
-    public PaymentResponseDTO payPendingWithRegisteredCard(Long buyerId, Long paymentId) {
-        PaymentVO payment = paymentDAO.findRawById(paymentId)
-                .orElseThrow(() -> new IllegalArgumentException("결제를 찾을 수 없습니다."));
-        if (!payment.getBuyerId().equals(buyerId)) {
-            throw new IllegalArgumentException("결제 권한이 없습니다.");
-        }
-        if (!"PENDING".equals(payment.getStatus())) {
-            throw new IllegalStateException("대기 상태의 결제만 처리할 수 있습니다.");
-        }
-
-        CardResponseDTO targetCard = resolveTargetCard(buyerId, payment.getCardId());
-        if (targetCard.getBillingKey() == null || targetCard.getBillingKey().isBlank()) {
-            throw new IllegalStateException("등록된 카드의 빌링키가 없어 간편결제를 진행할 수 없습니다.");
-        }
-
-        BootpayPaymentResultDTO bootpayPayment = bootpayBillingService.requestCardPayment(
-                targetCard.getBillingKey(),
-                payment.getPaymentCode(),
-                payment.getAuctionId() != null ? "BIDEO 경매 낙찰 결제" : "BIDEO 작품 결제",
-                payment.getTotalPrice()
-        );
-
-        paymentDAO.updatePgReceiptId(payment.getId(), bootpayPayment.getReceiptId());
-        return completePayment(payment.getId(), buyerId);
     }
 
     private PaymentResponseDTO createPendingPayment(Long buyerId, PaymentRequestDTO requestDTO, Long resolvedCardId) {
@@ -124,6 +101,7 @@ public class PaymentService {
                 .build();
 
         paymentDAO.save(paymentVO);
+        evictDashboardCaches();
 
         return paymentDAO.findById(paymentVO.getId())
                 .orElseThrow(() -> new IllegalStateException("결제 생성 후 조회 실패"));
@@ -154,16 +132,19 @@ public class PaymentService {
         OrderVO order = orderDAO.findByOrderCode(payment.getOrderCode());
         if (order != null) {
             orderDAO.updateStatus(order.getId(), "PAID");
+            paymentDAO.updateOtherOpenByBuyerAndWork(payment.getBuyerId(), payment.getWorkId(), payment.getId(), "CANCELLED");
+            orderDAO.updateOtherPendingByBuyerAndWork(payment.getBuyerId(), payment.getWorkId(), order.getId(), "CANCELLED");
+            if (order.getWorkId() != null) {
+                workDAO.updateStatus(order.getWorkId(), "SOLD");
+            }
 
             notificationService.createNotification(
                     order.getSellerId(), order.getBuyerId(), "PAYMENT", "ORDER",
                     order.getId(), "결제가 완료되었습니다."
             );
-
-            if (order.getWorkId() != null) {
-                workDAO.delete(order.getWorkId());
-            }
         }
+
+        evictDashboardCaches();
 
         return paymentDAO.findById(paymentId)
                 .orElseThrow(() -> new IllegalStateException("결제 완료 후 조회 실패"));
@@ -227,6 +208,8 @@ public class PaymentService {
             );
         }
 
+        evictDashboardCaches();
+
         return paymentDAO.findById(paymentId)
                 .orElseThrow(() -> new IllegalStateException("환불 후 조회 실패"));
     }
@@ -235,12 +218,6 @@ public class PaymentService {
     public PaymentResponseDTO getPaymentDetail(Long paymentId) {
         return paymentDAO.findById(paymentId)
                 .orElseThrow(() -> new IllegalArgumentException("결제를 찾을 수 없습니다."));
-    }
-
-    @Transactional(readOnly = true)
-    public PaymentResponseDTO getPendingAuctionPayment(Long buyerId, Long auctionId) {
-        return paymentDAO.findPendingByBuyerAndAuction(buyerId, auctionId)
-                .orElseThrow(() -> new IllegalArgumentException("결제 대기 내역이 없습니다."));
     }
 
     @Transactional(readOnly = true)
@@ -256,5 +233,17 @@ public class PaymentService {
                 .totalElements((long) total)
                 .totalPages((int) Math.ceil((double) total / PAGE_SIZE))
                 .build();
+    }
+
+    private void evictDashboardCaches() {
+        clearCache("dashboard");
+        clearCache("profile");
+    }
+
+    private void clearCache(String cacheName) {
+        Cache cache = cacheManager.getCache(cacheName);
+        if (cache != null) {
+            cache.clear();
+        }
     }
 }
