@@ -7,12 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title th:text="${pageTitle}">BIDEO - 영상 크리에이터를 위한 프리미엄 마켓플레이스</title>
     <link rel="icon" href="/images/favicon.png" />
+    <meta name="bd-current-user-id" th:if="${currentUserId != null}" th:content="${currentUserId}" />
     <link rel="stylesheet" href="/css/common/font.css" />
     <link rel="stylesheet" href="/css/layout/shell.css" />
     <link rel="stylesheet" href="/css/layout/search.css" />
     <link rel="stylesheet" href="/css/layout/voice-search.css" />
     <link rel="stylesheet" href="/css/layout/chat.css" />
     <link rel="stylesheet" href="/css/layout/layout.css">
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
   </th:block>
 </head>
 
@@ -145,7 +148,7 @@
                   fill="currentColor" />
           </svg><span class="bd-shell__guide-copy">내 페이지</span></a></li>
           <li class="bd-shell__guide-item"><a class="bd-shell__guide-link"
-                  th:classappend="${activeItemKey == 'bookmark'} ? ' is-active'"
+                  th:classappend="${activeItemKey == 'bookmark' or activeItemKey == 'downloads' or activeItemKey == 'wish'} ? ' is-active'"
                   href="/wish" title="찜한 작품"><svg
                   class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
             <path
@@ -482,17 +485,7 @@
                   </div>
                 </a>
               </div><div class="style-scope yt-multi-page-menu-section-renderer" hide-secondary-string="" compact-link-style="">
-                <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="/profile">
-                  <div role="none" class="style-scope ytd-compact-link-renderer" style-target="host" tabindex="0">
-                    <div class="style-scope ytd-compact-link-renderer"><span class="style-scope ytd-compact-link-renderer">
-                          <span class="yt-icon-shape style-scope yt-icon"><div style="width:100%;height:100%;display:block;fill:currentcolor"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events:none;display:inherit;width:100%;height:100%">
-                            <path d="M4 6H2v14a2 2 0 002 2h14v-2H4V6zm16-4H8a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2zm0 14H8V4h12v12zM10 9h8v2h-8V9zm0 3h4v2h-4v-2zm0-6h8v2h-8V6z"></path>
-                          </svg></div></span></span></div>
-                    <div class="style-scope ytd-compact-link-renderer"><span class="style-scope ytd-compact-link-renderer">내 컬렉션</span></div>
-                  </div>
-                </a>
-              </div><div class="style-scope yt-multi-page-menu-section-renderer" hide-secondary-string="" compact-link-style="">
-                <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="/profile">
+                <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="/wish">
                   <div role="none" class="style-scope ytd-compact-link-renderer" style-target="host" tabindex="0">
                     <div class="style-scope ytd-compact-link-renderer"><span class="style-scope ytd-compact-link-renderer">
                           <span class="yt-icon-shape style-scope yt-icon"><div style="width:100%;height:100%;display:block;fill:currentcolor"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events:none;display:inherit;width:100%;height:100%">
@@ -516,7 +509,7 @@
                   </div>
                 </a>
               </div><div class="style-scope yt-multi-page-menu-section-renderer" hide-secondary-string="" compact-link-style="">
-                <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="/contest/list">
+                <a class="yt-simple-endpoint style-scope ytd-compact-link-renderer" role="link" tabindex="-1" href="/contest/list?scope=joined">
                   <div role="none" class="style-scope ytd-compact-link-renderer" style-target="host" tabindex="0">
                     <div class="style-scope ytd-compact-link-renderer"><span class="style-scope ytd-compact-link-renderer">
                           <span class="yt-icon-shape style-scope yt-icon"><div style="width:100%;height:100%;display:block;fill:currentcolor"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events:none;display:inherit;width:100%;height:100%">
@@ -577,14 +570,17 @@
         <div id="header" class="style-scope ytd-multi-page-menu-renderer">
           <div class="bd-shell__notification-header">
             <h2 class="bd-shell__notification-title">알림</h2>
-            <button type="button" class="bd-shell__notification-toggle" id="notificationToggle" aria-label="알림 설정" title="알림 켜기/끄기" data-bd-notification-toggle-btn>
-              <svg class="notification-icon-on" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
-                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
-              </svg>
-              <svg class="notification-icon-off" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
-                <path d="M20 18.69L7.84 6.14 5.27 3.49 4 4.76l2.8 2.8v.01c-.52.99-.8 2.16-.8 3.43v5l-2 2v1h13.73l2 2L21 19.72l-1-1.03zM12 22c1.11 0 2-.89 2-2h-4c0 1.11.89 2 2 2zm6-7.32V11c0-3.08-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68c-.15.03-.29.08-.42.12-.1.03-.2.07-.3.11h-.01c-.01 0-.01 0-.02.01-.23.09-.46.2-.68.31 0 0 0 0-.01.01L18 14.68z"/>
-              </svg>
-            </button>
+            <div class="bd-shell__notification-actions">
+              <button type="button" class="bd-shell__notification-toggle" id="notificationToggle" aria-label="알림 설정" title="알림 켜기/끄기" data-bd-notification-toggle-btn>
+                <svg class="notification-icon-on" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
+                  <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                </svg>
+                <svg class="notification-icon-off" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
+                  <path d="M20 18.69L7.84 6.14 5.27 3.49 4 4.76l2.8 2.8v.01c-.52.99-.8 2.16-.8 3.43v5l-2 2v1h13.73l2 2L21 19.72l-1-1.03zM12 22c1.11 0 2-.89 2-2h-4c0 1.11.89 2 2 2zm6-7.32V11c0-3.08-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68c-.15.03-.29.08-.42.12-.1.03-.2.07-.3.11h-.01c-.01 0-.01 0-.02.01-.23.09-.46.2-.68.31 0 0 0 0-.01.01L18 14.68z"/>
+                </svg>
+              </button>
+              <button type="button" class="bd-shell__notification-readall" data-bd-notification-readall>전체 읽음</button>
+            </div>
           </div>
         </div>
         <div id="container" class="menu-container style-scope ytd-multi-page-menu-renderer">

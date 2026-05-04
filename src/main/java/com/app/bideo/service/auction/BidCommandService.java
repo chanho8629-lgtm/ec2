@@ -64,14 +64,14 @@ public class BidCommandService {
         notificationService.createNotification(
                 auction.getSellerId(), memberId, "BID", "AUCTION",
                 auction.getWorkId(),
-                requestDTO.getBidPrice() + "원에 새로운 입찰이 있습니다."
+                String.format("%,d원에 입찰했습니다.", requestDTO.getBidPrice())
         );
 
         if (previousHighest != null && !previousHighest.getMemberId().equals(memberId)) {
             notificationService.createNotification(
                     previousHighest.getMemberId(), memberId, "BID", "AUCTION",
                     auction.getWorkId(),
-                    "더 높은 입찰이 등록되었습니다."
+                    String.format("더 높은 금액(%,d원)으로 입찰했습니다.", requestDTO.getBidPrice())
             );
         }
 
