@@ -24,6 +24,7 @@
 \ir tbl_work_file.sql
 \ir tbl_work_tag.sql
 \ir tbl_gallery.sql
+\ir tbl_gallery_view.sql
 \ir tbl_contest.sql
 \ir tbl_work_like.sql
 \ir tbl_gallery_like.sql
@@ -53,30 +54,3 @@
 \ir tbl_withdrawal_request.sql
 \ir seed_badge.sql
 \ir tbl_like.sql
-\ir tbl_message_like
-
-
--- ----------------------------------------------------------
--- tbl_message 누락 컬럼 추가 (기존 DB 마이그레이션용)
--- ----------------------------------------------------------
-ALTER TABLE tbl_message ADD COLUMN IF NOT EXISTS updated_datetime TIMESTAMP NOT NULL DEFAULT now();
-ALTER TABLE tbl_message ADD COLUMN IF NOT EXISTS deleted_datetime TIMESTAMP NULL;
-ALTER TABLE tbl_message ADD COLUMN IF NOT EXISTS reply_to_message_id BIGINT NULL REFERENCES tbl_message(id);
-ALTER TABLE tbl_message ADD COLUMN IF NOT EXISTS like_count INT NOT NULL DEFAULT 0;
-CREATE INDEX IF NOT EXISTS idx_msg_reply ON tbl_message (reply_to_message_id);
-
--- tbl_message_like 테이블 생성 (없을 경우)
-CREATE TABLE IF NOT EXISTS tbl_message_like (
-    id               bigint generated always as identity primary key,
-    message_id       bigint    not null,
-    member_id        bigint    not null,
-    created_datetime timestamp not null default now(),
-    constraint uk_message_like unique (message_id, member_id),
-    constraint fk_message_like_message foreign key (message_id) references tbl_message (id),
-    constraint fk_message_like_member foreign key (member_id) references tbl_member (id)
-);
-CREATE INDEX IF NOT EXISTS idx_message_like_message ON tbl_message_like (message_id);
-CREATE INDEX IF NOT EXISTS idx_message_like_member ON tbl_message_like (member_id);
-
--- oauth_provider enum에 google 추가 (기존 DB 마이그레이션용)
-ALTER TYPE oauth_provider ADD VALUE IF NOT EXISTS 'google';

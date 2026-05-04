@@ -12,3 +12,15 @@ select,
 textarea {
   font-family: inherit;
 }
+body{
+  -ms-overflow-style: none;
+}
+
+::-webkit-scrollbar,
+*::-webkit-scrollbar{
+  display: none;
+}
+
+*{
+  -ms-overflow-style: none;
+}

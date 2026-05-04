@@ -54,4 +54,8 @@ public class PaymentDAO {
     public void updatePgReceiptId(Long paymentId, String pgReceiptId) {
         paymentMapper.updatePgReceiptId(paymentId, pgReceiptId);
     }
+
+    public void updateOtherOpenByBuyerAndWork(Long buyerId, Long workId, Long excludePaymentId, String status) {
+        paymentMapper.updateOtherOpenByBuyerAndWork(buyerId, workId, excludePaymentId, status);
+    }
 }

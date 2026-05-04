@@ -7,6 +7,7 @@ const payState = {
     paymentDetail: null,
     order: null,
     payment: null,
+    cards: [],
     submitting: false
 };
 
@@ -239,7 +240,7 @@ async function createOrderAndPayment() {
         method: "POST",
         body: {
             orderCode: order.orderCode,
-            payMethod: payState.selectedMethod === "bootpay" ? "BOOTPAY" : "CARD",
+            payMethod,
             paymentPurpose: "PURCHASE"
         }
     });
@@ -247,6 +248,18 @@ async function createOrderAndPayment() {
     payState.order = order;
     payState.payment = payment;
     return { order, payment };
+}
+
+async function requestEasyCardPayment(order) {
+    return apiRequest("/api/payments/easy", {
+        method: "POST",
+        body: {
+            orderCode: order.orderCode,
+            cardId: null,
+            payMethod: "BOOTPAY_BILLING",
+            paymentPurpose: "WORK_PURCHASE"
+        }
+    });
 }
 
 async function confirmBootpayPayment(receiptId) {
@@ -362,7 +375,7 @@ async function submitPayment() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-    selectPayMethod("bootpay");
+    selectPayMethod("card");
 
     try {
         if (resolveLongParam("paymentId") || resolveLongParam("auctionId")) {

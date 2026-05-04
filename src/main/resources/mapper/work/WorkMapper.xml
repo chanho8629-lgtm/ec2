@@ -141,6 +141,14 @@
           and deleted_datetime is null
     </update>
 
+    <insert id="insertWorkView">
+        insert into tbl_work_view (
+            work_id, member_id, viewed_at, created_datetime
+        ) values (
+            #{workId}, #{memberId}, now(), now()
+        )
+    </insert>
+
     <select id="selectWorkDetail" resultMap="workDetailMap">
         <![CDATA[
         select

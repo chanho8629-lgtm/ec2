@@ -42,8 +42,8 @@ create index idx_report_target on tbl_report (target_type, target_id);
 create index idx_report_status on tbl_report (status, created_datetime desc);
 
 -- 기존 테이블에 제약조건만 추가할 경우 아래 실행
-alter table tbl_report add constraint chk_report_target_type check (target_type in ('WORK', 'MEMBER', 'COMMENT', 'GALLERY'));
-alter table tbl_report add constraint chk_report_reason check (reason in ('SENSITIVE', 'IMPERSONATION', 'HARASSMENT', 'COPYRIGHT'));
-alter table tbl_report add constraint chk_report_status check (status in ('PENDING', 'REVIEWING', 'RESOLVED', 'CANCELLED'));
+-- alter table tbl_report add constraint chk_report_target_type check (target_type in ('WORK', 'MEMBER', 'COMMENT', 'GALLERY'));
+-- alter table tbl_report add constraint chk_report_reason check (reason in ('SENSITIVE', 'IMPERSONATION', 'HARASSMENT', 'COPYRIGHT'));
+-- alter table tbl_report add constraint chk_report_status check (status in ('PENDING', 'REVIEWING', 'RESOLVED', 'CANCELLED'));
 
-select * from tbl_report;
+-- select * from tbl_report;

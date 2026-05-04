@@ -30,7 +30,7 @@ public class PaymentService {
     private final OrderDAO orderDAO;
     private final CardDAO cardDAO;
     private final NotificationService notificationService;
-    private final BootpayBillingService bootpayBillingService;
+    private final BootpayService bootpayService;
     private final WorkDAO workDAO;
     private final BootpayClient bootpayClient;
 
@@ -48,7 +48,7 @@ public class PaymentService {
         }
 
         PaymentResponseDTO pendingPayment = createPendingPayment(buyerId, requestDTO, targetCard.getId());
-        BootpayPaymentResultDTO bootpayPayment = bootpayBillingService.requestCardPayment(
+        BootpayPaymentResultDTO bootpayPayment = bootpayService.requestCardPayment(
                 targetCard.getBillingKey(),
                 pendingPayment.getPaymentCode(),
                 "BIDEO 작품 결제",
@@ -95,6 +95,12 @@ public class PaymentService {
         }
         if (!"PENDING_PAYMENT".equals(order.getStatus())) {
             throw new IllegalStateException("결제 대기 상태가 아닙니다.");
+        }
+
+        PaymentVO existingPayment = paymentDAO.findLatestActiveByOrderCode(order.getOrderCode()).orElse(null);
+        if (existingPayment != null) {
+            return paymentDAO.findById(existingPayment.getId())
+                    .orElseThrow(() -> new IllegalStateException("기존 결제 조회 실패"));
         }
 
         long originalAmount = order.getOriginalPrice();

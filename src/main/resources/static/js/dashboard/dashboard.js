@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var state = {
     dashboard: null,
     cards: [],
-    activeMetric: 'views',
+    activeMetric: 'favorites',
     activeRange: '28d',
     chart: null,
     editingCardId: null,
@@ -27,6 +27,11 @@ document.addEventListener('DOMContentLoaded', function () {
   var listBodies = Array.from(document.querySelectorAll('[data-list-body]'));
   var cardRowsRoot = document.querySelector('[data-card-rows]');
   var cardForm = document.querySelector('[data-card-form]');
+  var cardCompanySelect = document.querySelector('[data-card-company-select]');
+  var cardCompanyTrigger = document.querySelector('[data-card-company-trigger]');
+  var cardCompanyLabel = document.querySelector('[data-card-company-label]');
+  var cardCompanyMenu = document.querySelector('[data-card-company-menu]');
+  var cardCompanyOptions = Array.from(document.querySelectorAll('[data-card-company-option]'));
   var cardCompanyInput = document.querySelector('[data-card-company-input]');
   var cardNumberInput = document.querySelector('[data-card-number-input]');
   var cardPasswordInput = document.querySelector('[data-card-password-input]');
@@ -86,6 +91,10 @@ document.addEventListener('DOMContentLoaded', function () {
       .replace(/'/g, '&#39;');
   }
 
+  function escapeAttribute(value) {
+    return escapeHtml(value);
+  }
+
   function digitsOnly(value) {
     return String(value || '').replace(/\D/g, '');
   }
@@ -107,6 +116,53 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function hasRawCardInput(payload) {
     return !!(payload.cardNumber || payload.cardPasswordTwoDigits || payload.cardIdentityNo || payload.cardExpireMonth || payload.cardExpireYear);
+  }
+
+  function getSelectedCardCompany() {
+    return cardCompanyInput ? cardCompanyInput.value.trim() : '';
+  }
+
+  function closeCardCompanyMenu() {
+    if (cardCompanyMenu) {
+      cardCompanyMenu.classList.remove('is-active');
+      cardCompanyMenu.hidden = true;
+    }
+    if (cardCompanyTrigger) {
+      cardCompanyTrigger.setAttribute('aria-expanded', 'false');
+    }
+    if (cardCompanySelect) {
+      cardCompanySelect.classList.remove('is-open');
+    }
+  }
+
+  function openCardCompanyMenu() {
+    if (cardCompanyMenu) {
+      cardCompanyMenu.hidden = false;
+      cardCompanyMenu.classList.add('is-active');
+    }
+    if (cardCompanyTrigger) {
+      cardCompanyTrigger.setAttribute('aria-expanded', 'true');
+    }
+    if (cardCompanySelect) {
+      cardCompanySelect.classList.add('is-open');
+    }
+  }
+
+  function setCardCompany(value) {
+    var company = String(value || '').trim();
+
+    if (cardCompanyInput) {
+      cardCompanyInput.value = company;
+    }
+    if (cardCompanyLabel) {
+      cardCompanyLabel.textContent = company || '카드사를 선택해 주세요.';
+    }
+
+    cardCompanyOptions.forEach(function (option) {
+      var selected = option.dataset.cardCompanyOption === company;
+      option.classList.toggle('is-selected', selected);
+      option.setAttribute('aria-selected', selected ? 'true' : 'false');
+    });
   }
 
   // 모달 열기
@@ -231,9 +287,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var tables = state.dashboard.summaryTables || [];
     summaryTablesRoot.innerHTML = tables.map(function (table) {
-      var rows = (table.items || []).map(function (item) {
+      var items = (table.items || []).slice();
+      var isPortfolioSummary = table.title === '작품/예술관 요약';
+
+      if (isPortfolioSummary && !items.some(function (item) { return item.label === '누적 조회수'; })) {
+        items.push({
+          label: '누적 조회수',
+          value: (state.dashboard.totalViewsText || '0') + '회',
+        });
+      }
+
+      var rows = items.map(function (item) {
         return '<tr><td>' + escapeHtml(item.label) + '</td><td>' + escapeHtml(item.value) + '</td></tr>';
       }).join('');
+
+      var hint = isPortfolioSummary
+        ? '<p class="Dashboard-TableHint">※작품+예술관 조회수 합산입니다.</p>'
+        : '';
 
       return '' +
         '<article class="Dashboard-Card Dashboard-InfoCard Dashboard-TableCard">' +
@@ -247,6 +317,7 @@ document.addEventListener('DOMContentLoaded', function () {
               '<tbody>' + rows + '</tbody>' +
             '</table>' +
           '</div>' +
+          hint +
         '</article>';
     }).join('');
   }
@@ -259,6 +330,79 @@ document.addEventListener('DOMContentLoaded', function () {
     return '';
   }
 
+  function resolveDownloadTargetFile(files) {
+    if (!Array.isArray(files) || !files.length) {
+      return null;
+    }
+
+    var mediaFile = files.find(function (file) {
+      return Number(file && file.sortOrder) > 0 && file.fileUrl;
+    });
+    if (mediaFile) {
+      return mediaFile;
+    }
+
+    return files.find(function (file) {
+      return file && file.fileUrl;
+    }) || null;
+  }
+
+  function buildDownloadFilename(title, file) {
+    var rawTitle = String(title || 'bideo-work').trim();
+    var safeTitle = rawTitle.replace(/[\\/:*?"<>|]/g, '_') || 'bideo-work';
+    var fileUrl = String(file && file.fileUrl || '');
+    var pathname = '';
+
+    try {
+      pathname = new URL(fileUrl).pathname || '';
+    } catch (error) {
+      pathname = fileUrl.split('?')[0] || '';
+    }
+
+    var fileName = pathname.split('/').pop() || '';
+    var dotIndex = fileName.lastIndexOf('.');
+    if (dotIndex > -1) {
+      return safeTitle + fileName.slice(dotIndex);
+    }
+
+    var fileType = String(file && file.fileType || '');
+    if (fileType.indexOf('video/') === 0) return safeTitle + '.mp4';
+    if (fileType.indexOf('image/png') === 0) return safeTitle + '.png';
+    if (fileType.indexOf('image/jpeg') === 0) return safeTitle + '.jpg';
+    if (fileType.indexOf('image/webp') === 0) return safeTitle + '.webp';
+    return safeTitle;
+  }
+
+  function triggerDirectDownload(url) {
+    var link = document.createElement('a');
+    link.href = url;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  async function downloadWorkAsset(item, triggerButton) {
+    if (!item || !item.downloadWorkId) {
+      throw new Error('다운로드할 작품 정보가 없습니다.');
+    }
+
+    var originalText = triggerButton ? triggerButton.textContent : '';
+
+    try {
+      if (triggerButton) {
+        triggerButton.disabled = true;
+        triggerButton.textContent = '다운로드 중';
+      }
+
+      triggerDirectDownload('/downloads/works/' + item.downloadWorkId);
+    } finally {
+      if (triggerButton) {
+        triggerButton.disabled = false;
+        triggerButton.textContent = originalText;
+      }
+    }
+  }
+
   // 각 탭의 리스트형 데이터를 행 UI로 렌더링한다.
   function renderList(name, items) {
     var body = document.querySelector('[data-list-body="' + name + '"]');
@@ -269,6 +413,18 @@ document.addEventListener('DOMContentLoaded', function () {
     body.innerHTML = (items || []).map(function (item) {
       var badge = item.tag ? '<span class="Dashboard-StatusBadge' + inferStatusClass(item.tag) + '">' + escapeHtml(item.tag) + '</span>' : '';
       var amount = item.amount ? '<span>' + escapeHtml(item.amount) + '</span>' : '';
+      var usesModalDetail = name === 'paymentHistory' || name === 'settlements';
+      var detailAction = item.detailUrl
+        ? (usesModalDetail
+            ? '<button class="Dashboard-TextButton Dashboard-TextButton--link" type="button" data-open-detail>상세</button>'
+            : '<a class="Dashboard-TextButton Dashboard-TextButton--link" href="' + escapeAttribute(item.detailUrl) + '" data-detail-link>상세</a>')
+        : '';
+      var downloadAction = item.downloadWorkId
+        ? '<button class="Dashboard-TextButton Dashboard-TextButton--link" type="button" data-download-work-id="' + item.downloadWorkId + '">다운로드</button>'
+        : '';
+      var actionMarkup = (detailAction || downloadAction)
+        ? '<div class="Dashboard-DataRowActions">' + detailAction + downloadAction + '</div>'
+        : '';
       return '' +
         '<article class="Dashboard-DataRow" tabindex="0" data-detail-row>' +
           '<div>' +
@@ -278,6 +434,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '<div class="Dashboard-DataRowMeta">' +
             amount +
             badge +
+            actionMarkup +
           '</div>' +
         '</article>';
     }).join('');
@@ -299,6 +456,26 @@ document.addEventListener('DOMContentLoaded', function () {
           }
           openDetail(items[index]);
         }
+      });
+    });
+
+    Array.from(body.querySelectorAll('[data-detail-link]')).forEach(function (link) {
+      link.addEventListener('click', function (event) {
+        event.stopPropagation();
+      });
+    });
+
+    Array.from(body.querySelectorAll('[data-open-detail]')).forEach(function (button, index) {
+      button.addEventListener('click', function (event) {
+        event.stopPropagation();
+        openDetail(items[index]);
+      });
+    });
+
+    Array.from(body.querySelectorAll('[data-download-work-id]')).forEach(function (button, index) {
+      button.addEventListener('click', function (event) {
+        event.stopPropagation();
+        downloadWorkAsset(items[index], button).catch(handleError);
       });
     });
   }
@@ -343,7 +520,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     var metrics = state.dashboard.analyticsMetrics || {};
-    var metric = metrics[state.activeMetric] || metrics.views;
+    var metric = metrics[state.activeMetric];
+    if (!metric) {
+      var metricKeys = Object.keys(metrics);
+      metric = metricKeys.length ? metrics[metricKeys[0]] : null;
+    }
     if (!metric) {
       return;
     }
@@ -428,7 +609,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // 카드 미리보기 동기화
   function syncCardPreview() {
     if (cardPreviewBrand) {
-      cardPreviewBrand.textContent = (cardCompanyInput && cardCompanyInput.value.trim()) || 'NEW CARD';
+      cardPreviewBrand.textContent = getSelectedCardCompany() || 'NEW CARD';
     }
     if (cardPreviewNumberText) {
       cardPreviewNumberText.textContent = maskCardNumber(cardNumberInput ? cardNumberInput.value : '');
@@ -462,13 +643,15 @@ document.addEventListener('DOMContentLoaded', function () {
       cardPrimaryInput.checked = true;
     }
     setCardFormMode(false);
+    setCardCompany('');
+    closeCardCompanyMenu();
     syncCardPreview();
   }
 
   // 카드 폼 채우기
   function fillCardForm(card) {
     state.editingCardId = card.id;
-    if (cardCompanyInput) cardCompanyInput.value = card.cardCompany || '';
+    setCardCompany(card.cardCompany || '');
     if (cardNumberInput) cardNumberInput.value = '';
     if (cardPasswordInput) cardPasswordInput.value = '';
     if (cardIdentityInput) cardIdentityInput.value = '';
@@ -547,7 +730,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function buildCardPayload() {
     var cardNumber = formatCardNumber(cardNumberInput ? cardNumberInput.value : '');
     return {
-      cardCompany: cardCompanyInput ? cardCompanyInput.value.trim() : '',
+      cardCompany: getSelectedCardCompany(),
       cardNumber: digitsOnly(cardNumber),
       cardNumberMasked: digitsOnly(cardNumber).length >= 8 ? maskCardNumber(cardNumber) : '',
       cardPasswordTwoDigits: digitsOnly(cardPasswordInput ? cardPasswordInput.value : '').slice(0, 2),
@@ -620,7 +803,6 @@ document.addEventListener('DOMContentLoaded', function () {
           renderList('ownedWorks', state.dashboard.ownedWorks || []);
           renderList('galleries', state.dashboard.galleries || []);
           renderList('soldWorks', state.dashboard.soldWorks || []);
-          renderList('purchasedWorks', state.dashboard.purchasedWorks || []);
           renderList('storedWorks', state.dashboard.storedWorks || []);
           renderList('paymentHistory', state.dashboard.paymentHistory || []);
           renderList('settlements', state.dashboard.settlements || []);
@@ -635,8 +817,38 @@ document.addEventListener('DOMContentLoaded', function () {
   // 카드 폼 관련 입력과 제출 이벤트를 연결한다.
   // 카드 폼 이벤트 연결
   function setupCardForm() {
-    if (cardCompanyInput) {
-      cardCompanyInput.addEventListener('input', syncCardPreview);
+    if (cardCompanyTrigger) {
+      cardCompanyTrigger.addEventListener('click', function () {
+        if (cardCompanyMenu && cardCompanyMenu.classList.contains('is-active')) {
+          closeCardCompanyMenu();
+        } else {
+          openCardCompanyMenu();
+        }
+      });
+    }
+
+    if (cardCompanySelect) {
+      document.addEventListener('click', function (event) {
+        if (!event.target.closest('[data-card-company-select]')) {
+          closeCardCompanyMenu();
+        }
+      });
+    }
+
+    cardCompanyOptions.forEach(function (option) {
+      option.addEventListener('click', function () {
+        setCardCompany(option.dataset.cardCompanyOption);
+        closeCardCompanyMenu();
+        syncCardPreview();
+      });
+    });
+
+    if (cardCompanyTrigger) {
+      cardCompanyTrigger.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+          closeCardCompanyMenu();
+        }
+      });
     }
     if (cardNumberInput) {
       cardNumberInput.addEventListener('input', function () {
@@ -723,13 +935,15 @@ document.addEventListener('DOMContentLoaded', function () {
           return;
         }
 
+        var deletingCardId = state.pendingDeleteId;
+
         requestJson('/api/cards/' + state.pendingDeleteId, {
           method: 'DELETE',
         })
           .then(function () {
             state.pendingDeleteId = null;
             closeModal(cardDeleteConfirmButton);
-            if (state.editingCardId && !state.cards.some(function (card) { return card.id === state.editingCardId; })) {
+            if (state.editingCardId === deletingCardId) {
               resetCardForm();
             }
             return loadDashboard();
