@@ -41,9 +41,13 @@ public class BookmarkService {
 
             Long ownerId = resolveOwnerId(targetType, targetId);
             if (ownerId != null) {
+                String label = switch (targetType) {
+                    case "WORK" -> "회원님의 작품을 북마크했습니다.";
+                    case "GALLERY" -> "회원님의 갤러리를 북마크했습니다.";
+                    default -> "콘텐츠를 북마크했습니다.";
+                };
                 notificationService.createNotification(
-                        ownerId, memberId, "BOOKMARK", targetType, targetId,
-                        "콘텐츠를 북마크했습니다."
+                        ownerId, memberId, "BOOKMARK", targetType, targetId, label
                 );
             }
         }

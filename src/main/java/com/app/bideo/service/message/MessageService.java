@@ -69,6 +69,7 @@ public class MessageService {
         messageRoomDAO.createRoom(roomVO);
         messageRoomDAO.addMember(roomVO.getId(), currentMemberId);
         messageRoomDAO.addMember(roomVO.getId(), partnerId);
+        broadcastRoomTouch(roomVO.getId());
         return buildRoomResponse(roomVO.getId(), currentMemberId);
     }
 
@@ -245,6 +246,17 @@ public class MessageService {
                         .message(message)
                         .build()
         );
+        broadcastRoomTouch(roomId);
+    }
+
+    private void broadcastRoomTouch(Long roomId) {
+        List<Long> memberIds = messageRoomDAO.findRoomMemberIds(roomId);
+        for (Long memberId : memberIds) {
+            messagingTemplate.convertAndSend(
+                    "/topic/user." + memberId,
+                    java.util.Map.of("type", "ROOM_TOUCH", "roomId", roomId)
+            );
+        }
     }
 
     private MessageRoomResponseDTO buildRoomResponse(Long roomId, Long currentMemberId) {

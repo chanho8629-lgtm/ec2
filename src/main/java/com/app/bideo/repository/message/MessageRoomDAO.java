@@ -35,6 +35,10 @@ public class MessageRoomDAO {
         return messageRoomMapper.selectRoomMembers(roomId, excludeMemberId);
     }
 
+    public List<Long> findRoomMemberIds(Long roomId) {
+        return messageRoomMapper.selectRoomMemberIds(roomId);
+    }
+
     public boolean isMember(Long roomId, Long memberId) {
         return messageRoomMapper.existsRoomMember(roomId, memberId);
     }

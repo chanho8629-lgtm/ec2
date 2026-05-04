@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var popupToggle = document.querySelector("[data-bd-shell-notification-toggle]");
   var popup = document.querySelector("[data-bd-shell-notification-popup]");
   var toggleBtn = document.querySelector("[data-bd-notification-toggle-btn]");
+  var readAllBtn = document.querySelector("[data-bd-notification-readall]");
 
   if (!badge || !list || !popupToggle) return;
 
@@ -55,6 +56,59 @@ document.addEventListener("DOMContentLoaded", function () {
     return src || fallback;
   }
 
+  var SENDER_PREFIX_TYPES = {
+    FOLLOW: true,
+    LIKE: true,
+    BOOKMARK: true,
+    COMMENT: true,
+    BID: true,
+    MESSAGE: true,
+    AUCTION_END: true,
+    PAYMENT: true,
+    CONTEST_ENTRY: true,
+    CONTEST_WIN: true
+  };
+
+  function resolveNotificationImage(noti) {
+    var profileFallback = "/images/default-profile.svg";
+    var workFallback = "/images/logo.png";
+    var senderImg = String(noti.senderProfileImage || "").trim();
+    var targetImg = String(noti.targetImage || "").trim();
+
+    var t = noti.notiType;
+    var tt = noti.targetType;
+
+    if (t === "FOLLOW" || tt === "MEMBER" || tt === "MESSAGE") {
+      return { src: senderImg || profileFallback, fallback: profileFallback, rounded: true };
+    }
+
+    if (tt === "WORK" || tt === "AUCTION" || tt === "PAYMENT" || tt === "ORDER") {
+      return { src: targetImg || senderImg || workFallback, fallback: workFallback, rounded: false };
+    }
+
+    if (tt === "GALLERY") {
+      return { src: targetImg || senderImg || workFallback, fallback: workFallback, rounded: false };
+    }
+
+    if (tt === "CONTEST") {
+      return { src: targetImg || workFallback, fallback: workFallback, rounded: false };
+    }
+
+    return { src: senderImg || profileFallback, fallback: profileFallback, rounded: true };
+  }
+
+  function buildNotificationText(noti) {
+    var nickname = (noti.senderNickname || "").trim();
+    var message = String(noti.message || "");
+    if (nickname && SENDER_PREFIX_TYPES[noti.notiType]) {
+      return '<strong class="bd-shell__notification-sender">' +
+             escapeHtml(nickname) +
+             '</strong>님이 ' +
+             escapeHtml(message);
+    }
+    return escapeHtml(message);
+  }
+
   /* ── Badge ── */
   function updateBadge() {
     fetch("/api/notifications/unread-count", { credentials: "same-origin" })
@@ -88,14 +142,14 @@ document.addEventListener("DOMContentLoaded", function () {
     list.innerHTML = notifications.map(function (noti) {
       var unreadClass = noti.isRead ? "" : " is-unread";
       var href = buildNotificationLink(noti);
-      var avatarSrc = normalizeImageSrc(noti.senderProfileImage, "/images/default-profile.svg");
+      var imageInfo = resolveNotificationImage(noti);
       var dotHtml = noti.isRead ? "" : '<div class="bd-shell__notification-dot"></div>';
 
       return (
           '<a class="bd-shell__notification-item' + unreadClass + '" href="' + escapeHtml(href) + '" data-noti-id="' + noti.id + '">' +
-          '<img class="bd-shell__notification-avatar" src="' + escapeHtml(avatarSrc) + '" alt="" onerror="this.onerror=null;this.src=\'/images/default-profile.svg\'" />' +
+          '<img class="bd-shell__notification-avatar' + (imageInfo.rounded ? '' : ' bd-shell__notification-avatar--square') + '" src="' + escapeHtml(imageInfo.src) + '" alt="" onerror="this.onerror=null;this.src=\'' + imageInfo.fallback + '\'" />' +
           '<div class="bd-shell__notification-body">' +
-          '<p class="bd-shell__notification-text">' + escapeHtml(noti.message) + '</p>' +
+          '<p class="bd-shell__notification-text">' + buildNotificationText(noti) + '</p>' +
           '<span class="bd-shell__notification-time">' + formatTime(noti.createdDatetime) + '</span>' +
           '</div>' +
           dotHtml +
@@ -156,6 +210,24 @@ document.addEventListener("DOMContentLoaded", function () {
       }).catch(function () {
         applyToggleUI(!willPause);
       });
+    });
+  }
+
+  if (readAllBtn) {
+    readAllBtn.addEventListener("click", function () {
+      fetch("/api/notifications/read-all", {
+        method: "PATCH",
+        credentials: "same-origin"
+      })
+        .then(function () {
+          list.querySelectorAll(".bd-shell__notification-item.is-unread").forEach(function (item) {
+            item.classList.remove("is-unread");
+            var dot = item.querySelector(".bd-shell__notification-dot");
+            if (dot) dot.remove();
+          });
+          updateBadge();
+        })
+        .catch(function () {});
     });
   }
 

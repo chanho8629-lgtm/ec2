@@ -404,7 +404,21 @@ const ContestListModule = (function () {
     function init() {
         initFilters();
         initEntryModal();
+        applyInitialScopeFromUrl();
         resetList();
+    }
+
+    function applyInitialScopeFromUrl() {
+        var params = new URLSearchParams(window.location.search);
+        var scope = params.get("scope");
+        if (scope !== "joined" && scope !== "mine") return;
+        var btn = document.querySelector('.Contest-Filter-Btn--toggle[data-scope="' + scope + '"]');
+        if (!btn) return;
+        document.querySelectorAll(".Contest-Filter-Btn--toggle").forEach(function (b) {
+            b.classList.remove("Contest-Filter-Btn--selected");
+        });
+        btn.classList.add("Contest-Filter-Btn--selected");
+        currentScope = scope;
     }
 
     return { init: init };

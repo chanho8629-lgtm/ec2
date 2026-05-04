@@ -8,6 +8,7 @@ import com.app.bideo.dto.payment.BootpayPaymentResultDTO;
 import com.app.bideo.dto.payment.CardResponseDTO;
 import com.app.bideo.dto.payment.PaymentRequestDTO;
 import com.app.bideo.dto.payment.PaymentResponseDTO;
+import com.app.bideo.repository.gallery.GalleryDAO;
 import com.app.bideo.repository.order.OrderDAO;
 import com.app.bideo.repository.payment.CardDAO;
 import com.app.bideo.repository.payment.PaymentDAO;
@@ -34,6 +35,7 @@ public class PaymentService {
     private final NotificationService notificationService;
     private final BootpayService bootpayService;
     private final WorkDAO workDAO;
+    private final GalleryDAO galleryDAO;
     private final BootpayClient bootpayClient;
     private final CacheManager cacheManager;
 
@@ -162,6 +164,10 @@ public class PaymentService {
             orderDAO.updateOtherPendingByBuyerAndWork(payment.getBuyerId(), payment.getWorkId(), order.getId(), "CANCELLED");
             if (order.getWorkId() != null) {
                 workDAO.updateStatus(order.getWorkId(), "SOLD");
+                galleryDAO.findGalleryIdByWorkId(order.getWorkId()).ifPresent(galleryId -> {
+                    galleryDAO.deleteWorkLinkByWorkId(order.getWorkId());
+                    galleryDAO.updateWorkCount(galleryId);
+                });
             }
 
             notificationService.createNotification(

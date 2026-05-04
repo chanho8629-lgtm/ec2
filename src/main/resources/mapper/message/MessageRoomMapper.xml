@@ -13,6 +13,13 @@
         ON CONFLICT (message_room_id, member_id) DO NOTHING
     </insert>
 
+    <select id="selectRoomMemberIds" resultType="java.lang.Long">
+        SELECT member_id
+        FROM tbl_message_room_member
+        WHERE message_room_id = #{roomId}
+          AND left_at IS NULL
+    </select>
+
     <select id="selectExistingRoomId" resultType="java.lang.Long">
         SELECT mrm1.message_room_id
         FROM tbl_message_room_member mrm1
