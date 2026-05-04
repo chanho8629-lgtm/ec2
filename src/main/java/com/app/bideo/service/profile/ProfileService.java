@@ -72,7 +72,7 @@ public class ProfileService {
                 .isFollowing(isFollowing)
                 .isBlocked(isBlocked)
                 .shareUrl("/profile/" + profileMember.getNickname())
-                .profileBadges(memberRepository.findDisplayedBadgesByMemberId(profileMember.getId()))
+                .profileBadges(normalizeBadgeImages(memberRepository.findDisplayedBadgesByMemberId(profileMember.getId())))
                 .build();
     }
 
@@ -297,7 +297,7 @@ public class ProfileService {
     // 뱃지 관리 조회
     @Transactional(readOnly = true)
     public MyProfileBadgeManageResponseDTO getMyBadgeManage(Long memberId) {
-        List<MemberBadgeResponseDTO> ownedBadges = memberRepository.findOwnedBadgesByMemberId(memberId);
+        List<MemberBadgeResponseDTO> ownedBadges = normalizeBadgeImages(memberRepository.findOwnedBadgesByMemberId(memberId));
         List<Long> displayedBadgeIds = ownedBadges.stream()
                 .filter(badge -> Boolean.TRUE.equals(badge.getIsDisplayed()))
                 .map(MemberBadgeResponseDTO::getBadgeId)
@@ -360,7 +360,7 @@ public class ProfileService {
             throw new IllegalArgumentException("대표 뱃지는 최대 2개까지 선택할 수 있습니다.");
         }
 
-        List<MemberBadgeResponseDTO> ownedBadges = memberRepository.findOwnedBadgesByMemberId(memberId);
+        List<MemberBadgeResponseDTO> ownedBadges = normalizeBadgeImages(memberRepository.findOwnedBadgesByMemberId(memberId));
         Set<Long> ownedBadgeIds = new HashSet<>();
         ownedBadges.forEach(badge -> ownedBadgeIds.add(badge.getBadgeId()));
 
@@ -375,7 +375,7 @@ public class ProfileService {
             memberRepository.displayBadges(memberId, safeBadgeIds);
         }
 
-        return memberRepository.findDisplayedBadgesByMemberId(memberId);
+        return normalizeBadgeImages(memberRepository.findDisplayedBadgesByMemberId(memberId));
     }
 
     private int zeroIfNull(Integer value) {
@@ -396,6 +396,52 @@ public class ProfileService {
         }
         String normalized = requestedValue.trim();
         return normalized.isBlank() ? null : normalized;
+    }
+
+    private List<MemberBadgeResponseDTO> normalizeBadgeImages(List<MemberBadgeResponseDTO> badges) {
+        return badges.stream()
+                .map(this::normalizeBadgeImage)
+                .toList();
+    }
+
+    private MemberBadgeResponseDTO normalizeBadgeImage(MemberBadgeResponseDTO badge) {
+        String resolvedImageFile = resolveBadgeImageFile(badge.getBadgeKey(), badge.getImageFile());
+        if (resolvedImageFile.equals(badge.getImageFile())) {
+            return badge;
+        }
+
+        return MemberBadgeResponseDTO.builder()
+                .id(badge.getId())
+                .badgeId(badge.getBadgeId())
+                .badgeKey(badge.getBadgeKey())
+                .badgeName(badge.getBadgeName())
+                .imageFile(resolvedImageFile)
+                .isDisplayed(badge.getIsDisplayed())
+                .earnedAt(badge.getEarnedAt())
+                .build();
+    }
+
+    private String resolveBadgeImageFile(String badgeKey, String imageFile) {
+        if (imageFile != null && !imageFile.isBlank() && imageFile.endsWith(".png")) {
+            return imageFile;
+        }
+
+        if (badgeKey == null) {
+            return "contest_award_badge.png";
+        }
+
+        return switch (badgeKey) {
+            case "FIRST_WORK" -> "first_video_badge.png";
+            case "WORK_10" -> "uploaded_more_than_5_times_badge.png";
+            case "WORK_50" -> "uploaded_more_than_5_times_badge.png";
+            case "FIRST_SALE" -> "first_sell_badge.png";
+            case "FIRST_AUCTION" -> "first_auction_winner_badge.png";
+            case "GALLERY_CREATOR" -> "art_gallery_views_over_10_million.png";
+            case "CONTEST_WINNER" -> "contest_award_badge.png";
+            case "FOLLOWER_100" -> "write_contest_badge.png";
+            case "EARLY_ADOPTER" -> "auction_price_of_1_million_won_badge.png";
+            default -> "contest_award_badge.png";
+        };
     }
 
 }
