@@ -82,6 +82,7 @@
                 select sum(p.total_price)
                 from tbl_payment p
                 where p.buyer_id = #{memberId}
+                  and p.auction_id is not null
                   and p.status in ('PENDING', 'AUTHORIZED')
             ), 0) as pending_payment_amount,
             coalesce((
@@ -95,6 +96,7 @@
                 select count(*)
                 from tbl_payment p
                 where p.buyer_id = #{memberId}
+                  and p.auction_id is not null
                   and p.status in ('PENDING', 'AUTHORIZED')
             ), 0) as pending_payment_count,
             coalesce((
@@ -358,6 +360,7 @@
         from tbl_payment p
         join tbl_work w on p.work_id = w.id
         where p.seller_id = #{memberId}
+          and not (p.auction_id is null and p.status in ('PENDING', 'AUTHORIZED'))
         order by coalesce(p.paid_at, p.created_datetime) desc
         limit 5
     </select>
@@ -379,6 +382,7 @@
         join tbl_work w on p.work_id = w.id
         join tbl_member seller on p.seller_id = seller.id
         where p.buyer_id = #{memberId}
+          and not (p.auction_id is null and p.status in ('PENDING', 'AUTHORIZED'))
         order by coalesce(p.paid_at, p.created_datetime) desc
         limit 5
     </select>
@@ -414,7 +418,7 @@
     <select id="selectPaymentHistoryItems" resultType="com.app.bideo.dto.dashboard.DashboardListItemDTO">
         select
             case
-                when p.buyer_id = #{memberId} and p.status in ('PENDING', 'AUTHORIZED') then '결제대기'
+                when p.buyer_id = #{memberId} and p.auction_id is not null and p.status in ('PENDING', 'AUTHORIZED') then '결제대기'
                 when p.auction_id is not null then '입찰결제'
                 when p.buyer_id = #{memberId} then '구매내역'
                 else '판매정산대상'
@@ -445,6 +449,7 @@
         ) p
         join tbl_work w on p.work_id = w.id
         where p.rn = 1
+          and not (p.auction_id is null and p.status in ('PENDING', 'AUTHORIZED'))
         order by coalesce(p.paid_at, p.created_datetime) desc
         limit 5
     </select>
