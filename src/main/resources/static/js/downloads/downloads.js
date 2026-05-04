@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", function () {
         switch (item.targetType) {
             case "CONTEST": return "/contest/list";
             case "WORK": return "/work/detail/" + item.targetId;
-            case "GALLERY": return "/gallery/detail/" + item.targetId;
+            case "GALLERY": return "/gallery/" + item.targetId;
             case "AUCTION": return "/auction/detail/" + item.targetId;
             default: return "#";
         }

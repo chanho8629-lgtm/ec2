@@ -16,18 +16,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @Controller
-@RequestMapping("/downloads")
+@RequestMapping("/wish")
 @RequiredArgsConstructor
 public class DownloadsController {
 
     private final WorkDAO workDAO;
     private final S3FileService s3FileService;
+
+    @GetMapping
+    public String downloadsPage() {
+        return "downloads/downloads";   
+    }
 
     @GetMapping("/works/{workId}")
     public ResponseEntity<ByteArrayResource> downloadWork(@PathVariable Long workId) {
@@ -50,7 +57,7 @@ public class DownloadsController {
         String zipFileName = buildZipFileName(work.getTitle());
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + zipFileName + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, buildContentDisposition(zipFileName))
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .contentLength(zipBytes.length)
                 .body(new ByteArrayResource(zipBytes));
@@ -86,6 +93,23 @@ public class DownloadsController {
         String safeTitle = (title == null || title.isBlank() ? "bideo-work" : title.trim())
                 .replaceAll("[\\\\/:*?\"<>|]", "_");
         return safeTitle + ".zip";
+    }
+
+    private String buildContentDisposition(String fileName) {
+        String fallback = toAsciiFileName(fileName);
+        String encoded = URLEncoder.encode(fileName, StandardCharsets.UTF_8).replace("+", "%20");
+        return "attachment; filename=\"" + fallback + "\"; filename*=UTF-8''" + encoded;
+    }
+
+    private String toAsciiFileName(String fileName) {
+        String normalized = (fileName == null || fileName.isBlank() ? "download.zip" : fileName)
+                .replaceAll("[^\\x20-\\x7E]", "_")
+                .replace("\"", "_");
+
+        if (!normalized.contains(".")) {
+            normalized += ".zip";
+        }
+        return normalized;
     }
 
     private byte[] buildZipBytes(String fileName, byte[] fileBytes) {

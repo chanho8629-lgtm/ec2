@@ -14,6 +14,7 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.time.Duration;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -125,11 +126,17 @@ public class S3FileService {
         }
 
         String normalizedKey = key.trim();
-        if (normalizedKey.startsWith("http://")
-                || normalizedKey.startsWith("https://")
-                || normalizedKey.startsWith("data:")
+        if (normalizedKey.startsWith("http://") || normalizedKey.startsWith("https://")) {
+            try (var inputStream = URI.create(normalizedKey).toURL().openStream()) {
+                return inputStream.readAllBytes();
+            } catch (Exception e) {
+                throw new IllegalStateException("외부 URL 파일 다운로드에 실패했습니다.", e);
+            }
+        }
+
+        if (normalizedKey.startsWith("data:")
                 || normalizedKey.startsWith("blob:")) {
-            throw new IllegalStateException("외부 URL 파일은 서버 다운로드를 지원하지 않습니다.");
+            throw new IllegalStateException("지원하지 않는 파일 URL 형식입니다.");
         }
 
         requireBucket();
