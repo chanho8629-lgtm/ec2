@@ -4,14 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
 import java.util.Map;
 
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DashboardResponseDTO {
     private String creatorName;
     private String totalViewsText;
@@ -32,7 +36,6 @@ public class DashboardResponseDTO {
     private List<DashboardListItemDTO> participatingContests;
     private List<DashboardListItemDTO> galleries;
     private List<DashboardListItemDTO> soldWorks;
-    private List<DashboardListItemDTO> purchasedWorks;
     private List<DashboardListItemDTO> storedWorks;
     private List<DashboardListItemDTO> paymentHistory;
     private List<DashboardListItemDTO> settlements;

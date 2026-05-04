@@ -77,11 +77,6 @@ public interface DashboardMapper {
     // 등록된 카드 수 조회
     Integer selectRegisteredCardCount(@Param("memberId") Long memberId);
 
-    // 조회수 추이 조회
-    List<DashboardDailyMetricPointDTO> selectDailyViewCounts(@Param("memberId") Long memberId,
-                                                             @Param("startDate") LocalDate startDate,
-                                                             @Param("endDate") LocalDate endDate);
-
     // 찜한 작품 수 추이 조회
     List<DashboardDailyMetricPointDTO> selectDailyBookmarkedWorkCounts(@Param("memberId") Long memberId,
                                                                        @Param("startDate") LocalDate startDate,

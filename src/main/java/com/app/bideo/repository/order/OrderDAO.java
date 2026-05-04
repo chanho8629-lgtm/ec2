@@ -28,6 +28,10 @@ public class OrderDAO {
         return orderMapper.selectByOrderCode(orderCode);
     }
 
+    public OrderVO findLatestPendingByBuyerAndWork(Long buyerId, Long workId, String orderType) {
+        return orderMapper.selectLatestPendingByBuyerAndWork(buyerId, workId, orderType);
+    }
+
     public List<OrderListResponseDTO> findByBuyerId(Long buyerId, int offset, int limit) {
         return orderMapper.selectByBuyerId(buyerId, offset, limit);
     }
@@ -46,5 +50,9 @@ public class OrderDAO {
 
     public void updateStatus(Long orderId, String status) {
         orderMapper.updateStatus(orderId, status);
+    }
+
+    public void updateOtherPendingByBuyerAndWork(Long buyerId, Long workId, Long excludeOrderId, String status) {
+        orderMapper.updateOtherPendingByBuyerAndWork(buyerId, workId, excludeOrderId, status);
     }
 }

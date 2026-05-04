@@ -69,13 +69,19 @@ public class ProfileController {
         Long viewerId = userDetails != null ? userDetails.getId() : null;
         String selectedTab = "works".equalsIgnoreCase(tab) ? "works" : "galleries";
         ProfileViewResponseDTO profile = profileService.getProfile(profileMember, viewerId);
-        List<WorkListResponseDTO> works = workService.getProfileWorks(profileMember.getId(), galleryId);
-        List<GalleryListResponseDTO> galleries = galleryService.getProfileGalleries(profileMember.getId());
+        boolean blockedProfile = Boolean.TRUE.equals(profile.getIsBlocked()) && !Boolean.TRUE.equals(profile.getIsOwner());
+        List<WorkListResponseDTO> works = blockedProfile
+                ? List.of()
+                : workService.getProfileWorks(profileMember.getId(), galleryId);
+        List<GalleryListResponseDTO> galleries = blockedProfile
+                ? List.of()
+                : galleryService.getProfileGalleries(profileMember.getId());
 
         model.addAttribute("works", works);
         model.addAttribute("galleries", galleries);
         model.addAttribute("workCount", works.size());
         model.addAttribute("galleryCount", galleries.size());
+        model.addAttribute("blockedProfile", blockedProfile);
         model.addAttribute("selectedTab", selectedTab);
         model.addAttribute("selectedGalleryId", galleryId);
         model.addAttribute("profile", profile);

@@ -19,11 +19,14 @@ public class BootpayClient {
 
     private final ObjectMapper objectMapper;
 
-    @Value("${bootpay.rest-client-key:}")
-    private String restClientKey;
+    @Value("${boot-pay.api.application-id:${bootpay.rest-client-key:}}")
+    private String applicationId;
 
-    @Value("${bootpay.private-key:}")
+    @Value("${boot-pay.api.private-key:${bootpay.private-key:}}")
     private String privateKey;
+
+    @Value("${boot-pay.urls.server-base-url:https://api.bootpay.co.kr}")
+    private String serverBaseUrl;
 
     private final RestClient restClient = RestClient.builder().build();
 
@@ -31,7 +34,7 @@ public class BootpayClient {
         String accessToken = issueAccessToken();
 
         String response = restClient.get()
-                .uri("https://api.bootpay.co.kr/v2/receipt/{receiptId}", receiptId)
+                .uri(serverBaseUrl + "/v2/receipt/{receiptId}", receiptId)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .retrieve()
                 .body(String.class);
@@ -40,20 +43,20 @@ public class BootpayClient {
     }
 
     private String issueAccessToken() {
-        if (restClientKey == null || restClientKey.isBlank() || privateKey == null || privateKey.isBlank()) {
+        if (applicationId == null || applicationId.isBlank() || privateKey == null || privateKey.isBlank()) {
             throw new IllegalStateException("부트페이 서버 연동키가 설정되지 않았습니다.");
         }
 
         String basicToken = Base64.getEncoder()
-                .encodeToString((restClientKey + ":" + privateKey).getBytes(StandardCharsets.UTF_8));
+                .encodeToString((applicationId + ":" + privateKey).getBytes(StandardCharsets.UTF_8));
 
         String response = restClient.post()
-                .uri("https://api.bootapi.com/v1/request/token")
+                .uri(serverBaseUrl + "/v2/request/token")
                 .header(HttpHeaders.AUTHORIZATION, "Basic " + basicToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Map.of(
-                        "client_key", restClientKey,
-                        "secret_key", privateKey
+                        "application_id", applicationId,
+                        "private_key", privateKey
                 ))
                 .retrieve()
                 .body(String.class);

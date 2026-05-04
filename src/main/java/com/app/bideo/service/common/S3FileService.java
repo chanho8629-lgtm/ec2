@@ -4,14 +4,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.time.Duration;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @Service
@@ -81,6 +86,69 @@ public class S3FileService {
                 .build();
 
         return s3Presigner.presignGetObject(presignRequest).url().toString();
+    }
+
+    public String getPresignedDownloadUrl(String key, String fileName) {
+        if (key == null || key.isBlank()) {
+            return null;
+        }
+
+        String normalizedKey = key.trim();
+
+        if (normalizedKey.startsWith("http://")
+                || normalizedKey.startsWith("https://")
+                || normalizedKey.startsWith("data:")
+                || normalizedKey.startsWith("blob:")) {
+            return normalizedKey;
+        }
+
+        requireBucket();
+
+        String encodedFileName = URLEncoder.encode(fileName == null ? "download" : fileName, StandardCharsets.UTF_8)
+                .replace("+", "%20");
+        String s3Key = normalizedKey.startsWith("/") ? normalizedKey.substring(1) : normalizedKey;
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(PRESIGNED_URL_DURATION)
+                .getObjectRequest(GetObjectRequest.builder()
+                        .bucket(bucket)
+                        .key(s3Key)
+                        .responseContentDisposition("attachment; filename*=UTF-8''" + encodedFileName)
+                        .build())
+                .build();
+
+        return s3Presigner.presignGetObject(presignRequest).url().toString();
+    }
+
+    public byte[] downloadBytes(String key) {
+        if (key == null || key.isBlank()) {
+            throw new IllegalArgumentException("다운로드할 파일 키가 없습니다.");
+        }
+
+        String normalizedKey = key.trim();
+        if (normalizedKey.startsWith("http://") || normalizedKey.startsWith("https://")) {
+            try (var inputStream = URI.create(normalizedKey).toURL().openStream()) {
+                return inputStream.readAllBytes();
+            } catch (Exception e) {
+                throw new IllegalStateException("외부 URL 파일 다운로드에 실패했습니다.", e);
+            }
+        }
+
+        if (normalizedKey.startsWith("data:")
+                || normalizedKey.startsWith("blob:")) {
+            throw new IllegalStateException("지원하지 않는 파일 URL 형식입니다.");
+        }
+
+        requireBucket();
+
+        String s3Key = normalizedKey.startsWith("/") ? normalizedKey.substring(1) : normalizedKey;
+        ResponseBytes<GetObjectResponse> response = s3Client.getObjectAsBytes(
+                GetObjectRequest.builder()
+                        .bucket(bucket)
+                        .key(s3Key)
+                        .build()
+        );
+        return response.asByteArray();
     }
 
     private void requireBucket() {

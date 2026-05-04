@@ -12,11 +12,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class DashboardListItemDTO {
-    private Long targetId;
     private String tag;
     private boolean goldTag;
     private String title;
     private String description;
     private String amount;
-    private String actionUrl;
+    private String detailUrl;
+    private Long downloadWorkId;
 }
