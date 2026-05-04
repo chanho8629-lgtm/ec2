@@ -195,7 +195,7 @@ function resolveShareUrl() {
 function applyProfileCounters(profile) {
   const channelText = document.querySelector('.channelText span:last-child');
   if (channelText && profile) {
-    channelText.textContent = ' · 팔로워 ' + (profile.followerCount ?? 0) + '명 · 팔로잉 ' + (profile.followingCount ?? 0) + '명 · 작품 ' + (profile.workCount ?? 0) + '개';
+    channelText.textContent = ' 팔로워 ' + (profile.followerCount ?? 0) + '명 · 팔로잉 ' + (profile.followingCount ?? 0) + '명 · 작품 ' + (profile.workCount ?? 0) + '개';
   }
 }
 
@@ -1028,7 +1028,7 @@ document.addEventListener('click', async (event) => {
       });
       syncBlackButtonState(true);
       modalClose('black-modal');
-      showSuccessMessage('사용자를 차단했습니다.');
+      window.location.reload();
     } catch (error) {
       alert(error.message || '차단에 실패했습니다.');
     }
@@ -1044,7 +1044,7 @@ document.addEventListener('click', async (event) => {
       });
       syncBlackButtonState(false);
       modalClose('unblack-modal');
-      showSuccessMessage('차단이 해제되었습니다.');
+      window.location.reload();
     } catch (error) {
       alert(error.message || '차단 해제에 실패했습니다.');
     }

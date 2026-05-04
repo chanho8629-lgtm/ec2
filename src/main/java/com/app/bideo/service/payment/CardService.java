@@ -21,7 +21,7 @@ public class CardService {
     private static final Pattern DIGITS_ONLY = Pattern.compile("\\d+");
 
     private final CardDAO cardDAO;
-    private final BootpayBillingService bootpayBillingService;
+    private final BootpayService bootpayService;
 
     // 카드 목록 조회
     @Transactional(readOnly = true)
@@ -149,7 +149,7 @@ public class CardService {
         if (hasSensitiveInput) {
             validateSensitiveFields(cardNumber, requestDTO);
             // 변경: 입력된 카드 민감정보는 저장하지 않고 부트페이 빌링키 발급 결과만 남긴다.
-            BootpayBillingCardResultDTO issuedCard = bootpayBillingService.issueBillingKey(memberId, requestDTO);
+            BootpayBillingCardResultDTO issuedCard = bootpayService.issueBillingKey(memberId, requestDTO);
             billingKey = issuedCard.getBillingKey();
             billingReceiptId = issuedCard.getBillingReceiptId();
             billingMethod = issuedCard.getBillingMethod();

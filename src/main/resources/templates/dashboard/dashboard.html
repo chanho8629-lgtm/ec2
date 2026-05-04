@@ -2,44 +2,59 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <th:block th:replace="~{layout/layout :: ytShellHead('BIDEO | 대시보드')}"></th:block>
-    <link rel="stylesheet" href="/css/common/reset.css" th:href="@{/css/common/reset.css}" />
-    <link rel="stylesheet" href="/css/common/global.css" th:href="@{/css/common/global.css}" />
-    <link rel="stylesheet" href="/css/common/util.css" th:href="@{/css/common/util.css}" />
-    <link rel="stylesheet" href="/css/common/common.css" th:href="@{/css/common/common.css}" />
-    <link rel="stylesheet" href="/css/dashboard/dashboard.css" th:href="@{/css/dashboard/dashboard.css}" />
+    <link rel="stylesheet" href="/css/common/reset.css" th:href="@{/css/common/reset.css}"/>
+    <link rel="stylesheet" href="/css/common/global.css" th:href="@{/css/common/global.css}"/>
+    <link rel="stylesheet" href="/css/common/util.css" th:href="@{/css/common/util.css}"/>
+    <link rel="stylesheet" href="/css/common/common.css" th:href="@{/css/common/common.css}"/>
+    <link rel="stylesheet" href="/css/dashboard/dashboard.css" th:href="@{/css/dashboard/dashboard.css}"/>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script defer src="/js/dashboard/dashboard.js" th:src="@{/js/dashboard/dashboard.js}"></script>
 </head>
 <body>
-    <div th:replace="~{layout/layout :: ytShellChrome('dashboard')}"></div>
-    <main class="yt-shell__page-content">
-        <div id="section" class="section Dashboard-Shell">
-            <div class="Dashboard-Page">
+<div th:replace="~{layout/layout :: ytShellChrome('dashboard')}"></div>
+<main class="yt-shell__page-content">
+    <div id="section" class="section Dashboard-Shell">
+        <div class="Dashboard-Page">
             <header class="Dashboard-Header">
                 <h1 class="Dashboard-Title">대시보드</h1>
             </header>
 
             <div class="Dashboard-Toolbar">
                 <div class="Dashboard-Tabs" role="tablist" aria-label="대시보드 탭">
-                    <button class="Dashboard-Tab is-active" type="button" role="tab" aria-selected="true" data-dashboard-tab="analytics">통계</button>
-                    <button class="Dashboard-Tab" type="button" role="tab" aria-selected="false" data-dashboard-tab="auction">경매</button>
-                    <button class="Dashboard-Tab" type="button" role="tab" aria-selected="false" data-dashboard-tab="contest">공모전</button>
-                    <button class="Dashboard-Tab" type="button" role="tab" aria-selected="false" data-dashboard-tab="portfolio">작품/예술관</button>
-                    <button class="Dashboard-Tab" type="button" role="tab" aria-selected="false" data-dashboard-tab="payment">출금/결제</button>
-                    <button class="Dashboard-Tab" type="button" role="tab" aria-selected="false" data-dashboard-tab="card">카드</button>
+                    <button class="Dashboard-Tab is-active" type="button" role="tab" aria-selected="true"
+                            data-dashboard-tab="analytics">통계
+                    </button>
+                    <button class="Dashboard-Tab" type="button" role="tab" aria-selected="false"
+                            data-dashboard-tab="auction">경매
+                    </button>
+                    <button class="Dashboard-Tab" type="button" role="tab" aria-selected="false"
+                            data-dashboard-tab="contest">공모전
+                    </button>
+                    <button class="Dashboard-Tab" type="button" role="tab" aria-selected="false"
+                            data-dashboard-tab="portfolio">작품/예술관
+                    </button>
+                    <button class="Dashboard-Tab" type="button" role="tab" aria-selected="false"
+                            data-dashboard-tab="payment">출금/결제
+                    </button>
+                    <button class="Dashboard-Tab" type="button" role="tab" aria-selected="false"
+                            data-dashboard-tab="card">카드
+                    </button>
                     <span class="Dashboard-TabIndicator" aria-hidden="true"></span>
                 </div>
 
                 <div class="Dashboard-DatePicker">
-                    <button class="Dashboard-DateButton" type="button" aria-label="기간 선택" aria-expanded="false" data-date-toggle>
+                    <button class="Dashboard-DateButton" type="button" aria-label="기간 선택" aria-expanded="false"
+                            data-date-toggle>
                         <span class="Dashboard-DateRange" data-date-range>기간을 불러오는 중입니다.</span>
                         <span class="Dashboard-DateLabel" data-date-label>지난 28일</span>
                         <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                            <path d="M18.707 8.793a1 1 0 0 0-1.414 0L12 14.086 6.707 8.793a1 1 0 1 0-1.414 1.414L12 16.914l6.707-6.707a1 1 0 0 0 0-1.414Z" fill="currentColor"></path>
+                            <path d="M18.707 8.793a1 1 0 0 0-1.414 0L12 14.086 6.707 8.793a1 1 0 1 0-1.414 1.414L12 16.914l6.707-6.707a1 1 0 0 0 0-1.414Z"
+                                  fill="currentColor"></path>
                         </svg>
                     </button>
                     <div class="Dashboard-DateMenu" hidden data-date-menu>
-                        <button class="Dashboard-DateOption is-active" type="button" data-date-option="28d">지난 28일</button>
+                        <button class="Dashboard-DateOption is-active" type="button" data-date-option="28d">지난 28일
+                        </button>
                         <button class="Dashboard-DateOption" type="button" data-date-option="month">이번 달</button>
                         <button class="Dashboard-DateOption" type="button" data-date-option="3m">최근 3개월</button>
                         <button class="Dashboard-DateOption" type="button" data-date-option="6m">최근 6개월</button>
@@ -52,12 +67,9 @@
 
             <section class="Dashboard-Panel is-active" data-dashboard-panel="analytics">
                 <article class="Dashboard-Card Dashboard-SummaryCard">
-                    <div class="Dashboard-Metrics Dashboard-Metrics--4">
-                        <button class="Dashboard-Metric is-active" type="button" data-metric-tab="views">
-                            <span class="Dashboard-MetricKey">조회수</span>
-                            <strong class="Dashboard-MetricValue" data-metric-value="views">0</strong>
-                        </button>
-                        <button class="Dashboard-Metric" type="button" data-metric-tab="favorites">
+
+                    <div class="Dashboard-Metrics Dashboard-Metrics--3">
+                        <button class="Dashboard-Metric is-active" type="button" data-metric-tab="favorites">
                             <span class="Dashboard-MetricKey">찜한 작품</span>
                             <strong class="Dashboard-MetricValue" data-metric-value="favorites">0</strong>
                         </button>
@@ -93,7 +105,7 @@
                     <article class="Dashboard-Card Dashboard-InfoCard">
                         <div class="Dashboard-CardHead">
                             <h2>내 경매</h2>
-<!--                            <p>내가 등록한 경매와 현재 진행 상태를 확인합니다.</p>-->
+                            <!--                            <p>내가 등록한 경매와 현재 진행 상태를 확인합니다.</p>-->
                         </div>
                         <div class="Dashboard-DataList">
                             <div class="Dashboard-DataListBody" data-list-body="myAuctions"></div>
@@ -103,7 +115,7 @@
                     <article class="Dashboard-Card Dashboard-InfoCard">
                         <div class="Dashboard-CardHead">
                             <h2>내가 참여한 경매</h2>
-<!--                            <p>입찰하거나 관심 등록한 경매의 진행 상태를 확인합니다.</p>-->
+                            <!--                            <p>입찰하거나 관심 등록한 경매의 진행 상태를 확인합니다.</p>-->
                         </div>
                         <div class="Dashboard-DataList">
                             <div class="Dashboard-DataListBody" data-list-body="participatingAuctions"></div>
@@ -117,7 +129,7 @@
                     <article class="Dashboard-Card Dashboard-InfoCard">
                         <div class="Dashboard-CardHead">
                             <h2>내 공모전</h2>
-<!--                            <p>내가 등록한 공모전과 현재 진행 상태를 확인합니다.</p>-->
+                            <!--                            <p>내가 등록한 공모전과 현재 진행 상태를 확인합니다.</p>-->
                         </div>
                         <div class="Dashboard-DataList">
                             <div class="Dashboard-DataListBody" data-list-body="hostedContests"></div>
@@ -127,7 +139,7 @@
                     <article class="Dashboard-Card Dashboard-InfoCard">
                         <div class="Dashboard-CardHead">
                             <h2>내가 참여한 공모전</h2>
-<!--                            <p>출품한 공모전의 진행 상태를 확인합니다.</p>-->
+                            <!--                            <p>출품한 공모전의 진행 상태를 확인합니다.</p>-->
                         </div>
                         <div class="Dashboard-DataList">
                             <div class="Dashboard-DataListBody" data-list-body="participatingContests"></div>
@@ -141,7 +153,7 @@
                     <article class="Dashboard-Card Dashboard-InfoCard">
                         <div class="Dashboard-CardHead">
                             <h2>찜한 작품</h2>
-<!--                            <p>내가 저장한 작품 목록입니다.</p>-->
+                            <!--                            <p>내가 저장한 작품 목록입니다.</p>-->
                         </div>
                         <div class="Dashboard-DataList">
                             <div class="Dashboard-DataListBody" data-list-body="bookmarkedWorks"></div>
@@ -152,9 +164,10 @@
                         <div class="Dashboard-CardHead Dashboard-CardHead--row">
                             <div>
                                 <h2>내 작품</h2>
-<!--                                <p>내가 올린 대표 작품과 예술관입니다.</p>-->
+                                <!--                                <p>내가 올린 대표 작품과 예술관입니다.</p>-->
                             </div>
-                            <a class="Dashboard-TonalButton" href="/profile?tab=works" th:href="@{/profile(tab='works')}">더보기</a>
+                            <a class="Dashboard-TonalButton" href="/profile?tab=works"
+                               th:href="@{/profile(tab='works')}">더보기</a>
                         </div>
                         <div class="Dashboard-DataList">
                             <div class="Dashboard-DataListBody" data-list-body="ownedWorks"></div>
@@ -165,9 +178,10 @@
                         <div class="Dashboard-CardHead Dashboard-CardHead--row">
                             <div>
                                 <h2>내 예술관</h2>
-<!--                                <p>전시 상태와 구성을 확인합니다.</p>-->
+                                <!--                                <p>전시 상태와 구성을 확인합니다.</p>-->
                             </div>
-                            <a class="Dashboard-TonalButton" href="/profile?tab=galleries" th:href="@{/profile(tab='galleries')}">더보기</a>
+                            <a class="Dashboard-TonalButton" href="/profile?tab=galleries"
+                               th:href="@{/profile(tab='galleries')}">더보기</a>
                         </div>
                         <div class="Dashboard-DataList">
                             <div class="Dashboard-DataListBody" data-list-body="galleries"></div>
@@ -177,7 +191,7 @@
                     <article class="Dashboard-Card Dashboard-InfoCard">
                         <div class="Dashboard-CardHead">
                             <h2>내가 판매한 작품</h2>
-<!--                            <p>판매 완료된 작품과 최근 거래 금액입니다.</p>-->
+                            <!--                            <p>판매 완료된 작품과 최근 거래 금액입니다.</p>-->
                         </div>
                         <div class="Dashboard-DataList">
                             <div class="Dashboard-DataListBody" data-list-body="soldWorks"></div>
@@ -186,18 +200,8 @@
 
                     <article class="Dashboard-Card Dashboard-InfoCard">
                         <div class="Dashboard-CardHead">
-                            <h2>내가 구매한 작품</h2>
-<!--                            <p>구매 완료한 작품과 결제 진행 상태를 확인합니다.</p>-->
-                        </div>
-                        <div class="Dashboard-DataList">
-                            <div class="Dashboard-DataListBody" data-list-body="purchasedWorks"></div>
-                        </div>
-                    </article>
-
-                    <article class="Dashboard-Card Dashboard-InfoCard">
-                        <div class="Dashboard-CardHead">
                             <h2>보관중인 작품</h2>
-<!--                            <p>구매 이후 보관 또는 이관 중인 작품 상태를 확인합니다.</p>-->
+                            <!--                            <p>구매 이후 보관 또는 이관 중인 작품 상태를 확인합니다.</p>-->
                         </div>
                         <div class="Dashboard-DataList">
                             <div class="Dashboard-DataListBody" data-list-body="storedWorks"></div>
@@ -211,7 +215,7 @@
                     <article class="Dashboard-Card Dashboard-InfoCard">
                         <div class="Dashboard-CardHead">
                             <h2>출금 관리</h2>
-<!--                            <p>정산 요청과 출금 상태를 확인합니다.</p>-->
+                            <!--                            <p>정산 요청과 출금 상태를 확인합니다.</p>-->
                         </div>
                         <div class="Dashboard-DataList">
                             <div class="Dashboard-DataListBody" data-list-body="settlements"></div>
@@ -221,7 +225,7 @@
                     <article class="Dashboard-Card Dashboard-InfoCard">
                         <div class="Dashboard-CardHead">
                             <h2>결제 관리</h2>
-<!--                            <p>결제 흐름과 거래 상태를 확인합니다.</p>-->
+                            <!--                            <p>결제 흐름과 거래 상태를 확인합니다.</p>-->
                         </div>
                         <div class="Dashboard-DataList">
                             <div class="Dashboard-DataListBody" data-list-body="paymentHistory"></div>
@@ -236,9 +240,11 @@
                         <div class="Dashboard-CardHead Dashboard-CardHead--row">
                             <div>
                                 <h2>카드 관리</h2>
-<!--                                <p>등록된 카드와 대표 카드 상태를 확인합니다.</p>-->
+                                <!--                                <p>등록된 카드와 대표 카드 상태를 확인합니다.</p>-->
                             </div>
-                            <button class="Dashboard-TonalButton Dashboard-TonalButton--blue" type="button" data-card-create-trigger>등록하기</button>
+                            <button class="Dashboard-TonalButton Dashboard-TonalButton--blue" type="button"
+                                    data-card-create-trigger>등록하기
+                            </button>
                         </div>
 
                         <div class="Dashboard-CardList">
@@ -253,37 +259,70 @@
                         </div>
 
                         <form class="Dashboard-Form" action="#" method="post" data-card-form>
-                            <label class="Dashboard-Field">
+                            <div class="Dashboard-Field">
                                 <span>카드사</span>
-                                <input class="Dashboard-Input" type="text" name="cardCompany" placeholder="예: 신한카드" data-card-company-input />
-                            </label>
+                                <div class="Dashboard-Select" data-card-company-select>
+                                    <button class="Dashboard-SelectTrigger" type="button" aria-haspopup="listbox"
+                                            aria-expanded="false" data-card-company-trigger>
+                                        <span data-card-company-label>카드사를 선택해 주세요.</span>
+                                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                                            <path d="M18.707 8.793a1 1 0 0 0-1.414 0L12 14.086 6.707 8.793a1 1 0 1 0-1.414 1.414L12 16.914l6.707-6.707a1 1 0 0 0 0-1.414Z"
+                                                  fill="currentColor"></path>
+                                        </svg>
+                                    </button>
+                                    <div class="Dashboard-SelectMenu" hidden role="listbox" data-card-company-menu>
+                                        <button class="Dashboard-SelectOption" type="button" data-card-company-option="신한카드">신한카드</button>
+                                        <button class="Dashboard-SelectOption" type="button" data-card-company-option="KB국민카드">KB국민카드</button>
+                                        <button class="Dashboard-SelectOption" type="button" data-card-company-option="삼성카드">삼성카드</button>
+                                        <button class="Dashboard-SelectOption" type="button" data-card-company-option="현대카드">현대카드</button>
+                                        <button class="Dashboard-SelectOption" type="button" data-card-company-option="롯데카드">롯데카드</button>
+                                        <button class="Dashboard-SelectOption" type="button" data-card-company-option="우리카드">우리카드</button>
+                                        <button class="Dashboard-SelectOption" type="button" data-card-company-option="하나카드">하나카드</button>
+                                        <button class="Dashboard-SelectOption" type="button" data-card-company-option="NH농협카드">NH농협카드</button>
+                                        <button class="Dashboard-SelectOption" type="button" data-card-company-option="BC카드">BC카드</button>
+                                        <button class="Dashboard-SelectOption" type="button" data-card-company-option="카카오뱅크">카카오뱅크</button>
+                                        <button class="Dashboard-SelectOption" type="button" data-card-company-option="토스뱅크">토스뱅크</button>
+                                    </div>
+                                    <input type="hidden" name="cardCompany" value="" data-card-company-input/>
+                                </div>
+                            </div>
 
                             <label class="Dashboard-Field">
                                 <span>카드 번호</span>
-                                <input class="Dashboard-Input" type="text" name="cardNumber" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456" data-card-number-input />
+                                <input class="Dashboard-Input" type="text" name="cardNumber" inputmode="numeric"
+                                       autocomplete="cc-number" placeholder="1234 5678 9012 3456"
+                                       data-card-number-input/>
                             </label>
 
                             <div class="Dashboard-FieldRow">
                                 <label class="Dashboard-Field">
                                     <span>비밀번호 앞 2자리</span>
-                                    <input class="Dashboard-Input" type="password" name="cardPasswordTwoDigits" inputmode="numeric" autocomplete="off" placeholder="12" maxlength="2" data-card-password-input />
+                                    <input class="Dashboard-Input" type="password" name="cardPasswordTwoDigits"
+                                           inputmode="numeric" autocomplete="off" placeholder="12" maxlength="2"
+                                           data-card-password-input/>
                                 </label>
 
                                 <label class="Dashboard-Field">
                                     <span>생년월일 6자리</span>
-                                    <input class="Dashboard-Input" type="password" name="cardIdentityNo" inputmode="numeric" autocomplete="cc-csc" placeholder="900101" maxlength="6" data-card-identity-input />
+                                    <input class="Dashboard-Input" type="password" name="cardIdentityNo"
+                                           inputmode="numeric" autocomplete="cc-csc" placeholder="900101" maxlength="6"
+                                           data-card-identity-input/>
                                 </label>
                             </div>
 
                             <div class="Dashboard-FieldRow">
                                 <label class="Dashboard-Field">
                                     <span>유효기간 월</span>
-                                    <input class="Dashboard-Input" type="text" name="cardExpireMonth" inputmode="numeric" autocomplete="cc-exp-month" placeholder="08" maxlength="2" data-card-expire-month-input />
+                                    <input class="Dashboard-Input" type="text" name="cardExpireMonth"
+                                           inputmode="numeric" autocomplete="cc-exp-month" placeholder="08"
+                                           maxlength="2" data-card-expire-month-input/>
                                 </label>
 
                                 <label class="Dashboard-Field">
                                     <span>유효기간 년</span>
-                                    <input class="Dashboard-Input" type="text" name="cardExpireYear" inputmode="numeric" autocomplete="cc-exp-year" placeholder="27" maxlength="2" data-card-expire-year-input />
+                                    <input class="Dashboard-Input" type="text" name="cardExpireYear" inputmode="numeric"
+                                           autocomplete="cc-exp-year" placeholder="27" maxlength="2"
+                                           data-card-expire-year-input/>
                                 </label>
                             </div>
 
@@ -291,7 +330,7 @@
                                 <label class="Dashboard-Field">
                                     <span>대표 카드 설정</span>
                                     <label class="Dashboard-Check Dashboard-Check--field">
-                                        <input type="checkbox" name="isPrimary" checked data-card-primary-input />
+                                        <input type="checkbox" name="isPrimary" checked data-card-primary-input/>
                                         <span>등록 후 대표 카드로 설정</span>
                                     </label>
                                 </label>
@@ -302,75 +341,82 @@
                                     <span class="Dashboard-PaymentBadge">미리보기</span>
                                     <span class="Dashboard-PaymentBrand" data-card-preview-brand>NEW CARD</span>
                                 </div>
-                                <strong class="Dashboard-PaymentNumber" data-card-preview-number-text>**** **** **** ****</strong>
+                                <strong class="Dashboard-PaymentNumber" data-card-preview-number-text>**** **** ****
+                                    ****</strong>
                             </div>
 
                             <div class="Dashboard-FormActions">
                                 <button class="Dashboard-TonalButton" type="button" data-card-cancel>취소</button>
-                                <button class="Dashboard-TonalButton Dashboard-TonalButton--blue" type="submit" data-card-submit>카드 등록</button>
+                                <button class="Dashboard-TonalButton Dashboard-TonalButton--blue" type="submit"
+                                        data-card-submit>카드 등록
+                                </button>
                             </div>
                         </form>
                     </article>
                 </div>
             </section>
-            </div>
         </div>
-    </main>
+    </div>
+</main>
 
-    <div class="Dashboard-ModalLayer">
-        <div class="Dashboard-Modal" hidden data-dashboard-modal="delete">
-            <div class="Dashboard-ModalBackdrop" data-modal-close></div>
-            <div class="Dashboard-ModalDialog Dashboard-ModalDialog--small" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
-                <div class="Dashboard-ModalHead">
-                    <div>
-                        <h2 id="deleteModalTitle">카드 삭제</h2>
-                        <p data-delete-message>선택한 카드를 삭제하시겠습니까?</p>
-                    </div>
-                    <button class="Dashboard-IconButton" type="button" aria-label="닫기" data-modal-close>&times;</button>
+<div class="Dashboard-ModalLayer">
+    <div class="Dashboard-Modal" hidden data-dashboard-modal="delete">
+        <div class="Dashboard-ModalBackdrop" data-modal-close></div>
+        <div class="Dashboard-ModalDialog Dashboard-ModalDialog--small" role="dialog" aria-modal="true"
+             aria-labelledby="deleteModalTitle">
+            <div class="Dashboard-ModalHead">
+                <div>
+                    <h2 id="deleteModalTitle">카드 삭제</h2>
+                    <p data-delete-message>선택한 카드를 삭제하시겠습니까?</p>
                 </div>
-                <div class="Dashboard-ModalActions">
-                    <button class="Dashboard-TonalButton" type="button" data-modal-close>취소</button>
-                    <button class="Dashboard-TonalButton Dashboard-TonalButton--danger" type="button" data-card-delete-confirm>삭제</button>
-                </div>
+                <button class="Dashboard-IconButton" type="button" aria-label="닫기" data-modal-close>&times;</button>
             </div>
-        </div>
-
-        <div class="Dashboard-Modal" hidden data-dashboard-modal="payment-detail">
-            <div class="Dashboard-ModalBackdrop" data-modal-close></div>
-            <div class="Dashboard-ModalDialog" role="dialog" aria-modal="true" aria-labelledby="paymentDetailTitle">
-                <div class="Dashboard-ModalHead">
-                    <div>
-                        <h2 id="paymentDetailTitle" data-detail-modal-title>상세 정보</h2>
-                        <p data-detail-modal-subtitle>선택한 내역의 상세 정보입니다.</p>
-                    </div>
-                    <button class="Dashboard-IconButton" type="button" aria-label="닫기" data-modal-close>&times;</button>
-                </div>
-                <div class="Dashboard-ModalBody">
-                    <div class="Dashboard-DetailGrid">
-                        <div class="Dashboard-DetailItem">
-                            <span>구분</span>
-                            <strong data-detail-field="tag">-</strong>
-                        </div>
-                        <div class="Dashboard-DetailItem">
-                            <span>제목</span>
-                            <strong data-detail-field="title">-</strong>
-                        </div>
-                        <div class="Dashboard-DetailItem">
-                            <span>설명</span>
-                            <strong data-detail-field="description">-</strong>
-                        </div>
-                        <div class="Dashboard-DetailItem">
-                            <span>금액</span>
-                            <strong data-detail-field="amount">-</strong>
-                        </div>
-                    </div>
-                </div>
-                <div class="Dashboard-ModalActions">
-                    <button class="Dashboard-TonalButton Dashboard-TonalButton--blue" type="button" data-modal-close>확인</button>
-                </div>
+            <div class="Dashboard-ModalActions">
+                <button class="Dashboard-TonalButton" type="button" data-modal-close>취소</button>
+                <button class="Dashboard-TonalButton Dashboard-TonalButton--danger" type="button"
+                        data-card-delete-confirm>삭제
+                </button>
             </div>
         </div>
     </div>
-    <th:block th:replace="~{layout/layout :: ytShellScripts()}"></th:block>
+
+    <div class="Dashboard-Modal" hidden data-dashboard-modal="payment-detail">
+        <div class="Dashboard-ModalBackdrop" data-modal-close></div>
+        <div class="Dashboard-ModalDialog" role="dialog" aria-modal="true" aria-labelledby="paymentDetailTitle">
+            <div class="Dashboard-ModalHead">
+                <div>
+                    <h2 id="paymentDetailTitle" data-detail-modal-title>상세 정보</h2>
+                    <p data-detail-modal-subtitle>선택한 내역의 상세 정보입니다.</p>
+                </div>
+                <button class="Dashboard-IconButton" type="button" aria-label="닫기" data-modal-close>&times;</button>
+            </div>
+            <div class="Dashboard-ModalBody">
+                <div class="Dashboard-DetailGrid">
+                    <div class="Dashboard-DetailItem">
+                        <span>구분</span>
+                        <strong data-detail-field="tag">-</strong>
+                    </div>
+                    <div class="Dashboard-DetailItem">
+                        <span>제목</span>
+                        <strong data-detail-field="title">-</strong>
+                    </div>
+                    <div class="Dashboard-DetailItem">
+                        <span>설명</span>
+                        <strong data-detail-field="description">-</strong>
+                    </div>
+                    <div class="Dashboard-DetailItem">
+                        <span>금액</span>
+                        <strong data-detail-field="amount">-</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="Dashboard-ModalActions">
+                <button class="Dashboard-TonalButton Dashboard-TonalButton--blue" type="button" data-modal-close>확인
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:replace="~{layout/layout :: ytShellScripts()}"></th:block>
 </body>
 </html>

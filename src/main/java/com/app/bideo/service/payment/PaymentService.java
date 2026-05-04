@@ -15,6 +15,8 @@ import com.app.bideo.repository.work.WorkDAO;
 import com.app.bideo.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,9 +32,10 @@ public class PaymentService {
     private final OrderDAO orderDAO;
     private final CardDAO cardDAO;
     private final NotificationService notificationService;
-    private final BootpayBillingService bootpayBillingService;
+    private final BootpayService bootpayService;
     private final WorkDAO workDAO;
     private final BootpayClient bootpayClient;
+    private final CacheManager cacheManager;
 
     private static final int PAGE_SIZE = 20;
     private static final double FEE_RATE = 0.10;
@@ -48,7 +51,7 @@ public class PaymentService {
         }
 
         PaymentResponseDTO pendingPayment = createPendingPayment(buyerId, requestDTO, targetCard.getId());
-        BootpayPaymentResultDTO bootpayPayment = bootpayBillingService.requestCardPayment(
+        BootpayPaymentResultDTO bootpayPayment = bootpayService.requestCardPayment(
                 targetCard.getBillingKey(),
                 pendingPayment.getPaymentCode(),
                 "BIDEO 작품 결제",
@@ -74,7 +77,7 @@ public class PaymentService {
             throw new IllegalStateException("등록된 카드의 빌링키가 없어 간편결제를 진행할 수 없습니다.");
         }
 
-        BootpayPaymentResultDTO bootpayPayment = bootpayBillingService.requestCardPayment(
+        BootpayPaymentResultDTO bootpayPayment = bootpayService.requestCardPayment(
                 targetCard.getBillingKey(),
                 payment.getPaymentCode(),
                 payment.getAuctionId() != null ? "BIDEO 경매 낙찰 결제" : "BIDEO 작품 결제",
@@ -95,6 +98,12 @@ public class PaymentService {
         }
         if (!"PENDING_PAYMENT".equals(order.getStatus())) {
             throw new IllegalStateException("결제 대기 상태가 아닙니다.");
+        }
+
+        PaymentVO existingPayment = paymentDAO.findLatestActiveByOrderCode(order.getOrderCode()).orElse(null);
+        if (existingPayment != null) {
+            return paymentDAO.findById(existingPayment.getId())
+                    .orElseThrow(() -> new IllegalStateException("기존 결제 조회 실패"));
         }
 
         long originalAmount = order.getOriginalPrice();
@@ -118,6 +127,7 @@ public class PaymentService {
                 .build();
 
         paymentDAO.save(paymentVO);
+        evictDashboardCaches();
 
         return paymentDAO.findById(paymentVO.getId())
                 .orElseThrow(() -> new IllegalStateException("결제 생성 후 조회 실패"));
@@ -148,16 +158,19 @@ public class PaymentService {
         OrderVO order = orderDAO.findByOrderCode(payment.getOrderCode());
         if (order != null) {
             orderDAO.updateStatus(order.getId(), "PAID");
+            paymentDAO.updateOtherOpenByBuyerAndWork(payment.getBuyerId(), payment.getWorkId(), payment.getId(), "CANCELLED");
+            orderDAO.updateOtherPendingByBuyerAndWork(payment.getBuyerId(), payment.getWorkId(), order.getId(), "CANCELLED");
+            if (order.getWorkId() != null) {
+                workDAO.updateStatus(order.getWorkId(), "SOLD");
+            }
 
             notificationService.createNotification(
                     order.getSellerId(), order.getBuyerId(), "PAYMENT", "ORDER",
                     order.getId(), "결제가 완료되었습니다."
             );
-
-            if (order.getWorkId() != null) {
-                workDAO.delete(order.getWorkId());
-            }
         }
+
+        evictDashboardCaches();
 
         return paymentDAO.findById(paymentId)
                 .orElseThrow(() -> new IllegalStateException("결제 완료 후 조회 실패"));
@@ -221,6 +234,8 @@ public class PaymentService {
             );
         }
 
+        evictDashboardCaches();
+
         return paymentDAO.findById(paymentId)
                 .orElseThrow(() -> new IllegalStateException("환불 후 조회 실패"));
     }
@@ -250,5 +265,17 @@ public class PaymentService {
                 .totalElements((long) total)
                 .totalPages((int) Math.ceil((double) total / PAGE_SIZE))
                 .build();
+    }
+
+    private void evictDashboardCaches() {
+        clearCache("dashboard");
+        clearCache("profile");
+    }
+
+    private void clearCache(String cacheName) {
+        Cache cache = cacheManager.getCache(cacheName);
+        if (cache != null) {
+            cache.clear();
+        }
     }
 }

@@ -24,7 +24,7 @@ Desktop.ini
 $RECYCLE.BIN/
 *.lnk
 *.stackdump
-
+.gradle-user-home/
 # Linux
 *~
 .directory
@@ -67,6 +67,7 @@ nbdist/
 # Java / Gradle / Spring Boot
 # =====================================================
 .gradle/
+.gradle-user/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
@@ -84,6 +85,8 @@ HELP.md
 # 보안/로컬 설정 (커밋 금지)
 # =====================================================
 application*
+*.yaml
+*.yml
 src/main/resources/certs/
 certs
 key/
@@ -93,6 +96,7 @@ key/
 # 프로젝트 전용
 # =====================================================
 .claude
+.vscode
 front
 ex/
 .gstack/

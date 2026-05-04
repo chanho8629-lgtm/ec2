@@ -18,6 +18,8 @@ public interface PaymentMapper {
 
     PaymentResponseDTO selectByPaymentCode(@Param("paymentCode") String paymentCode);
 
+    PaymentVO selectLatestActiveByOrderCode(@Param("orderCode") String orderCode);
+
     PaymentResponseDTO selectPendingByBuyerAndAuction(@Param("buyerId") Long buyerId,
                                                       @Param("auctionId") Long auctionId);
 
@@ -32,4 +34,9 @@ public interface PaymentMapper {
     void updateStatusRefunded(@Param("paymentId") Long paymentId);
 
     void updatePgReceiptId(@Param("paymentId") Long paymentId, @Param("pgReceiptId") String pgReceiptId);
+
+    void updateOtherOpenByBuyerAndWork(@Param("buyerId") Long buyerId,
+                                       @Param("workId") Long workId,
+                                       @Param("excludePaymentId") Long excludePaymentId,
+                                       @Param("status") String status);
 }
