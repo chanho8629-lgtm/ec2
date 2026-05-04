@@ -24,7 +24,7 @@ Desktop.ini
 $RECYCLE.BIN/
 *.lnk
 *.stackdump
-
+.gradle-user-home/
 # Linux
 *~
 .directory
