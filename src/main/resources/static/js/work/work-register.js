@@ -371,8 +371,8 @@ function initializeWorkRegister() {
             '<path d="M434 700H538V736H434Z" fill="#c9a24e"/>',
             '<path d="M404 720L454 918H392L338 806Z" fill="#2b2422"/>',
             '<path d="M526 720L602 900H544L486 812Z" fill="#2b2422"/>',
-            '<text x="84" y="1122" fill="#ffffff" fill-opacity="0.88" font-size="42" font-family="Noto Sans KR, sans-serif">이미지 생성됨 · </text>',
-            '<text x="310" y="1122" fill="#ffffff" fill-opacity="0.96" font-size="42" font-family="Noto Sans KR, sans-serif">', safePrompt, '</text>',
+            '<text x="84" y="1122" fill="#ffffff" fill-opacity="0.88" font-size="42" font-family="sans-serif">이미지 생성됨 · </text>',
+            '<text x="310" y="1122" fill="#ffffff" fill-opacity="0.96" font-size="42" font-family="sans-serif">', safePrompt, '</text>',
             '</svg>'
         ].join("");
     }
