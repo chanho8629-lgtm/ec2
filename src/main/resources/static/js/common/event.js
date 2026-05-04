@@ -257,3 +257,36 @@ document.addEventListener("click", (event) => {
     dateInput.showPicker();
   }
 });
+
+// 1. 마우스 우클릭 방지
+document.oncontextmenu = function() {
+  return false;
+};
+
+// 2. 드래그 및 텍스트 선택 방지
+document.onselectstart = function() {
+  return false;
+};
+
+// 3. 주요 단축키 차단 (F12, Ctrl+Shift+I, Ctrl+U, Ctrl+S)
+document.onkeydown = function(e) {
+  if (e.keyCode == 123) { // F12
+    return false;
+  }
+  if (e.ctrlKey && e.shiftKey && e.keyCode == 73) { // Ctrl+Shift+I
+    return false;
+  }
+  if (e.ctrlKey && e.keyCode == 85) { // Ctrl+U (소스보기)
+    return false;
+  }
+  if (e.ctrlKey && e.keyCode == 83) { // Ctrl+S (저장)
+    return false;
+  }
+};
+
+// 4. 개발자 도구 감지 시 페이지 멈춤 (우회 가능성 있음)
+window.addEventListener('devtoolschange', function(e) {
+  if (e.detail.open) {
+    document.body.innerHTML = '개발자 도구는 사용할 수 없습니다.';
+  }
+});
