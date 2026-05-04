@@ -159,7 +159,9 @@
         <h2 class="bd-shell__section-title">인기 태그</h2>
         <ul class="bd-shell__guide-list">
           <li class="bd-shell__guide-item" th:each="tag : ${popularTags}">
-            <a class="bd-shell__guide-link" th:href="@{/main(tag=${tag.tagName})}" th:title="'#' + ${tag.tagName}">
+            <a class="bd-shell__guide-link"
+               th:classappend="${selectedTag != null and selectedTag == tag.tagName} ? ' is-active' : ''"
+               th:href="@{/main(tag=${tag.tagName})}" th:title="'#' + ${tag.tagName}">
               <svg class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M5.41 21 1.71 17.29a1 1 0 0 1 0-1.41L13.29 4.29a1 1 0 0 1 1.41 0L18.41 8a1 1 0 0 1 0 1.41L6.83 21H5.41ZM20 7l2-2-3-3-2 2 3 3ZM2 20h4v2H2v-2Z" fill="currentColor" />
               </svg>

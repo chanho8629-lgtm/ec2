@@ -10,7 +10,7 @@ body.work-register-page *,
 
 body.work-register-page {
     min-height: 100vh;
-    font-family: "Noto Sans KR", sans-serif;
+    font-family: "Roboto", sans-serif;
     color: #0f0f0f;
     background: #f5f5f5;
 }
@@ -81,7 +81,7 @@ body.work-register-page a:hover,
 .page-shell[data-compose-embedded="true"] {
     min-height: auto;
     overflow: visible;
-    font-family: "Noto Sans KR", sans-serif;
+    font-family: "Roboto", sans-serif;
     font-size: 16px;
     color: #0f0f0f;
 }

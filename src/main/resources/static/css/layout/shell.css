@@ -676,7 +676,7 @@ body:has(.artwork-dialog-backdrop:not([hidden]))::after {
 }
 
 .bd-shell__notification-title {
-  font-family: "Roboto", "Arial", sans-serif;
+  font-family: "Roboto", sans-serif;
   font-weight: 400;
   color: var(--yt-spec-text-primary, #0f0f0f);
   margin: 0;

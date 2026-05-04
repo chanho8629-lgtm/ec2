@@ -10,7 +10,7 @@ html {
 }
 
 body {
-  font-family: 'Noto Sans KR', 'Roboto', Arial, sans-serif;
+  font-family: 'Roboto', sans-serif;
   background-color: #ffffff;
   color: #0f0f0f;
   /*display: flex; => 해당 속성으로 오른쪽 짧아짐*/

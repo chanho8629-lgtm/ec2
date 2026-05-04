@@ -25,23 +25,23 @@
     --ytcp-themed-blue: #065fd4;
 
     /* Typography tokens */
-    --ytcp-font-title-font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    --ytcp-font-title-font-family: 'Roboto', sans-serif;
     --ytcp-font-title-font-weight: 400;
     --ytcp-font-title-font-size: 24px;
     --ytcp-font-title-line-height: 32px;
-    --ytcp-font-subheading-font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    --ytcp-font-subheading-font-family: 'Roboto', sans-serif;
     --ytcp-font-subheading-font-weight: 400;
     --ytcp-font-subheading-font-size: 16px;
     --ytcp-font-subheading-line-height: 24px;
-    --ytcp-font-subheading2-font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    --ytcp-font-subheading2-font-family: 'Roboto', sans-serif;
     --ytcp-font-subheading2-font-weight: 500;
     --ytcp-font-subheading2-font-size: 14px;
     --ytcp-font-subheading2-line-height: 20px;
-    --ytcp-font-body1-font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    --ytcp-font-body1-font-family: 'Roboto', sans-serif;
     --ytcp-font-body1-font-weight: 400;
     --ytcp-font-body1-font-size: 14px;
     --ytcp-font-body1-line-height: 20px;
-    --ytcp-font-body2-font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    --ytcp-font-body2-font-family: 'Roboto', sans-serif;
     --ytcp-font-body2-font-weight: 400;
     --ytcp-font-body2-font-size: 13px;
     --ytcp-font-body2-line-height: 18px;
@@ -71,7 +71,7 @@
     --admin-accent: #065fd4;
     --admin-accent-hover: #0356c4;
     --admin-error: #cc0000;
-    --admin-font: 'Roboto', 'Noto Sans KR', sans-serif;
+    --admin-font: 'Roboto', sans-serif;
     --admin-sidebar-width: 240px;
     --admin-border-radius: 8px;
 
@@ -840,7 +840,7 @@ nav.ytcp-navigation-drawer * {
     flex-direction: column;
     overflow: hidden;
     font-size: 14px;
-    font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    font-family: 'Roboto', sans-serif;
     font-weight: 400;
     line-height: 20px;
     color: var(--admin-text-primary);
@@ -858,7 +858,7 @@ nav.ytcp-navigation-drawer * {
     font-weight: 500;
     line-height: 28px;
     color: var(--admin-text-primary);
-    font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    font-family: 'Roboto', sans-serif;
 }
 
 .modal-header-title {
@@ -866,7 +866,7 @@ nav.ytcp-navigation-drawer * {
     font-weight: 500;
     line-height: 28px;
     color: var(--admin-text-primary);
-    font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    font-family: 'Roboto', sans-serif;
     display: block;
 }
 
@@ -884,7 +884,7 @@ nav.ytcp-navigation-drawer * {
 .modal-body-text {
     padding: 7px 0 17px;
     font-size: 15px;
-    font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    font-family: 'Roboto', sans-serif;
     font-weight: 400;
     line-height: 24px;
     color: var(--admin-text-primary);
@@ -937,7 +937,7 @@ nav.ytcp-navigation-drawer * {
     border: 1px solid var(--admin-border);
     border-radius: var(--ytcp-m-border-radius);
     font-size: 14px;
-    font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    font-family: 'Roboto', sans-serif;
     outline: none;
     color: var(--admin-text-primary);
     background: #ffffff;
@@ -963,7 +963,7 @@ nav.ytcp-navigation-drawer * {
     border: 1px solid var(--admin-border);
     border-radius: var(--ytcp-m-border-radius);
     font-size: 14px;
-    font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+    font-family: 'Roboto', sans-serif;
     resize: vertical;
     margin-top: 8px;
     outline: none;
@@ -1006,7 +1006,7 @@ nav.ytcp-navigation-drawer * {
     min-height: 36px;
     padding: 0 16px;
     font-size: 14px;
-    font-family: 'Roboto', Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
     font-weight: 500;
     line-height: 36px;
     border: 0 none;
