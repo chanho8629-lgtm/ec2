@@ -159,6 +159,62 @@ set
     status = excluded.status,
     updated_datetime = now();
 
+insert into tbl_member (
+    email,
+    password,
+    nickname,
+    real_name,
+    bio,
+    role,
+    creator_verified,
+    seller_verified,
+    creator_tier,
+    follower_count,
+    following_count,
+    gallery_count,
+    phone_number,
+    last_login_datetime,
+    status,
+    created_datetime,
+    updated_datetime
+)
+values (
+    'dlwnstn0315@gmail.com',
+    '$2b$10$J34V9sWoEokz6k6NhZtAxe2QYEGXHsZ4L/N.RaJDmHnQlZZXGdUO6',
+    'dlwnstn0315',
+    'dlwnstn0315',
+    '추가 더미 회원',
+    'USER',
+    false,
+    false,
+    'BASIC',
+    0,
+    0,
+    0,
+    '010-9397-3256',
+    now(),
+    'ACTIVE',
+    now(),
+    now()
+)
+on conflict (email) do update
+set
+    password = excluded.password,
+    nickname = excluded.nickname,
+    real_name = excluded.real_name,
+    bio = excluded.bio,
+    role = excluded.role,
+    creator_verified = excluded.creator_verified,
+    seller_verified = excluded.seller_verified,
+    creator_tier = excluded.creator_tier,
+    follower_count = excluded.follower_count,
+    following_count = excluded.following_count,
+    gallery_count = excluded.gallery_count,
+    phone_number = excluded.phone_number,
+    last_login_datetime = excluded.last_login_datetime,
+    status = excluded.status,
+    updated_datetime = now();
+
 -- gallery/work dummy data
 
 drop table if exists tmp_dummy_gallery_seed;
@@ -375,3 +431,51 @@ drop table if exists tmp_dummy_works;
 drop table if exists tmp_dummy_galleries;
 drop table if exists tmp_dummy_gallery_seed;
 
+update tbl_badge
+set image_file = case badge_key
+    when 'FIRST_WORK' then 'first_video_badge.png'
+    when 'WORK_10' then 'uploaded_more_than_5_times_badge.png'
+    when 'WORK_50' then 'uploaded_more_than_5_times_badge.png'
+    when 'FIRST_SALE' then 'first_sell_badge.png'
+    when 'FIRST_AUCTION' then 'first_auction_winner_badge.png'
+    when 'GALLERY_CREATOR' then 'art_gallery_views_over_10_million.png'
+    when 'CONTEST_WINNER' then 'contest_award_badge.png'
+    when 'FOLLOWER_100' then 'write_contest_badge.png'
+    when 'EARLY_ADOPTER' then 'auction_price_of_1_million_won_badge.png'
+    else image_file
+end
+where badge_key in (
+    'FIRST_WORK',
+    'WORK_10',
+    'WORK_50',
+    'FIRST_SALE',
+    'FIRST_AUCTION',
+    'GALLERY_CREATOR',
+    'CONTEST_WINNER',
+    'FOLLOWER_100',
+    'EARLY_ADOPTER'
+);
+
+insert into tbl_member_badge (member_id, badge_id, is_displayed, earned_at)
+select
+    m.id,
+    b.id,
+    case
+        when b.badge_key in ('FIRST_WORK', 'FIRST_SALE') then true
+        else false
+    end,
+    now() - (row_number() over (partition by m.id order by b.id) * interval '1 day')
+from tbl_member m
+join tbl_badge b
+  on b.badge_key in ('FIRST_WORK', 'WORK_10', 'FIRST_SALE')
+where m.email in (
+    'admin@bideo.com',
+    'test1@bideo.com',
+    'test2@bideo.com',
+    'test3@bideo.com',
+    'dlwnstn0315@gmail.com'
+)
+on conflict (member_id, badge_id) do update
+set
+    is_displayed = excluded.is_displayed,
+    earned_at = excluded.earned_at;
