@@ -8,8 +8,10 @@ import com.app.bideo.dto.contest.ContestEntryRequestDTO;
 import com.app.bideo.dto.contest.ContestEntryResponseDTO;
 import com.app.bideo.dto.contest.ContestListResponseDTO;
 import com.app.bideo.dto.contest.ContestSearchDTO;
+import com.app.bideo.dto.contest.ContestShareRequestDTO;
 import com.app.bideo.dto.contest.ContestUpdateRequestDTO;
 import com.app.bideo.dto.contest.ContestWorkOptionDTO;
+import com.app.bideo.dto.member.MemberListResponseDTO;
 import com.app.bideo.service.contest.ContestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -83,6 +85,37 @@ public class ContestController {
     public List<ContestWorkOptionDTO> apiMyWorks(@AuthenticationPrincipal CustomUserDetails userDetails) {
         if (userDetails == null) return Collections.emptyList();
         return contestService.getEntryWorkOptions(userDetails.getId());
+    }
+
+    @GetMapping("/api/{id}/share/receivers")
+    @ResponseBody
+    public org.springframework.http.ResponseEntity<List<MemberListResponseDTO>> apiShareReceivers(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam(name = "keyword", required = false) String keyword) {
+        if (userDetails == null) {
+            return org.springframework.http.ResponseEntity.status(401).build();
+        }
+        return org.springframework.http.ResponseEntity.ok(contestService.searchShareReceivers(userDetails.getId(), keyword));
+    }
+
+    @PostMapping("/api/{id}/share")
+    @ResponseBody
+    public org.springframework.http.ResponseEntity<Map<String, Object>> apiShareContest(
+            @PathVariable Long id,
+            @RequestBody ContestShareRequestDTO requestDTO,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return org.springframework.http.ResponseEntity.status(401)
+                    .body(Map.of("success", false, "message", "로그인이 필요합니다."));
+        }
+        try {
+            contestService.shareContest(userDetails.getId(), id, requestDTO);
+            return org.springframework.http.ResponseEntity.ok(Map.of("success", true));
+        } catch (IllegalArgumentException e) {
+            return org.springframework.http.ResponseEntity.badRequest()
+                    .body(Map.of("success", false, "message", e.getMessage() != null ? e.getMessage() : "공유에 실패했습니다."));
+        }
     }
 
     @PostMapping("/api/{id}/entry")

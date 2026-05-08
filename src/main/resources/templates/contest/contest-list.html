@@ -36,10 +36,8 @@
         <!-- 리스트 아이템들 (JS에서 동적 렌더링) -->
         <div class="Contest-List" id="contestList"></div>
 
-        <!-- 무한스크롤 로딩 표시 -->
-        <div class="Contest-List-Loader" id="contestLoader">
-            <div class="Contest-List-Spinner"></div>
-        </div>
+        <!-- 페이지네이션 -->
+        <nav class="Contest-Pagination" id="contestPagination" aria-label="공모전 페이지"></nav>
 
     </div>
 
@@ -125,6 +123,43 @@
     </div>
 
 </div>
+</div>
+
+<!-- ===== 공유 모달 ===== -->
+<div class="work-share-modal-overlay" hidden id="contestShareModal" aria-hidden="true">
+    <div class="work-share-modal" role="dialog" aria-modal="true" aria-labelledby="contestShareModalTitle">
+        <div class="work-share-modal__header">
+            <div class="work-share-modal__spacer"></div>
+            <h2 class="work-share-modal__title" id="contestShareModalTitle">공유</h2>
+            <button class="work-share-modal__close" type="button" aria-label="닫기" id="contestShareModalClose">
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                    <polyline fill="none" points="20.643 3.357 12 12 3.353 20.647" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></polyline>
+                    <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" x1="20.649" x2="3.354" y1="20.649" y2="3.354"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="work-share-modal__link-row">
+            <input class="work-share-modal__link-input" type="text" readonly id="contestShareLinkInput" data-share-link-input>
+            <button class="work-share-modal__link-copy" type="button" id="contestShareLinkCopy">복사</button>
+        </div>
+        <div class="work-share-modal__receiver">
+            <label class="work-share-modal__label">받는 사람:</label>
+            <div class="work-share-modal__receiver-body">
+                <div class="work-share-modal__chips" id="contestShareChips"></div>
+                <input class="work-share-modal__search" type="text" placeholder="검색..." autocomplete="off" id="contestShareSearch">
+            </div>
+        </div>
+        <div class="work-share-modal__list" id="contestShareList">
+            <div class="work-share-empty">
+                <div class="work-share-empty__title">공유 대상을 검색하세요</div>
+                <p class="work-share-empty__copy">검색창에 닉네임을 입력하면 결과가 표시됩니다.</p>
+            </div>
+        </div>
+        <div class="work-share-modal__footer">
+            <input class="work-share-modal__message" type="text" placeholder="메시지 쓰기..." autocomplete="off" id="contestShareMessage">
+            <button class="work-share-modal__send" type="button" id="contestShareSend">보내기</button>
+        </div>
+    </div>
 </div>
 
 <!-- ===== 참가 신청 모달 ===== -->

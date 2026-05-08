@@ -7,11 +7,15 @@ import com.app.bideo.dto.contest.ContestEntryRequestDTO;
 import com.app.bideo.dto.contest.ContestEntryResponseDTO;
 import com.app.bideo.dto.contest.ContestListResponseDTO;
 import com.app.bideo.dto.contest.ContestSearchDTO;
+import com.app.bideo.dto.contest.ContestShareRequestDTO;
 import com.app.bideo.dto.contest.ContestWorkOptionDTO;
 import com.app.bideo.dto.contest.ContestUpdateRequestDTO;
 import com.app.bideo.dto.contest.ContestWinnerNotificationDTO;
+import com.app.bideo.dto.member.MemberListResponseDTO;
 import com.app.bideo.mapper.contest.ContestMapper;
+import com.app.bideo.repository.member.MemberRepository;
 import com.app.bideo.service.common.S3FileService;
+import com.app.bideo.service.common.ShareService;
 import com.app.bideo.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -30,6 +34,8 @@ public class ContestService {
     private final ContestMapper contestMapper;
     private final NotificationService notificationService;
     private final S3FileService s3FileService;
+    private final MemberRepository memberRepository;
+    private final ShareService shareService;
 
     public Long createContest(Long memberId, ContestCreateRequestDTO contestCreateRequestDTO) {
         validateContestCreateRequest(contestCreateRequestDTO);
@@ -268,5 +274,44 @@ public class ContestService {
         if (today.isBefore(contest.getEntryStart()) || today.isAfter(contest.getEntryEnd())) {
             throw new IllegalArgumentException("contest entry period is closed");
         }
+    }
+
+    // 공유 대상 검색
+    @Transactional(readOnly = true)
+    public List<MemberListResponseDTO> searchShareReceivers(Long currentMemberId, String keyword) {
+        String safeKeyword = keyword == null ? "" : keyword.trim();
+        List<MemberListResponseDTO> receivers = memberRepository.searchByKeyword(safeKeyword, currentMemberId, 20);
+        receivers.forEach(receiver -> receiver.setProfileImage(
+                s3FileService.getPresignedUrl(receiver.getProfileImage())
+        ));
+        return receivers;
+    }
+
+    // 콘테스트 공유
+    public void shareContest(Long currentMemberId, Long contestId, ContestShareRequestDTO requestDTO) {
+        if (contestId == null) {
+            throw new IllegalArgumentException("공모전 정보가 필요합니다.");
+        }
+        ContestDetailResponseDTO contest = contestMapper.selectContestDetail(contestId, null);
+        if (contest == null) {
+            throw new IllegalArgumentException("공모전을 찾을 수 없습니다.");
+        }
+
+        List<Long> receiverIds = requestDTO == null || requestDTO.getReceiverIds() == null
+                ? List.of()
+                : requestDTO.getReceiverIds().stream().distinct().toList();
+
+        String extraMessage = requestDTO != null && requestDTO.getMessage() != null
+                ? requestDTO.getMessage().trim()
+                : "";
+
+        shareService.shareToMembers(
+                currentMemberId,
+                receiverIds,
+                contest.getTitle() + " 공모전을 공유했습니다.",
+                "/contest/list?id=" + contestId,
+                requestDTO != null ? requestDTO.getShareUrl() : null,
+                extraMessage
+        );
     }
 }

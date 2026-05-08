@@ -69,7 +69,9 @@ public class S3FileService {
         if (normalizedKey.startsWith("http://")
                 || normalizedKey.startsWith("https://")
                 || normalizedKey.startsWith("data:")
-                || normalizedKey.startsWith("blob:")) {
+                || normalizedKey.startsWith("blob:")
+                || normalizedKey.startsWith("/uploads/")
+                || normalizedKey.startsWith("/static/")) {
             return normalizedKey;
         }
 
@@ -98,7 +100,9 @@ public class S3FileService {
         if (normalizedKey.startsWith("http://")
                 || normalizedKey.startsWith("https://")
                 || normalizedKey.startsWith("data:")
-                || normalizedKey.startsWith("blob:")) {
+                || normalizedKey.startsWith("blob:")
+                || normalizedKey.startsWith("/uploads/")
+                || normalizedKey.startsWith("/static/")) {
             return normalizedKey;
         }
 

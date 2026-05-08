@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+window.addEventListener('load', function () {
 
   // 1. FAQ 탭 전환
   var tabs = document.querySelectorAll('.tablist__tab');
