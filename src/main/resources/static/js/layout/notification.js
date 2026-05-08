@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+window.addEventListener("load", function () {
   var badge = document.querySelector("[data-bd-notification-badge]");
   var list = document.querySelector("[data-bd-notification-list]");
   var popupToggle = document.querySelector("[data-bd-shell-notification-toggle]");

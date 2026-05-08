@@ -246,8 +246,9 @@
 }
 
 .bd-shell__guide-link.is-active {
-  background: var(--bd-shell-active);
-  color: var(--bd-shell-active-text);
+  background: var(--bd-shell-hover);
+  color: var(--bd-shell-text);
+  font-weight: 600;
 }
 
 .bd-shell__guide-icon,

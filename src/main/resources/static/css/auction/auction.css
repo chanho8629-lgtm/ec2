@@ -555,6 +555,10 @@ ul, ol {
     text-align: center;
 }
 
+.Auction-BidHistory-Empty[hidden] {
+    display: none;
+}
+
 .Auction-BidHistory-Empty svg {
     width: 32px;
     height: 32px;

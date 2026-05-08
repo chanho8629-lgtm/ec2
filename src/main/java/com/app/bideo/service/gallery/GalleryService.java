@@ -142,9 +142,9 @@ public class GalleryService {
 
     @Transactional(readOnly = true)
     private List<com.app.bideo.dto.work.WorkListResponseDTO> getGalleryWorks(Long galleryId, Long memberId) {
+        // 갤러리는 큐레이션이므로 작성자 외 작품도 포함 — galleryId 필터만 사용
         WorkSearchDTO searchDTO = new WorkSearchDTO();
         searchDTO.setGalleryId(galleryId);
-        searchDTO.setMemberId(memberId);
         searchDTO.setPage(1);
         searchDTO.setSize(50);
         List<com.app.bideo.dto.work.WorkListResponseDTO> works = workDAO.findAll(searchDTO);

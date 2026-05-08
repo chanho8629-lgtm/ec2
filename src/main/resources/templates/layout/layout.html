@@ -9,6 +9,8 @@
     <link rel="icon" href="/images/favicon.png" />
     <meta name="bd-current-user-id" th:if="${currentUserId != null}" th:content="${currentUserId}" />
     <link rel="stylesheet" href="/css/common/font.css" />
+    <link rel="stylesheet" href="/css/common/theme.css" />
+    <script src="/js/layout/theme.js"></script>
     <link rel="stylesheet" href="/css/layout/shell.css" />
     <link rel="stylesheet" href="/css/layout/search.css" />
     <link rel="stylesheet" href="/css/layout/voice-search.css" />
@@ -16,6 +18,11 @@
     <link rel="stylesheet" href="/css/layout/layout.css">
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+    <script defer src="/js/layout/shell.js"></script>
+    <script defer src="/js/layout/search.js"></script>
+    <script defer src="/js/layout/voice-search.js"></script>
+    <script defer src="/js/layout/chat.js"></script>
+    <script defer src="/js/layout/notification.js"></script>
   </th:block>
 </head>
 
@@ -78,7 +85,7 @@
           <span class="bd-shell__notification-badge" data-bd-notification-badge style="display:none"></span>
         </button>
         <button class="bd-shell__icon-button" type="button" aria-label="계정 메뉴" data-bd-shell-account-toggle aria-expanded="false">
-          <img class="bd-shell__avatar" th:src="${currentUserProfileImage != null ? currentUserProfileImage : '/images/default-profile.svg'}" src="/images/default-profile.svg" alt="계정" />
+          <img class="bd-shell__avatar" th:src="${currentUserProfileImage != null ? currentUserProfileImage : '/images/default-profile.svg'}" src="/images/default-profile.svg" alt="계정" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='/images/default-profile.svg';" />
         </button>
       </div>
     </header>
@@ -129,7 +136,7 @@
             <a class="bd-shell__guide-link" th:href="@{'/profile/' + ${artist.nickname}}" th:title="${artist.nickname}">
               <img class="bd-shell__guide-avatar"
                    th:src="${artist.profileImage != null ? artist.profileImage : '/images/default-profile.svg'}"
-                   alt="" />
+                   alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='/images/default-profile.svg';" />
               <span class="bd-shell__guide-copy" th:text="${artist.nickname}"></span>
               <span class="bd-shell__guide-meta" th:if="${artist.creatorVerified}"><span class="bd-shell__guide-badge"></span></span>
             </a>
@@ -459,7 +466,9 @@
                     style="background-color: transparent;">
                 <img draggable="false" class="style-scope yt-img-shadow" alt="" height="40" width="40"
                      th:src="${currentUserProfileImage != null ? currentUserProfileImage : '/images/default-profile.svg'}"
-                     src="/images/default-profile.svg">
+                     src="/images/default-profile.svg"
+                     referrerpolicy="no-referrer"
+                     onerror="this.onerror=null;this.src='/images/default-profile.svg';">
               </span>
             <div class="style-scope ytd-active-account-header-renderer">
               <span id="account-name" class="style-scope ytd-active-account-header-renderer" ellipsis-truncate-styling="" th:text="${currentUserNickname}"></span>
@@ -524,17 +533,17 @@
             <section class="style-scope ytd-multi-page-menu-renderer">
               <div id="items" class="style-scope yt-multi-page-menu-section-renderer">
                 <!-- 디자인 테마 -->
-                <div class="style-scope yt-multi-page-menu-section-renderer" role="link" tabindex="0">
-                  <div class="content-icon style-scope ytd-toggle-theme-compact-link-renderer">
-                      <span class="style-scope ytd-toggle-theme-compact-link-renderer">
-                        <span class="yt-icon-shape style-scope yt-icon"><div style="width:100%;height:100%;display:block;fill:currentcolor"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events:none;display:inherit;width:100%;height:100%">
+                <div class="style-scope yt-multi-page-menu-section-renderer" role="link" tabindex="0" data-bd-theme-trigger style="cursor:pointer">
+                  <div class="content-icon style-scope ytd-toggle-theme-compact-link-renderer" style="width:24px;height:24px;flex:0 0 24px">
+                      <span class="style-scope ytd-toggle-theme-compact-link-renderer" style="display:inline-flex;width:24px;height:24px">
+                        <span class="yt-icon-shape style-scope yt-icon" style="width:24px;height:24px;display:inline-flex"><div style="width:24px;height:24px;display:block;fill:currentcolor"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events:none;display:inherit;width:24px;height:24px">
                           <path d="M21.861 14.006a8 8 0 01-10.87-10.87c.452-.816-.101-1.976-1-1.721C5.379 2.724 2 6.965 2 11.998c0 6.075 4.925 11 11 11 5.032 0 9.275-3.38 10.584-7.992.255-.9-.905-1.451-1.723-1Zm-1.137 2.616A9 9 0 118.376 4.275 10 10 0 008 6.998c0 5.522 4.477 10 10 10 .943 0 1.857-.131 2.724-.376Z"></path>
                         </svg></div></span>
                       </span>
                   </div>
-                  <div id="label" class="style-scope ytd-toggle-theme-compact-link-renderer">디자인: 기기 테마</div>
-                  <span class="style-scope ytd-toggle-theme-compact-link-renderer">
-                      <span class="yt-icon-shape style-scope yt-icon"><div style="width:100%;height:100%;display:block;fill:currentcolor"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events:none;display:inherit;width:100%;height:100%">
+                  <div id="label" class="style-scope ytd-toggle-theme-compact-link-renderer" data-bd-theme-label>디자인: 기기 테마</div>
+                  <span class="style-scope ytd-toggle-theme-compact-link-renderer" style="display:inline-flex;width:24px;height:24px;margin-left:auto">
+                      <span class="yt-icon-shape style-scope yt-icon" style="width:24px;height:24px;display:inline-flex"><div style="width:24px;height:24px;display:block;fill:currentcolor"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true" style="pointer-events:none;display:inherit;width:24px;height:24px">
                         <path d="M8.793 5.293a1 1 0 000 1.414L14.086 12l-5.293 5.293a1 1 0 101.414 1.414L16.914 12l-6.707-6.707a1 1 0 00-1.414 0Z"></path>
                       </svg></div></span>
                     </span>
@@ -710,11 +719,6 @@
 </th:block>
 
 <th:block th:fragment="ytShellScripts()">
-  <script defer src="/js/layout/shell.js"></script>
-  <script defer src="/js/layout/search.js"></script>
-  <script defer src="/js/layout/voice-search.js"></script>
-  <script defer src="/js/layout/chat.js"></script>
-  <script defer src="/js/layout/notification.js"></script>
 </th:block>
 </body>
 

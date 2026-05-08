@@ -7,7 +7,6 @@ const ContestListModule = (function () {
     var currentPage = 1;
     var totalPages = 0;
     var isLoading = false;
-    var observer = null;
     var selectedId = -1;
     var itemsCache = {};
 
@@ -33,9 +32,17 @@ const ContestListModule = (function () {
         }
 
         fetch("/contest/api/list?" + params.toString(), {
-            credentials: "same-origin"
+            credentials: "same-origin",
+            redirect: "manual",
+            headers: { "Accept": "application/json" }
         })
-        .then(function (res) { return res.json(); })
+        .then(function (res) {
+            if (res.type === "opaqueredirect" || res.status === 401 || res.status === 302) {
+                throw new Error("인증이 만료되었습니다. 다시 로그인해 주세요.");
+            }
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+        })
         .then(function (data) {
             totalPages = data.totalPages || 0;
             var list = data.content || [];
@@ -44,22 +51,85 @@ const ContestListModule = (function () {
                 itemsCache[item.id] = item;
             });
 
+            var container = document.getElementById("contestList");
+            container.innerHTML = "";
             renderItems(list, (page - 1) * PAGE_SIZE);
             currentPage = page;
             isLoading = false;
 
-            var loader = document.getElementById("contestLoader");
-            if (currentPage >= totalPages || list.length === 0) {
-                loader.style.display = "none";
-                if (observer) observer.disconnect();
-            } else {
-                loader.style.display = "flex";
-            }
+            renderPagination();
+
+            window.scrollTo({ top: 0, behavior: "smooth" });
         })
         .catch(function (err) {
             console.error("공모전 목록 조회 실패:", err);
             isLoading = false;
+            var nav = document.getElementById("contestPagination");
+            if (nav) {
+                nav.innerHTML = '<span class="Contest-Pagination-Ellipsis" style="color:#d32f2f;">'
+                    + (err.message || "공모전을 불러오지 못했습니다.")
+                    + '</span>';
+            }
         });
+    }
+
+    /* ───── 페이지네이션 렌더링 ───── */
+    function renderPagination() {
+        var nav = document.getElementById("contestPagination");
+        if (!nav) return;
+        nav.innerHTML = "";
+
+        if (totalPages <= 1) return;
+
+        var WINDOW = 5; // 한 번에 보여줄 페이지 번호 수
+        var half = Math.floor(WINDOW / 2);
+        var start = Math.max(1, currentPage - half);
+        var end = Math.min(totalPages, start + WINDOW - 1);
+        if (end - start + 1 < WINDOW) {
+            start = Math.max(1, end - WINDOW + 1);
+        }
+
+        nav.appendChild(createPageBtn("‹", currentPage - 1, currentPage <= 1, false));
+
+        if (start > 1) {
+            nav.appendChild(createPageBtn("1", 1, false, currentPage === 1));
+            if (start > 2) nav.appendChild(createEllipsis());
+        }
+
+        for (var p = start; p <= end; p++) {
+            nav.appendChild(createPageBtn(String(p), p, false, p === currentPage));
+        }
+
+        if (end < totalPages) {
+            if (end < totalPages - 1) nav.appendChild(createEllipsis());
+            nav.appendChild(createPageBtn(String(totalPages), totalPages, false, currentPage === totalPages));
+        }
+
+        nav.appendChild(createPageBtn("›", currentPage + 1, currentPage >= totalPages, false));
+    }
+
+    function createPageBtn(label, page, disabled, active) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "Contest-Pagination-Btn" + (active ? " Contest-Pagination-Btn--active" : "");
+        btn.textContent = label;
+        if (disabled || active) btn.disabled = true;
+        if (!disabled && !active) {
+            btn.addEventListener("click", function () { goToPage(page); });
+        }
+        return btn;
+    }
+
+    function createEllipsis() {
+        var span = document.createElement("span");
+        span.className = "Contest-Pagination-Ellipsis";
+        span.textContent = "…";
+        return span;
+    }
+
+    function goToPage(page) {
+        if (page < 1 || page > totalPages || page === currentPage || isLoading) return;
+        fetchContestList(page);
     }
 
     /* ───── 아이템 렌더링 ───── */
@@ -124,21 +194,6 @@ const ContestListModule = (function () {
         panel.classList.remove("Contest-Detail-Panel--visible", "Contest-Detail-Panel--closing");
 
         fetchContestList(1);
-        setupObserver();
-    }
-
-    /* ───── IntersectionObserver (무한스크롤) ───── */
-    function setupObserver() {
-        if (observer) observer.disconnect();
-
-        var loader = document.getElementById("contestLoader");
-        observer = new IntersectionObserver(function (entries) {
-            if (entries[0].isIntersecting && !isLoading && currentPage < totalPages) {
-                fetchContestList(currentPage + 1);
-            }
-        }, { rootMargin: "200px" });
-
-        observer.observe(loader);
     }
 
     /* ───── 정렬 필터 클릭 ───── */
@@ -258,6 +313,14 @@ const ContestListModule = (function () {
         if (applyBtn) {
             applyBtn.onclick = function () {
                 openEntryModal(data.id);
+            };
+        }
+
+        /* 공유 버튼 */
+        var shareBtn = document.querySelector(".Contest-Detail-ShareBtn");
+        if (shareBtn) {
+            shareBtn.onclick = function () {
+                openShareModal(data.id);
             };
         }
 
@@ -400,10 +463,223 @@ const ContestListModule = (function () {
         });
     }
 
+    /* ───── 공유 모달 ───── */
+    var shareState = {
+        contestId: null,
+        receiverMap: new Map(),
+        selectedKeys: [],
+        searchTimer: null
+    };
+
+    function openShareModal(contestId) {
+        var overlay = document.getElementById("contestShareModal");
+        var input = document.getElementById("contestShareLinkInput");
+        if (!overlay || !input) return;
+
+        shareState.contestId = contestId;
+        shareState.selectedKeys = [];
+        shareState.receiverMap = new Map();
+
+        var shareUrl = window.location.origin + "/contest/list?id=" + encodeURIComponent(contestId);
+        input.value = shareUrl;
+
+        renderShareChips();
+        searchShareReceivers("");
+
+        overlay.hidden = false;
+        overlay.setAttribute("aria-hidden", "false");
+    }
+
+    function closeShareModal() {
+        var overlay = document.getElementById("contestShareModal");
+        if (!overlay) return;
+        overlay.hidden = true;
+        overlay.setAttribute("aria-hidden", "true");
+        var msg = document.getElementById("contestShareMessage");
+        if (msg) msg.value = "";
+        var search = document.getElementById("contestShareSearch");
+        if (search) search.value = "";
+        shareState.contestId = null;
+        shareState.selectedKeys = [];
+        shareState.receiverMap = new Map();
+    }
+
+    function copyShareLink() {
+        var input = document.getElementById("contestShareLinkInput");
+        if (!input || !input.value) return;
+        var url = input.value;
+
+        var done = function () {
+            var btn = document.getElementById("contestShareLinkCopy");
+            if (!btn) return;
+            var original = btn.textContent;
+            btn.textContent = "복사됨";
+            setTimeout(function () { btn.textContent = original; }, 1500);
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(done).catch(function () {
+                input.select();
+                document.execCommand("copy");
+                done();
+            });
+        } else {
+            input.select();
+            document.execCommand("copy");
+            done();
+        }
+    }
+
+    function searchShareReceivers(keyword) {
+        if (!shareState.contestId) return;
+        var list = document.getElementById("contestShareList");
+        if (!list) return;
+
+        fetch("/contest/api/" + shareState.contestId + "/share/receivers?keyword=" + encodeURIComponent(keyword || ""), {
+            credentials: "same-origin",
+            headers: { "Accept": "application/json" }
+        })
+        .then(function (res) {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+        })
+        .then(function (users) {
+            (users || []).forEach(function (user) {
+                shareState.receiverMap.set(user.nickname, user);
+            });
+
+            if (!users || users.length === 0) {
+                list.innerHTML = '<div class="work-share-empty"><div class="work-share-empty__title">검색 결과가 없습니다</div></div>';
+                return;
+            }
+
+            list.innerHTML = users.map(function (user) {
+                var key = user.nickname;
+                var isSelected = shareState.selectedKeys.indexOf(key) >= 0;
+                var avatar = user.profileImage
+                    ? '<img src="' + escapeHtml(user.profileImage) + '" alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/images/default-profile.svg\';" />'
+                    : '<img src="/images/default-profile.svg" alt="" />';
+                return '<button type="button" class="work-share-recipient" data-share-user="' + escapeHtml(key) + '">' +
+                       '<span class="work-share-recipient__main">' +
+                       '<span class="work-share-recipient__avatar">' + avatar + '</span>' +
+                       '<span class="work-share-recipient__copy">' +
+                       '<span class="work-share-recipient__username">' + escapeHtml(user.nickname) + '</span>' +
+                       '<span class="work-share-recipient__realname">' + escapeHtml(user.creatorVerified ? '크리에이터' : '회원') + '</span>' +
+                       '</span></span>' +
+                       '<span class="work-share-recipient__check' + (isSelected ? ' is-selected' : '') + '">' +
+                       (isSelected ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : '') +
+                       '</span></button>';
+            }).join("");
+
+            list.querySelectorAll("[data-share-user]").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    toggleReceiver(btn.getAttribute("data-share-user"));
+                });
+            });
+        })
+        .catch(function () {
+            list.innerHTML = '<div class="work-share-empty"><div class="work-share-empty__title">불러오지 못했습니다</div><p class="work-share-empty__copy">로그인 상태를 확인해 주세요.</p></div>';
+        });
+    }
+
+    function toggleReceiver(key) {
+        var idx = shareState.selectedKeys.indexOf(key);
+        if (idx >= 0) {
+            shareState.selectedKeys.splice(idx, 1);
+        } else {
+            shareState.selectedKeys.push(key);
+        }
+        renderShareChips();
+        var search = document.getElementById("contestShareSearch");
+        searchShareReceivers(search ? search.value : "");
+    }
+
+    function renderShareChips() {
+        var chipsEl = document.getElementById("contestShareChips");
+        if (!chipsEl) return;
+        chipsEl.innerHTML = shareState.selectedKeys.map(function (key) {
+            return '<span class="work-share-chip">' +
+                   '<span class="work-share-chip__text">' + escapeHtml(key) + '</span>' +
+                   '<button type="button" class="work-share-chip__remove" data-share-chip-remove="' + escapeHtml(key) + '" aria-label="삭제">×</button>' +
+                   '</span>';
+        }).join("");
+        chipsEl.querySelectorAll("[data-share-chip-remove]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                toggleReceiver(btn.getAttribute("data-share-chip-remove"));
+            });
+        });
+    }
+
+    function sendShareMessage() {
+        if (!shareState.contestId) return;
+        if (shareState.selectedKeys.length === 0) {
+            alert("받는 사람을 선택해 주세요.");
+            return;
+        }
+        var receiverIds = shareState.selectedKeys
+            .map(function (key) {
+                var u = shareState.receiverMap.get(key);
+                return u ? u.id : null;
+            })
+            .filter(function (v) { return v != null; });
+
+        var msgEl = document.getElementById("contestShareMessage");
+        var linkEl = document.getElementById("contestShareLinkInput");
+
+        fetch("/contest/api/" + shareState.contestId + "/share", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            body: JSON.stringify({
+                receiverIds: receiverIds,
+                message: msgEl ? msgEl.value : "",
+                shareUrl: linkEl ? linkEl.value : ""
+            })
+        })
+        .then(function (res) {
+            return res.json().then(function (body) { return { ok: res.ok, body: body }; });
+        })
+        .then(function (result) {
+            if (!result.ok || !result.body.success) {
+                throw new Error(result.body.message || "공유에 실패했습니다.");
+            }
+            alert("공유 메시지를 전송했습니다.");
+            closeShareModal();
+        })
+        .catch(function (err) {
+            alert(err.message || "공유 중 오류가 발생했습니다.");
+        });
+    }
+
+    function initShareModal() {
+        var closeBtn = document.getElementById("contestShareModalClose");
+        var copyBtn = document.getElementById("contestShareLinkCopy");
+        var sendBtn = document.getElementById("contestShareSend");
+        var overlay = document.getElementById("contestShareModal");
+        var search = document.getElementById("contestShareSearch");
+
+        if (closeBtn) closeBtn.addEventListener("click", closeShareModal);
+        if (copyBtn) copyBtn.addEventListener("click", copyShareLink);
+        if (sendBtn) sendBtn.addEventListener("click", sendShareMessage);
+        if (overlay) overlay.addEventListener("click", function (e) {
+            if (e.target === overlay) closeShareModal();
+        });
+        if (search) {
+            search.addEventListener("input", function () {
+                clearTimeout(shareState.searchTimer);
+                var keyword = search.value;
+                shareState.searchTimer = setTimeout(function () {
+                    searchShareReceivers(keyword);
+                }, 200);
+            });
+        }
+    }
+
     /* ───── 초기화 ───── */
     function init() {
         initFilters();
         initEntryModal();
+        initShareModal();
         applyInitialScopeFromUrl();
         resetList();
     }
@@ -425,4 +701,8 @@ const ContestListModule = (function () {
 
 })();
 
-document.addEventListener("DOMContentLoaded", ContestListModule.init);
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", ContestListModule.init);
+} else {
+    ContestListModule.init();
+}

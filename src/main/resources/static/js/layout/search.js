@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+window.addEventListener("load", function () {
   let sourceForms = Array.from(
     document.querySelectorAll("[data-bd-search-form]")
   );

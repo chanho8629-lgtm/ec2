@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+window.addEventListener("load", function () {
   var modal = document.querySelector("[data-bd-shell-voice-modal]");
   var scrim = document.querySelector("[data-bd-shell-voice-scrim]");
   var closeButton = document.querySelector("[data-bd-shell-voice-close]");
