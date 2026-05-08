@@ -16,8 +16,6 @@
     <!-- Lucide 아이콘 CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <script defer src="/js/main/main.js"></script>
-
     <!-- Tailwind 테마 및 스타일 설정 -->
     <script>
         tailwind.config = {
@@ -45,7 +43,11 @@
         <div class="main-tag-heading" th:if="${selectedTag != null and !#strings.isEmpty(selectedTag)}">
             <span th:text="'#' + ${selectedTag}">#태그</span>
         </div>
-        <div class="shelf-grid" th:if="${galleries != null and !galleries.isEmpty()}">
+        <div class="shelf-grid"
+             th:if="${galleries != null and !galleries.isEmpty()}"
+             th:data-tag="${selectedTag}"
+             data-next-page="2"
+             data-page-size="20">
             <div class="shelf-card" th:each="gallery : ${galleries}">
                 <a th:href="@{'/gallery/' + ${gallery.id}}">
                     <div class="shelf-card__thumb">
@@ -72,6 +74,9 @@
                 </a>
             </div>
         </div>
+        <div class="shelf-sentinel"
+             th:if="${galleries != null and galleries.size() >= 20}"
+             style="height:1px;"></div>
         <div th:if="${galleries == null or galleries.isEmpty()}" style="text-align:center; padding:60px 20px; color:#aaa;">
             <p>아직 등록된 예술관이 없습니다.</p>
         </div>

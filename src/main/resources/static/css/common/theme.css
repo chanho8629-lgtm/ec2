@@ -1,0 +1,5551 @@
+/* ============================================================
+   Global theme tokens (light default + dark override)
+   Activated via: <html data-theme="light|dark">
+   ============================================================ */
+:root {
+  --bd-color-bg: #ffffff;
+  --bd-color-bg-elevated: #ffffff;
+  --bd-color-bg-subtle: #f9f9f9;
+  --bd-color-bg-hover: #f2f2f2;
+  --bd-color-text: #0f0f0f;
+  --bd-color-text-muted: #606060;
+  --bd-color-border: #e5e5e5;
+  --bd-color-border-strong: #d3d3d3;
+  --bd-color-link: #065fd4;
+  --bd-color-accent: #6800ea;
+  --bd-color-accent-text: #ffffff;
+  --bd-color-input-bg: #ffffff;
+  --bd-color-overlay: rgba(0, 0, 0, 0.6);
+  --bd-color-shadow: rgba(15, 23, 42, 0.12);
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bd-color-bg: #0f0f0f;
+  --bd-color-bg-elevated: #1f1f1f;
+  --bd-color-bg-subtle: #181818;
+  --bd-color-bg-hover: #2a2a2a;
+  --bd-color-text: #f1f1f1;
+  --bd-color-text-muted: #aaaaaa;
+  --bd-color-border: #303030;
+  --bd-color-border-strong: #3f3f3f;
+  --bd-color-link: #3ea6ff;
+  --bd-color-accent: #b388ff;
+  --bd-color-accent-text: #0f0f0f;
+  --bd-color-input-bg: #121212;
+  --bd-color-overlay: rgba(0, 0, 0, 0.8);
+  --bd-color-shadow: rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+/* ── Global base ───────────────────────────────────────────── */
+html, body {
+  background-color: var(--bd-color-bg);
+  color: var(--bd-color-text);
+}
+
+/* ── Dark mode global overrides ────────────────────────────── */
+:root[data-theme="dark"] body,
+:root[data-theme="dark"] body[class] {
+  background-color: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-shell {
+  --bd-shell-surface: var(--bd-color-bg);
+  --bd-shell-border: var(--bd-color-border);
+  --bd-shell-text: var(--bd-color-text);
+  --bd-shell-muted: var(--bd-color-text-muted);
+  --bd-shell-hover: var(--bd-color-bg-hover);
+  --bd-shell-active: var(--bd-color-bg-hover);
+  --bd-shell-active-text: var(--bd-color-text);
+}
+
+:root[data-theme="dark"] .bd-shell__guide-link.is-active {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__header {
+  background: rgba(15, 15, 15, 0.96) !important;
+  border-bottom-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__guide,
+:root[data-theme="dark"] .bd-shell__mobile-search,
+:root[data-theme="dark"] .bd-shell__popup,
+:root[data-theme="dark"] .bd-shell__popup--account,
+:root[data-theme="dark"] .bd-shell__popup--notification,
+:root[data-theme="dark"] .bd-shell__popup--create {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__popup > div > [slot="dropdown-content"],
+:root[data-theme="dark"] .bd-shell__popup .style-scope.tp-yt-iron-dropdown,
+:root[data-theme="dark"] .bd-shell__popup .ytd-popup-container,
+:root[data-theme="dark"] .bd-shell__popup #header,
+:root[data-theme="dark"] .bd-shell__popup .menu-container,
+:root[data-theme="dark"] .bd-shell__popup section,
+:root[data-theme="dark"] .bd-shell__popup #items {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__popup [style-target="host"].ytd-compact-link-renderer,
+:root[data-theme="dark"] .bd-shell__popup #items > [role="link"]:not([compact-link-style]) {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__popup section[enable-handles-account-menu-switcher] {
+  border-bottom-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__popup #account-name {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__popup #channel-handle {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__popup [style-target="host"].ytd-compact-link-renderer:hover,
+:root[data-theme="dark"] .bd-shell__popup #items > [role="link"]:not([compact-link-style]):hover {
+  background-color: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__popup svg {
+  fill: currentColor;
+  color: var(--bd-color-text);
+}
+
+:root[data-theme="dark"] .bd-shell__search-field,
+:root[data-theme="dark"] .bd-shell__search-submit {
+  background: var(--bd-color-input-bg) !important;
+  border-color: var(--bd-color-border-strong) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__search-field input::placeholder,
+:root[data-theme="dark"] input::placeholder,
+:root[data-theme="dark"] textarea::placeholder {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__pill-button {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+/* Cards / shelves common patterns */
+:root[data-theme="dark"] .shelf-card,
+:root[data-theme="dark"] .work-card,
+:root[data-theme="dark"] .gallery-card,
+:root[data-theme="dark"] .Dashboard-Card,
+:root[data-theme="dark"] .Dashboard-EmptyCard,
+:root[data-theme="dark"] .Dashboard-Panel,
+:root[data-theme="dark"] .Contest-List-Item,
+:root[data-theme="dark"] .Contest-Detail-Panel,
+:root[data-theme="dark"] .pay-modal,
+:root[data-theme="dark"] .Auction-Bid-Panel {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* ── Chat overlay (must NOT cover full screen with dark) ──── */
+:root[data-theme="dark"] .bd-chat-layer {
+  background: transparent !important;
+}
+
+:root[data-theme="dark"] .bd-chat-layer__backdrop {
+  background: rgba(0, 0, 0, 0.45) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-panel {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  box-shadow: 0 28px 72px rgba(0, 0, 0, 0.6) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-sidebar,
+:root[data-theme="dark"] .bd-chat-thread,
+:root[data-theme="dark"] .bd-chat-sidebar__people {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-sidebar {
+  border-right-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-sidebar__search,
+:root[data-theme="dark"] .bd-chat-sidebar__search input,
+:root[data-theme="dark"] .bd-chat-composer__input,
+:root[data-theme="dark"] .bd-chat-composer textarea,
+:root[data-theme="dark"] .bd-chat-composer input {
+  background: var(--bd-color-input-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border-strong) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-room {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-room:hover,
+:root[data-theme="dark"] .bd-chat-room.is-active {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-room__name,
+:root[data-theme="dark"] .bd-chat-thread__identity strong {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-room__preview,
+:root[data-theme="dark"] .bd-chat-room__time,
+:root[data-theme="dark"] .bd-chat-thread__identity span {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-bubble__body {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-bubble--self .bd-chat-bubble__body {
+  background: var(--bd-chat-accent, #6800EA) !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .bd-chat-bubble__label {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-thread__messages {
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--bd-chat-accent) 14%, transparent), transparent 28%),
+    linear-gradient(180deg, #181818 0%, #141414 100%) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-thread__topbar,
+:root[data-theme="dark"] .bd-chat-thread__composer,
+:root[data-theme="dark"] .bd-chat-composer {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+  border-top-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-composer__field {
+  background: var(--bd-color-input-bg) !important;
+  border-color: var(--bd-color-border-strong) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-composer__field:focus-within {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-composer__field input {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-thread__ghost {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-thread__back {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-thread__empty {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-thread__empty h3 {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-thread__empty p {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-person:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-person__name {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-person__meta {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-msg-modal__sheet,
+:root[data-theme="dark"] .bd-chat-delete-confirm__dialog {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-delete-confirm__btn--cancel {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+/* Form controls */
+:root[data-theme="dark"] input[type="text"],
+:root[data-theme="dark"] input[type="email"],
+:root[data-theme="dark"] input[type="password"],
+:root[data-theme="dark"] input[type="number"],
+:root[data-theme="dark"] input[type="search"],
+:root[data-theme="dark"] textarea,
+:root[data-theme="dark"] select {
+  background-color: var(--bd-color-input-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border-strong) !important;
+}
+
+:root[data-theme="dark"] hr {
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] a {
+  color: inherit;
+}
+
+/* Modal overlays */
+:root[data-theme="dark"] .modal,
+:root[data-theme="dark"] .Modal,
+:root[data-theme="dark"] .auth-modal,
+:root[data-theme="dark"] .signup-modal {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+}
+
+/* ============================================================
+   Page-level dark overrides (broad selectors)
+   ============================================================ */
+
+/* Profile / Gallery / Work / Auction / Dashboard / Contest / Downloads pages */
+:root[data-theme="dark"] body[class*="-page"],
+:root[data-theme="dark"] body.profile-page,
+:root[data-theme="dark"] body.workdetail-page,
+:root[data-theme="dark"] body.gallery-detail-page,
+:root[data-theme="dark"] body.gallery-register-page,
+:root[data-theme="dark"] body.work-register-page,
+:root[data-theme="dark"] body.dashboard-page,
+:root[data-theme="dark"] body.auction-page,
+:root[data-theme="dark"] body.contest-page,
+:root[data-theme="dark"] body.downloads-page,
+:root[data-theme="dark"] body.intro-page,
+:root[data-theme="dark"] body.main-page,
+:root[data-theme="dark"] body.search-results-page,
+:root[data-theme="dark"] body.notification-page,
+:root[data-theme="dark"] body.pay-page {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+}
+
+/* Main page hero / shelves */
+:root[data-theme="dark"] .main-shell,
+:root[data-theme="dark"] .main-hero,
+:root[data-theme="dark"] .shelf,
+:root[data-theme="dark"] .shelf__row,
+:root[data-theme="dark"] .shelf-card,
+:root[data-theme="dark"] .shelf-card__media,
+:root[data-theme="dark"] .shelf-card__body,
+:root[data-theme="dark"] .feed-card,
+:root[data-theme="dark"] .gallery-shelf,
+:root[data-theme="dark"] .work-shelf {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* Profile page */
+:root[data-theme="dark"] .profile,
+:root[data-theme="dark"] .profile-page,
+:root[data-theme="dark"] .profile__main,
+:root[data-theme="dark"] .profile__sidebar,
+:root[data-theme="dark"] .profile__tabs,
+:root[data-theme="dark"] .profile__card,
+:root[data-theme="dark"] .videoEmpty {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* Gallery / Gallery detail */
+:root[data-theme="dark"] .gallery-page,
+:root[data-theme="dark"] .gallery-hero,
+:root[data-theme="dark"] .gallery-list,
+:root[data-theme="dark"] .gallery-detail,
+:root[data-theme="dark"] .gallery-detail__hero,
+:root[data-theme="dark"] .gallery-detail__body,
+:root[data-theme="dark"] .gallery-detail__sidebar,
+:root[data-theme="dark"] .gallery-card {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* Work detail page */
+:root[data-theme="dark"] .workdetail,
+:root[data-theme="dark"] .workdetail-page,
+:root[data-theme="dark"] .workdetail__main,
+:root[data-theme="dark"] .workdetail__media,
+:root[data-theme="dark"] .workdetail__sidebar,
+:root[data-theme="dark"] .workdetail__info,
+:root[data-theme="dark"] .workdetail__comments,
+:root[data-theme="dark"] .workdetail__related {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* Work register / Gallery register */
+:root[data-theme="dark"] .work-register,
+:root[data-theme="dark"] .work-register-modal,
+:root[data-theme="dark"] .work-register__form,
+:root[data-theme="dark"] .gallery-register,
+:root[data-theme="dark"] .gallery-register__form,
+:root[data-theme="dark"] .modal__content,
+:root[data-theme="dark"] .yt-compose-modal__content,
+:root[data-theme="dark"] .yt-compose-modal__loading,
+:root[data-theme="dark"] .yt-compose-modal__error {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* Dashboard */
+:root[data-theme="dark"] .Dashboard-Page,
+:root[data-theme="dark"] .Dashboard-Shell,
+:root[data-theme="dark"] .Dashboard-MainTab,
+:root[data-theme="dark"] .Dashboard-DateButton,
+:root[data-theme="dark"] .Dashboard-DateMenu,
+:root[data-theme="dark"] .Dashboard-DateOption,
+:root[data-theme="dark"] .Dashboard-Metric,
+:root[data-theme="dark"] .Dashboard-Chart,
+:root[data-theme="dark"] .Dashboard-TonalButton,
+:root[data-theme="dark"] .Dashboard-TabIndicator,
+:root[data-theme="dark"] .Dashboard-Title,
+:root[data-theme="dark"] .Dashboard-MetricKey,
+:root[data-theme="dark"] .Dashboard-MetricValue,
+:root[data-theme="dark"] .Dashboard-ChartTitle,
+:root[data-theme="dark"] .Dashboard-ChartEyebrow,
+:root[data-theme="dark"] .Dashboard-ChartSummary {
+  background-color: transparent !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-Card,
+:root[data-theme="dark"] .Dashboard-EmptyCard,
+:root[data-theme="dark"] .Dashboard-SummaryCard {
+  background: var(--bd-color-bg-elevated) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-MainTab.is-active {
+  background: var(--bd-color-bg-hover) !important;
+  border-color: var(--bd-color-text) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-Tab.is-active {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-DateOption:hover,
+:root[data-theme="dark"] .Dashboard-DateOption.is-active {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+/* Auction */
+:root[data-theme="dark"] .Auction-Page-Wrapper,
+:root[data-theme="dark"] .Auction-Watch-Main,
+:root[data-theme="dark"] .Auction-Bid-Header,
+:root[data-theme="dark"] .Auction-Bid-Messages,
+:root[data-theme="dark"] .Auction-Countdown-Wrap,
+:root[data-theme="dark"] .Auction-BidHistory-List,
+:root[data-theme="dark"] .Auction-Bid-Item,
+:root[data-theme="dark"] .Auction-Item-Title,
+:root[data-theme="dark"] .Auction-Gallery-Name,
+:root[data-theme="dark"] .Auction-Cd-Num {
+  background-color: transparent !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Auction-Gallery-FollowBtn {
+  background: var(--bd-color-text) !important;
+  color: var(--bd-color-bg) !important;
+}
+
+:root[data-theme="dark"] .Auction-Gallery-FollowBtn.following {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+/* Contest */
+:root[data-theme="dark"] .Contest-Page,
+:root[data-theme="dark"] .Contest-Filter-Bar,
+:root[data-theme="dark"] .Contest-Filter-Btn,
+:root[data-theme="dark"] .Contest-List,
+:root[data-theme="dark"] .Contest-Item-Title,
+:root[data-theme="dark"] .Contest-Item-Info,
+:root[data-theme="dark"] .Contest-Detail-Panel,
+:root[data-theme="dark"] .Contest-Detail-Body {
+  background-color: transparent !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Contest-List-Item {
+  background: var(--bd-color-bg-elevated) !important;
+}
+
+:root[data-theme="dark"] .Contest-Filter-Btn--active,
+:root[data-theme="dark"] .Contest-Filter-Btn--selected {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-text) !important;
+}
+
+/* Search results */
+:root[data-theme="dark"] .results-page,
+:root[data-theme="dark"] .results-list,
+:root[data-theme="dark"] .results-card,
+:root[data-theme="dark"] .results-card__body,
+:root[data-theme="dark"] .explore-result,
+:root[data-theme="dark"] .explore-result__card {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* Pay / Pay-API */
+:root[data-theme="dark"] .pay-modal__header,
+:root[data-theme="dark"] .pay-modal__title,
+:root[data-theme="dark"] .pay-product,
+:root[data-theme="dark"] .pay-product__body,
+:root[data-theme="dark"] .pay-product__name,
+:root[data-theme="dark"] .pay-product__creator,
+:root[data-theme="dark"] .pay-status,
+:root[data-theme="dark"] .pay-summary,
+:root[data-theme="dark"] .pay-method,
+:root[data-theme="dark"] .pay-method__option {
+  background-color: transparent !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .pay-method__option.is-selected {
+  background: var(--bd-color-bg-hover) !important;
+  border-color: var(--bd-color-text) !important;
+}
+
+/* Notifications page */
+:root[data-theme="dark"] .notification-page,
+:root[data-theme="dark"] .notification-list,
+:root[data-theme="dark"] .notification-card,
+:root[data-theme="dark"] .notification-item {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* Downloads (wish) page */
+:root[data-theme="dark"] .downloads-page,
+:root[data-theme="dark"] .downloads-list,
+:root[data-theme="dark"] .downloads-card,
+:root[data-theme="dark"] .downloads-empty {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* Tabs / pills / chips - shared */
+:root[data-theme="dark"] .tab-bar,
+:root[data-theme="dark"] .tab,
+:root[data-theme="dark"] .chip,
+:root[data-theme="dark"] .pill,
+:root[data-theme="dark"] .badge {
+  background-color: transparent !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .tab.is-active,
+:root[data-theme="dark"] .chip.is-active,
+:root[data-theme="dark"] .pill.is-active {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+/* Buttons - generic light backgrounds become dark */
+:root[data-theme="dark"] button:not([class*="primary"]):not([class*="accent"]):not([class*="danger"]):not([class*="follow"]):not([class*="bd-chat"]):not(.bd-shell__notification-readall):not(.bd-theme-picker__option) {
+  color: var(--bd-color-text);
+}
+
+/* Generic "white card" classes used across pages */
+:root[data-theme="dark"] .card,
+:root[data-theme="dark"] .card-body,
+:root[data-theme="dark"] .panel,
+:root[data-theme="dark"] .section,
+:root[data-theme="dark"] .container,
+:root[data-theme="dark"] .box {
+  background-color: transparent !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* Comments / replies */
+:root[data-theme="dark"] .comment,
+:root[data-theme="dark"] .comment-item,
+:root[data-theme="dark"] .reply,
+:root[data-theme="dark"] .comment-input,
+:root[data-theme="dark"] .comment__body {
+  background-color: transparent !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* Headings/secondary text */
+:root[data-theme="dark"] h1,
+:root[data-theme="dark"] h2,
+:root[data-theme="dark"] h3,
+:root[data-theme="dark"] h4,
+:root[data-theme="dark"] h5,
+:root[data-theme="dark"] h6,
+:root[data-theme="dark"] p,
+:root[data-theme="dark"] span:not([class*="badge"]):not([class*="dot"]):not([class*="primary"]),
+:root[data-theme="dark"] label {
+  color: inherit;
+}
+
+/* Auth modals (login / signup) */
+:root[data-theme="dark"] .auth-modal,
+:root[data-theme="dark"] .auth-modal__panel,
+:root[data-theme="dark"] .signup-modal,
+:root[data-theme="dark"] .signup-modal__panel,
+:root[data-theme="dark"] .admin-auth-modal {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* Voice search */
+:root[data-theme="dark"] .bd-voice-modal,
+:root[data-theme="dark"] .bd-voice-modal__panel {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+}
+
+/* Override gallery-detail's --main-bg variable */
+:root[data-theme="dark"] {
+  --main-bg: var(--bd-color-bg);
+  --yt-spec-base-background: var(--bd-color-bg);
+  --yt-spec-raised-background: var(--bd-color-bg-elevated);
+  --yt-spec-menu-background: var(--bd-color-bg-elevated);
+  --yt-spec-text-primary: var(--bd-color-text);
+  --yt-spec-text-secondary: var(--bd-color-text-muted);
+  --yt-spec-outline: var(--bd-color-border);
+  --yt-spec-additive-background: var(--bd-color-bg-hover);
+}
+
+/* Hardcoded inline fallbacks via attribute selectors */
+:root[data-theme="dark"] [style*="background:#fff"],
+:root[data-theme="dark"] [style*="background: #fff"],
+:root[data-theme="dark"] [style*="background-color:#fff"],
+:root[data-theme="dark"] [style*="background-color: #fff"] {
+  background: var(--bd-color-bg-elevated) !important;
+  background-color: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+}
+
+/* ── 작품/예술관/공모전 등록(Register) 페이지 ─────────── */
+:root[data-theme="dark"] .page-shell,
+:root[data-theme="dark"] .page-background,
+:root[data-theme="dark"] .upload-panel,
+:root[data-theme="dark"] .upload-dialog,
+:root[data-theme="dark"] .upload-content,
+:root[data-theme="dark"] .upload-graphic,
+:root[data-theme="dark"] .upload-header-block,
+:root[data-theme="dark"] .upload-header-row,
+:root[data-theme="dark"] .upload-header-title,
+:root[data-theme="dark"] .upload-footer,
+:root[data-theme="dark"] .upload-action-row,
+:root[data-theme="dark"] .upload-title,
+:root[data-theme="dark"] .upload-subtitle,
+:root[data-theme="dark"] .Register-Page,
+:root[data-theme="dark"] .Register-Page-Header,
+:root[data-theme="dark"] .Register-Page-Title,
+:root[data-theme="dark"] .Register-Form,
+:root[data-theme="dark"] .Register-Section,
+:root[data-theme="dark"] .Register-Section-Title,
+:root[data-theme="dark"] .Register-Section-Desc,
+:root[data-theme="dark"] .Register-ActionBar,
+:root[data-theme="dark"] .Register-ActionBar-Buttons,
+:root[data-theme="dark"] .Register-Tabs,
+:root[data-theme="dark"] .Register-Tab,
+:root[data-theme="dark"] .Register-Tab-Text,
+:root[data-theme="dark"] .Register-Tab-Indicator,
+:root[data-theme="dark"] .Register-Divider,
+:root[data-theme="dark"] .Register-Banner-Placeholder,
+:root[data-theme="dark"] .Register-Banner-Preview,
+:root[data-theme="dark"] .Register-Photo-Placeholder,
+:root[data-theme="dark"] .Register-Photo-Preview,
+:root[data-theme="dark"] .Register-Video-Placeholder,
+:root[data-theme="dark"] .Register-Video-Preview,
+:root[data-theme="dark"] .Register-Upload-Guide,
+:root[data-theme="dark"] .Register-Upload-Info,
+:root[data-theme="dark"] .Register-Upload-Row,
+:root[data-theme="dark"] .Register-Date-Row,
+:root[data-theme="dark"] .Register-Date-Separator,
+:root[data-theme="dark"] .Register-Delete-Section,
+:root[data-theme="dark"] .Register-Tag-Wrap,
+:root[data-theme="dark"] .Register-Tag-Chip,
+:root[data-theme="dark"] .Register-Input-Label,
+:root[data-theme="dark"] .info-card,
+:root[data-theme="dark"] .form-card,
+:root[data-theme="dark"] .field,
+:root[data-theme="dark"] .field-label,
+:root[data-theme="dark"] .field-inline-label,
+:root[data-theme="dark"] .field-control,
+:root[data-theme="dark"] .field-control-title,
+:root[data-theme="dark"] .field-count,
+:root[data-theme="dark"] .text-area,
+:root[data-theme="dark"] .text-area-title,
+:root[data-theme="dark"] .thumbnail-grid,
+:root[data-theme="dark"] .thumbnail-placeholder,
+:root[data-theme="dark"] .thumbnail-upload-text,
+:root[data-theme="dark"] .video-preview,
+:root[data-theme="dark"] .video-preview-empty,
+:root[data-theme="dark"] .video-preview-icon,
+:root[data-theme="dark"] .video-progress-title,
+:root[data-theme="dark"] .video-progress-subtitle,
+:root[data-theme="dark"] .video-side-card,
+:root[data-theme="dark"] .image-preview-player,
+:root[data-theme="dark"] .stepper,
+:root[data-theme="dark"] .step,
+:root[data-theme="dark"] .step-name,
+:root[data-theme="dark"] .step-dot,
+:root[data-theme="dark"] .progress-bar,
+:root[data-theme="dark"] .progress-value,
+:root[data-theme="dark"] .toggle-row,
+:root[data-theme="dark"] .toggle-row-text,
+:root[data-theme="dark"] .toggle-switch,
+:root[data-theme="dark"] .toggle-slider,
+:root[data-theme="dark"] .compact-row,
+:root[data-theme="dark"] .compact-col,
+:root[data-theme="dark"] .side-meta,
+:root[data-theme="dark"] .side-meta-row,
+:root[data-theme="dark"] .side-meta-link-row,
+:root[data-theme="dark"] .side-meta-link-actions,
+:root[data-theme="dark"] .side-meta-text-button,
+:root[data-theme="dark"] .side-meta-copy-tooltip,
+:root[data-theme="dark"] .footer-policy,
+:root[data-theme="dark"] .footer-warning,
+:root[data-theme="dark"] .header-actions,
+:root[data-theme="dark"] .header-icon-button,
+:root[data-theme="dark"] .section-head,
+:root[data-theme="dark"] .selected-file-name,
+:root[data-theme="dark"] .select-file-button,
+:root[data-theme="dark"] .top-search-bar,
+:root[data-theme="dark"] .tags-section,
+:root[data-theme="dark"] .tags-box,
+:root[data-theme="dark"] .tags-field,
+:root[data-theme="dark"] .tags-list,
+:root[data-theme="dark"] .tags-meta,
+:root[data-theme="dark"] .tags-label,
+:root[data-theme="dark"] .tags-description,
+:root[data-theme="dark"] .tags-suggestions,
+:root[data-theme="dark"] .tags-suggestion-item,
+:root[data-theme="dark"] .tags-suggestion-empty,
+:root[data-theme="dark"] .details-screen,
+:root[data-theme="dark"] .details-side,
+:root[data-theme="dark"] .details-grid,
+:root[data-theme="dark"] .details-header-block,
+:root[data-theme="dark"] .details-title-row,
+:root[data-theme="dark"] .details-title-actions,
+:root[data-theme="dark"] .details-buttons,
+:root[data-theme="dark"] .details-close-button,
+:root[data-theme="dark"] .details-file-title,
+:root[data-theme="dark"] .details-footer,
+:root[data-theme="dark"] .details-status,
+:root[data-theme="dark"] .dialog-body,
+:root[data-theme="dark"] .dialog-content,
+:root[data-theme="dark"] .dialog-footer,
+:root[data-theme="dark"] .dialog-header,
+:root[data-theme="dark"] .dialog-title,
+:root[data-theme="dark"] .playlist-description,
+:root[data-theme="dark"] .playlist-dropdown,
+:root[data-theme="dark"] .playlist-dropdown-menu,
+:root[data-theme="dark"] .playlist-dropdown-text,
+:root[data-theme="dark"] .playlist-label,
+:root[data-theme="dark"] .playlist-option,
+:root[data-theme="dark"] .playlist-option-empty,
+:root[data-theme="dark"] .auction-expand-button,
+:root[data-theme="dark"] .auction-expand-button__copy,
+:root[data-theme="dark"] .auction-expand-description,
+:root[data-theme="dark"] .auction-expand-label,
+:root[data-theme="dark"] .work-auction-config,
+:root[data-theme="dark"] .ai-prompt-modal,
+:root[data-theme="dark"] .ai-prompt-modal__dialog,
+:root[data-theme="dark"] .ai-prompt-modal__header,
+:root[data-theme="dark"] .ai-prompt-modal__title,
+:root[data-theme="dark"] .ai-prompt-modal__body,
+:root[data-theme="dark"] .ai-prompt-modal__divider,
+:root[data-theme="dark"] .ai-prompt-modal__close,
+:root[data-theme="dark"] .ai-prompt-thread,
+:root[data-theme="dark"] .ai-prompt-thread__bubble,
+:root[data-theme="dark"] .ai-prompt-thread__message,
+:root[data-theme="dark"] .ai-prompt-thread__label,
+:root[data-theme="dark"] .ai-prompt-thread__result,
+:root[data-theme="dark"] .ai-prompt-compose,
+:root[data-theme="dark"] .ai-prompt-compose-wrap,
+:root[data-theme="dark"] .ai-prompt-compose__input,
+:root[data-theme="dark"] .ai-prompt-compose__attachments,
+:root[data-theme="dark"] .ai-prompt-compose-menu,
+:root[data-theme="dark"] .ai-prompt-compose-menu__item,
+:root[data-theme="dark"] .ai-prompt-attachment,
+:root[data-theme="dark"] .ai-prompt-preview-card,
+:root[data-theme="dark"] .ai-prompt-preview-card__play,
+:root[data-theme="dark"] .ai-prompt-preview-card__split,
+:root[data-theme="dark"] .ai-prompt-preview-actions,
+:root[data-theme="dark"] .ai-prompt-preview-actions__button {
+  background-color: transparent !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* Surfaces / cards / elevated panels in register pages */
+:root[data-theme="dark"] .upload-panel,
+:root[data-theme="dark"] .upload-dialog,
+:root[data-theme="dark"] .form-card,
+:root[data-theme="dark"] .info-card,
+:root[data-theme="dark"] .Register-Form,
+:root[data-theme="dark"] .Register-Section,
+:root[data-theme="dark"] .video-side-card,
+:root[data-theme="dark"] .ai-prompt-modal__dialog,
+:root[data-theme="dark"] .ai-prompt-thread__bubble,
+:root[data-theme="dark"] .ai-prompt-preview-card,
+:root[data-theme="dark"] .ai-prompt-attachment,
+:root[data-theme="dark"] .dialog-content {
+  background-color: var(--bd-color-bg-elevated) !important;
+}
+
+/* Inputs/textareas in register pages */
+:root[data-theme="dark"] .Register-Input,
+:root[data-theme="dark"] .Register-Input-Wrap,
+:root[data-theme="dark"] .Register-Textarea,
+:root[data-theme="dark"] .Register-Textarea-Wrap,
+:root[data-theme="dark"] .Register-Tag-Input,
+:root[data-theme="dark"] .field-control input,
+:root[data-theme="dark"] .field-control textarea,
+:root[data-theme="dark"] .text-area,
+:root[data-theme="dark"] .tags-input,
+:root[data-theme="dark"] .ai-prompt-compose__input {
+  background: var(--bd-color-input-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border-strong) !important;
+}
+
+/* Active tab / selected chip / filled buttons - keep visible */
+:root[data-theme="dark"] .Register-Tab--selected,
+:root[data-theme="dark"] .Register-Tab--selected .Register-Tab-Text {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Register-Tag-Chip {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .filled-button,
+:root[data-theme="dark"] .Register-Button-Filled,
+:root[data-theme="dark"] .Register-ActionBar-Primary {
+  background: var(--bd-color-text) !important;
+  color: var(--bd-color-bg) !important;
+}
+
+:root[data-theme="dark"] .tonal-button,
+:root[data-theme="dark"] .Register-Button-Tonal,
+:root[data-theme="dark"] .Register-Button-Outline {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border-strong) !important;
+}
+
+:root[data-theme="dark"] .Register-Button-Delete {
+  background: #b1322d !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .ai-prompt-thread__message--user {
+  background: var(--bd-chat-accent, #6800EA) !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .ai-prompt-thread__message--assistant {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .ai-prompt-modal__backdrop {
+  background: rgba(0, 0, 0, 0.55) !important;
+}
+
+/* ── Gallery register modal (text-box / input-box wrappers) ── */
+:root[data-theme="dark"] #galleryModal,
+:root[data-theme="dark"] #galleryModal .modal-body,
+:root[data-theme="dark"] #galleryModal .modal-content,
+:root[data-theme="dark"] #galleryModal .modal-header,
+:root[data-theme="dark"] #galleryModal .modal-footer,
+:root[data-theme="dark"] .field-wrap,
+:root[data-theme="dark"] .title-wrap {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .input-box {
+  background: var(--bd-color-input-bg) !important;
+  border-color: var(--bd-color-border-strong) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .input-box:focus-within {
+  border-color: var(--bd-color-text) !important;
+  box-shadow: inset 0 0 0 1px var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .text-box,
+:root[data-theme="dark"] .title-box,
+:root[data-theme="dark"] .desc-box,
+:root[data-theme="dark"] [contenteditable="true"] {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  caret-color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .title-box:empty::before,
+:root[data-theme="dark"] .desc-box:empty::before,
+:root[data-theme="dark"] [contenteditable="true"]:empty::before {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .inner-label,
+:root[data-theme="dark"] .label,
+:root[data-theme="dark"] .section-title,
+:root[data-theme="dark"] .small-label,
+:root[data-theme="dark"] .title-label,
+:root[data-theme="dark"] .sub,
+:root[data-theme="dark"] .count {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .small-label,
+:root[data-theme="dark"] .sub,
+:root[data-theme="dark"] .count {
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* Cover any textarea/select/contenteditable inside register pages */
+:root[data-theme="dark"] body.work-register-page textarea,
+:root[data-theme="dark"] body.work-register-page input,
+:root[data-theme="dark"] body.work-register-page select,
+:root[data-theme="dark"] body.gallery-register-page textarea,
+:root[data-theme="dark"] body.gallery-register-page input,
+:root[data-theme="dark"] body.gallery-register-page select,
+:root[data-theme="dark"] body.contest-register-page textarea,
+:root[data-theme="dark"] body.contest-register-page input,
+:root[data-theme="dark"] body.contest-register-page select,
+:root[data-theme="dark"] .work-register-embedded-root textarea,
+:root[data-theme="dark"] .work-register-embedded-root input,
+:root[data-theme="dark"] .work-register-embedded-root select,
+:root[data-theme="dark"] .ai-prompt-modal textarea,
+:root[data-theme="dark"] .ai-prompt-modal input {
+  background: var(--bd-color-input-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border-strong) !important;
+}
+
+/* Artwork picker dialog (gallery register sub-modal) */
+:root[data-theme="dark"] .artwork-dialog,
+:root[data-theme="dark"] .artwork-dialog-body,
+:root[data-theme="dark"] .artwork-dialog-header,
+:root[data-theme="dark"] .artwork-dialog-footer,
+:root[data-theme="dark"] .artwork-dialog-title,
+:root[data-theme="dark"] .artwork-dialog-title-wrap,
+:root[data-theme="dark"] .artwork-list,
+:root[data-theme="dark"] .artwork-picker,
+:root[data-theme="dark"] .artwork-picker-left,
+:root[data-theme="dark"] .artwork-picker-right,
+:root[data-theme="dark"] .artwork-picker-tabs,
+:root[data-theme="dark"] .artwork-picker-tab,
+:root[data-theme="dark"] .artwork-row,
+:root[data-theme="dark"] .artwork-row-main,
+:root[data-theme="dark"] .art-list-section {
+  background-color: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .artwork-picker-tab.is-active {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .artwork-row:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .artwork-checkbox {
+  border-color: var(--bd-color-border-strong) !important;
+}
+
+/* Notification popup tweaks */
+:root[data-theme="dark"] .bd-shell__notification-readall {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border-strong) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__notification-readall:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__notification-item {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__notification-time {
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* Theme picker submenu */
+.bd-theme-picker {
+  position: fixed;
+  z-index: 100000;
+  min-width: 200px;
+  padding: 8px;
+  border-radius: 14px;
+  background: var(--bd-color-bg-elevated);
+  border: 1px solid var(--bd-color-border);
+  box-shadow: 0 18px 40px var(--bd-color-shadow);
+}
+
+.bd-theme-picker[hidden] { display: none !important; }
+
+.bd-theme-picker__title {
+  margin: 0 0 8px;
+  padding: 6px 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--bd-color-text-muted);
+}
+
+.bd-theme-picker__option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--bd-color-text);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.bd-theme-picker__option:hover {
+  background: var(--bd-color-bg-hover);
+}
+
+.bd-theme-picker__option.is-active {
+  background: var(--bd-color-bg-hover);
+  font-weight: 600;
+}
+
+.bd-theme-picker__check {
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+  opacity: 0;
+}
+
+.bd-theme-picker__option.is-active .bd-theme-picker__check {
+  opacity: 1;
+}
+
+/* ============================================================
+   Phase 1 — Page-level dark mode override
+   profile / gallery / gallery-detail / main / explore-result
+   ============================================================ */
+
+/* ── profile/profile.css ─────────────────────────────────── */
+:root[data-theme="dark"] .layout,
+:root[data-theme="dark"] .content,
+:root[data-theme="dark"] .channelText,
+:root[data-theme="dark"] .channelMeta,
+:root[data-theme="dark"] .tabRow {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .channelTitle,
+:root[data-theme="dark"] .metaInfo {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .followManageModalPanel,
+:root[data-theme="dark"] .badgeManageModalPanel,
+:root[data-theme="dark"] .profileBannerEditModalPanel,
+:root[data-theme="dark"] .followManageItem,
+:root[data-theme="dark"] .badgeManageGrid,
+:root[data-theme="dark"] .profileBadgeChip,
+:root[data-theme="dark"] .profileBadgeRow {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .channelActionRow button,
+:root[data-theme="dark"] .followManageActions,
+:root[data-theme="dark"] .profileFormActionRow,
+:root[data-theme="dark"] .profileFormBtnLeading,
+:root[data-theme="dark"] .profileEditUpload {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .profileBannerPreview,
+:root[data-theme="dark"] .bannerManageButton {
+  border-color: var(--bd-color-border) !important;
+}
+
+/* ── work/gallery.css (gallery picker modal) ─────────────── */
+:root[data-theme="dark"] #galleryModal,
+:root[data-theme="dark"] #galleryModal .modal-body,
+:root[data-theme="dark"] #galleryModal .modal-foot,
+:root[data-theme="dark"] #galleryModal .modal-head,
+:root[data-theme="dark"] .artwork-dialog,
+:root[data-theme="dark"] .artwork-dialog-body,
+:root[data-theme="dark"] .artwork-dialog-header,
+:root[data-theme="dark"] .artwork-dialog-footer,
+:root[data-theme="dark"] .artwork-picker,
+:root[data-theme="dark"] .artwork-picker-left,
+:root[data-theme="dark"] .artwork-picker-right,
+:root[data-theme="dark"] .grid-two,
+:root[data-theme="dark"] .modal,
+:root[data-theme="dark"] .modal-foot {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .modal-title,
+:root[data-theme="dark"] .artwork-dialog-title,
+:root[data-theme="dark"] .artwork-checkbox {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] #galleryModal .icon-btn,
+:root[data-theme="dark"] #galleryModal .artwork-dialog .icon-btn,
+:root[data-theme="dark"] .artwork-dialog-close {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] #galleryModal .icon-btn:hover,
+:root[data-theme="dark"] #galleryModal .artwork-dialog .icon-btn:hover,
+:root[data-theme="dark"] .artwork-dialog-close:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .artwork-dialog-backdrop {
+  background: var(--bd-color-overlay) !important;
+}
+
+/* ── work/gallery-detail.css ─────────────────────────────── */
+:root[data-theme="dark"] .bd-shell__page-content.gallery-page,
+:root[data-theme="dark"] .gallery-page,
+:root[data-theme="dark"] .gallery-container,
+:root[data-theme="dark"] .gallery-content,
+:root[data-theme="dark"] .gallery-detail-body,
+:root[data-theme="dark"] .video-grid,
+:root[data-theme="dark"] .content-row-section {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .gallery-header,
+:root[data-theme="dark"] .gallery-carousel-header,
+:root[data-theme="dark"] .gallery-top-actions,
+:root[data-theme="dark"] .gallery-nav ul {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .gallery-description {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] #pagination-thumbnails {
+  background: var(--bd-color-bg) !important;
+}
+
+:root[data-theme="dark"] #pagination-thumbnails button {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] #pagination-thumbnails button.selected {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+:root[data-theme="dark"] .work-action-sheet {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .btn-play-all-main {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .btn-play-all-main:hover {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+/* ── main/main.css ────────────────────────────────────────── */
+:root[data-theme="dark"] .main-page,
+:root[data-theme="dark"] .carousel-scroll {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .main-tag-heading {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .shelf-card,
+:root[data-theme="dark"] .shelf-card a {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .shelf-card__title {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .shelf-card__desc,
+:root[data-theme="dark"] .shelf-card__meta {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .shelf-card__overlay {
+  background: rgba(0, 0, 0, 0.7) !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .shelf-card__badge {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .shelf-card__stack1,
+:root[data-theme="dark"] .shelf-card__stack2,
+:root[data-theme="dark"] .shelf-card__thumb,
+:root[data-theme="dark"] .shelf-card__stacks {
+  background: var(--bd-color-bg-subtle) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* ── explore-result/explore-result.css ───────────────────── */
+:root[data-theme="dark"] .main-content,
+:root[data-theme="dark"] .sidebar {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .channel-header,
+:root[data-theme="dark"] .channel-info,
+:root[data-theme="dark"] .work-renderer,
+:root[data-theme="dark"] .profile-renderer {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .channel-name,
+:root[data-theme="dark"] .channel-handle,
+:root[data-theme="dark"] .gallery-channel-name {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .channel-desc,
+:root[data-theme="dark"] .gallery-description {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .channel-avatar,
+:root[data-theme="dark"] .gallery-channel-icon {
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-thumbnail {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+:root[data-theme="dark"] .chip {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .chip:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .chip.active {
+  background: var(--bd-color-text) !important;
+  color: var(--bd-color-bg) !important;
+}
+
+:root[data-theme="dark"] .chip.active:hover {
+  background: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .gallery-badge,
+:root[data-theme="dark"] .gallery-channel {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .gallery-dropdown,
+:root[data-theme="dark"] .filter-chips,
+:root[data-theme="dark"] .custom-radio {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bookmark-icon {
+  color: var(--bd-color-text) !important;
+}
+
+/* ============================================================
+   Phase 2 — Page-level dark mode override
+   notification / modal-shared / pay-api / search / auction
+   ============================================================ */
+
+/* ── notification/notification.css ───────────────────────── */
+:root[data-theme="dark"] .notification-page,
+:root[data-theme="dark"] .notification-shell,
+:root[data-theme="dark"] .notification-header,
+:root[data-theme="dark"] .notification-inline {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .notification-header h1,
+:root[data-theme="dark"] .notification-group h2,
+:root[data-theme="dark"] .notification-inline h2 {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .notification-group,
+:root[data-theme="dark"] .option-list {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .option-item {
+  border-color: var(--bd-color-border) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .group-note {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .back-button {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .back-button:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .switch-slider {
+  background: var(--bd-color-border-strong) !important;
+}
+
+:root[data-theme="dark"] .switch input:checked + .switch-slider {
+  background: var(--bd-color-accent) !important;
+}
+
+:root[data-theme="dark"] .radio-mark {
+  border-color: var(--bd-color-border-strong) !important;
+}
+
+/* ── main/modal-shared.css (legal + signup) ─────────────── */
+:root[data-theme="dark"] .legal-modal__dialog,
+:root[data-theme="dark"] .signup-modal__dialog {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .legal-modal__backdrop,
+:root[data-theme="dark"] .signup-modal__backdrop {
+  background: var(--bd-color-overlay) !important;
+}
+
+:root[data-theme="dark"] .legal-modal__title,
+:root[data-theme="dark"] .legal-modal__scroll h3 {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .legal-modal__body,
+:root[data-theme="dark"] .legal-modal__scroll,
+:root[data-theme="dark"] .legal-modal__scroll p {
+  color: var(--bd-color-text) !important;
+  background: var(--bd-color-bg-elevated) !important;
+}
+
+:root[data-theme="dark"] .legal-modal__date {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .legal-modal__close-btn {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .legal-modal__close-btn:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .legal-modal__scroll::-webkit-scrollbar-thumb {
+  background: var(--bd-color-border-strong) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__bold-link {
+  color: var(--bd-color-link) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__bottom-bar {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__bottom-bar:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .modal__social-icon {
+  background: var(--bd-color-bg-elevated) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* ── pay/pay-api.css ─────────────────────────────────────── */
+:root[data-theme="dark"] .pay-modal {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .pay-modal__header,
+:root[data-theme="dark"] .pay-modal__title {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .pay-modal__close {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .pay-modal__handle {
+  background: var(--bd-color-border-strong) !important;
+}
+
+:root[data-theme="dark"] .overlay {
+  background: var(--bd-color-overlay) !important;
+}
+
+:root[data-theme="dark"] .pay-hero,
+:root[data-theme="dark"] .pay-hero__copy {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .pay-product,
+:root[data-theme="dark"] .pay-product__body,
+:root[data-theme="dark"] .pay-product__thumb {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .pay-product__name {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .pay-product__creator,
+:root[data-theme="dark"] .pay-product__license {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .pay-method__list {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .pay-method__option {
+  border-color: var(--bd-color-border) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .pay-method__name {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .pay-method__desc,
+:root[data-theme="dark"] .pay-method__copy {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .pay-method__chip {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .pay-method__radio {
+  border-color: var(--bd-color-border-strong) !important;
+}
+
+:root[data-theme="dark"] .pay-footer {
+  background: var(--bd-color-bg) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .pay-note,
+:root[data-theme="dark"] .pay-note__list,
+:root[data-theme="dark"] .pay-note__list li {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* ── layout/search.css ───────────────────────────────────── */
+:root[data-theme="dark"] .bd-search-portal,
+:root[data-theme="dark"] .bd-search-portal__surface,
+:root[data-theme="dark"] .bd-search-portal__form {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-search-portal__field,
+:root[data-theme="dark"] .bd-search-portal__field input {
+  background: var(--bd-color-input-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-search-panel,
+:root[data-theme="dark"] .bd-search-panel__header,
+:root[data-theme="dark"] .bd-search-panel__results {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-search-panel__title,
+:root[data-theme="dark"] .bd-search-panel__eyebrow {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-search-empty {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .bd-search-empty strong {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-search-result,
+:root[data-theme="dark"] .bd-search-result__body {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-search-result:hover,
+:root[data-theme="dark"] .bd-search-result:focus-visible {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .bd-search-result__title {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-search-result__description,
+:root[data-theme="dark"] .bd-search-result__date,
+:root[data-theme="dark"] .bd-search-result__meta,
+:root[data-theme="dark"] .bd-search-result__duration {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .bd-search-result__chip {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-search-result__thumb {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+/* ── auction/auction.css 보강 (Bid Panel 위주) ─────────── */
+:root[data-theme="dark"] .Auction-Bid-Avatar,
+:root[data-theme="dark"] .Auction-Bid-AvatarCircle {
+  background: var(--bd-color-bg-subtle) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Auction-Bid-Content,
+:root[data-theme="dark"] .Auction-Bid-Info {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Auction-Bid-CurrentPrice {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Auction-Bid-CurrentPrice-Label {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Auction-Bid-CurrentPrice-Value {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Auction-Bid-Info-Btn {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Auction-Bid-Info-Btn:hover {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Auction-Bid-Info-Tooltip {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Auction-Bid-InputArea,
+:root[data-theme="dark"] .Auction-Bid-InputWrapper {
+  background: var(--bd-color-input-bg) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Auction-Bid-Input,
+:root[data-theme="dark"] .Auction-Bid-Input-Unit {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Auction-Bid-Input::placeholder {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Auction-Bid-Instant-Label,
+:root[data-theme="dark"] .Auction-Bid-Instant-Text {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Auction-Bid-Instant-Label:hover .Auction-Bid-Instant-Text {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Auction-Bid-SubmitBtn {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+/* ============================================================
+   Phase 3 — Page-level dark mode override
+   admin / auth-modal / admin-auth-modal / contest-list / 404 / downloads
+   ============================================================ */
+
+/* ── admin/admin-style.css + admin/admin-override.css ───── */
+:root[data-theme="dark"] .admin-layout,
+:root[data-theme="dark"] .admin-main,
+:root[data-theme="dark"] .admin-content {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .admin-sidebar {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .admin-sidebar::-webkit-scrollbar-thumb {
+  background: var(--bd-color-border-strong) !important;
+}
+
+:root[data-theme="dark"] .sidebar-logo,
+:root[data-theme="dark"] .sidebar-nav-item,
+:root[data-theme="dark"] .sidebar-nav-icon,
+:root[data-theme="dark"] .sidebar-nav-item .nav-item-text {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .sidebar-nav-item:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .filter-bar,
+:root[data-theme="dark"] .filter-search {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .breadcrumb,
+:root[data-theme="dark"] .breadcrumb a,
+:root[data-theme="dark"] .breadcrumb-separator {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .breadcrumb a:hover {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .back-link {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .back-link:hover {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .back-link svg {
+  fill: currentColor !important;
+}
+
+:root[data-theme="dark"] .detail-layout,
+:root[data-theme="dark"] .detail-columns,
+:root[data-theme="dark"] .detail-sidebar {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .btn,
+:root[data-theme="dark"] .btn-action-sm {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .btn-action-sm.btn-outline {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border-strong) !important;
+}
+
+:root[data-theme="dark"] .btn-action-sm.btn-danger {
+  background: #c5221f !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .btn-action-sm.btn-danger:hover {
+  background: #a51815 !important;
+}
+
+/* ── main/auth-modal.css ─────────────────────────────────── */
+:root[data-theme="dark"] .auth-modal__dialog,
+:root[data-theme="dark"] .auth-modal__login-view .auth-modal__dialog-inner,
+:root[data-theme="dark"] .auth-modal__login-view .auth-modal__inner,
+:root[data-theme="dark"] .auth-modal__subview,
+:root[data-theme="dark"] .auth-modal__subview-inner {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .auth-modal__form-side,
+:root[data-theme="dark"] .auth-modal__content-row {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .auth-modal__form-title,
+:root[data-theme="dark"] .auth-modal__logo {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .auth-modal__divider-text,
+:root[data-theme="dark"] .auth-modal__helper-links {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .auth-modal__forgot-link {
+  color: var(--bd-color-link) !important;
+}
+
+:root[data-theme="dark"] .auth-modal__forgot-link:hover {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .auth-modal__close-btn {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .auth-modal__close-btn:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .auth-modal__bottom-bar {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text-muted) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .auth-modal__qr-image {
+  background: #ffffff !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* ── main/admin-auth-modal.css ───────────────────────────── */
+:root[data-theme="dark"] .admin-auth-modal__badge {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .admin-auth-modal__submit-btn {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+:root[data-theme="dark"] .admin-auth-modal__submit-btn:hover {
+  filter: brightness(1.1) !important;
+}
+
+/* ── contest/contest-list-page.css 보강 ─────────────────── */
+:root[data-theme="dark"] .Contest-Detail-Banner,
+:root[data-theme="dark"] .Contest-Detail-BannerImage {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+:root[data-theme="dark"] .Contest-Detail-Header,
+:root[data-theme="dark"] .Contest-Detail-HeaderInfo,
+:root[data-theme="dark"] .Contest-Detail-Host {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Contest-Detail-Avatar {
+  background: var(--bd-color-bg-subtle) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Contest-Detail-DescSection,
+:root[data-theme="dark"] .Contest-Detail-InfoGroup {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Contest-Detail-DescTitle {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Contest-Detail-DescText,
+:root[data-theme="dark"] .Contest-Detail-InfoLabel {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Contest-Detail-InfoValue,
+:root[data-theme="dark"] .Contest-Detail-InfoRow {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Contest-Detail-Divider {
+  background: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Contest-Detail-ButtonGroup {
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Contest-Detail-ApplyBtn {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+:root[data-theme="dark"] .Contest-Detail-ApplyBtn:hover {
+  filter: brightness(1.1) !important;
+}
+
+:root[data-theme="dark"] .Contest-Detail-BookmarkBtn {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Contest-Detail-BookmarkBtn:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .Contest-Detail-BookmarkBtn--active {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+/* ── error/404.css ───────────────────────────────────────── */
+:root[data-theme="dark"] .Error-Page,
+:root[data-theme="dark"] .Error-Container,
+:root[data-theme="dark"] .Error-Illustration {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Error-Code,
+:root[data-theme="dark"] .Error-Title {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Error-Description,
+:root[data-theme="dark"] .Error-Help-Text {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Error-Icon-Circle,
+:root[data-theme="dark"] .Error-Icon-Group {
+  background: var(--bd-color-bg-subtle) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Error-Button-Primary {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+:root[data-theme="dark"] .Error-Button-Primary:hover {
+  filter: brightness(1.1) !important;
+}
+
+:root[data-theme="dark"] .Error-Button-Outline {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border-strong) !important;
+}
+
+:root[data-theme="dark"] .Error-Button-Outline:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .Error-Help {
+  background: var(--bd-color-bg-subtle) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Error-Help-Link {
+  color: var(--bd-color-link) !important;
+}
+
+:root[data-theme="dark"] .Error-Help-Link:hover {
+  color: var(--bd-color-text) !important;
+}
+
+/* ── downloads/downloads.css ─────────────────────────────── */
+:root[data-theme="dark"] .Downloads-Alert-Container,
+:root[data-theme="dark"] .Downloads-Alert-Content,
+:root[data-theme="dark"] .Downloads-Alert-TextWrap {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Alert-Heading span {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Alert-Body span {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Alert-Action,
+:root[data-theme="dark"] .Downloads-Button-Text {
+  color: var(--bd-color-link) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Button-Outline {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border-strong) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Button-Outline:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Button-Feedback,
+:root[data-theme="dark"] .Downloads-Button-Feedback-Fill {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Filter-Bar {
+  background: var(--bd-color-bg) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Filter-Btn {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Filter-Btn:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Filter-Btn--active {
+  background: var(--bd-color-text) !important;
+  color: var(--bd-color-bg) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Filter-Btn--active:hover {
+  background: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Channel-Name {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Channel-Name:hover {
+  color: var(--bd-color-link) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Menu-Button {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Menu-Button:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Empty-State,
+:root[data-theme="dark"] .Downloads-Empty-Message,
+:root[data-theme="dark"] .Downloads-Empty-Text {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Empty-Image {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+/* ============================================================
+   Phase 4 — Spot fixes from screenshots
+   gallery-register modal / workdetail actions / work-register buttons / profile card actions
+   ============================================================ */
+
+/* ── 1. gallery-register page (이미지 업로드 모달) ───────── */
+:root[data-theme="dark"] body.gallery-register-page,
+:root[data-theme="dark"] .gallery-register-page {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] body.gallery-register-page .modal,
+:root[data-theme="dark"] body.gallery-register-page .modal-head,
+:root[data-theme="dark"] body.gallery-register-page .modal-body,
+:root[data-theme="dark"] body.gallery-register-page .modal-foot {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] body.gallery-register-page .modal-title,
+:root[data-theme="dark"] body.gallery-register-page .label,
+:root[data-theme="dark"] body.gallery-register-page .inner-label {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] body.gallery-register-page .field-wrap,
+:root[data-theme="dark"] body.gallery-register-page .input-box {
+  background: var(--bd-color-input-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] body.gallery-register-page input,
+:root[data-theme="dark"] body.gallery-register-page textarea {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] body.gallery-register-page input::placeholder,
+:root[data-theme="dark"] body.gallery-register-page textarea::placeholder {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] body.gallery-register-page .count {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] body.gallery-register-page .icon-btn {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] body.gallery-register-page .icon-btn:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] body.gallery-register-page .main-btn {
+  background: var(--bd-color-text) !important;
+  color: var(--bd-color-bg) !important;
+}
+
+/* 이미지 업로드 dropzone — 흰 박스 형태의 모든 컨테이너 톤 다운 */
+:root[data-theme="dark"] body.gallery-register-page [class*="upload"],
+:root[data-theme="dark"] body.gallery-register-page [class*="dropzone"],
+:root[data-theme="dark"] body.gallery-register-page [class*="cover"],
+:root[data-theme="dark"] body.gallery-register-page .thumb-preview,
+:root[data-theme="dark"] body.gallery-register-page .thumb-btn {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text-muted) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* ── 2. workdetail.css 우측 액션 사이드바 (.actions/.action/.bubble) ── */
+:root[data-theme="dark"] .actions {
+  background: transparent !important;
+}
+
+:root[data-theme="dark"] .action {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .action span:last-child {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bubble {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .action:hover .bubble {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .bubble svg {
+  fill: currentColor !important;
+}
+
+:root[data-theme="dark"] .action.is-active .bubble {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+  border-color: var(--bd-color-accent) !important;
+}
+
+/* ── 3. work-register AI/파일 버튼 ───────────────────────── */
+:root[data-theme="dark"] .select-file-button {
+  background: var(--bd-color-text) !important;
+  color: var(--bd-color-bg) !important;
+  border-color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .select-file-button:hover {
+  background: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .upload-ai-button {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border-strong) !important;
+}
+
+:root[data-theme="dark"] .upload-ai-button:hover {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-accent) !important;
+}
+
+/* ── 4. profile 카드 / 액션 버튼 ─────────────────────────── */
+:root[data-theme="dark"] .videoCard,
+:root[data-theme="dark"] .videoSection {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .videoTitle {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .videoMeta,
+:root[data-theme="dark"] .videoEmpty {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .videoThumb,
+:root[data-theme="dark"] .videoThumbMedia {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+:root[data-theme="dark"] .moreBtn,
+:root[data-theme="dark"] .shareBtn,
+:root[data-theme="dark"] .tabBtn,
+:root[data-theme="dark"] .filterBtn {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .moreBtn:hover,
+:root[data-theme="dark"] .shareBtn:hover,
+:root[data-theme="dark"] .tabBtn:hover,
+:root[data-theme="dark"] .filterBtn:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .filterBtn.is-active,
+:root[data-theme="dark"] .tabBtn.is-active {
+  background: var(--bd-color-text) !important;
+  color: var(--bd-color-bg) !important;
+  border-color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .subscribeBtn {
+  background: var(--bd-color-text) !important;
+  color: var(--bd-color-bg) !important;
+  border-color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .subscribeBtn:hover {
+  background: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .subscribeBtn.is-subscribed {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .subscribeBtn.is-subscribed:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .more {
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* unsubscribe 모달 */
+:root[data-theme="dark"] .unsubscribeModalPanel {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .unsubscribeModalTitle,
+:root[data-theme="dark"] .unsubscribeModalText,
+:root[data-theme="dark"] .unsubscribeModalHeader {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .unsubscribeModalButtonGhost {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .unsubscribeModalButtonGhost:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .unsubscribeModalButtonPrimary {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+/* work-share-modal (프로필에서 공유 모달) */
+:root[data-theme="dark"] .work-share-modal,
+:root[data-theme="dark"] .work-share-modal__header,
+:root[data-theme="dark"] .work-share-modal__footer {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-share-modal__title,
+:root[data-theme="dark"] .work-share-modal__label {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-share-modal__message,
+:root[data-theme="dark"] .work-share-modal__receiver,
+:root[data-theme="dark"] .work-share-modal__receiver-body {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .work-share-modal__close {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-share-modal__close:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .work-share-modal__link-row,
+:root[data-theme="dark"] .work-share-modal__link-input,
+:root[data-theme="dark"] .work-share-modal__search {
+  background: var(--bd-color-input-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-share-modal__link-copy,
+:root[data-theme="dark"] .work-share-modal__send {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+:root[data-theme="dark"] .work-share-modal__chips {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+/* ============================================================
+   Phase 5 — workdetail comprehensive dark mode
+   page / info / channel / thumb / comments / anchored / pivot
+   report-modal / Auction-Modal / BidHistory / Countdown / snackbar
+   work-share-modal 보강
+   ============================================================ */
+
+/* ── workdetail page level ───────────────────────────────── */
+:root[data-theme="dark"] .workdetail-shell,
+:root[data-theme="dark"] .workdetail-page,
+:root[data-theme="dark"] .workdetail-stage,
+:root[data-theme="dark"] .page-stack,
+:root[data-theme="dark"] .page,
+:root[data-theme="dark"] .view,
+:root[data-theme="dark"] .media-cluster {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .media,
+:root[data-theme="dark"] .info,
+:root[data-theme="dark"] .left-meta,
+:root[data-theme="dark"] .card {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .headline,
+:root[data-theme="dark"] .name {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .sub,
+:root[data-theme="dark"] .desc {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .desc-box,
+:root[data-theme="dark"] .desc-head {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .facts,
+:root[data-theme="dark"] .fact {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .fact-l {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .fact-v {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .made,
+:root[data-theme="dark"] .made-head,
+:root[data-theme="dark"] .made-title,
+:root[data-theme="dark"] .made-text {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .made-link {
+  color: var(--bd-color-link) !important;
+}
+
+:root[data-theme="dark"] .channel,
+:root[data-theme="dark"] .channel-box {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .workdetail-tags {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* ── thumb 영역 (썸네일/비디오 컨트롤) ───────────────────── */
+:root[data-theme="dark"] .thumb {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+:root[data-theme="dark"] .thumb-controls,
+:root[data-theme="dark"] .thumb-controls-group,
+:root[data-theme="dark"] .thumb-controls-group-left,
+:root[data-theme="dark"] .thumb-controls-group-right,
+:root[data-theme="dark"] .thumb-volume-wrap {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .thumb-volume-panel {
+  background: rgba(0, 0, 0, 0.6) !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .thumb-control-button,
+:root[data-theme="dark"] .thumb-control-button-dark,
+:root[data-theme="dark"] .thumb-control-button-bookmark {
+  background: transparent !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .thumb-control-button:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+}
+
+:root[data-theme="dark"] .thumb-more-menu {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .thumb-more-menu-item {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .thumb-more-menu-item:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .thumb-more-menu-item-danger {
+  color: #e53935 !important;
+}
+
+:root[data-theme="dark"] .thumb-more-menu-item-danger:hover {
+  background: rgba(229, 57, 53, 0.16) !important;
+}
+
+:root[data-theme="dark"] .thumb-more-menu-icon {
+  color: currentColor !important;
+}
+
+/* ── navigation 버튼 (위/아래 이동) ──────────────────────── */
+:root[data-theme="dark"] .navigation-button,
+:root[data-theme="dark"] .navigation-button-up,
+:root[data-theme="dark"] .navigation-button-down,
+:root[data-theme="dark"] .shorts-navigation {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .navigation-button:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+/* ── comments-panel (댓글창) ⭐ ──────────────────────────── */
+:root[data-theme="dark"] .comments-panel,
+:root[data-theme="dark"] .comments-panel-body,
+:root[data-theme="dark"] .comments-panel-header,
+:root[data-theme="dark"] .comments-panel-title-wrap {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .comments-panel-title,
+:root[data-theme="dark"] .comments-panel-count {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .comments-panel-close {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .comments-panel-close:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .comments-list {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .cp-box,
+:root[data-theme="dark"] .cp-input-wrap {
+  background: var(--bd-color-input-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .cp-input {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .cp-input::placeholder {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .cp-av {
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .cp-submit {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+/* ── anchored-panel (고정 패널) ──────────────────────────── */
+:root[data-theme="dark"] .anchored-panel,
+:root[data-theme="dark"] .anchored-panel-body,
+:root[data-theme="dark"] .anchored-panel-header,
+:root[data-theme="dark"] .anchored-panel-title-wrap {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .anchored-panel-title,
+:root[data-theme="dark"] .anchored-panel-headline {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .anchored-panel-description {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .anchored-panel-close {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .anchored-panel-close:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+/* ── pivot-panel + pivot-gallery (관련 갤러리/작품) ─────── */
+:root[data-theme="dark"] .pivot-panel,
+:root[data-theme="dark"] .pivot-panel-body,
+:root[data-theme="dark"] .pivot-panel-header,
+:root[data-theme="dark"] .pivot-panel-title-wrap {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .pivot-panel-title {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .pivot-panel-close {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .pivot-panel-close:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .pivot,
+:root[data-theme="dark"] .pivot-grid {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .pivot-gallery-cover,
+:root[data-theme="dark"] .pivot-gallery-avatar {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+:root[data-theme="dark"] .pivot-gallery-header,
+:root[data-theme="dark"] .pivot-gallery-title {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .pivot-gallery-artist,
+:root[data-theme="dark"] .pivot-gallery-count,
+:root[data-theme="dark"] .pivot-gallery-meta-row,
+:root[data-theme="dark"] .pivot-gallery-copy {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .pivot-gallery-divider {
+  background: var(--bd-color-border) !important;
+}
+
+/* ── report-modal (신고 모달) ────────────────────────────── */
+:root[data-theme="dark"] .report-modal-dialog,
+:root[data-theme="dark"] .report-modal-body,
+:root[data-theme="dark"] .report-modal-header,
+:root[data-theme="dark"] .report-modal-footer,
+:root[data-theme="dark"] .report-modal-step,
+:root[data-theme="dark"] .report-modal-step-confirmation,
+:root[data-theme="dark"] .report-modal-body-confirmation,
+:root[data-theme="dark"] .report-modal-header-spacer {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .report-modal-backdrop {
+  background: var(--bd-color-overlay) !important;
+}
+
+:root[data-theme="dark"] .report-modal-title,
+:root[data-theme="dark"] .report-modal-heading {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .report-modal-copy,
+:root[data-theme="dark"] .report-modal-copy-centered {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .report-modal-close {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .report-modal-close:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .report-modal-reasons,
+:root[data-theme="dark"] .report-modal-reason {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .report-modal-reason:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .report-modal-button {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .report-modal-button-next,
+:root[data-theme="dark"] .report-modal-button-confirm {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+:root[data-theme="dark"] .report-modal-image {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+/* ── Auction-Modal (거래하기 모달) ⭐ ───────────────────── */
+:root[data-theme="dark"] .Auction-Modal,
+:root[data-theme="dark"] .Auction-Modal-Body,
+:root[data-theme="dark"] .Auction-Modal-Footer {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Auction-Modal-Backdrop {
+  background: var(--bd-color-overlay) !important;
+}
+
+:root[data-theme="dark"] .Auction-Modal-Message {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Auction-Modal-Btn {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Auction-Modal-Btn--cancel {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Auction-Modal-Btn--cancel:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .Auction-Modal-Btn--confirm {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+  border-color: var(--bd-color-accent) !important;
+}
+
+:root[data-theme="dark"] .Auction-Modal-Btn--confirm:hover {
+  filter: brightness(1.1) !important;
+}
+
+/* ── Auction-BidHistory (입찰 히스토리) ──────────────────── */
+:root[data-theme="dark"] .Auction-BidHistory-Header,
+:root[data-theme="dark"] .Auction-BidHistory-List,
+:root[data-theme="dark"] .Auction-BidHistory-Title,
+:root[data-theme="dark"] .Auction-BidHistory-Count {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Auction-BidHistory-Empty {
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* ── Auction-Countdown ──────────────────────────────────── */
+:root[data-theme="dark"] .Auction-Countdown-Wrap,
+:root[data-theme="dark"] .Auction-Countdown-Timer {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Auction-Countdown-Label,
+:root[data-theme="dark"] .Auction-Countdown-Deadline {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Auction-Cd-Num,
+:root[data-theme="dark"] .Auction-Cd-Lbl,
+:root[data-theme="dark"] .Auction-Cd-Sep,
+:root[data-theme="dark"] .Auction-Cd-Unit {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Auction-Live-Dot {
+  background: #e53935 !important;
+}
+
+/* ── Auction-Bid 추가 보강 (텍스트 + 아이템) ───────────── */
+:root[data-theme="dark"] .Auction-Bid-Title,
+:root[data-theme="dark"] .Auction-Bid-TitleText,
+:root[data-theme="dark"] .Auction-Bid-Username,
+:root[data-theme="dark"] .Auction-Bid-Text {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Auction-Bid-Item {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Auction-Bid-SubmitBtn-Amount {
+  color: var(--bd-color-accent-text) !important;
+}
+
+/* ── Auction-Toast / work-snackbar ──────────────────────── */
+:root[data-theme="dark"] .Auction-Toast,
+:root[data-theme="dark"] .Auction-Toast-Message,
+:root[data-theme="dark"] .work-snackbar {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-snackbar__message {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-snackbar__action {
+  color: var(--bd-color-link) !important;
+}
+
+/* ── work-share-modal 추가 보강 (X 버튼 + 회원 색깔) ──── */
+:root[data-theme="dark"] .work-share-modal-backdrop,
+:root[data-theme="dark"] .work-share-modal-overlay {
+  background: var(--bd-color-overlay) !important;
+}
+
+:root[data-theme="dark"] .work-share-modal__list {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-share-modal__list .name,
+:root[data-theme="dark"] .work-share-modal__list .username,
+:root[data-theme="dark"] .work-share-modal__list .nickname,
+:root[data-theme="dark"] .work-share-modal__list [class*="member"],
+:root[data-theme="dark"] .work-share-modal__list [class*="user"] {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-share-modal__spacer {
+  background: var(--bd-color-border) !important;
+}
+
+/* ============================================================
+   Phase 6 — workdetail spot fixes
+   work-trade-modal / work-auction-modal close / pay-status
+   info·channel·left-meta·media 톤 통일 (페이지 배경에 맞춤)
+   ============================================================ */
+
+/* ── info / channel / left-meta / media 배경을 페이지와 동일 톤으로 ── */
+:root[data-theme="dark"] .info,
+:root[data-theme="dark"] .channel-box,
+:root[data-theme="dark"] .channel,
+:root[data-theme="dark"] .left-meta,
+:root[data-theme="dark"] .media {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: transparent !important;
+}
+
+:root[data-theme="dark"] .channel .name {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .channel .sub {
+  background: var(--bd-color-text) !important;
+  color: var(--bd-color-bg) !important;
+  border: 0 !important;
+}
+
+:root[data-theme="dark"] .channel .sub:hover {
+  background: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .avatar {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* ── work-trade-modal (거래하기 모달) ───────────────────── */
+:root[data-theme="dark"] .work-trade-modal {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-trade-modal__header {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-trade-modal__title {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-trade-modal__close {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-trade-modal__close:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .work-trade-modal__close svg {
+  fill: currentColor !important;
+}
+
+:root[data-theme="dark"] .work-trade-modal__body {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-trade-modal__copy {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .work-trade-modal__action {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+  border: 0 !important;
+}
+
+:root[data-theme="dark"] .work-trade-modal__action:hover {
+  filter: brightness(1.1) !important;
+}
+
+/* ── work-auction-modal close 버튼 (+ 호버) ─────────────── */
+:root[data-theme="dark"] .work-auction-modal__close {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-auction-modal__close:hover {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-auction-modal__close svg {
+  fill: currentColor !important;
+}
+
+/* ── pay-status (거래 상태 카드) ─────────────────────────── */
+:root[data-theme="dark"] .pay-status,
+:root[data-theme="dark"] .pay-status__item {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .pay-status__label {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .pay-status__value {
+  color: var(--bd-color-text) !important;
+}
+
+/* ============================================================
+   Phase 7 — Additional spot fixes
+   work-share-user / work-share-chip / thumb-btn-main / tag-field
+   sub-btn / selected-artwork-links
+   ============================================================ */
+
+/* ── work-share-user (공유 모달 회원 리스트 항목) ───────── */
+:root[data-theme="dark"] .work-share-user {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-share-user:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .work-share-user.is-selected {
+  background: var(--bd-color-bg-hover) !important;
+  border-color: var(--bd-color-accent) !important;
+}
+
+:root[data-theme="dark"] .work-share-user__avatar {
+  background: var(--bd-color-bg-subtle) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-share-user__meta strong {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-share-user__meta small {
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* ── work-share-chip (선택된 회원 칩 + × 제거 버튼) ────── */
+:root[data-theme="dark"] .work-share-chip {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-share-chip button,
+:root[data-theme="dark"] .work-share-chip [data-share-remove] {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+  border: 0 !important;
+}
+
+:root[data-theme="dark"] .work-share-chip button:hover,
+:root[data-theme="dark"] .work-share-chip [data-share-remove]:hover {
+  color: var(--bd-color-text) !important;
+  background: var(--bd-color-bg-hover) !important;
+}
+
+/* ── thumb-btn-main (갤러리 등록 이미지 업로드 박스) ⭐ ── */
+:root[data-theme="dark"] .thumb-btn-main,
+:root[data-theme="dark"] .thumb-btn {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text-muted) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .thumb-btn-main:hover,
+:root[data-theme="dark"] .thumb-btn:hover {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-accent) !important;
+}
+
+:root[data-theme="dark"] .thumb-icon,
+:root[data-theme="dark"] .thumb-icon svg {
+  color: var(--bd-color-text-muted) !important;
+  fill: currentColor !important;
+}
+
+:root[data-theme="dark"] .thumb-btn-text {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .thumb-guide {
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* ── tag-field (태그 입력 필드) ─────────────────────────── */
+:root[data-theme="dark"] .tag-field,
+:root[data-theme="dark"] .tag-box {
+  background: var(--bd-color-input-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .tag-input {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .tag-input::placeholder {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .tag-list {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .tag-suggestions {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* ── sub-btn (서브 액션 버튼: 작품 추가 등) ─────────────── */
+:root[data-theme="dark"] .sub-btn {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border-strong) !important;
+}
+
+:root[data-theme="dark"] .sub-btn:hover {
+  background: var(--bd-color-bg-hover) !important;
+  border-color: var(--bd-color-accent) !important;
+}
+
+/* ── selected-artwork-links (선택된 작품 링크 박스) ────── */
+:root[data-theme="dark"] .selected-artwork-links {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .selected-artwork-empty {
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* ── tabBtn 보강 (.is-active 단계 강조) ─────────────────── */
+:root[data-theme="dark"] a.tabBtn.is-active,
+:root[data-theme="dark"] .tabBtn.is-active {
+  background: var(--bd-color-text) !important;
+  color: var(--bd-color-bg) !important;
+  border-color: var(--bd-color-text) !important;
+}
+
+/* ============================================================
+   Phase 8 — thumb area & link meta dark mode
+   thumb-area / thumb-pick / thumb-card / thumb-link-meta
+   thumb-meta-row / thumb-meta-label / thumb-meta-link-row
+   thumb-copy-button / thumb-copy-tooltip
+   ============================================================ */
+
+/* ── thumb-area / thumb-pick (썸네일 업로드 카드 컨테이너) ── */
+:root[data-theme="dark"] .thumb-area,
+:root[data-theme="dark"] .thumb-pick,
+:root[data-theme="dark"] .thumb-card {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .thumb-btn.is-filled {
+  background: var(--bd-color-bg-elevated) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .thumb-btn.is-filled .thumb-btn-main {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+/* ── thumb-link-meta (링크 표시 행) ──────────────────────── */
+:root[data-theme="dark"] .thumb-link-meta {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .thumb-meta-row {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .thumb-meta-label {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .thumb-meta-link-row {
+  background: var(--bd-color-bg-subtle) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .thumb-meta-link-row a,
+:root[data-theme="dark"] #galleryLinkUrl {
+  color: var(--bd-color-link) !important;
+}
+
+:root[data-theme="dark"] .thumb-meta-link-row a:hover,
+:root[data-theme="dark"] #galleryLinkUrl:hover {
+  color: var(--bd-color-text) !important;
+}
+
+/* ── thumb-copy-button (링크 복사 아이콘 버튼 + 툴팁) ──── */
+:root[data-theme="dark"] .thumb-copy-button {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+  border: 0 !important;
+}
+
+:root[data-theme="dark"] .thumb-copy-button:hover {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .thumb-copy-button svg {
+  fill: currentColor !important;
+}
+
+:root[data-theme="dark"] .thumb-copy-tooltip {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+/* ── tabBtn.is-active 추가 강조 (a 태그 + 다중 공백 변형) ── */
+:root[data-theme="dark"] a.tabBtn,
+:root[data-theme="dark"] .tabBtn[href] {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] a.tabBtn:hover,
+:root[data-theme="dark"] .tabBtn[href]:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] a.tabBtn.is-active,
+:root[data-theme="dark"] .tabBtn[href].is-active {
+  background: var(--bd-color-text) !important;
+  color: var(--bd-color-bg) !important;
+  border-color: var(--bd-color-text) !important;
+}
+
+/* ============================================================
+   Phase 9 — tabBtn 최종 fix
+   원래 텍스트 메뉴 (배경 없음, 밑줄 효과로 활성 표시)
+   Phase 4의 elevated 배경 처리 덮어쓰기
+   ============================================================ */
+
+:root[data-theme="dark"] .tabRow .tabBtn,
+:root[data-theme="dark"] a.tabBtn,
+:root[data-theme="dark"] .tabBtn[href],
+:root[data-theme="dark"] .tabBtn {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+  border: 0 !important;
+  border-color: transparent !important;
+}
+
+:root[data-theme="dark"] .tabRow .tabBtn:hover,
+:root[data-theme="dark"] a.tabBtn:hover,
+:root[data-theme="dark"] .tabBtn[href]:hover,
+:root[data-theme="dark"] .tabBtn:hover {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border: 0 !important;
+}
+
+:root[data-theme="dark"] .tabRow .tabBtn.is-active,
+:root[data-theme="dark"] a.tabBtn.is-active,
+:root[data-theme="dark"] .tabBtn[href].is-active,
+:root[data-theme="dark"] .tabBtn.is-active {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border: 0 !important;
+  border-color: transparent !important;
+}
+
+/* 활성 상태의 밑줄(::after)은 원본 var(--color-primary) 그대로 사용 */
+
+/* ============================================================
+   Phase 10 — profile setting / edit / form modals
+   profileSettingModal* / profileEditModal* / profileForm*
+   work-share-modal__receiver-body 보더 fix
+   ============================================================ */
+
+/* ── profileSettingModal (프로필 설정 메뉴 모달) ────────── */
+:root[data-theme="dark"] .profileSettingModalPanel {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .profileSettingModalHeader {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .profileSettingModalTitle {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .profileSettingModalClose {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border: 0 !important;
+}
+
+:root[data-theme="dark"] .profileSettingModalClose:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .profileSettingModalList {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .profileSettingModalItem {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border-bottom: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .profileSettingModalItem:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+/* ── profileEditModal (프로필 수정 모달) ────────────────── */
+:root[data-theme="dark"] .profileEditModalPanel {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .profileEditModalBody {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .profileEditPreview {
+  background: var(--bd-color-bg-subtle) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .profileEditUpload {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border-strong) !important;
+}
+
+:root[data-theme="dark"] .profileEditUpload:hover {
+  background: var(--bd-color-bg-hover) !important;
+  border-color: var(--bd-color-accent) !important;
+}
+
+:root[data-theme="dark"] .profileEditReset {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .profileEditReset:hover {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .profileEditActionRow,
+:root[data-theme="dark"] .profileFormActionRow {
+  background: transparent !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* ── profileForm (닉네임·비밀번호 폼) ────────────────────── */
+:root[data-theme="dark"] .profileFormBody {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .profileFormLabel {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .profileFormInput {
+  background: var(--bd-color-input-bg) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .profileFormInput::placeholder {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .profileFormInput:focus {
+  border-color: var(--bd-color-accent) !important;
+  outline: none !important;
+}
+
+/* ── profileFormBtn (취소/저장 버튼) ────────────────────── */
+:root[data-theme="dark"] .profileFormBtn {
+  border: 1px solid var(--bd-color-border) !important;
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .profileFormBtnGhost {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .profileFormBtnGhost:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .profileFormBtnPrimary {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+  border-color: var(--bd-color-accent) !important;
+}
+
+:root[data-theme="dark"] .profileFormBtnPrimary:hover {
+  filter: brightness(1.1) !important;
+}
+
+/* ── work-share-modal__receiver-body 보더 fix ───────────── */
+:root[data-theme="dark"] .work-share-modal__receiver-body {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-share-modal__receiver-body * {
+  border-color: var(--bd-color-border) !important;
+}
+
+/* ============================================================
+   Phase 11 — gallery-detail hero/scrim 명시적 보존
+   다크모드에서 우측 cover 이미지가 사라지는 문제 fix
+   ============================================================ */
+
+/* promo-panel — 원본 box 유지 */
+:root[data-theme="dark"] .gallery-promo-panel,
+:root[data-theme="dark"] ytd-default-promo-panel-renderer {
+  background-color: #000 !important;
+  width: 100% !important;
+  height: 420px !important;
+  display: flex !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* hero (우측 cover 이미지 영역) — 가시성·위치·크기 강제 보존 */
+:root[data-theme="dark"] #hero,
+:root[data-theme="dark"] .gallery-hero {
+  display: block !important;
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  width: 70% !important;
+  height: 100% !important;
+  background-color: transparent !important;
+  background-size: cover !important;
+  background-position: center !important;
+  z-index: 1 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.18) 18%, rgba(0,0,0,0.72) 34%, black 48%) !important;
+  mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.18) 18%, rgba(0,0,0,0.72) 34%, black 48%) !important;
+}
+
+/* scrim — 살짝의 어두운 오버레이 유지, hero 위에 깔리되 콘텐츠 위는 아님 */
+:root[data-theme="dark"] #scrim,
+:root[data-theme="dark"] .gallery-scrim {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: rgba(0, 0, 0, 0.1) !important;
+  z-index: 2 !important;
+  pointer-events: none !important;
+}
+
+/* promo-content (좌측 텍스트) — 검정 배경 transparent 유지 */
+:root[data-theme="dark"] #content.ytd-default-promo-panel-renderer,
+:root[data-theme="dark"] .gallery-promo-content {
+  position: relative !important;
+  z-index: 3 !important;
+  background-color: transparent !important;
+  color: #ffffff !important;
+}
+
+/* 모바일 — 마스크 방향만 변경 (원본 동작 유지) */
+@media (max-width: 1024px) {
+  :root[data-theme="dark"] #hero,
+  :root[data-theme="dark"] .gallery-hero {
+    width: 100% !important;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 50%) !important;
+    mask-image: linear-gradient(to bottom, transparent 0%, black 50%) !important;
+  }
+}
+
+/* ============================================================
+   Phase 12 — bd-shell__guide-link.is-active 강조 복구
+   light: 검정 배경 + 흰 텍스트
+   dark : 흰 배경 + 검정 텍스트 (반전 강조)
+   ============================================================ */
+
+/* Light mode — 사이드바 active 메뉴 강조 */
+.bd-shell__guide-link.is-active {
+  background: var(--bd-shell-active, #0f0f0f) !important;
+  color: var(--bd-shell-active-text, #ffffff) !important;
+  font-weight: 600 !important;
+}
+
+.bd-shell__guide-link.is-active .bd-shell__guide-icon,
+.bd-shell__guide-link.is-active svg {
+  color: var(--bd-shell-active-text, #ffffff) !important;
+  fill: currentColor !important;
+}
+
+/* Dark mode — 반전 강조 */
+:root[data-theme="dark"] .bd-shell__guide-link.is-active {
+  background: var(--bd-color-text) !important;
+  color: var(--bd-color-bg) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__guide-link.is-active .bd-shell__guide-icon,
+:root[data-theme="dark"] .bd-shell__guide-link.is-active svg {
+  color: var(--bd-color-bg) !important;
+  fill: currentColor !important;
+}
+
+/* ============================================================
+   Phase 13 — comment-action-menu (댓글 수정/삭제 드롭다운)
+   ============================================================ */
+
+:root[data-theme="dark"] .comment-action-menu {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+  box-shadow: 0 4px 16px var(--bd-color-shadow) !important;
+}
+
+:root[data-theme="dark"] .comment-action-item {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border: 0 !important;
+}
+
+:root[data-theme="dark"] .comment-action-item:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+/* 삭제(위험 액션)는 빨강 강조 */
+:root[data-theme="dark"] .comment-action-item[data-role="comment-delete"] {
+  color: #ff6b6b !important;
+}
+
+:root[data-theme="dark"] .comment-action-item[data-role="comment-delete"]:hover {
+  background: rgba(229, 57, 53, 0.16) !important;
+  color: #ff8a85 !important;
+}
+
+/* ============================================================
+   Phase 14 — comment inline buttons + cm-mn (댓글 메뉴 토글)
+   ============================================================ */
+
+/* 인라인 댓글 액션 버튼 (취소/저장 등) */
+:root[data-theme="dark"] .comment-inline-button {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .comment-inline-button:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+/* ghost 버전 (취소처럼 보조) */
+:root[data-theme="dark"] .comment-inline-button--ghost {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .comment-inline-button--ghost:hover {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+/* primary 버전 (저장 같은 강조) */
+:root[data-theme="dark"] .comment-inline-button--primary {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+  border-color: var(--bd-color-accent) !important;
+}
+
+:root[data-theme="dark"] .comment-inline-button--primary:hover {
+  filter: brightness(1.1) !important;
+}
+
+/* cm-mn (댓글 ⋯ 메뉴 토글 버튼) */
+:root[data-theme="dark"] .cm-mn {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+  border: 0 !important;
+}
+
+:root[data-theme="dark"] .cm-mn:hover {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .cm-mn[aria-expanded="true"] {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .cm-mn svg {
+  fill: currentColor !important;
+}
+
+/* ============================================================
+   Phase 15 — Mass dark mode coverage (487 → ~0)
+   안전한 BEM/prefix 컴포넌트만 일괄 처리
+   ============================================================ */
+
+/* ── Contest 컴포넌트 보강 ───────────────────────────────── */
+:root[data-theme="dark"] .Contest-Detail-Inner,
+:root[data-theme="dark"] .Contest-Detail-Title,
+:root[data-theme="dark"] .Contest-Detail-Tag,
+:root[data-theme="dark"] .Contest-Detail-TagTitle,
+:root[data-theme="dark"] .Contest-Detail-Prize,
+:root[data-theme="dark"] .Contest-Item-Channel,
+:root[data-theme="dark"] .Contest-Item-Date,
+:root[data-theme="dark"] .Contest-Item-Index,
+:root[data-theme="dark"] .Contest-Item-Separator,
+:root[data-theme="dark"] .Contest-List-Item--active,
+:root[data-theme="dark"] .Contest-Thumbnail-Link {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Contest-Detail-ReportBtn,
+:root[data-theme="dark"] .Contest-Detail-ShareBtn,
+:root[data-theme="dark"] .Contest-Item-MenuBtn,
+:root[data-theme="dark"] .Contest-Filter-Btn--toggle {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Contest-Detail-ReportBtn:hover,
+:root[data-theme="dark"] .Contest-Detail-ShareBtn:hover,
+:root[data-theme="dark"] .Contest-Item-MenuBtn:hover,
+:root[data-theme="dark"] .Contest-Filter-Btn--toggle:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .Contest-Filter-Divider {
+  background: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Contest-Detail-Status,
+:root[data-theme="dark"] .Contest-Detail-Status--open {
+  background: rgba(0, 168, 107, 0.18) !important;
+  color: #6ee7b7 !important;
+}
+
+:root[data-theme="dark"] .Contest-Detail-Status--closing {
+  background: rgba(255, 159, 0, 0.18) !important;
+  color: #ffd28a !important;
+}
+
+:root[data-theme="dark"] .Contest-Detail-Status--closed {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Contest-List-Spinner {
+  border-color: var(--bd-color-border) !important;
+  border-top-color: var(--bd-color-accent) !important;
+}
+
+/* ── Dashboard 컴포넌트 보강 ─────────────────────────────── */
+:root[data-theme="dark"] .Dashboard-AccentValue,
+:root[data-theme="dark"] .Dashboard-Block,
+:root[data-theme="dark"] .Dashboard-BootpayBox,
+:root[data-theme="dark"] .Dashboard-CardHead,
+:root[data-theme="dark"] .Dashboard-CardPreview,
+:root[data-theme="dark"] .Dashboard-CardRow,
+:root[data-theme="dark"] .Dashboard-CardRowMeta,
+:root[data-theme="dark"] .Dashboard-DataList,
+:root[data-theme="dark"] .Dashboard-DataListBody,
+:root[data-theme="dark"] .Dashboard-DataListHead,
+:root[data-theme="dark"] .Dashboard-DataRow,
+:root[data-theme="dark"] .Dashboard-DateLabel,
+:root[data-theme="dark"] .Dashboard-DateRange,
+:root[data-theme="dark"] .Dashboard-DetailItem,
+:root[data-theme="dark"] .Dashboard-StackRow,
+:root[data-theme="dark"] .Dashboard-StackRows,
+:root[data-theme="dark"] .Dashboard-Table,
+:root[data-theme="dark"] .Dashboard-TableHint,
+:root[data-theme="dark"] .Dashboard-TableWrap {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-Muted {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-AccentValue {
+  color: var(--bd-color-accent) !important;
+  background: transparent !important;
+}
+
+:root[data-theme="dark"] .Dashboard-Rule {
+  background: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-Chip {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-Tab {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+  border-bottom: 2px solid transparent !important;
+}
+
+:root[data-theme="dark"] .Dashboard-Tab:hover {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-Segment {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-Input {
+  background: var(--bd-color-input-bg) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-Input::placeholder {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-IconButton,
+:root[data-theme="dark"] .Dashboard-TextButton,
+:root[data-theme="dark"] .Dashboard-TextButton--link {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border: 0 !important;
+}
+
+:root[data-theme="dark"] .Dashboard-IconButton:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-TextButton--link {
+  color: var(--bd-color-link) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-TextButton--danger {
+  color: #ff6b6b !important;
+}
+
+:root[data-theme="dark"] .Dashboard-TonalButton--blue {
+  background: rgba(62, 166, 255, 0.18) !important;
+  color: #82c8ff !important;
+}
+
+:root[data-theme="dark"] .Dashboard-TonalButton--danger {
+  background: rgba(229, 57, 53, 0.18) !important;
+  color: #ff8a85 !important;
+}
+
+:root[data-theme="dark"] .Dashboard-StatusBadge {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-StatusBadge--soft {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-StatusBadge--pending {
+  background: rgba(255, 159, 0, 0.18) !important;
+  color: #ffd28a !important;
+}
+
+:root[data-theme="dark"] .Dashboard-StatusBadge--danger {
+  background: rgba(229, 57, 53, 0.18) !important;
+  color: #ff8a85 !important;
+}
+
+:root[data-theme="dark"] .Dashboard-PaymentBadge {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-PaymentMeta {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-BarTrack {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-BarFill {
+  background: var(--bd-color-accent) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-Check {
+  border-color: var(--bd-color-border-strong) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-MetricRipple {
+  background: rgba(104, 0, 234, 0.16) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-ModalBackdrop {
+  background: var(--bd-color-overlay) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-ModalDialog,
+:root[data-theme="dark"] .Dashboard-ModalDialog--small,
+:root[data-theme="dark"] .Dashboard-ModalHead {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-SelectMenu,
+:root[data-theme="dark"] .Dashboard-SelectOption,
+:root[data-theme="dark"] .Dashboard-SelectTrigger {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-SelectOption:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-TooltipBubble {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Dashboard-TooltipTrigger {
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* ── Downloads 컴포넌트 보강 ────────────────────────────── */
+:root[data-theme="dark"] .Downloads-Shelf-Body,
+:root[data-theme="dark"] .Downloads-Shelf-Subtitle,
+:root[data-theme="dark"] .Downloads-Shelf-Title,
+:root[data-theme="dark"] .Downloads-Video-Title,
+:root[data-theme="dark"] .Downloads-Message-Text,
+:root[data-theme="dark"] .Downloads-Meta-Item {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Status-Badge {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Status-Badge-Text {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Downloads-Time-Badge {
+  background: rgba(0, 0, 0, 0.6) !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .Downloads-Time-Badge-Text {
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .Downloads-Thumbnail-Link {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+/* ── Entry-Modal (공모전 응모) ──────────────────────────── */
+:root[data-theme="dark"] .Entry-Modal,
+:root[data-theme="dark"] .Entry-Modal-Header,
+:root[data-theme="dark"] .Entry-Modal-Footer {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Entry-Modal-Overlay {
+  background: var(--bd-color-overlay) !important;
+}
+
+:root[data-theme="dark"] .Entry-Modal-Title {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Entry-Modal-Empty {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Entry-Modal-CloseBtn,
+:root[data-theme="dark"] .Entry-Modal-CancelBtn {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Entry-Modal-CloseBtn:hover,
+:root[data-theme="dark"] .Entry-Modal-CancelBtn:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .Entry-Modal-SubmitBtn {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+  border-color: var(--bd-color-accent) !important;
+}
+
+:root[data-theme="dark"] .Entry-Work-Card {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Entry-Work-Card--selected {
+  border-color: var(--bd-color-accent) !important;
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .Entry-Work-Thumb {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+:root[data-theme="dark"] .Entry-Work-Title {
+  color: var(--bd-color-text) !important;
+}
+
+/* ── ai-prompt 컴포넌트 ─────────────────────────────────── */
+:root[data-theme="dark"] .ai-prompt-attachment--file,
+:root[data-theme="dark"] .ai-prompt-attachment--image {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .ai-prompt-attachment__file-icon,
+:root[data-theme="dark"] .ai-prompt-attachment__file-name {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .ai-prompt-compose-menu__icon {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .ai-prompt-compose-menu__item--danger {
+  color: #ff6b6b !important;
+}
+
+:root[data-theme="dark"] .ai-prompt-compose__icon-button,
+:root[data-theme="dark"] .ai-prompt-compose__tool {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .ai-prompt-compose__icon-button:hover,
+:root[data-theme="dark"] .ai-prompt-compose__tool:hover {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .ai-prompt-compose__send {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+/* ── artwork picker 추가 ────────────────────────────────── */
+:root[data-theme="dark"] .artwork-row-meta,
+:root[data-theme="dark"] .artwork-selection-empty,
+:root[data-theme="dark"] .artwork-selection-header,
+:root[data-theme="dark"] .artwork-selection-title {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .artwork-selection-title {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .artwork-search-wrap,
+:root[data-theme="dark"] .artwork-search-input {
+  background: var(--bd-color-input-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .artwork-search-input::placeholder {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .artwork-thumb {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+/* ── auth-modal 추가 ────────────────────────────────────── */
+:root[data-theme="dark"] .auth-modal__qr-side {
+  background: var(--bd-color-bg-elevated) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .auth-modal__social-login {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .auth-modal__social-login:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .auth-modal__subcopy,
+:root[data-theme="dark"] .auth-modal__terms-text {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .auth-modal__text-btn {
+  background: transparent !important;
+  color: var(--bd-color-link) !important;
+}
+
+/* ── bd-chat 컴포넌트 일괄 ──────────────────────────────── */
+:root[data-theme="dark"] .bd-chat-bubble--self {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-bubble__action {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-bubble__action:hover {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-bubble__action--like {
+  color: var(--bd-color-accent) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-bubble__action--delete {
+  color: #ff6b6b !important;
+}
+
+:root[data-theme="dark"] .bd-chat-composer__send {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-delete-confirm {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-delete-confirm__text {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-delete-confirm__btn {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-delete-confirm__btn:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-delete-confirm__btn--confirm {
+  background: #c5221f !important;
+  color: #ffffff !important;
+  border-color: #c5221f !important;
+}
+
+:root[data-theme="dark"] .bd-chat-fab {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-fab__badge {
+  background: #e53935 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .bd-chat-msg-modal {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-msg-modal__btn {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-msg-modal__btn--cancel {
+  background: transparent !important;
+}
+
+:root[data-theme="dark"] .bd-chat-msg-modal__btn--danger {
+  background: #c5221f !important;
+  color: #ffffff !important;
+  border-color: #c5221f !important;
+}
+
+:root[data-theme="dark"] .bd-chat-msg-modal__preview {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-panel__close {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-panel__close:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-person__avatar,
+:root[data-theme="dark"] .bd-chat-thread__avatar {
+  background: var(--bd-color-bg-subtle) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-room__unread {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-sidebar__compose {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-sidebar__compose:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-thread__empty-mark {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-thread__header {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-bottom: 1px solid var(--bd-color-border) !important;
+}
+
+/* ── bd-shell 보강 (avatar/brand/guide/notification 등) ── */
+:root[data-theme="dark"] .bd-shell__avatar {
+  background: var(--bd-color-bg-subtle) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__brand,
+:root[data-theme="dark"] .bd-shell__brand-region {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__guide-avatar {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__guide-badge {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__guide-link:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__guide-section {
+  border-top: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__guide-toggle {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__guide-toggle:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__notification-avatar,
+:root[data-theme="dark"] .bd-shell__notification-avatar--square {
+  background: var(--bd-color-bg-subtle) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__notification-badge,
+:root[data-theme="dark"] .bd-shell__notification-dot {
+  background: #e53935 !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .bd-shell__notification-empty {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__notification-header {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-bottom: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__notification-text {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__notification-title {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__notification-toggle {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__notification-toggle:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__page-content {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__section-title {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .bd-shell__skip {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+}
+
+/* ── bd-snackbar / bd-voice-modal ───────────────────────── */
+:root[data-theme="dark"] .bd-snackbar {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-voice-modal__dialog,
+:root[data-theme="dark"] .bd-voice-modal__body,
+:root[data-theme="dark"] .bd-voice-modal__header-text {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-voice-modal__scrim {
+  background: var(--bd-color-overlay) !important;
+}
+
+:root[data-theme="dark"] .bd-voice-modal__close {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-voice-modal__close:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .bd-voice-modal__mic-circle,
+:root[data-theme="dark"] .bd-voice-modal__mic-pulse {
+  background: var(--bd-color-accent) !important;
+}
+
+:root[data-theme="dark"] .bd-voice-modal__mic-label,
+:root[data-theme="dark"] .bd-voice-modal__mic-levels,
+:root[data-theme="dark"] .bd-voice-modal__mic-spinner {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .bd-voice-modal__transcription--low {
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* ── followManage / badgeManage / badgeGradeDivider ────── */
+:root[data-theme="dark"] .followManageActionBtn {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .followManageActionBtn:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .followManageAvatar {
+  background: var(--bd-color-bg-subtle) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .followManageBadge {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .followManageBio,
+:root[data-theme="dark"] .followManageMeta,
+:root[data-theme="dark"] .followManageSummary {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .followManageEmpty {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .followManageSearchInput {
+  background: var(--bd-color-input-bg) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .followManageSearchInput::placeholder {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .followManageTab {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .followManageTab:hover {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .badgeManageItem,
+:root[data-theme="dark"] .badgeManageSummary {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .badgeManageIcon {
+  background: var(--bd-color-bg-elevated) !important;
+}
+
+:root[data-theme="dark"] .badgeManageName {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .badgeManageState {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .badgeGradeDivider {
+  background: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .badgeGradeDivider--bronze {
+  background: #cd7f32 !important;
+}
+
+:root[data-theme="dark"] .badgeGradeDivider--silver {
+  background: #c0c0c0 !important;
+}
+
+:root[data-theme="dark"] .badgeGradeDivider--gold {
+  background: #d4af37 !important;
+}
+
+:root[data-theme="dark"] .badgeGradeDivider--black {
+  background: #303030 !important;
+}
+
+/* ── gallery 보강 (gallery-detail / explore-result 추가) ── */
+:root[data-theme="dark"] .gallery-dropdown-item,
+:root[data-theme="dark"] .gallery-metadata,
+:root[data-theme="dark"] .gallery-title,
+:root[data-theme="dark"] .gallery-icon-circle,
+:root[data-theme="dark"] .gallery-thumbnail {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .gallery-dropdown-item:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .gallery-duration,
+:root[data-theme="dark"] .gallery-hero-tag {
+  background: rgba(0, 0, 0, 0.6) !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .gallery-hero-title {
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .gallery-icon-circle {
+  background: var(--bd-color-bg-elevated) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .gallery-more-btn,
+:root[data-theme="dark"] .gallery-top-action-button {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .gallery-more-btn:hover,
+:root[data-theme="dark"] .gallery-top-action-button:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .gallery-thumbnail {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+/* ── hero (workdetail 큰 hero/__desc/mute/video) ────────── */
+:root[data-theme="dark"] .hero__desc {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .hero__mute-btn {
+  background: rgba(0, 0, 0, 0.6) !important;
+  color: #ffffff !important;
+  border: 0 !important;
+}
+
+:root[data-theme="dark"] .hero__video-container {
+  background: #000 !important;
+}
+
+:root[data-theme="dark"] .hero-meta {
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* ── layout-preview ─────────────────────────────────────── */
+:root[data-theme="dark"] .layout-preview__card,
+:root[data-theme="dark"] .layout-preview__panel,
+:root[data-theme="dark"] .layout-preview__hero {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .layout-preview__eyebrow,
+:root[data-theme="dark"] .layout-preview__stat {
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* ── pagination / page-size ─────────────────────────────── */
+:root[data-theme="dark"] .pagination-btn,
+:root[data-theme="dark"] .page-nav-btn,
+:root[data-theme="dark"] .page-num-btn {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .pagination-btn:hover,
+:root[data-theme="dark"] .page-nav-btn:hover,
+:root[data-theme="dark"] .page-num-btn:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .page-size-menu,
+:root[data-theme="dark"] .page-size-trigger,
+:root[data-theme="dark"] .page-size-select {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .page-size-menu-item:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+/* ── pay 보강 ───────────────────────────────────────────── */
+:root[data-theme="dark"] .pay-hero__eyebrow,
+:root[data-theme="dark"] .pay-section-title {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .pay-method__chip--muted {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .pay-submit {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+  border: 0 !important;
+}
+
+:root[data-theme="dark"] .pay-summary__caption,
+:root[data-theme="dark"] .pay-summary__label {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .pay-summary__value {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .pay-summary__value--fee {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .pay-summary__row--total {
+  border-top: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .pay-terms {
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* ── pivot-card ─────────────────────────────────────────── */
+:root[data-theme="dark"] .pivot-card,
+:root[data-theme="dark"] .pivot-card-link {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .pivot-card-link:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .pivot-card-meta {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .pivot-card-overlay {
+  background: rgba(0, 0, 0, 0.6) !important;
+  color: #ffffff !important;
+}
+
+/* ── playlist ───────────────────────────────────────────── */
+:root[data-theme="dark"] .playlist-item,
+:root[data-theme="dark"] .playlist-footer {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .playlist-item:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .playlist-name {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .playlist-privacy {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .playlist-thumb {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+:root[data-theme="dark"] .playlist-dropdown-icon {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .new-playlist-btn {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .new-playlist-btn:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+/* ── report-cancel / submit ─────────────────────────────── */
+:root[data-theme="dark"] .report-cancel-btn {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .report-cancel-btn:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .report-submit-btn {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+  border: 0 !important;
+}
+
+/* ── resources / related ────────────────────────────────── */
+:root[data-theme="dark"] .resources__desc,
+:root[data-theme="dark"] .related__desc {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .resources__icon-wrap,
+:root[data-theme="dark"] .related__media {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+:root[data-theme="dark"] .resources__links,
+:root[data-theme="dark"] .related__item {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* ── rp-* (댓글 관련 짧은 prefix) ───────────────────────── */
+:root[data-theme="dark"] .rp-av {
+  background: var(--bd-color-bg-subtle) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .rp-nm,
+:root[data-theme="dark"] .rp-tx,
+:root[data-theme="dark"] .rp-ln {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .rp-tm,
+:root[data-theme="dark"] .rp-ft {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .rp-rb,
+:root[data-theme="dark"] .rp-ic {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .rp-rb:hover,
+:root[data-theme="dark"] .rp-ic:hover {
+  color: var(--bd-color-text) !important;
+}
+
+/* ── side-meta ──────────────────────────────────────────── */
+:root[data-theme="dark"] .side-meta-copy-button {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .side-meta-copy-button:hover {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .side-meta-copy-icon {
+  color: currentColor !important;
+}
+
+/* ── sidebar ────────────────────────────────────────────── */
+:root[data-theme="dark"] .sidebar-divider {
+  background: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .sidebar-profile {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .sidebar-profile-img {
+  background: var(--bd-color-bg-subtle) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .sidebar-profile-name {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .sidebar-profile-type {
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* ── signup-modal 보강 (대량) ──────────────────────────── */
+:root[data-theme="dark"] .signup-modal__close-btn {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__close-btn:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__form-label {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__hint-text,
+:root[data-theme="dark"] .signup-modal__terms-text,
+:root[data-theme="dark"] .signup-modal__or-text,
+:root[data-theme="dark"] .signup-modal__subtitle {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__info-icon {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__input {
+  background: var(--bd-color-input-bg) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__input::placeholder {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__login-link,
+:root[data-theme="dark"] .signup-modal__text-btn {
+  color: var(--bd-color-link) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__logo {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__password-toggle {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__password-toggle:hover {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__social-login {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__social-login:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__social-login--google,
+:root[data-theme="dark"] .signup-modal__social-login--kakao,
+:root[data-theme="dark"] .signup-modal__social-login--naver {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__social-avatar {
+  background: var(--bd-color-bg-subtle) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__social-name {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__submit-btn {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+:root[data-theme="dark"] .signup-modal__title {
+  color: var(--bd-color-text) !important;
+}
+
+/* ── site-footer / site-header ─────────────────────────── */
+:root[data-theme="dark"] .site-footer {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text-muted) !important;
+  border-top: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .site-footer__bottom,
+:root[data-theme="dark"] .site-footer__bottom-right,
+:root[data-theme="dark"] .site-footer__col,
+:root[data-theme="dark"] .site-footer__policies {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .site-footer__social-headline {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .site-footer__social-links a {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .site-footer__social-links a:hover {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .site-header {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-bottom: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .site-header__nav-wrapper,
+:root[data-theme="dark"] .site-header__nav-item,
+:root[data-theme="dark"] .site-header__subnav,
+:root[data-theme="dark"] .site-header__subnav-item {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .site-header__nav-item:hover,
+:root[data-theme="dark"] .site-header__subnav-item:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .site-header__menu-btn,
+:root[data-theme="dark"] .site-header__search-toggle {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .site-header__menu-btn:hover,
+:root[data-theme="dark"] .site-header__search-toggle:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .site-header__menu-icon {
+  color: currentColor !important;
+}
+
+:root[data-theme="dark"] .site-header__auth-btn {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .site-header__auth-btn:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .site-header__search-inner,
+:root[data-theme="dark"] .site-header__search-input {
+  background: var(--bd-color-input-bg) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .site-header__search-input::placeholder {
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* ── sort-filter ────────────────────────────────────────── */
+:root[data-theme="dark"] .sort-filter-btn,
+:root[data-theme="dark"] .sort-filter-dropdown {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .sort-filter-btn:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .sort-filter-dropdown-item:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+/* ── tablist / tabs / tag-* ─────────────────────────────── */
+:root[data-theme="dark"] .tablist__tab {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .tablist__tab:hover {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .tablist__tab--active {
+  color: var(--bd-color-text) !important;
+  border-bottom: 2px solid var(--bd-color-accent) !important;
+}
+
+:root[data-theme="dark"] .tablist__number {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .tag-chip {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .tag-suggestion-empty {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .tag-suggestion-item {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .tag-suggestion-item:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .tags-suggestion-current {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+/* ── thumb-* / thumbnail-* 보강 ─────────────────────────── */
+:root[data-theme="dark"] .thumb-img-wrapper,
+:root[data-theme="dark"] .thumb-preview-image,
+:root[data-theme="dark"] .thumbnail,
+:root[data-theme="dark"] .thumbnail-img,
+:root[data-theme="dark"] .thumbnail-wrapper,
+:root[data-theme="dark"] .thumbnail-wrapper-channel {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+:root[data-theme="dark"] .thumbnail-upload-icon {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .thumb-more {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .thumb-more:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .thumb-volume-slider {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* ── work-auction-config / work-auction-modal ───────────── */
+:root[data-theme="dark"] .work-auction-config__title,
+:root[data-theme="dark"] .work-auction-config__label {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-auction-config__deadline-btn {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-auction-config__deadline-btn:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .work-auction-config__deadline-btn--active {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+  border-color: var(--bd-color-accent) !important;
+}
+
+:root[data-theme="dark"] .work-auction-config__price-wrap {
+  background: var(--bd-color-input-bg) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-auction-config__price-input {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-auction-config__price-input::placeholder {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .work-auction-config__price-unit {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .work-auction-config__reset {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .work-auction-config__reset:hover {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-auction-config__selected {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-auction-config__section--deadline {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+:root[data-theme="dark"] .work-auction-modal,
+:root[data-theme="dark"] .work-auction-modal__content,
+:root[data-theme="dark"] .work-auction-modal__frame,
+:root[data-theme="dark"] .work-auction-modal__header {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-auction-modal-backdrop {
+  background: var(--bd-color-overlay) !important;
+}
+
+:root[data-theme="dark"] .work-auction-modal__title {
+  color: var(--bd-color-text) !important;
+}
+
+/* ── work 추가 (channel-name / description / 등) ────────── */
+:root[data-theme="dark"] .work-channel-name,
+:root[data-theme="dark"] .work-title {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-description,
+:root[data-theme="dark"] .work-metadata,
+:root[data-theme="dark"] .work-duration {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .work-icon-circle {
+  background: var(--bd-color-bg-elevated) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-more-btn {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .work-more-btn:hover {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-dropdown {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-dropdown-item:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+/* ── work-share 추가 (chip remove / empty / recipient) ──── */
+:root[data-theme="dark"] .work-share-chip__remove {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .work-share-chip__remove:hover {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-share-empty__title {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-share-empty__copy {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .work-share-recipient {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-share-recipient:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .work-share-recipient__avatar {
+  background: var(--bd-color-bg-subtle) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-share-recipient__realname,
+:root[data-theme="dark"] .work-share-recipient__username {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-share-recipient__check {
+  color: var(--bd-color-accent) !important;
+}
+
+:root[data-theme="dark"] .workShareModalWrap {
+  background: var(--bd-color-overlay) !important;
+}
+
+:root[data-theme="dark"] .workdetail-tag {
+  background: var(--bd-color-bg-subtle) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+/* ── work-trade-config / work-trade-modal-backdrop ────── */
+:root[data-theme="dark"] .work-trade-config__label {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-trade-config__price-wrap {
+  background: var(--bd-color-input-bg) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .work-trade-config__price-input {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .work-trade-config__price-input::placeholder {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .work-trade-config__price-unit {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .work-trade-modal-backdrop {
+  background: var(--bd-color-overlay) !important;
+}
+
+/* ── 기타 보강 (상세 사이드 / 폼 / table / status / etc) ── */
+:root[data-theme="dark"] .detail-amount-card,
+:root[data-theme="dark"] .detail-section,
+:root[data-theme="dark"] .detail-sidebar-card {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .detail-section-title,
+:root[data-theme="dark"] .detail-sidebar-title,
+:root[data-theme="dark"] .detail-field-value,
+:root[data-theme="dark"] .detail-sidebar-value {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .detail-field-label {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .data-table {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .data-table th,
+:root[data-theme="dark"] .data-table td {
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .empty-state,
+:root[data-theme="dark"] .empty-state-text {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .filter-search-icon {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .filter-tab {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .filter-tab:hover {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .modal-overlay {
+  background: var(--bd-color-overlay) !important;
+}
+
+:root[data-theme="dark"] .modal-body-text,
+:root[data-theme="dark"] .modal-header-title {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .selected-artwork-link-item {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .selected-artwork-link-title {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .selection-bar {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+/* ── text-* utility (color helpers) ─────────────────────── */
+:root[data-theme="dark"] .text-link {
+  color: var(--bd-color-link) !important;
+}
+
+:root[data-theme="dark"] .text-muted {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .text-accent {
+  color: var(--bd-color-accent) !important;
+}
+
+:root[data-theme="dark"] .text-success {
+  color: #6ee7b7 !important;
+}
+
+:root[data-theme="dark"] .text-warn {
+  color: #ffd28a !important;
+}
+
+:root[data-theme="dark"] .text-info {
+  color: #82c8ff !important;
+}
+
+/* ── status-* (badges/colors only — generic .status- 안전 처리) ── */
+:root[data-theme="dark"] .status-active {
+  color: #6ee7b7 !important;
+}
+
+:root[data-theme="dark"] .status-pending {
+  color: #ffd28a !important;
+}
+
+:root[data-theme="dark"] .status-urgent {
+  color: #ff8a85 !important;
+}
+
+:root[data-theme="dark"] .status-muted {
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* ── highlight (workdetail) ─────────────────────────────── */
+:root[data-theme="dark"] .highlight {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .highlight--blue {
+  background: rgba(62, 166, 255, 0.16) !important;
+  color: #82c8ff !important;
+}
+
+:root[data-theme="dark"] .highlight__image-wrap {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+/* ── Register-Input-CopyBtn / Register-Tag-Remove ──────── */
+:root[data-theme="dark"] .Register-Input-CopyBtn {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Register-Input-CopyBtn:hover {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Register-Tag-Remove {
+  background: transparent !important;
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Register-Tag-Remove:hover {
+  color: var(--bd-color-text) !important;
+}
+
+/* ── QuickThemeToggle ───────────────────────────────────── */
+:root[data-theme="dark"] .QuickThemeToggle {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .QuickThemeToggle:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+/* ── Auction 추가 보강 ───────────────────────────────────── */
+:root[data-theme="dark"] .Auction-Bid-Instant-Checkbox {
+  accent-color: var(--bd-color-accent) !important;
+}
+
+:root[data-theme="dark"] .Auction-Gallery-Thumbnail {
+  background: var(--bd-color-bg-subtle) !important;
+}
+
+:root[data-theme="dark"] .Auction-Gallery-Followers {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .Auction-Player-Screen {
+  background: #000 !important;
+}
+
+/* ── Contest 추가 ───────────────────────────────────────── */
+:root[data-theme="dark"] .auction-expand-icon {
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* ── faq / faq-tabular ──────────────────────────────────── */
+:root[data-theme="dark"] .faq-section {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .faq-tabular__description {
+  color: var(--bd-color-text-muted) !important;
+}
+
+/* ── arrow-link / clickable-link ───────────────────────── */
+:root[data-theme="dark"] .arrow-link,
+:root[data-theme="dark"] .clickable-link {
+  color: var(--bd-color-link) !important;
+}
+
+:root[data-theme="dark"] .arrow-link:hover,
+:root[data-theme="dark"] .clickable-link:hover {
+  color: var(--bd-color-text) !important;
+}
+
+/* ============================================================
+   Phase 16 — shelf-card 톤 통일 (페이지 배경과 동일)
+   ============================================================ */
+
+:root[data-theme="dark"] .shelf-card,
+:root[data-theme="dark"] .shelf-card a,
+:root[data-theme="dark"] .shelf-card__meta,
+:root[data-theme="dark"] .shelf-card__thumb,
+:root[data-theme="dark"] .shelf-card__thumb-inner {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+  border: 0 !important;
+}
+
+:root[data-theme="dark"] .shelf-card__title {
+  color: var(--bd-color-text) !important;
+  background: transparent !important;
+}
+
+:root[data-theme="dark"] .shelf-card__desc,
+:root[data-theme="dark"] .shelf-card__meta {
+  color: var(--bd-color-text-muted) !important;
+}
+
+:root[data-theme="dark"] .shelf-card__badge {
+  background: rgba(0, 0, 0, 0.6) !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .shelf-card__overlay {
+  background: rgba(0, 0, 0, 0.6) !important;
+  color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .shelf-card__stack1,
+:root[data-theme="dark"] .shelf-card__stack2,
+:root[data-theme="dark"] .shelf-card__stacks {
+  background: var(--bd-color-bg-subtle) !important;
+  border-color: var(--bd-color-border) !important;
+}
+
+/* ── bd-chat-bubble row/body 톤 통일 (페이지 배경) ──────── */
+:root[data-theme="dark"] .bd-chat-bubble__row,
+:root[data-theme="dark"] .bd-chat-bubble__body {
+  background: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-bubble__body em {
+  color: var(--bd-color-text-muted) !important;
+  font-style: italic;
+}
+
+/* ── bd-chat-bubble 강제 적용 (specificity 보강) ────────── */
+:root[data-theme="dark"] .bd-chat-thread__messages .bd-chat-bubble__row,
+:root[data-theme="dark"] .bd-chat-thread__messages .bd-chat-bubble__body,
+:root[data-theme="dark"] .bd-chat-thread .bd-chat-bubble__body {
+  background: var(--bd-color-bg) !important;
+  background-color: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+  border: 0 !important;
+}
+
+:root[data-theme="dark"] .bd-chat-thread__messages .bd-chat-bubble--self .bd-chat-bubble__body {
+  background: var(--bd-color-accent) !important;
+  background-color: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-bubble__actions {
+  background: transparent !important;
+}
+
+/* ── bd-chat-thread__messages 페이지 배경과 동일하게 ───── */
+:root[data-theme="dark"] .bd-chat-thread__messages,
+:root[data-theme="dark"] .bd-chat-panel .bd-chat-thread__messages,
+:root[data-theme="dark"] .bd-chat-thread .bd-chat-thread__messages {
+  background: var(--bd-color-bg) !important;
+  background-image: none !important;
+}
+
+/* ── bd-chat-sidebar__compose ("새 대화" 버튼) 보라색 복구 ── */
+:root[data-theme="dark"] .bd-chat-sidebar__compose {
+  background: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+  border: 0 !important;
+}
+
+:root[data-theme="dark"] .bd-chat-sidebar__compose:hover {
+  filter: brightness(1.1) !important;
+  background: var(--bd-color-accent) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-sidebar__compose-icon {
+  color: var(--bd-color-accent-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-sidebar__compose-icon svg {
+  fill: currentColor !important;
+}
+
+/* ── bd-chat-bubble__body 회색 복구 (구분용, --self는 보라 유지) ── */
+:root[data-theme="dark"] .bd-chat-thread__messages .bd-chat-bubble__row,
+:root[data-theme="dark"] .bd-chat-thread .bd-chat-bubble__row {
+  background: transparent !important;
+}
+
+:root[data-theme="dark"] .bd-chat-thread__messages .bd-chat-bubble__body,
+:root[data-theme="dark"] .bd-chat-thread .bd-chat-bubble__body {
+  background: var(--bd-color-bg-hover) !important;
+  background-color: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-thread__messages .bd-chat-bubble--self .bd-chat-bubble__body,
+:root[data-theme="dark"] .bd-chat-thread .bd-chat-bubble--self .bd-chat-bubble__body {
+  background: var(--bd-color-accent) !important;
+  background-color: var(--bd-color-accent) !important;
+  color: var(--bd-color-accent-text) !important;
+}
+
+/* ── bd-chat-person (채팅 사용자 검색/선택 카드) ────────── */
+:root[data-theme="dark"] .bd-chat-person {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-person:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .bd-chat-person__name {
+  color: var(--bd-color-text) !important;
+}
+
+/* ── explore-result main-content / filter / sort 톤 통일 ── */
+:root[data-theme="dark"] .main-content,
+:root[data-theme="dark"] #section.main-content,
+:root[data-theme="dark"] .item-section-renderer,
+:root[data-theme="dark"] .filter-chips,
+:root[data-theme="dark"] .sort-filter {
+  background: var(--bd-color-bg) !important;
+  background-color: var(--bd-color-bg) !important;
+  color: var(--bd-color-text) !important;
+  border-color: transparent !important;
+}
+
+:root[data-theme="dark"] .chip {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .chip:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .chip.active,
+:root[data-theme="dark"] .chip.active:hover {
+  background: var(--bd-color-text) !important;
+  color: var(--bd-color-bg) !important;
+  border-color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .sort-filter-btn {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .sort-filter-btn:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .sort-filter-text {
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .sort-filter-dropdown {
+  background: var(--bd-color-bg-elevated) !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .sort-filter-dropdown-item {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .sort-filter-dropdown-item:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .sort-filter-dropdown-item.active {
+  background: var(--bd-color-bg-hover) !important;
+  color: var(--bd-color-text) !important;
+  font-weight: 600;
+}
+
+/* ── sort-filter-btn 내 svg 아이콘 흰색으로 ─────────────── */
+:root[data-theme="dark"] .sort-filter-btn svg,
+:root[data-theme="dark"] .sort-filter-btn svg path {
+  fill: var(--bd-color-text) !important;
+  color: var(--bd-color-text) !important;
+}
+
+/* ── Contest-Filter-Btn--toggle 스타일 통일 (sort-filter-btn 동일) ── */
+:root[data-theme="dark"] .Contest-Filter-Btn--toggle {
+  background: transparent !important;
+  color: var(--bd-color-text) !important;
+  border: 1px solid var(--bd-color-border) !important;
+}
+
+:root[data-theme="dark"] .Contest-Filter-Btn--toggle:hover {
+  background: var(--bd-color-bg-hover) !important;
+}
+
+:root[data-theme="dark"] .Contest-Filter-Btn--toggle.Contest-Filter-Btn--selected {
+  border-color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .Contest-Filter-Btn--toggle.active,
+:root[data-theme="dark"] .Contest-Filter-Btn--toggle.is-active {
+  background: var(--bd-color-text) !important;
+  color: var(--bd-color-bg) !important;
+  border-color: var(--bd-color-text) !important;
+}
+
+:root[data-theme="dark"] .Contest-Filter-Btn--toggle svg,
+:root[data-theme="dark"] .Contest-Filter-Btn--toggle svg path {
+  fill: currentColor !important;
+}

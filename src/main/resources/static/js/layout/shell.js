@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+window.addEventListener("load", function () {
   let root = document.querySelector("[data-bd-shell-root]");
   if (!root) {
     return;

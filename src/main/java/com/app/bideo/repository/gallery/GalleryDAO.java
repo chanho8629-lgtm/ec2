@@ -56,6 +56,8 @@ public class GalleryDAO {
         if (galleryMapper.softDeleteGallery(id) == 0) {
             throw new IllegalArgumentException("gallery not found");
         }
+        galleryMapper.deleteGalleryTagByGalleryId(id);
+        galleryMapper.deleteGalleryWorkByGalleryId(id);
     }
 
     public void saveWorkLink(Long galleryId, Long workId) {
