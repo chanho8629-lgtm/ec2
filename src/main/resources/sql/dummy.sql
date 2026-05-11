@@ -215,6 +215,62 @@ values (
                                status = excluded.status,
                                updated_datetime = now();
 
+insert into tbl_member (
+    email,
+    password,
+    nickname,
+    real_name,
+    bio,
+    role,
+    creator_verified,
+    seller_verified,
+    creator_tier,
+    follower_count,
+    following_count,
+    gallery_count,
+    phone_number,
+    last_login_datetime,
+    status,
+    created_datetime,
+    updated_datetime
+)
+values (
+    'dlwnstn0315@gmail.com',
+    '$2b$10$J34V9sWoEokz6k6NhZtAxe2QYEGXHsZ4L/N.RaJDmHnQlZZXGdUO6',
+    'dlwnstn0315',
+    'dlwnstn0315',
+    '추가 더미 회원',
+    'USER',
+    false,
+    false,
+    'BASIC',
+    0,
+    0,
+    0,
+    '010-9397-3256',
+    now(),
+    'ACTIVE',
+    now(),
+    now()
+)
+on conflict (email) do update
+set
+    password = excluded.password,
+    nickname = excluded.nickname,
+    real_name = excluded.real_name,
+    bio = excluded.bio,
+    role = excluded.role,
+    creator_verified = excluded.creator_verified,
+    seller_verified = excluded.seller_verified,
+    creator_tier = excluded.creator_tier,
+    follower_count = excluded.follower_count,
+    following_count = excluded.following_count,
+    gallery_count = excluded.gallery_count,
+    phone_number = excluded.phone_number,
+    last_login_datetime = excluded.last_login_datetime,
+    status = excluded.status,
+    updated_datetime = now();
+
 -- gallery/work dummy data
 
 drop table if exists tmp_dummy_gallery_seed;

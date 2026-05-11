@@ -26,3 +26,10 @@
         padding: 8px !important;
     }
 }
+
+/*5. CSS를 이용한 드래그/복사 방지*/
+body {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10+ and Edge */
+    user-select: none; /* Standard syntax */
+}
