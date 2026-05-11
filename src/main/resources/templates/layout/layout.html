@@ -132,13 +132,21 @@
       <section class="bd-shell__guide-section" th:if="${followingArtists != null and !followingArtists.isEmpty()}">
         <h2 class="bd-shell__section-title">팔로우 한 아티스트</h2>
         <ul class="bd-shell__guide-list">
-          <li class="bd-shell__guide-item" th:each="artist : ${followingArtists}">
+          <li class="bd-shell__guide-item" th:each="artist, iter : ${followingArtists}" th:if="${iter.index &lt; 5}">
             <a class="bd-shell__guide-link" th:href="@{'/profile/' + ${artist.nickname}}" th:title="${artist.nickname}">
               <img class="bd-shell__guide-avatar"
                    th:src="${artist.profileImage != null ? artist.profileImage : '/images/default-profile.svg'}"
                    alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='/images/default-profile.svg';" />
               <span class="bd-shell__guide-copy" th:text="${artist.nickname}"></span>
               <span class="bd-shell__guide-meta" th:if="${artist.creatorVerified}"><span class="bd-shell__guide-badge"></span></span>
+            </a>
+          </li>
+          <li class="bd-shell__guide-item">
+            <a class="bd-shell__guide-link" th:href="@{/profile(openFollowManage=1)}" title="팔로우 관리">
+              <svg class="bd-shell__guide-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41Z" fill="currentColor" />
+              </svg>
+              <span class="bd-shell__guide-copy">더 보기</span>
             </a>
           </li>
         </ul>
