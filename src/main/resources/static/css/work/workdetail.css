@@ -1662,7 +1662,7 @@ svg {
 }
 
 .page.panel-open:not(.panel-auction) .media-cluster {
-    transform: translateX(calc(var(--media-cluster-shift) - var(--anchored-panel-media-shift)));
+    transform: translateX(calc(150px - var(--anchored-panel-media-shift)));
 }
 
 .page.panel-open .anchored-panel {
@@ -1705,7 +1705,7 @@ svg {
 }
 
 .page.panel-open.panel-auction .media-cluster {
-    transform: translateX(calc(var(--media-cluster-shift) - var(--anchored-panel-media-shift)));
+    transform: translateX(calc(150px - var(--anchored-panel-media-shift)));
 }
 
 .page.panel-open.panel-auction .anchored-panel,

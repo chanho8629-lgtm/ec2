@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="/css/common/global.css" th:href="@{/css/common/global.css}" />
     <link rel="stylesheet" href="/css/common/util.css" th:href="@{/css/common/util.css}" />
     <link rel="stylesheet" href="/css/common/common.css" th:href="@{/css/common/common.css}" />
+    <link rel="stylesheet" href="/css/common/work-share-modal.css" th:href="@{/css/common/work-share-modal.css}" />
+    <link rel="stylesheet" href="/css/common/work-report-modal.css" th:href="@{/css/common/work-report-modal.css}" />
     <link rel="stylesheet" href="/css/contest/contest-list-page.css" th:href="@{/css/contest/contest-list-page.css}" />
     <script defer src="/js/contest/contest-list.js" th:src="@{/js/contest/contest-list.js}"></script>
 </head>
@@ -125,13 +127,13 @@
 </div>
 </div>
 
-<!-- ===== 공유 모달 ===== -->
-<div class="work-share-modal-overlay" hidden id="contestShareModal" aria-hidden="true">
+<!-- ===== 공유 모달 (작품 상세와 동일 마크업) ===== -->
+<div class="work-share-modal-backdrop work-share-modal-overlay" hidden id="contestShareModal" data-role="share-modal-backdrop" aria-hidden="true">
     <div class="work-share-modal" role="dialog" aria-modal="true" aria-labelledby="contestShareModalTitle">
         <div class="work-share-modal__header">
             <div class="work-share-modal__spacer"></div>
             <h2 class="work-share-modal__title" id="contestShareModalTitle">공유</h2>
-            <button class="work-share-modal__close" type="button" aria-label="닫기" id="contestShareModalClose">
+            <button class="work-share-modal__close" type="button" aria-label="닫기" id="contestShareModalClose" data-role="share-modal-close">
                 <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
                     <polyline fill="none" points="20.643 3.357 12 12 3.353 20.647" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></polyline>
                     <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" x1="20.649" x2="3.354" y1="20.649" y2="3.354"></line>
@@ -139,27 +141,77 @@
             </button>
         </div>
         <div class="work-share-modal__link-row">
-            <input class="work-share-modal__link-input" type="text" readonly id="contestShareLinkInput" data-share-link-input>
-            <button class="work-share-modal__link-copy" type="button" id="contestShareLinkCopy">복사</button>
+            <input class="work-share-modal__link-input" type="text" readonly id="contestShareLinkInput" data-role="share-link-input" data-share-link-input>
+            <button class="work-share-modal__link-copy" type="button" id="contestShareLinkCopy" data-role="share-link-copy" data-share-copy>복사</button>
         </div>
         <div class="work-share-modal__receiver">
             <label class="work-share-modal__label">받는 사람:</label>
             <div class="work-share-modal__receiver-body">
-                <div class="work-share-modal__chips" id="contestShareChips"></div>
-                <input class="work-share-modal__search" type="text" placeholder="검색..." autocomplete="off" id="contestShareSearch">
+                <div class="work-share-modal__chips" id="contestShareChips" data-share-chips></div>
+                <input class="work-share-modal__search" type="text" placeholder="검색..." autocomplete="off" id="contestShareSearch" data-share-search>
             </div>
         </div>
-        <div class="work-share-modal__list" id="contestShareList">
-            <div class="work-share-empty">
-                <div class="work-share-empty__title">공유 대상을 검색하세요</div>
-                <p class="work-share-empty__copy">검색창에 닉네임을 입력하면 결과가 표시됩니다.</p>
-            </div>
-        </div>
+        <div class="work-share-modal__list" id="contestShareList" data-share-list></div>
         <div class="work-share-modal__footer">
-            <input class="work-share-modal__message" type="text" placeholder="메시지 쓰기..." autocomplete="off" id="contestShareMessage">
-            <button class="work-share-modal__send" type="button" id="contestShareSend">보내기</button>
+            <input class="work-share-modal__message" type="text" placeholder="메시지 쓰기..." autocomplete="off" id="contestShareMessage" data-share-message>
+            <button class="work-share-modal__send" type="button" id="contestShareSend" data-share-send>보내기</button>
         </div>
     </div>
+</div>
+
+<!-- ===== 신고 모달 (작품 상세와 동일 마크업) ===== -->
+<div hidden class="report-modal-backdrop" data-role="report-modal-backdrop">
+    <tp-yt-paper-dialog class="report-modal-dialog" role="dialog" tabindex="-1" prevent-autonav="true" modern>
+        <div class="report-modal-header">
+            <div class="report-modal-header-spacer"></div>
+            <yt-formatted-string tabindex="-1" class="report-modal-title">신고</yt-formatted-string>
+            <button type="button" class="report-modal-close" aria-label="닫기" data-role="report-modal-close">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
+                    <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 10-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 001.414 1.414L12 13.414l5.293 5.293a1 1 0 001.414-1.414L13.414 12l5.293-5.293a1 1 0 10-1.414-1.414Z"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="report-modal-step" data-role="report-step-reasons">
+            <div class="report-modal-body">
+                <h1 class="report-modal-heading">어떤 문제인가요?</h1>
+                <div class="report-modal-copy">YouTube에서 모든 커뮤니티 가이드에 대해 확인하므로 완벽히 들어맞지 않아도 괜찮습니다.</div>
+                <div class="report-modal-reasons">
+                    <label class="report-modal-reason"><input type="radio" name="report-form-reason-select-page" aria-label="성적인 콘텐츠"><span>성적인 콘텐츠</span></label>
+                    <label class="report-modal-reason"><input type="radio" name="report-form-reason-select-page" aria-label="폭력적 또는 혐오스러운 콘텐츠"><span>폭력적 또는 혐오스러운 콘텐츠</span></label>
+                    <label class="report-modal-reason"><input type="radio" name="report-form-reason-select-page" aria-label="괴롭힘 또는 폭력"><span>괴롭힘 또는 폭력</span></label>
+                    <label class="report-modal-reason"><input type="radio" name="report-form-reason-select-page" aria-label="유해하거나 위험한 행위"><span>유해하거나 위험한 행위</span></label>
+                </div>
+            </div>
+            <div class="report-modal-footer">
+                <button type="button" disabled aria-disabled="true" class="report-modal-button report-modal-button-next" data-role="report-next-button">다음</button>
+            </div>
+        </div>
+    </tp-yt-paper-dialog>
+</div>
+
+<div hidden class="report-modal-backdrop" data-role="report-confirmation-backdrop">
+    <tp-yt-paper-dialog class="report-modal-dialog" role="dialog" tabindex="-1" prevent-autonav="true" modern>
+        <div class="report-modal-header">
+            <div class="report-modal-header-spacer"></div>
+            <yt-formatted-string tabindex="-1" class="report-modal-title">신고</yt-formatted-string>
+            <button type="button" class="report-modal-close" aria-label="닫기" data-role="report-confirmation-close">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
+                    <path d="M17.293 5.293 12 10.586 6.707 5.293a1 1 0 10-1.414 1.414L10.586 12l-5.293 5.293a1 1 0 001.414 1.414L12 13.414l5.293 5.293a1 1 0 001.414-1.414L13.414 12l5.293-5.293a1 1 0 10-1.414-1.414Z"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="report-modal-step report-modal-step-confirmation">
+            <div class="report-modal-body report-modal-body-confirmation">
+                <img alt="" width="178" height="115" src="https://www.youtube.com/img/flagging/confirm-light.png" class="report-modal-image">
+                <h1 class="report-modal-heading">커뮤니티에 도움을 주셔서 감사합니다</h1>
+                <div class="report-modal-copy report-modal-copy-centered">신고해 주신 내용은 유해한 콘텐츠로부터 커뮤니티를 보호하는 데 도움이 됩니다.</div>
+                <div class="report-modal-copy report-modal-copy-centered">누군가 위급한 상황에 처했다고 생각한다면 현지 법 집행 기관에 연락하세요.</div>
+            </div>
+            <div class="report-modal-footer">
+                <button type="button" class="report-modal-button report-modal-button-confirm" data-role="report-confirm-button">확인</button>
+            </div>
+        </div>
+    </tp-yt-paper-dialog>
 </div>
 
 <!-- ===== 참가 신청 모달 ===== -->

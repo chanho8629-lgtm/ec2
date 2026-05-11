@@ -124,7 +124,7 @@ select
         when 98 then '$2a$10$dPQEz5EL46OJnY0BZ.84.OhcFVax/9kenedmVmMrC7.p0Ku9KFPMW'
         when 99 then '$2a$10$YlH1q6fe2KUzBO7o.HRnIu4WsWoy.nV96f3b7kmFN30XTGPzw7vx.'
         when 100 then '$2a$10$X9mg3VtBN.vrlp8ZCS2TXel.SMi5nTWTgqGQLylRb3Kzdn2ioaIaW'
-    end as password,
+        end as password,
     'test' || gs as nickname,
     '테스트' || gs as real_name,
     '더미 회원 ' || gs as bio,
@@ -141,23 +141,79 @@ select
     now() as created_datetime,
     now() as updated_datetime
 from generate_series(1, 100) as gs
-on conflict (email) do update
-set
-    password = excluded.password,
-    nickname = excluded.nickname,
-    real_name = excluded.real_name,
-    bio = excluded.bio,
-    role = excluded.role,
-    creator_verified = excluded.creator_verified,
-    seller_verified = excluded.seller_verified,
-    creator_tier = excluded.creator_tier,
-    follower_count = excluded.follower_count,
-    following_count = excluded.following_count,
-    gallery_count = excluded.gallery_count,
-    phone_number = excluded.phone_number,
-    last_login_datetime = excluded.last_login_datetime,
-    status = excluded.status,
-    updated_datetime = now();
+    on conflict (email) do update
+                               set
+                                   password = excluded.password,
+                               nickname = excluded.nickname,
+                               real_name = excluded.real_name,
+                               bio = excluded.bio,
+                               role = excluded.role,
+                               creator_verified = excluded.creator_verified,
+                               seller_verified = excluded.seller_verified,
+                               creator_tier = excluded.creator_tier,
+                               follower_count = excluded.follower_count,
+                               following_count = excluded.following_count,
+                               gallery_count = excluded.gallery_count,
+                               phone_number = excluded.phone_number,
+                               last_login_datetime = excluded.last_login_datetime,
+                               status = excluded.status,
+                               updated_datetime = now();
+
+insert into tbl_member (
+    email,
+    password,
+    nickname,
+    real_name,
+    bio,
+    role,
+    creator_verified,
+    seller_verified,
+    creator_tier,
+    follower_count,
+    following_count,
+    gallery_count,
+    phone_number,
+    last_login_datetime,
+    status,
+    created_datetime,
+    updated_datetime
+)
+values (
+           'dlwnstn0315@gmail.com',
+           '$2b$10$J34V9sWoEokz6k6NhZtAxe2QYEGXHsZ4L/N.RaJDmHnQlZZXGdUO6',
+           'dlwnstn0315',
+           'dlwnstn0315',
+           '추가 더미 회원',
+           'USER',
+           false,
+           false,
+           'BASIC',
+           0,
+           0,
+           0,
+           '010-9397-3256',
+           now(),
+           'ACTIVE',
+           now(),
+           now()
+       )
+    on conflict (email) do update
+                               set
+                                   password = excluded.password,
+                               nickname = excluded.nickname,
+                               real_name = excluded.real_name,
+                               bio = excluded.bio,
+                               role = excluded.role,
+                               creator_verified = excluded.creator_verified,
+                               seller_verified = excluded.seller_verified,
+                               creator_tier = excluded.creator_tier,
+                               follower_count = excluded.follower_count,
+                               following_count = excluded.following_count,
+                               gallery_count = excluded.gallery_count,
+                               phone_number = excluded.phone_number,
+                               last_login_datetime = excluded.last_login_datetime,
+                               status = excluded.status,
+                               updated_datetime = now();
 
 insert into tbl_member (
     email,
@@ -370,8 +426,8 @@ select
     w.work_no,
     now()
 from tmp_dummy_galleries g
-join tmp_dummy_works w
-  on g.gallery_no = w.gallery_no
+         join tmp_dummy_works w
+              on g.gallery_no = w.gallery_no
 order by g.gallery_no, w.work_no;
 
 insert into tbl_work_file (
@@ -401,7 +457,7 @@ set
     work_count = coalesce((
         select count(*)
         from tbl_gallery_work gw
-        join tbl_work w on gw.work_id = w.id
+                 join tbl_work w on gw.work_id = w.id
         where gw.gallery_id = g.id
           and w.deleted_datetime is null
           and w.status != 'DELETED'
@@ -433,28 +489,28 @@ drop table if exists tmp_dummy_gallery_seed;
 
 update tbl_badge
 set image_file = case badge_key
-    when 'FIRST_WORK' then 'first_video_badge.png'
-    when 'WORK_10' then 'uploaded_more_than_5_times_badge.png'
-    when 'WORK_50' then 'uploaded_more_than_5_times_badge.png'
-    when 'FIRST_SALE' then 'first_sell_badge.png'
-    when 'FIRST_AUCTION' then 'first_auction_winner_badge.png'
-    when 'GALLERY_CREATOR' then 'art_gallery_views_over_10_million.png'
-    when 'CONTEST_WINNER' then 'contest_award_badge.png'
-    when 'FOLLOWER_100' then 'write_contest_badge.png'
-    when 'EARLY_ADOPTER' then 'auction_price_of_1_million_won_badge.png'
-    else image_file
-end
+                     when 'FIRST_WORK' then 'first_video_badge.png'
+                     when 'WORK_10' then 'uploaded_more_than_5_times_badge.png'
+                     when 'WORK_50' then 'uploaded_more_than_5_times_badge.png'
+                     when 'FIRST_SALE' then 'first_sell_badge.png'
+                     when 'FIRST_AUCTION' then 'first_auction_winner_badge.png'
+                     when 'GALLERY_CREATOR' then 'art_gallery_views_over_10_million.png'
+                     when 'CONTEST_WINNER' then 'contest_award_badge.png'
+                     when 'FOLLOWER_100' then 'write_contest_badge.png'
+                     when 'EARLY_ADOPTER' then 'auction_price_of_1_million_won_badge.png'
+                     else image_file
+    end
 where badge_key in (
-    'FIRST_WORK',
-    'WORK_10',
-    'WORK_50',
-    'FIRST_SALE',
-    'FIRST_AUCTION',
-    'GALLERY_CREATOR',
-    'CONTEST_WINNER',
-    'FOLLOWER_100',
-    'EARLY_ADOPTER'
-);
+                    'FIRST_WORK',
+                    'WORK_10',
+                    'WORK_50',
+                    'FIRST_SALE',
+                    'FIRST_AUCTION',
+                    'GALLERY_CREATOR',
+                    'CONTEST_WINNER',
+                    'FOLLOWER_100',
+                    'EARLY_ADOPTER'
+    );
 
 insert into tbl_member_badge (member_id, badge_id, is_displayed, earned_at)
 select
@@ -463,19 +519,19 @@ select
     case
         when b.badge_key in ('FIRST_WORK', 'FIRST_SALE') then true
         else false
-    end,
+        end,
     now() - (row_number() over (partition by m.id order by b.id) * interval '1 day')
 from tbl_member m
-join tbl_badge b
-  on b.badge_key in ('FIRST_WORK', 'WORK_10', 'FIRST_SALE')
+         join tbl_badge b
+              on b.badge_key in ('FIRST_WORK', 'WORK_10', 'FIRST_SALE')
 where m.email in (
-    'admin@bideo.com',
-    'test1@bideo.com',
-    'test2@bideo.com',
-    'test3@bideo.com',
-    'dlwnstn0315@gmail.com'
-)
-on conflict (member_id, badge_id) do update
-set
-    is_displayed = excluded.is_displayed,
-    earned_at = excluded.earned_at;
+                  'admin@bideo.com',
+                  'test1@bideo.com',
+                  'test2@bideo.com',
+                  'test3@bideo.com',
+                  'dlwnstn0315@gmail.com'
+    )
+    on conflict (member_id, badge_id) do update
+                                             set
+                                                 is_displayed = excluded.is_displayed,
+                                             earned_at = excluded.earned_at;

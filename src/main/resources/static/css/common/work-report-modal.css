@@ -1,0 +1,177 @@
+/* Work / Contest 신고 모달 공통 스타일 (report-modal-*)
+   원본: static/css/work/workdetail.css
+*/
+
+.report-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 10020;
+    background: rgba(15, 23, 42, 0.42);
+}
+
+.report-modal-dialog {
+    outline: none;
+    box-sizing: border-box;
+    position: fixed;
+    top: 154px;
+    left: 720px;
+    z-index: 2204;
+    width: 504px;
+    max-width: calc(100vw - 32px);
+    max-height: min(807px, calc(100vh - 32px));
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: #ffffff;
+    color: var(--panel-text);
+    overflow: hidden;
+    box-shadow: none;
+}
+
+.report-modal-header {
+    display: grid;
+    grid-template-columns: 40px 1fr 40px;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+    background: #ffffff;
+}
+
+.report-modal-header-spacer {
+    width: 40px;
+    height: 40px;
+}
+
+.report-modal-title {
+    margin: 0;
+    text-align: center;
+    font-size: 18px;
+    line-height: 1.5;
+    font-weight: 750;
+    color: var(--panel-text);
+}
+
+.report-modal-close {
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--panel-text);
+    cursor: pointer;
+}
+
+.report-modal-close:hover {
+    background: #f2f2f2;
+}
+
+.report-modal-close svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    display: block;
+}
+
+.report-modal-step {
+    display: flex;
+    flex-direction: column;
+}
+
+.report-modal-body {
+    padding: 24px;
+    background: #ffffff;
+}
+
+.report-modal-body-confirmation {
+    padding-top: 28px;
+    padding-bottom: 16px;
+    text-align: center;
+}
+
+.report-modal-heading {
+    margin: 0 0 12px;
+    color: var(--panel-text);
+    font-size: 28px;
+    line-height: 1.25;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.report-modal-copy {
+    margin-bottom: 20px;
+    color: var(--panel-muted);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.report-modal-copy-centered {
+    max-width: 420px;
+    margin: 0 auto 12px;
+}
+
+.report-modal-copy-centered:last-child {
+    margin-bottom: 0;
+}
+
+.report-modal-reasons {
+    display: grid;
+}
+
+.report-modal-reason {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    color: var(--panel-text);
+    font-size: 15px;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+.report-modal-reason input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: #0f0f0f;
+}
+
+.report-modal-image {
+    display: block;
+    margin: 0 auto 24px;
+    object-fit: contain;
+}
+
+.report-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 24px 24px;
+    border-top: 1px solid var(--line);
+    background: #ffffff;
+}
+
+.report-modal-button {
+    min-width: 88px;
+    height: 36px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 999px;
+    font: inherit;
+    font-weight: 700;
+}
+
+.report-modal-button-next {
+    background: #e5e7eb;
+    color: #9ca3af;
+}
+
+.report-modal-button-next:not(:disabled) {
+    background: #0f0f0f;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.report-modal-button-confirm {
+    background: #0f0f0f;
+    color: #ffffff;
+    cursor: pointer;
+}
