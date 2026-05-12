@@ -1327,3 +1327,24 @@ if (document.querySelector('[data-profile-avatar-open]') && !document.querySelec
 if (document.querySelector('[data-share-list]')) {
   searchShareUsers('');
 }
+
+// 쿼리 파라미터로 팔로우 관리 모달 자동 열기
+(async () => {
+  if (!isMyProfilePage()) return;
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('openFollowManage') !== '1') return;
+  if (!document.getElementById('follow-manage-modal')) return;
+
+  try {
+    await loadFollowManageData();
+    modalOpen('follow-manage-modal');
+  } catch (error) {
+    alert(error.message || '팔로우 관리 정보를 불러오지 못했습니다.');
+  }
+
+  params.delete('openFollowManage');
+  const query = params.toString();
+  const nextUrl = window.location.pathname + (query ? '?' + query : '') + window.location.hash;
+  window.history.replaceState({}, '', nextUrl);
+})();

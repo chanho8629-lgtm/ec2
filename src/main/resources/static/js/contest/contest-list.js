@@ -324,6 +324,14 @@ const ContestListModule = (function () {
             };
         }
 
+        /* 신고 버튼 */
+        var reportBtn = document.querySelector(".Contest-Detail-ReportBtn");
+        if (reportBtn) {
+            reportBtn.onclick = function () {
+                openReportModal();
+            };
+        }
+
         /* 찜하기 버튼 */
         var bookmarkBtn = document.getElementById("bookmarkBtn");
         if (bookmarkBtn) {
@@ -555,20 +563,18 @@ const ContestListModule = (function () {
 
             list.innerHTML = users.map(function (user) {
                 var key = user.nickname;
+                var nickname = user.nickname || "user";
+                var avatarHtml = user.profileImage
+                    ? '<span class="work-share-user__avatar"><img src="' + escapeHtml(user.profileImage) + '" alt="' + escapeHtml(nickname) + ' 프로필 이미지" onerror="this.onerror=null;this.remove();"></span>'
+                    : '<span class="work-share-user__avatar">' + escapeHtml((nickname.charAt(0) || "?").toUpperCase()) + '</span>';
                 var isSelected = shareState.selectedKeys.indexOf(key) >= 0;
-                var avatar = user.profileImage
-                    ? '<img src="' + escapeHtml(user.profileImage) + '" alt="" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'/images/default-profile.svg\';" />'
-                    : '<img src="/images/default-profile.svg" alt="" />';
-                return '<button type="button" class="work-share-recipient" data-share-user="' + escapeHtml(key) + '">' +
-                       '<span class="work-share-recipient__main">' +
-                       '<span class="work-share-recipient__avatar">' + avatar + '</span>' +
-                       '<span class="work-share-recipient__copy">' +
-                       '<span class="work-share-recipient__username">' + escapeHtml(user.nickname) + '</span>' +
-                       '<span class="work-share-recipient__realname">' + escapeHtml(user.creatorVerified ? '크리에이터' : '회원') + '</span>' +
-                       '</span></span>' +
-                       '<span class="work-share-recipient__check' + (isSelected ? ' is-selected' : '') + '">' +
-                       (isSelected ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : '') +
-                       '</span></button>';
+                return '<button type="button" class="work-share-user' + (isSelected ? ' is-selected' : '') + '" data-share-user="' + escapeHtml(key) + '">' +
+                       avatarHtml +
+                       '<span class="work-share-user__meta">' +
+                         '<strong>' + escapeHtml(nickname) + '</strong>' +
+                         '<small>' + escapeHtml(user.creatorVerified ? '크리에이터 인증' : '일반 회원') + '</small>' +
+                       '</span>' +
+                       '</button>';
             }).join("");
 
             list.querySelectorAll("[data-share-user]").forEach(function (btn) {
@@ -675,11 +681,93 @@ const ContestListModule = (function () {
         }
     }
 
+    /* ───── 신고 모달 (작품 상세 workdetail.js 와 동일 동작) ───── */
+    function syncReportNextButton() {
+        var nextBtn = document.querySelector('[data-role="report-next-button"]');
+        if (!nextBtn) return;
+        var inputs = document.querySelectorAll('input[name="report-form-reason-select-page"]');
+        var hasSelection = Array.prototype.some.call(inputs, function (i) { return i.checked; });
+        nextBtn.disabled = !hasSelection;
+        nextBtn.setAttribute("aria-disabled", hasSelection ? "false" : "true");
+        nextBtn.style.background = hasSelection ? "#0f0f0f" : "#e5e7eb";
+        nextBtn.style.color = hasSelection ? "#ffffff" : "#9ca3af";
+        nextBtn.style.cursor = hasSelection ? "pointer" : "default";
+    }
+
+    function openReportModal() {
+        var backdrop = document.querySelector('[data-role="report-modal-backdrop"]');
+        var confirmation = document.querySelector('[data-role="report-confirmation-backdrop"]');
+        var step = document.querySelector('[data-role="report-step-reasons"]');
+        if (!backdrop) return;
+        var inputs = document.querySelectorAll('input[name="report-form-reason-select-page"]');
+        Array.prototype.forEach.call(inputs, function (i) { i.checked = false; });
+        if (step) step.hidden = false;
+        syncReportNextButton();
+        backdrop.hidden = false;
+        if (confirmation) confirmation.hidden = true;
+    }
+
+    function closeReportModal() {
+        var backdrop = document.querySelector('[data-role="report-modal-backdrop"]');
+        if (backdrop) backdrop.hidden = true;
+    }
+
+    function openReportConfirmation() {
+        var confirmation = document.querySelector('[data-role="report-confirmation-backdrop"]');
+        if (confirmation) confirmation.hidden = false;
+    }
+
+    function closeReportConfirmation() {
+        var confirmation = document.querySelector('[data-role="report-confirmation-backdrop"]');
+        if (confirmation) confirmation.hidden = true;
+    }
+
+    function initReportModal() {
+        var backdrop = document.querySelector('[data-role="report-modal-backdrop"]');
+        var close = document.querySelector('[data-role="report-modal-close"]');
+        var next = document.querySelector('[data-role="report-next-button"]');
+        var confirmation = document.querySelector('[data-role="report-confirmation-backdrop"]');
+        var confirmClose = document.querySelector('[data-role="report-confirmation-close"]');
+        var confirmBtn = document.querySelector('[data-role="report-confirm-button"]');
+        var inputs = document.querySelectorAll('input[name="report-form-reason-select-page"]');
+
+        if (close) close.addEventListener("click", closeReportModal);
+        if (backdrop) {
+            backdrop.addEventListener("click", function (e) {
+                if (e.target === backdrop) closeReportModal();
+            });
+        }
+        if (confirmation) {
+            confirmation.addEventListener("click", function (e) {
+                if (e.target === confirmation) closeReportConfirmation();
+            });
+        }
+        if (confirmClose) confirmClose.addEventListener("click", closeReportConfirmation);
+        if (confirmBtn) confirmBtn.addEventListener("click", closeReportConfirmation);
+        Array.prototype.forEach.call(inputs, function (input) {
+            input.addEventListener("change", syncReportNextButton);
+        });
+        if (next) {
+            next.addEventListener("click", function () {
+                if (!next.disabled) {
+                    closeReportModal();
+                    openReportConfirmation();
+                }
+            });
+        }
+        document.addEventListener("keydown", function (e) {
+            if (e.key !== "Escape") return;
+            if (backdrop && !backdrop.hidden) closeReportModal();
+            if (confirmation && !confirmation.hidden) closeReportConfirmation();
+        });
+    }
+
     /* ───── 초기화 ───── */
     function init() {
         initFilters();
         initEntryModal();
         initShareModal();
+        initReportModal();
         applyInitialScopeFromUrl();
         resetList();
     }

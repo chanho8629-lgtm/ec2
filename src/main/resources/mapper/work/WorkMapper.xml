@@ -239,19 +239,23 @@
         ) t_file on true
         where w.deleted_datetime is null
           and w.status = 'ACTIVE'
-          and not exists (
-              select 1
-              from tbl_auction latest
-              where latest.id = (
-                  select a.id
-                  from tbl_auction a
-                  where a.work_id = w.id
-                  order by a.created_datetime desc, a.id desc
-                  limit 1
-              )
-                and (latest.status != 'ACTIVE' or latest.closing_at <= now())
-          )
         ]]>
+        <if test="galleryId == null">
+            <![CDATA[
+            and not exists (
+                select 1
+                from tbl_auction latest
+                where latest.id = (
+                    select a.id
+                    from tbl_auction a
+                    where a.work_id = w.id
+                    order by a.created_datetime desc, a.id desc
+                    limit 1
+                )
+                  and (latest.status != 'ACTIVE' or latest.closing_at <= now())
+            )
+            ]]>
+        </if>
         <if test="galleryId != null">
             and exists (
             select 1
@@ -457,19 +461,23 @@
         left join tbl_member m on w.member_id = m.id
         where w.deleted_datetime is null
           and w.status = 'ACTIVE'
-          and not exists (
-              select 1
-              from tbl_auction latest
-              where latest.id = (
-                  select a.id
-                  from tbl_auction a
-                  where a.work_id = w.id
-                  order by a.created_datetime desc, a.id desc
-                  limit 1
-              )
-                and (latest.status != 'ACTIVE' or latest.closing_at <= now())
-          )
         ]]>
+        <if test="galleryId == null">
+            <![CDATA[
+            and not exists (
+                select 1
+                from tbl_auction latest
+                where latest.id = (
+                    select a.id
+                    from tbl_auction a
+                    where a.work_id = w.id
+                    order by a.created_datetime desc, a.id desc
+                    limit 1
+                )
+                  and (latest.status != 'ACTIVE' or latest.closing_at <= now())
+            )
+            ]]>
+        </if>
         <if test="galleryId != null">
             and exists (
             select 1
