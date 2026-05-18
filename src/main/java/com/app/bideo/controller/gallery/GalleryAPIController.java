@@ -2,6 +2,8 @@ package com.app.bideo.controller.gallery;
 
 import com.app.bideo.dto.common.PageResponseDTO;
 import com.app.bideo.dto.gallery.GalleryCreateRequestDTO;
+import com.app.bideo.dto.work.WorkListResponseDTO;
+import com.app.bideo.service.work.WorkService;
 import com.app.bideo.dto.gallery.GalleryCreateResponseDTO;
 import com.app.bideo.dto.gallery.GalleryDetailResponseDTO;
 import com.app.bideo.dto.gallery.GalleryListResponseDTO;
@@ -32,6 +34,7 @@ import java.util.List;
 public class GalleryAPIController {
 
     private final GalleryService galleryService;
+    private final WorkService workService;
 
     @GetMapping
     public PageResponseDTO<GalleryListResponseDTO> list(@ModelAttribute GallerySearchDTO searchDTO) {
@@ -84,6 +87,22 @@ public class GalleryAPIController {
             @RequestBody CommentCreateRequestDTO requestDTO
     ) {
         return galleryService.writeComment(id, memberId, requestDTO.getContent());
+    }
+
+    @GetMapping("/{id}/similar")
+    public List<GalleryListResponseDTO> similar(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "6") int limit
+    ) {
+        return galleryService.getSimilarGalleries(id, limit);
+    }
+
+    @GetMapping("/{id}/similar-works")
+    public List<WorkListResponseDTO> similarWorks(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "6") int limit
+    ) {
+        return workService.getSimilarWorksByGallery(id, limit);
     }
 
     @PostMapping("/{id}/likes")

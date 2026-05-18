@@ -22,6 +22,7 @@ public class AuctionController {
     private final AuctionService auctionService;
     private final BidQueryService bidQueryService;
     private final BidCommandService bidCommandService;
+    private final AuctionRagService auctionRagService;
     private final SimpMessagingTemplate messagingTemplate;
 
     // 경매 조회
@@ -74,6 +75,11 @@ public class AuctionController {
         messagingTemplate.convertAndSend("/topic/auction." + auctionId, broadcast);
 
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/{auctionId}/ai/analyze")
+    public ResponseEntity<AuctionRagAnalyzeResponseDTO> analyzeAuctionWithAi(@PathVariable Long auctionId) {
+        return ResponseEntity.ok(auctionRagService.analyzeAuction(auctionId));
     }
 
 

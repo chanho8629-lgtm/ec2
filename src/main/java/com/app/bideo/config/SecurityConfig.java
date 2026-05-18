@@ -42,7 +42,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/dashboard", "/api/dashboard/**").authenticated()
                         .requestMatchers("/api/cards", "/api/cards/**").authenticated()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/works/**").permitAll()
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/galleries", "/api/galleries/*", "/api/galleries/*/comments").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST,
+                                "/api/works/ai/prediction",
+                                "/api/auction/*/ai/analyze"
+                        ).permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/galleries", "/api/galleries/*", "/api/galleries/*/comments", "/api/galleries/*/similar", "/api/galleries/*/similar-works").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/gallery-register", "/gallery/gallery-register").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/gallery/*").permitAll()
                         .requestMatchers(

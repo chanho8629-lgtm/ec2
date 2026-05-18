@@ -7,6 +7,7 @@
 \set ON_ERROR_STOP on
 \ir tbl_member.sql
 \ir tbl_tag.sql
+\ir 2026-05-15_seed_tags_500.sql
 \ir tbl_badge.sql
 \ir tbl_message_room.sql
 \ir tbl_faq.sql
@@ -41,6 +42,7 @@
 \ir tbl_display_control.sql
 \ir tbl_curator_setting.sql
 \ir tbl_gallery_tag.sql
+\ir 2026-05-15_seed_random_work_gallery_tags.sql
 \ir tbl_gallery_work.sql
 \ir tbl_contest_tag.sql
 \ir tbl_contest_entry.sql

@@ -19,15 +19,13 @@ truncate tbl_member restart identity cascade;
 insert into tbl_member (
     email, password, nickname, real_name, role, status,
     creator_verified, creator_tier, phone_number,
-    email_verified, phone_verified,
-    last_login_datetime, last_activity_datetime
+    last_login_datetime
 ) values (
     'admin@bideo.com',
     '$2b$10$J34V9sWoEokz6k6NhZtAxe2QYEGXHsZ4L/N.RaJDmHnQlZZXGdUO6',
     '관리자', '관리자', 'ADMIN', 'ACTIVE',
     false, 'BASIC', '010-0000-0000',
-    true, true,
-    now() - interval '5 minute', now()
+    now() - interval '5 minute'
 );
 
 -- ---------------------------------------------------------------
@@ -38,8 +36,7 @@ insert into tbl_member (
     email, password, nickname, real_name, role, status,
     creator_verified, creator_tier, phone_number,
     follower_count, following_count, gallery_count,
-    email_verified, phone_verified,
-    last_login_datetime, last_activity_datetime,
+    last_login_datetime,
     created_datetime
 )
 select
@@ -61,10 +58,7 @@ select
     case when i <= 50 then (i * 7) % 200 else (i * 2) % 50 end,
     case when i <= 50 then (i * 3) % 30  else (i * 5) % 100 end,
     case when i <= 50 then (i % 6)       else 0 end,
-    true,
-    case when i % 7 = 0 then false else true end,
     now() - ((i % 240 + 1) || ' hour')::interval,
-    now() - ((i % 60 + 1)  || ' minute')::interval,
     now() - ((i % 365 + 1) || ' day')::interval
 from generate_series(1, 100) as g(i);
 
@@ -126,6 +120,9 @@ select i,
                           else 'https://www.w3schools.com/html/mov_bbb.mp4' end,
        'VIDEO', 1048576 + (i * 1000), 1920, 1080, 1
 from generate_series(1, 100) as g(i);
+
+\echo '=> Filling AI regression/classification features'
+\ir 2026-05-13_fill_work_ai_features.sql
 
 -- ---------------------------------------------------------------
 -- 6) 카드 (컬렉터 50명, 각 1장)

@@ -7,6 +7,7 @@ import com.app.bideo.dto.gallery.GalleryCreateRequestDTO;
 import com.app.bideo.dto.gallery.GalleryDetailResponseDTO;
 import com.app.bideo.dto.gallery.GalleryListResponseDTO;
 import com.app.bideo.dto.gallery.GallerySearchDTO;
+import com.app.bideo.dto.gallery.GallerySimilarityDocumentDTO;
 import com.app.bideo.dto.gallery.GalleryUpdateRequestDTO;
 import com.app.bideo.dto.gallery.SearchGalleryCoverDataDTO;
 import com.app.bideo.dto.gallery.SearchGallerySuggestionDTO;
@@ -148,6 +149,17 @@ public class GalleryDAO {
 
     public List<GalleryListResponseDTO> findAll(GallerySearchDTO searchDTO) {
         return galleryMapper.selectGalleryList(searchDTO);
+    }
+
+    public List<GallerySimilarityDocumentDTO> findSimilarityDocuments(Long targetGalleryId, int limit) {
+        return galleryMapper.selectGallerySimilarityDocuments(targetGalleryId, limit);
+    }
+
+    public List<GalleryListResponseDTO> findAllByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return galleryMapper.selectGalleryListByIds(ids);
     }
 
     // 검색해서 목록 조회

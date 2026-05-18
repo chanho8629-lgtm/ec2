@@ -1,5 +1,6 @@
 const AuctionEvent = (() => {
     let isBound = false;
+    let scrollGuardBound = false;
     let currentAuctionId = null;
 
     // 토스트
@@ -60,6 +61,17 @@ const AuctionEvent = (() => {
 
         if (!bidSubmitBtn || !bidNextAmountEl) return;
 
+        const auctionModal = document.querySelector(".work-auction-modal-backdrop");
+        if (auctionModal && !scrollGuardBound) {
+            auctionModal.addEventListener("wheel", (event) => {
+                event.stopPropagation();
+            }, { passive: true });
+            auctionModal.addEventListener("touchmove", (event) => {
+                event.stopPropagation();
+            }, { passive: true });
+            scrollGuardBound = true;
+        }
+
         bidInfoBtn?.addEventListener("click", (event) => {
             event.stopPropagation();
             bidInfoTooltip?.classList.toggle("on");
@@ -117,6 +129,25 @@ const AuctionEvent = (() => {
                 `${bidAmount.toLocaleString("ko-KR")}원으로 입찰하시겠습니까?`,
                 () => AuctionLayout.executeBid(elements, currentAuctionId)
             );
+        });
+
+        elements.auctionAiAnalyzeBtn?.addEventListener("click", async (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (!currentAuctionId) {
+                showToast("경매 정보를 먼저 불러와주세요.", "error");
+                return;
+            }
+
+            try {
+                AuctionLayout.setAiLoading(true);
+                const result = await AuctionService.analyzeAuction(currentAuctionId);
+                AuctionLayout.renderAiAnalysis(result);
+            } catch (error) {
+                AuctionLayout.setAiLoading(false);
+                showToast(error.message || "AI 경매 분석에 실패했습니다.", "error");
+            }
         });
 
         isBound = true;

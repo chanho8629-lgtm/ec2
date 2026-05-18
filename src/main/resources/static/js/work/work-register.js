@@ -43,6 +43,12 @@ function initializeWorkRegister() {
     var playlistDropdownText = document.getElementById("playlist-dropdown-text");
     var playlistOptions = document.querySelectorAll(".playlist-option");
     var submitButton = document.getElementById("work-submit-button");
+    var workPredictionButton = document.getElementById("work-prediction-button");
+    var workPredictionStatus = document.getElementById("work-prediction-status");
+    var workRegressionViews = document.getElementById("work-regression-views");
+    var workPredictionLikes = document.getElementById("work-prediction-likes");
+    var workClassificationLabel = document.getElementById("work-classification-label");
+    var workClassificationProbability = document.getElementById("work-classification-probability");
     var thumbnailUploadButtons = document.querySelectorAll(".thumbnail-upload-button");
     var thumbnailFileInputs = document.querySelectorAll('input[id^="thumbnail-file-input-"]');
     var aiPromptModal = document.getElementById("ai-prompt-modal");
@@ -67,6 +73,12 @@ function initializeWorkRegister() {
     var currentPreviewUrl = "";
     var currentAiPromptAttachmentUrl = "";
     var currentAiGeneratedAssetUrl = "";
+    var currentAiGeneratedTitle = "";
+    var currentAiGeneratedDescription = "";
+    var currentAiDescriptionReady = false;
+    var currentAiGeneratedImageKey = "";
+    var currentAiGeneratedFileType = "";
+    var currentAiGeneratedFileSize = 0;
     var thumbnailPreviewUrls = {};
     var currentMediaFile = null;
     var currentExistingMediaUrl = registerState ? (registerState.getAttribute("data-media-url") || "").trim() : "";
@@ -78,6 +90,11 @@ function initializeWorkRegister() {
     var activeTagSuggestionIndex = -1;
     var selectedExistingTagNames = {};
     var selectedTagNames = [];
+    var workPredictionAbortController = null;
+    var lastPredictedViews = 0;
+    var lastPredictedLikes = 0;
+    var lastPredictedPopular = 0;
+    var lastPredictedPopularProbability = 0;
 
     if (!modal || !dialogContent || !uploadScreen || !detailsScreen || !uploadPanel || !fileInput || !selectFileButton || !fileNameText) {
         return;
@@ -107,6 +124,60 @@ function initializeWorkRegister() {
                 node.remove();
             }
         });
+    }
+
+    ensureWorkPredictionPanel();
+
+    function ensureWorkPredictionPanel() {
+        var panel = document.getElementById("work-ai-prediction");
+        var formCard = detailsScreen ? detailsScreen.querySelector(".form-card") : null;
+        var targetParent;
+
+        if (!formCard) {
+            return;
+        }
+
+        targetParent = formCard.parentNode;
+        if (!targetParent) {
+            return;
+        }
+
+        if (!panel) {
+            panel = document.createElement("div");
+            panel.className = "work-ai-prediction";
+            panel.id = "work-ai-prediction";
+            panel.innerHTML = [
+                '<div class="work-ai-prediction__header">',
+                '<div>',
+                '<div class="work-ai-prediction__title">AI 예측</div>',
+                '<div class="work-ai-prediction__status" id="work-prediction-status">작성값 기준 예측 대기</div>',
+                '</div>',
+                '<button type="button" class="work-ai-prediction__button" id="work-prediction-button">예측하기</button>',
+                '</div>',
+                '<div class="work-ai-prediction__grid">',
+                '<div class="work-ai-prediction__item"><span>예상 조회수</span><strong id="work-regression-views">-</strong></div>',
+                '<div class="work-ai-prediction__item"><span>예상 좋아요</span><strong id="work-prediction-likes">-</strong></div>',
+                '<div class="work-ai-prediction__item"><span>분류 결과</span><strong id="work-classification-label">-</strong></div>',
+                '<div class="work-ai-prediction__item"><span>고조회수 확률</span><strong id="work-classification-probability">-</strong></div>',
+                '<div class="work-ai-prediction__item"><span>예상 댓글</span><strong id="work-prediction-comments">-</strong></div>',
+                '<div class="work-ai-prediction__item"><span>예상 공유</span><strong id="work-prediction-shares">-</strong></div>',
+                '<div class="work-ai-prediction__item"><span>예측 등급</span><strong id="work-prediction-grade">-</strong></div>',
+                '<div class="work-ai-prediction__item"><span>신뢰도</span><strong id="work-prediction-confidence">-</strong></div>',
+                '<div class="work-ai-prediction__item work-ai-prediction__item--wide"><span>모델 근거</span><strong id="work-prediction-signal">-</strong></div>',
+                '</div>'
+            ].join("");
+        }
+
+        if (formCard.nextSibling !== panel) {
+            targetParent.insertBefore(panel, formCard.nextSibling);
+        }
+
+        workPredictionButton = document.getElementById("work-prediction-button");
+        workPredictionStatus = document.getElementById("work-prediction-status");
+        workRegressionViews = document.getElementById("work-regression-views");
+        workPredictionLikes = document.getElementById("work-prediction-likes");
+        workClassificationLabel = document.getElementById("work-classification-label");
+        workClassificationProbability = document.getElementById("work-classification-probability");
     }
 
     function closeModal() {
@@ -267,6 +338,12 @@ function initializeWorkRegister() {
         }
 
         currentAiGeneratedAssetUrl = "";
+        currentAiGeneratedTitle = "";
+        currentAiGeneratedDescription = "";
+        currentAiDescriptionReady = false;
+        currentAiGeneratedImageKey = "";
+        currentAiGeneratedFileType = "";
+        currentAiGeneratedFileSize = 0;
     }
 
     function renderAiPromptAttachment(file) {
@@ -344,8 +421,7 @@ function initializeWorkRegister() {
             .replace(/'/g, "&#39;");
     }
 
-    function buildAiGeneratedPlaceholderSvg(promptText) {
-        var safePrompt = escapeHtml(promptText || "해질 무렵 산 정상의 여인");
+    function buildAiGeneratedPlaceholderSvg() {
         return [
             '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1280">',
             '<defs>',
@@ -371,8 +447,6 @@ function initializeWorkRegister() {
             '<path d="M434 700H538V736H434Z" fill="#c9a24e"/>',
             '<path d="M404 720L454 918H392L338 806Z" fill="#2b2422"/>',
             '<path d="M526 720L602 900H544L486 812Z" fill="#2b2422"/>',
-            '<text x="84" y="1122" fill="#ffffff" fill-opacity="0.88" font-size="42" font-family="sans-serif">이미지 생성됨 · </text>',
-            '<text x="310" y="1122" fill="#ffffff" fill-opacity="0.96" font-size="42" font-family="sans-serif">', safePrompt, '</text>',
             '</svg>'
         ].join("");
     }
@@ -393,31 +467,45 @@ function initializeWorkRegister() {
         aiPromptThread.scrollTop = aiPromptThread.scrollHeight;
     }
 
-    function renderAiPromptConversation(promptText) {
-        var previewSource;
-        var labelText;
+    function removeAiPromptPending() {
+        var pendingNode;
 
         if (!aiPromptThread) {
             return;
         }
 
-        previewSource = currentAiPromptAttachmentUrl || createAiGeneratedAssetUrl(promptText);
-        labelText = promptText || "해질 무렵 산 정상의 여인";
+        pendingNode = aiPromptThread.querySelector('[data-role="ai-prompt-pending"]');
+        if (pendingNode) {
+            pendingNode.remove();
+        }
+    }
 
-        aiPromptThread.innerHTML = [
-            '<div class="ai-prompt-thread__message ai-prompt-thread__message--user">', escapeHtml(promptText), '</div>',
+    function renderAiPromptConversation(promptText, result) {
+        var previewSource;
+
+        if (!aiPromptThread) {
+            return;
+        }
+
+        if (result && result.imageUrl) {
+            clearAiGeneratedAsset();
+            currentAiGeneratedAssetUrl = result.imageUrl;
+            currentAiGeneratedTitle = result.title || "";
+            currentAiGeneratedDescription = result.description || "";
+            currentAiDescriptionReady = false;
+            currentAiGeneratedImageKey = result.imageKey || "";
+            currentAiGeneratedFileType = result.fileType || "image/png";
+            currentAiGeneratedFileSize = Number(result.fileSize || 0);
+        }
+
+        previewSource = currentAiPromptAttachmentUrl || currentAiGeneratedAssetUrl || createAiGeneratedAssetUrl(promptText);
+
+        removeAiPromptPending();
+
+        aiPromptThread.insertAdjacentHTML("beforeend", [
             '<div class="ai-prompt-thread__result">',
-            '<div class="ai-prompt-thread__label">이미지 생성됨 \u00b7 ', escapeHtml(labelText), '</div>',
             '<div class="ai-prompt-preview-card" data-role="ai-preview-card">',
-            '<div class="ai-prompt-preview-card__split">',
             '<img src="', escapeHtml(previewSource), '" alt="AI 생성 이미지">',
-            '</div>',
-            '<div class="ai-prompt-preview-card__split">',
-            '<img src="', escapeHtml(previewSource), '" alt="AI 생성 비디오 썸네일">',
-            '<span class="ai-prompt-preview-card__play" aria-hidden="true">',
-            '<svg viewBox="0 0 24 24"><path d="M8 5.14v13.72L19 12 8 5.14Z"/></svg>',
-            '</span>',
-            '</div>',
             '</div>',
             '<div class="ai-prompt-preview-actions">',
             '<button type="button" class="ai-prompt-preview-actions__button" data-role="ai-preview-copy" aria-label="복사">',
@@ -431,9 +519,80 @@ function initializeWorkRegister() {
             '</button>',
             '</div>',
             '</div>'
-        ].join("");
+        ].join(""));
 
         scrollAiPromptThreadToBottom();
+    }
+
+    function renderAiDescriptionConversation(promptText, result) {
+        if (!aiPromptThread) {
+            return;
+        }
+
+        currentAiGeneratedTitle = result && result.title ? result.title : currentAiGeneratedTitle;
+        currentAiGeneratedDescription = result && result.description ? result.description : currentAiGeneratedDescription;
+        currentAiDescriptionReady = !!(currentAiGeneratedTitle || currentAiGeneratedDescription);
+
+        if (currentAiDescriptionReady && currentAiGeneratedTitle && videoTitleInput) {
+            videoTitleInput.value = currentAiGeneratedTitle;
+            autoResizeTextarea(videoTitleInput);
+            updateTextCount(videoTitleInput, videoTitleCount, 100);
+            if (detailsVideoTitle) {
+                detailsVideoTitle.textContent = currentAiGeneratedTitle;
+            }
+        }
+
+        if (currentAiDescriptionReady && currentAiGeneratedDescription && videoDescriptionInput) {
+            videoDescriptionInput.value = currentAiGeneratedDescription;
+            updateTextCount(videoDescriptionInput, videoDescriptionCount, 5000);
+        }
+
+        removeAiPromptPending();
+
+        aiPromptThread.insertAdjacentHTML("beforeend", [
+            '<div class="ai-prompt-thread__message ai-prompt-thread__message--assistant">',
+            escapeHtml([currentAiGeneratedTitle, currentAiGeneratedDescription].filter(Boolean).join("\n\n")),
+            '</div>'
+        ].join(""));
+
+        scrollAiPromptThreadToBottom();
+    }
+
+    function isDescriptionPrompt(promptText) {
+        var normalized = String(promptText || "").replace(/\s+/g, "").toLowerCase();
+
+        return normalized.indexOf("설명") >= 0 ||
+            normalized.indexOf("분석") >= 0 ||
+            normalized.indexOf("제목") >= 0 ||
+            normalized.indexOf("내용") >= 0 ||
+            normalized.indexOf("묘사") >= 0 ||
+            normalized.indexOf("describe") >= 0 ||
+            normalized.indexOf("analyze") >= 0;
+    }
+
+    function getCurrentAiDescriptionTarget() {
+        if (currentAiGeneratedImageKey || currentAiGeneratedAssetUrl) {
+            return {
+                imageKey: currentAiGeneratedImageKey,
+                imageUrl: currentAiGeneratedAssetUrl
+            };
+        }
+
+        if (currentExistingMediaUrl && currentExistingMediaType.indexOf("image/") === 0) {
+            return {
+                imageKey: "",
+                imageUrl: currentExistingMediaUrl
+            };
+        }
+
+        if (currentPreviewUrl && currentPreviewUrl.indexOf("blob:") !== 0) {
+            return {
+                imageKey: "",
+                imageUrl: currentPreviewUrl
+            };
+        }
+
+        return null;
     }
 
     function dataUrlToFile(dataUrl, fileName) {
@@ -472,25 +631,70 @@ function initializeWorkRegister() {
         promptText = aiPromptInput ? aiPromptInput.value.trim() : "";
         attachedFile = aiPromptFileInput && aiPromptFileInput.files ? aiPromptFileInput.files[0] : null;
 
-        if (attachedFile && attachedFile.type && attachedFile.type.indexOf("image/") === 0) {
+        if (currentAiGeneratedImageKey && currentAiGeneratedAssetUrl) {
+            generatedFile = {
+                name: "ai-generated-artwork.png",
+                type: currentAiGeneratedFileType || "image/png"
+            };
+            currentMediaFile = null;
+            currentExistingMediaUrl = currentAiGeneratedAssetUrl;
+            currentExistingMediaType = currentAiGeneratedFileType || "image/png";
+        } else if (attachedFile && attachedFile.type && attachedFile.type.indexOf("image/") === 0) {
             generatedFile = attachedFile;
+            currentMediaFile = generatedFile;
+            currentExistingMediaUrl = "";
+            currentExistingMediaType = generatedFile.type || "image/svg+xml";
+        } else if (currentAiGeneratedAssetUrl && currentAiGeneratedAssetUrl.indexOf("data:") === 0) {
+            generatedFile = dataUrlToFile(currentAiGeneratedAssetUrl, "ai-generated-artwork.png");
+            currentMediaFile = generatedFile;
+            currentExistingMediaUrl = "";
+            currentExistingMediaType = generatedFile.type || "image/svg+xml";
         } else {
             dataUrl = "data:image/svg+xml;base64," + window.btoa(unescape(encodeURIComponent(buildAiGeneratedPlaceholderSvg(promptText))));
             generatedFile = dataUrlToFile(dataUrl, "ai-generated-artwork.svg");
+            currentMediaFile = generatedFile;
+            currentExistingMediaUrl = "";
+            currentExistingMediaType = generatedFile.type || "image/svg+xml";
         }
 
         if (!generatedFile) {
             return;
         }
 
-        currentMediaFile = generatedFile;
-        currentExistingMediaUrl = "";
-        currentExistingMediaType = generatedFile.type || "image/svg+xml";
+        if (currentAiDescriptionReady && currentAiGeneratedTitle && videoTitleInput) {
+            videoTitleInput.value = currentAiGeneratedTitle;
+            autoResizeTextarea(videoTitleInput);
+            updateTextCount(videoTitleInput, videoTitleCount, 100);
+            if (detailsVideoTitle) {
+                detailsVideoTitle.textContent = currentAiGeneratedTitle;
+            }
+        }
+        if (currentAiDescriptionReady && currentAiGeneratedDescription && videoDescriptionInput) {
+            videoDescriptionInput.value = currentAiGeneratedDescription;
+            updateTextCount(videoDescriptionInput, videoDescriptionCount, 5000);
+        }
         updateSelectedFile(generatedFile);
-        updateMediaPreview(generatedFile);
+        if (currentAiGeneratedImageKey && currentAiGeneratedAssetUrl) {
+            renderExistingMediaPreview(currentAiGeneratedAssetUrl, currentAiGeneratedFileType || "image/png");
+        } else {
+            updateMediaPreview(generatedFile);
+        }
         updateVideoLink(currentPreviewUrl, generatedFile.name);
         closeAiPromptModal();
         showDetailsScreen(generatedFile);
+
+        if (currentAiDescriptionReady && currentAiGeneratedTitle && videoTitleInput) {
+            videoTitleInput.value = currentAiGeneratedTitle;
+            autoResizeTextarea(videoTitleInput);
+            updateTextCount(videoTitleInput, videoTitleCount, 100);
+            if (detailsVideoTitle) {
+                detailsVideoTitle.textContent = currentAiGeneratedTitle;
+            }
+        }
+        if (currentAiDescriptionReady && currentAiGeneratedDescription && videoDescriptionInput) {
+            videoDescriptionInput.value = currentAiGeneratedDescription;
+            updateTextCount(videoDescriptionInput, videoDescriptionCount, 5000);
+        }
     }
 
     function submitAiPrompt() {
@@ -507,7 +711,58 @@ function initializeWorkRegister() {
             return;
         }
 
-        renderAiPromptConversation(promptText);
+        aiPromptSendButton.disabled = true;
+        aiPromptInput.disabled = true;
+        aiPromptInput.value = "";
+        aiPromptThread.insertAdjacentHTML("beforeend", [
+            '<div class="ai-prompt-thread__message ai-prompt-thread__message--user">', escapeHtml(promptText), '</div>',
+            '<div class="ai-prompt-thread__result" data-role="ai-prompt-pending">',
+            '<div class="ai-prompt-thread__label">처리 중...</div>',
+            '</div>'
+        ].join(""));
+        scrollAiPromptThreadToBottom();
+
+        var descriptionTarget = isDescriptionPrompt(promptText) ? getCurrentAiDescriptionTarget() : null;
+        var requestUrl = descriptionTarget ? "/api/works/ai/image/describe" : "/api/works/ai/image/pipeline";
+        var requestBody = descriptionTarget ? descriptionTarget : {
+            prompt: promptText,
+            size: "1024x1024"
+        };
+
+        fetch(requestUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(requestBody)
+        })
+            .then(function (response) {
+                if (!response.ok) {
+                    return response.text().then(function (message) {
+                        throw new Error(message || "AI 이미지 생성에 실패했습니다.");
+                    });
+                }
+                return response.json();
+            })
+            .then(function (data) {
+                if (descriptionTarget) {
+                    renderAiDescriptionConversation(promptText, data);
+                    return;
+                }
+
+                renderAiPromptConversation(promptText, data);
+            })
+            .catch(function (error) {
+                window.alert(error.message || "AI 처리 중 오류가 발생했습니다.");
+                if (!descriptionTarget) {
+                    renderAiPromptConversation(promptText);
+                }
+            })
+            .finally(function () {
+                aiPromptSendButton.disabled = false;
+                aiPromptInput.disabled = false;
+                aiPromptInput.focus();
+            });
     }
 
     function updateMediaPreview(file) {
@@ -742,6 +997,198 @@ function initializeWorkRegister() {
         return category || "VIDEO";
     }
 
+    function clampNumber(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    function buildWorkPredictionPayload() {
+        var file = getSelectedMediaFile();
+        var title = videoTitleInput ? videoTitleInput.value.trim() : "";
+        var description = videoDescriptionInput ? videoDescriptionInput.value.trim() : "";
+        var category = getCurrentMediaCategory(file);
+        var tagCount = selectedTagNames.length;
+        var tradePrice = tradePriceInput ? parseNumber(tradePriceInput.value) : null;
+        var auctionStartingPrice = auctionBidPriceInput ? parseNumber(auctionBidPriceInput.value) : null;
+        var auctionEnabled = !!(auctionConfig && !auctionConfig.hidden);
+        var startingBid = auctionStartingPrice || tradePrice || 10000;
+        var finalBidPrice = auctionEnabled ? Math.round(startingBid * 1.35) : startingBid;
+        var ageDays = 1;
+        var titleQuality = clampNumber(title.length / 45, 0, 1);
+        var descriptionQuality = clampNumber(description.length / 320, 0, 1);
+        var titleCompleteness = clampNumber(title.length / 12, 0, 1);
+        var descriptionCompleteness = clampNumber(description.length / 80, 0, 1);
+        var contentCompleteness = clampNumber(0.18 + titleCompleteness * 0.32 + descriptionCompleteness * 0.50, 0.18, 1);
+        var tagQuality = clampNumber(tagCount / 5, 0, 1);
+        var mediaQuality = file || currentAiGeneratedImageKey || currentExistingMediaUrl ? 1 : 0;
+        var qualityRatio = clampNumber(
+            0.03 + titleQuality * 0.24 + descriptionQuality * 0.35 + tagQuality * 0.18 + mediaQuality * 0.20,
+            0.01,
+            0.98
+        );
+        var aiQualityScore = Math.round(clampNumber(10 + qualityRatio * 89, 10, 99) * 10) / 10;
+        var estimatedViewsForRatio = Math.round(clampNumber(
+            (350 + Math.pow(qualityRatio, 1.75) * 38000 + tagQuality * 4200 + descriptionQuality * 5200 + mediaQuality * 2600) * contentCompleteness,
+            300,
+            75000
+        ));
+        var likeRatio = clampNumber((0.014 + qualityRatio * 0.075 + tagQuality * 0.010) * contentCompleteness, 0.006, 0.12);
+        var commentRatio = clampNumber((0.0008 + descriptionQuality * 0.008 + tagQuality * 0.003) * contentCompleteness, 0.0002, 0.020);
+        var shareRatio = clampNumber((0.0006 + titleQuality * 0.0045 + tagQuality * 0.003 + (currentAiGeneratedImageKey ? 0.0015 : 0)) * contentCompleteness, 0, 0.016);
+        var likes = Math.round(estimatedViewsForRatio * likeRatio);
+        var comments = Math.round(Math.max(2, estimatedViewsForRatio * commentRatio));
+        var shares = Math.round(Math.max(1, estimatedViewsForRatio * shareRatio));
+        var engagementScore = likes + comments + shares;
+        var watchCompletionRate = clampNumber(0.2 + qualityRatio * 0.78, 0.2, 0.98);
+        var now = new Date();
+        var bidderCount = auctionEnabled ? Math.round(clampNumber(tagCount + 2 + qualityRatio * 6, 1, 30)) : 0;
+        var bidCount = auctionEnabled ? bidderCount * 2 : 0;
+        var priceGap = finalBidPrice - startingBid;
+
+        return {
+            regression: {
+                video_length_sec: category === "IMAGE" ? 15 : 60,
+                age_days: ageDays,
+                likes: likes,
+                comments: comments,
+                shares: shares,
+                watch_completion_rate: watchCompletionRate,
+                ai_quality_score: aiQualityScore,
+                like_ratio: likes / estimatedViewsForRatio,
+                comment_ratio: comments / estimatedViewsForRatio,
+                share_ratio: shares / estimatedViewsForRatio,
+                engagement_score: engagementScore,
+                upload_month: now.getMonth() + 1,
+                upload_dayofweek: now.getDay(),
+                upload_year: now.getFullYear(),
+                reaction_score: engagementScore,
+                likes_per_day: likes / ageDays,
+                comments_per_day: comments / ageDays,
+                shares_per_day: shares / ageDays,
+                engagement_per_day: engagementScore / ageDays,
+                quality_completion_score: aiQualityScore * watchCompletionRate,
+                short_video_score: category === "IMAGE" ? 1 : 0,
+                log_likes: Math.log1p(likes),
+                log_comments: Math.log1p(comments),
+                log_shares: Math.log1p(shares),
+                log_engagement_score: Math.log1p(engagementScore)
+            },
+            classification: {
+                category: category === "IMAGE" ? "Animation" : "Vlog",
+                quality: "1080p",
+                license_type: "Limited",
+                creator_tier: "Silver",
+                video_length_sec: category === "IMAGE" ? 15 : 60,
+                age_days: ageDays,
+                likes: likes,
+                comments: comments,
+                shares: shares,
+                watch_completion_rate: watchCompletionRate,
+                ai_quality_score: aiQualityScore,
+                starting_bid: startingBid,
+                bidder_count: bidderCount,
+                bid_count: bidCount,
+                final_bid_price: finalBidPrice,
+                engagement_score: engagementScore,
+                price_gap: priceGap,
+                engagement_per_bidder: bidderCount > 0 ? engagementScore / bidderCount : engagementScore,
+                bid_to_starting_ratio: startingBid > 0 ? finalBidPrice / startingBid : 1
+            }
+        };
+    }
+
+    function setWorkPredictionLoading(loading) {
+        if (workPredictionButton) {
+            workPredictionButton.disabled = loading;
+            workPredictionButton.textContent = loading ? "예측 중..." : "예측하기";
+        }
+
+        if (workPredictionStatus) {
+            workPredictionStatus.textContent = loading ? "FastAPI 모델 예측 중" : "작성값 기준 예측";
+        }
+    }
+
+    function renderWorkPrediction(data) {
+        lastPredictedViews = Number(data.predictedViews || 0);
+        lastPredictedLikes = Number(data.estimatedLikes || 0);
+        lastPredictedPopular = Number(data.predictedPopular || 0);
+        lastPredictedPopularProbability = Number(data.popularProbability || 0);
+
+        if (workRegressionViews) {
+            workRegressionViews.textContent = lastPredictedViews.toLocaleString("ko-KR") + "회";
+        }
+
+        if (workPredictionLikes) {
+            workPredictionLikes.textContent = lastPredictedLikes.toLocaleString("ko-KR") + "개";
+        }
+
+        if (workClassificationLabel) {
+            workClassificationLabel.textContent = data.predictedLabel || "-";
+        }
+
+        if (workClassificationProbability) {
+            workClassificationProbability.textContent = Math.round(lastPredictedPopularProbability * 1000) / 10 + "%";
+        }
+
+        if (workPredictionStatus) {
+            workPredictionStatus.textContent = "최근 작성값으로 계산됨";
+        }
+
+        setPredictionText("work-prediction-comments", Number(data.estimatedComments || 0).toLocaleString("ko-KR") + "개");
+        setPredictionText("work-prediction-shares", Number(data.estimatedShares || 0).toLocaleString("ko-KR") + "회");
+        setPredictionText("work-prediction-grade", data.predictionGrade || "-");
+        setPredictionText("work-prediction-confidence", Math.round(Number(data.confidence || 0) * 1000) / 10 + "%");
+        setPredictionText("work-prediction-signal", data.modelSignal || "-");
+    }
+
+    function setPredictionText(id, value) {
+        var element = document.getElementById(id);
+        if (element) {
+            element.textContent = value;
+        }
+    }
+
+    function requestWorkPrediction() {
+        if (!workPredictionButton && !workRegressionViews && !workClassificationLabel) {
+            return;
+        }
+
+        if (workPredictionAbortController) {
+            workPredictionAbortController.abort();
+        }
+
+        workPredictionAbortController = new AbortController();
+        setWorkPredictionLoading(true);
+
+        fetch("/api/works/ai/prediction", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(buildWorkPredictionPayload()),
+            signal: workPredictionAbortController.signal
+        })
+            .then(function (response) {
+                if (!response.ok) {
+                    return response.text().then(function (message) {
+                        throw new Error(message || "AI 예측에 실패했습니다.");
+                    });
+                }
+                return response.json();
+            })
+            .then(renderWorkPrediction)
+            .catch(function (error) {
+                if (error && error.name === "AbortError") {
+                    return;
+                }
+                if (workPredictionStatus) {
+                    workPredictionStatus.textContent = error.message || "AI 예측 실패";
+                }
+            })
+            .finally(function () {
+                setWorkPredictionLoading(false);
+            });
+    }
+
     function getSelectedThumbnailFile() {
         var manualThumbnailInput = document.getElementById("thumbnail-file-input-1");
 
@@ -826,13 +1273,28 @@ function initializeWorkRegister() {
     function addSelectedTag(tagName) {
         var normalizedTagName = normalizeSelectedTagName(tagName);
 
-        if (!normalizedTagName || selectedTagNames.indexOf(normalizedTagName) > -1) {
-            return;
+        if (!normalizedTagName) {
+            return false;
+        }
+
+        if (selectedTagNames.indexOf(normalizedTagName) > -1) {
+            if (videoTagsInput) {
+                videoTagsInput.value = "";
+                updateTextCount(videoTagsInput, videoTagsCount, 500);
+            }
+            closeTagSuggestions();
+            return false;
         }
 
         selectedExistingTagNames[normalizedTagName] = true;
         selectedTagNames.push(normalizedTagName);
         renderSelectedTags();
+        if (videoTagsInput) {
+            videoTagsInput.value = "";
+            updateTextCount(videoTagsInput, videoTagsCount, 500);
+        }
+        closeTagSuggestions();
+        return true;
     }
 
     function getCurrentTagKeyword() {
@@ -883,9 +1345,6 @@ function initializeWorkRegister() {
 
         normalizedTagName = normalizeSelectedTagName(tagName);
         addSelectedTag(normalizedTagName);
-        videoTagsInput.value = "";
-        updateTextCount(videoTagsInput, videoTagsCount, 500);
-        closeTagSuggestions();
         videoTagsInput.focus();
     }
 
@@ -995,6 +1454,7 @@ function initializeWorkRegister() {
         var linkUrlText = videoLinkUrl ? (videoLinkUrl.getAttribute("href") || "").trim() : "";
         var tags = extractTagNames(videoTagsInput ? videoTagsInput.value : "");
         var thumbnailFile = getSelectedThumbnailFile();
+        var predictionPayload = buildWorkPredictionPayload();
 
         if (!file && !currentExistingMediaUrl) {
             throw new Error("업로드할 파일을 선택해주세요.");
@@ -1019,11 +1479,27 @@ function initializeWorkRegister() {
         formData.append("isTradable", String(!!(tradeToggle && tradeToggle.checked)));
         formData.append("allowComment", "true");
         formData.append("showSimilar", "true");
-        formData.append("linkUrl", linkUrlText.indexOf("blob:") === 0 ? "" : linkUrlText);
+        formData.append("linkUrl", resolveSubmitLinkUrl(linkUrlText));
         formData.append("auctionEnabled", String(!!(auctionConfig && !auctionConfig.hidden)));
         formData.append("auctionDeadlineHours", String(auctionDeadlineHours));
+        formData.append("mediaType", file && file.type ? file.type : (currentAiGeneratedFileType || getCurrentMediaCategory(file)));
+        formData.append("titleLength", String(title.length));
+        formData.append("descriptionLength", String(description.length));
+        formData.append("tagCount", String(tags.length));
+        formData.append("thumbnailExists", String(!!thumbnailFile));
+        formData.append("isAiGenerated", String(!!currentAiGeneratedImageKey));
+        formData.append("aiQualityScore", String(predictionPayload.regression.ai_quality_score || 0));
+        formData.append("predictedViews", String(Math.round(lastPredictedViews || 0)));
+        formData.append("predictedLikeCount", String(Math.round(lastPredictedLikes || 0)));
+        formData.append("predictedPopular", String(Math.round(lastPredictedPopular || 0)));
+        formData.append("predictedPopularProbability", String(lastPredictedPopularProbability || 0));
         if (file) {
             formData.append("mediaFile", file);
+        } else if (currentAiGeneratedImageKey) {
+            formData.append("files[0].fileUrl", currentAiGeneratedImageKey);
+            formData.append("files[0].fileType", currentAiGeneratedFileType || "image/png");
+            formData.append("files[0].fileSize", String(currentAiGeneratedFileSize || 0));
+            formData.append("files[0].sortOrder", "0");
         }
 
         if (thumbnailFile) {
@@ -1043,6 +1519,20 @@ function initializeWorkRegister() {
         });
 
         return formData;
+    }
+
+    function resolveSubmitLinkUrl(linkUrlText) {
+        var value = String(linkUrlText || "").trim();
+
+        if (!value || value.indexOf("blob:") === 0) {
+            return "";
+        }
+
+        if (currentAiGeneratedImageKey || currentExistingMediaUrl) {
+            return "";
+        }
+
+        return value.slice(0, 255);
     }
 
     function resolveProfileRedirectUrl() {
@@ -1119,7 +1609,16 @@ function initializeWorkRegister() {
     }
 
     function showDetailsScreen(file) {
-        var title = toDisplayTitle(file.name);
+        var title = "";
+        var displayTitle = "업로드한 이미지";
+
+        if (currentAiDescriptionReady && currentAiGeneratedImageKey && currentAiGeneratedTitle) {
+            title = currentAiGeneratedTitle;
+            displayTitle = currentAiGeneratedTitle;
+        } else if (!currentAiGeneratedImageKey) {
+            title = toDisplayTitle(file.name);
+            displayTitle = title;
+        }
 
         if (uploadScreen) {
             uploadScreen.hidden = true;
@@ -1130,7 +1629,7 @@ function initializeWorkRegister() {
         dialogContent.classList.add("is-details");
 
         if (detailsVideoTitle) {
-            detailsVideoTitle.textContent = title;
+            detailsVideoTitle.textContent = displayTitle;
         }
 
         if (videoFileLabel) {
@@ -1156,6 +1655,9 @@ function initializeWorkRegister() {
         currentMediaFile = null;
         currentExistingMediaUrl = "";
         currentExistingMediaType = "";
+        currentAiGeneratedImageKey = "";
+        currentAiGeneratedFileType = "";
+        currentAiGeneratedFileSize = 0;
 
         if (fileInput) {
             fileInput.value = "";
@@ -1173,7 +1675,7 @@ function initializeWorkRegister() {
     }
 
     function hasSelectedSessionMedia() {
-        return !!currentMediaFile || (currentPreviewUrl && currentPreviewUrl.indexOf("blob:") === 0);
+        return !!currentMediaFile || !!currentAiGeneratedImageKey || (currentPreviewUrl && currentPreviewUrl.indexOf("blob:") === 0);
     }
 
     function clearLinkOnly() {
@@ -1185,6 +1687,9 @@ function initializeWorkRegister() {
 
         if (!file) {
             currentMediaFile = null;
+            currentAiGeneratedImageKey = "";
+            currentAiGeneratedFileType = "";
+            currentAiGeneratedFileSize = 0;
             updateSelectedFile(null);
             updateMediaPreview(null);
             updateVideoLink("", "");
@@ -1198,6 +1703,9 @@ function initializeWorkRegister() {
         currentMediaFile = file;
         currentExistingMediaUrl = "";
         currentExistingMediaType = "";
+        currentAiGeneratedImageKey = "";
+        currentAiGeneratedFileType = "";
+        currentAiGeneratedFileSize = 0;
         updateSelectedFile(file);
         updateMediaPreview(file);
         updateVideoLink(currentPreviewUrl, file.name);
@@ -1432,6 +1940,10 @@ function initializeWorkRegister() {
 
     if (submitButton) {
         submitButton.addEventListener("click", submitWork);
+    }
+
+    if (workPredictionButton) {
+        workPredictionButton.addEventListener("click", requestWorkPrediction);
     }
 
     if (videoTitleInput && videoTitleCount) {

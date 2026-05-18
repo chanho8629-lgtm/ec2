@@ -60,12 +60,20 @@
         insert into tbl_work (
             member_id, title, category, description, price,
             license_type, license_terms, is_tradable, allow_comment,
-            show_similar, link_url, status
+            show_similar, link_url, media_type, title_length,
+            description_length, tag_count, thumbnail_exists, is_ai_generated,
+            ai_quality_score, predicted_views, predicted_like_count,
+            predicted_popular, predicted_popular_probability, status
         ) values (
-                     #{memberId}, #{title}, #{category}, #{description}, #{price},
-                     #{licenseType}, #{licenseTerms}, coalesce(#{isTradable}, false), coalesce(#{allowComment}, true),
-                     coalesce(#{showSimilar}, true), #{linkUrl}, coalesce(#{status}, 'ACTIVE')
-                 )
+                      #{memberId}, #{title}, #{category}, #{description}, #{price},
+                      #{licenseType}, #{licenseTerms}, coalesce(#{isTradable}, false), coalesce(#{allowComment}, true),
+                      coalesce(#{showSimilar}, true), #{linkUrl}, #{mediaType}, coalesce(#{titleLength}, 0),
+                      coalesce(#{descriptionLength}, 0), coalesce(#{tagCount}, 0), coalesce(#{thumbnailExists}, false),
+                      coalesce(#{isAiGenerated}, false), coalesce(#{aiQualityScore}, 0),
+                      coalesce(#{predictedViews}, 0), coalesce(#{predictedLikeCount}, 0),
+                      coalesce(#{predictedPopular}, 0), coalesce(#{predictedPopularProbability}, 0),
+                      coalesce(#{status}, 'ACTIVE')
+                  )
     </insert>
 
     <update id="updateWork">
@@ -790,6 +798,70 @@
         from tbl_work
         where id = #{workId}
           and deleted_datetime is null
+    </select>
+
+    <select id="selectWorkSimilarityDocuments" resultType="WorkSimilarityDocumentDTO">
+        select
+            w.id,
+            w.title,
+            coalesce(w.category, '')    as category,
+            coalesce(w.description, '') as description,
+            coalesce(string_agg(distinct t.tag_name, ' | ') filter (where t.tag_name is not null), '') as tag_text
+        from tbl_work w
+        left join tbl_work_tag wt on wt.work_id = w.id
+        left join tbl_tag t        on t.id = wt.tag_id
+        where w.deleted_datetime is null
+          and w.status = 'ACTIVE'
+        group by w.id, w.title, w.category, w.description, w.created_datetime, w.view_count, w.like_count
+        order by
+            case when w.id in (
+                select gw.work_id from tbl_gallery_work gw where gw.gallery_id = #{galleryId}
+            ) then 0 else 1 end,
+            w.view_count desc,
+            w.created_datetime desc
+        limit #{limit}
+    </select>
+
+    <select id="selectWorkListByIds" resultType="WorkListResponseDTO">
+        select
+            w.id,
+            w.member_id,
+            w.title,
+            w.category,
+            w.is_tradable,
+            w.price,
+            w.status,
+            m.nickname      as member_nickname,
+            m.profile_image as member_profile_image,
+            t_file.file_url     as thumbnail_url,
+            t_file.file_type    as thumbnail_file_type,
+            t_file.width        as thumbnail_width,
+            t_file.height       as thumbnail_height,
+            w.view_count,
+            w.like_count,
+            w.save_count,
+            w.comment_count,
+            w.created_datetime
+        from tbl_work w
+        left join tbl_member m on m.id = w.member_id
+        left join lateral (
+            select wf.file_url, wf.file_type, wf.width, wf.height
+            from tbl_work_file wf
+            where wf.work_id = w.id
+            order by case when wf.file_type like 'image/%' then 0 else 1 end, wf.sort_order asc, wf.id asc
+            limit 1
+        ) t_file on true
+        where w.deleted_datetime is null
+          and w.status != 'DELETED'
+          and w.id in
+          <foreach collection="ids" item="id" open="(" separator="," close=")">
+              #{id}
+          </foreach>
+        order by array_position(array[
+          <foreach collection="ids" item="id" separator=",">
+              #{id}::bigint
+          </foreach>
+        ], w.id)
     </select>
 
 </mapper>

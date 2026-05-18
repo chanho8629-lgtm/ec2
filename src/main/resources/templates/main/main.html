@@ -46,6 +46,7 @@
         <div class="shelf-grid"
              th:if="${galleries != null and !galleries.isEmpty()}"
              th:data-tag="${selectedTag}"
+             th:data-related-gallery-id="${relatedGalleryId}"
              data-next-page="2"
              data-page-size="20">
             <div class="shelf-card" th:each="gallery : ${galleries}">

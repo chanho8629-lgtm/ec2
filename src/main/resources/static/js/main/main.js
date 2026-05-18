@@ -97,11 +97,13 @@ window.addEventListener("load", function () {
     var page = parseInt(grid.dataset.nextPage, 10) || 2;
     var size = parseInt(grid.dataset.pageSize, 10) || 20;
     var tag = grid.dataset.tag;
+    var relatedGalleryId = grid.dataset.relatedGalleryId;
 
     var params = new URLSearchParams();
     params.set("page", page);
     params.set("size", size);
     if (tag) params.set("tag", tag);
+    if (!tag && relatedGalleryId) params.set("relatedGalleryId", relatedGalleryId);
 
     fetch("/api/galleries?" + params.toString(), {
       headers: { "Accept": "application/json" }
@@ -141,4 +143,3 @@ window.addEventListener("load", function () {
 
   observer.observe(sentinel);
 });
-

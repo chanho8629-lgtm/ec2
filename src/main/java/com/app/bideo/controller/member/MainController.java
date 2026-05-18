@@ -20,22 +20,27 @@ public class MainController {
     private final GalleryService galleryService;
 
     @GetMapping("/")
-    public String root(Authentication authentication, @RequestParam(required = false) String tag, Model model) {
+    public String root(Authentication authentication,
+                       @RequestParam(required = false) String tag,
+                       @RequestParam(required = false) Long relatedGalleryId,
+                       Model model) {
         boolean isLoggedIn = authentication != null
                 && authentication.isAuthenticated()
                 && !(authentication instanceof AnonymousAuthenticationToken);
         model.addAttribute("isLoggedIn", isLoggedIn);
         if (isLoggedIn) {
-            addGalleryData(model, tag);
+            addGalleryData(model, tag, relatedGalleryId);
             return "main/main";
         }
         return "main/intro-main";
     }
 
     @GetMapping("/main")
-    public String main(@RequestParam(required = false) String tag, Model model) {
+    public String main(@RequestParam(required = false) String tag,
+                       @RequestParam(required = false) Long relatedGalleryId,
+                       Model model) {
         model.addAttribute("isLoggedIn", false);
-        addGalleryData(model, tag);
+        addGalleryData(model, tag, relatedGalleryId);
         return "main/main";
     }
 
@@ -44,7 +49,7 @@ public class MainController {
         return "error/404";
     }
 
-    private void addGalleryData(Model model, String tag) {
+    private void addGalleryData(Model model, String tag, Long relatedGalleryId) {
         try {
             GallerySearchDTO searchDTO = new GallerySearchDTO();
             searchDTO.setPage(1);
@@ -53,12 +58,17 @@ public class MainController {
             if (normalizedTag != null) {
                 searchDTO.setTag(normalizedTag);
             }
+            if (normalizedTag == null) {
+                searchDTO.setRelatedGalleryId(relatedGalleryId);
+            }
             List<GalleryListResponseDTO> galleries = galleryService.getGalleryList(searchDTO).getContent();
             model.addAttribute("galleries", galleries);
             model.addAttribute("selectedTag", normalizedTag);
+            model.addAttribute("relatedGalleryId", normalizedTag == null ? relatedGalleryId : null);
         } catch (Exception e) {
             model.addAttribute("galleries", List.of());
             model.addAttribute("selectedTag", null);
+            model.addAttribute("relatedGalleryId", null);
         }
     }
 

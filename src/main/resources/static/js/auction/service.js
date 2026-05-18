@@ -15,8 +15,24 @@ const AuctionService = (() => {
         }
     }
 
+    const analyzeAuction = async (auctionId) => {
+        const response = await fetch(`/api/auction/${auctionId}/ai/analyze`, {
+            method: "POST",
+            headers: {
+                "Accept": "application/json"
+            }
+        });
+
+        if (!response.ok) {
+            const message = await response.text();
+            throw new Error(message || "AI 경매 분석에 실패했습니다.");
+        }
+
+        return response.json();
+    };
 
     return {
-        getAuctionInfo: getAuctionInfo
+        getAuctionInfo: getAuctionInfo,
+        analyzeAuction: analyzeAuction
     };
 })();

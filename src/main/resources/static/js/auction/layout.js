@@ -6,7 +6,10 @@ const AuctionLayout = (() => {
         bidCustomInput: root.getElementById("bidCustomInput"),
         bidNextAmountEl: root.getElementById("bidNextAmount"),
         bidInfoBtn: root.getElementById("bidInfoBtn"),
-        bidInfoTooltip: root.getElementById("bidInfoTooltip")
+        bidInfoTooltip: root.getElementById("bidInfoTooltip"),
+        auctionAiAnalyzeBtn: root.getElementById("auctionAiAnalyzeBtn"),
+        auctionAiStatus: root.getElementById("auctionAiStatus"),
+        auctionAiResult: root.getElementById("auctionAiResult")
     });
 
     const getMinAmount = (elements) =>
@@ -104,6 +107,8 @@ const AuctionLayout = (() => {
             currentHighestPrice.textContent = `${(auction.currentPrice ?? 0).toLocaleString()}원`;
         }
 
+        resetAiAnalysis(root);
+
         const minNextBid = Math.round((auction.currentPrice ?? 0) * 1.1);
         const bidNextAmount = root.getElementById("bidNextAmount");
         if (bidNextAmount) {
@@ -181,6 +186,68 @@ const AuctionLayout = (() => {
         })}`;
     }
 
+    function setAiLoading(loading, root = document) {
+        const elements = getElements(root);
+        if (elements.auctionAiAnalyzeBtn) {
+            elements.auctionAiAnalyzeBtn.disabled = loading;
+            elements.auctionAiAnalyzeBtn.textContent = loading ? "분석 중" : "분석";
+        }
+        if (elements.auctionAiStatus) {
+            elements.auctionAiStatus.textContent = loading ? "FastAPI 빠른 경매 분석 중입니다." : "경매 작품의 투자 가치와 ROI를 분석합니다.";
+        }
+    }
+
+    function renderAiAnalysis(data, root = document) {
+        const elements = getElements(root);
+        if (!elements.auctionAiResult) {
+            return;
+        }
+
+        const imageAnalysis = data?.imageAnalysis || data?.image_analysis || "";
+        const auctionReport = data?.auctionReport || data?.auction_report || "";
+        const usedRag = data?.usedRag ?? data?.used_rag;
+
+        if (elements.auctionAiAnalyzeBtn) {
+            elements.auctionAiAnalyzeBtn.disabled = false;
+            elements.auctionAiAnalyzeBtn.textContent = "재분석";
+        }
+        elements.auctionAiResult.hidden = false;
+        elements.auctionAiResult.innerHTML = [
+            `<div class="Auction-AI-ResultBadge">${usedRag === false ? "Fast analysis" : "Tinuiti RAG"}</div>`,
+            imageAnalysis ? `<div class="Auction-AI-ResultBlock"><strong>작품 분석</strong><p>${escapeHtml(imageAnalysis)}</p></div>` : "",
+            auctionReport ? `<div class="Auction-AI-ResultBlock"><strong>투자 분석</strong><p>${escapeHtml(auctionReport)}</p></div>` : ""
+        ].join("");
+
+        if (elements.auctionAiStatus) {
+            elements.auctionAiStatus.textContent = "AI 경매 분석 완료";
+        }
+    }
+
+    function resetAiAnalysis(root = document) {
+        const elements = getElements(root);
+        if (elements.auctionAiAnalyzeBtn) {
+            elements.auctionAiAnalyzeBtn.disabled = false;
+            elements.auctionAiAnalyzeBtn.textContent = "분석";
+        }
+        if (elements.auctionAiStatus) {
+            elements.auctionAiStatus.textContent = "경매 작품의 투자 가치와 ROI를 분석합니다.";
+        }
+        if (elements.auctionAiResult) {
+            elements.auctionAiResult.hidden = true;
+            elements.auctionAiResult.innerHTML = "";
+        }
+    }
+
+    function escapeHtml(value) {
+        return String(value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;")
+            .replace(/\n/g, "<br>");
+    }
+
     return {
         init: init,
         getElements: getElements,
@@ -188,5 +255,8 @@ const AuctionLayout = (() => {
         setInputError: setInputError,
         executeBid: executeBid,
         setClosedState: setClosedState,
+        setAiLoading: setAiLoading,
+        renderAiAnalysis: renderAiAnalysis,
+        resetAiAnalysis: resetAiAnalysis,
     };
 })();

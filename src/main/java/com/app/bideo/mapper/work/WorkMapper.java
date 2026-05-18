@@ -11,6 +11,7 @@ import com.app.bideo.dto.work.WorkDetailResponseDTO;
 import com.app.bideo.dto.work.WorkFileResponseDTO;
 import com.app.bideo.dto.work.WorkListResponseDTO;
 import com.app.bideo.dto.work.WorkSearchDTO;
+import com.app.bideo.dto.work.WorkSimilarityDocumentDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -102,4 +103,8 @@ public interface WorkMapper {
     Integer selectWorkLikeCount(@Param("workId") Long workId);
 
     int updateWorkStatus(@Param("id") Long id, @Param("status") String status);
+
+    List<WorkSimilarityDocumentDTO> selectWorkSimilarityDocuments(@Param("galleryId") Long galleryId, @Param("limit") int limit);
+
+    List<WorkListResponseDTO> selectWorkListByIds(@Param("ids") List<Long> ids);
 }

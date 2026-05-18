@@ -148,6 +148,34 @@
                     </label>
                 </div>
 
+                <div class="work-ai-prediction" id="work-ai-prediction">
+                    <div class="work-ai-prediction__header">
+                        <div>
+                            <div class="work-ai-prediction__title">AI 예측</div>
+                            <div class="work-ai-prediction__status" id="work-prediction-status">작성값 기준 예측 대기</div>
+                        </div>
+                        <button type="button" class="work-ai-prediction__button" id="work-prediction-button">예측하기</button>
+                    </div>
+                    <div class="work-ai-prediction__grid">
+                        <div class="work-ai-prediction__item">
+                            <span>예상 조회수</span>
+                            <strong id="work-regression-views">-</strong>
+                        </div>
+                        <div class="work-ai-prediction__item">
+                            <span>예상 좋아요</span>
+                            <strong id="work-prediction-likes">-</strong>
+                        </div>
+                        <div class="work-ai-prediction__item">
+                            <span>분류 결과</span>
+                            <strong id="work-classification-label">-</strong>
+                        </div>
+                        <div class="work-ai-prediction__item">
+                            <span>고조회수 확률</span>
+                            <strong id="work-classification-probability">-</strong>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="details-grid">
                     <section class="info-card">
                         <h2>썸네일</h2>

@@ -637,7 +637,11 @@ add("""update tbl_member m
  where m.id = c.following_id;""")
 add("""update tbl_member m
    set follower_count = 0
- where m.id not in (select following_id from tbl_follow);""")
+  where m.id not in (select following_id from tbl_follow);""")
+add("")
+
+add("-- 10-1. 회귀/분류 학습용 작품 feature 채우기")
+add("\\ir 2026-05-13_fill_work_ai_features.sql")
 add("")
 
 # --- 11) 경매 (2단계 임시 테이블로 random 값 freeze 후 INSERT) ---

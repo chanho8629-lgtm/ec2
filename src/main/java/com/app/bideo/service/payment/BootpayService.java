@@ -16,8 +16,6 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -31,19 +29,19 @@ public class BootpayService {
     private final ObjectMapper objectMapper;
     private final RestClient restClient = RestClient.create();
 
-    @Value("${boot-pay.enabled:true}")
+    @Value("${boot-pay.enabled:${bootpay.enabled:true}}")
     private boolean enabled;
 
-    @Value("${boot-pay.api.application-id:}")
+    @Value("${boot-pay.api.application-id:${bootpay.rest-client-key:}}")
     private String applicationId;
 
-    @Value("${boot-pay.api.private-key:}")
+    @Value("${boot-pay.api.private-key:${bootpay.private-key:}}")
     private String privateKey;
 
     @Value("${boot-pay.mode:test}")
     private String mode;
 
-    @Value("${boot-pay.billing.pg:nicepay}")
+    @Value("${boot-pay.billing.pg:${bootpay.pg:tosspayments}}")
     private String billingPg;
 
     @Value("${boot-pay.billing.customer.key-prefix:BIDEO_MEMBER_}")
@@ -60,7 +58,6 @@ public class BootpayService {
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
 
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("pg", billingPg);
         requestBody.put("order_name", "BIDEO 카드 등록");
         requestBody.put("subscription_id", buildSubscriptionId(memberId));
         requestBody.put("card_no", requestDTO.getCardNumber());
@@ -196,11 +193,8 @@ public class BootpayService {
     // 부트페이 서버 호출에 사용할 access_token을 발급받는다.
     private String getAccessToken() {
         try {
-            String basicToken = Base64.getEncoder()
-                    .encodeToString((applicationId + ":" + privateKey).getBytes(StandardCharsets.UTF_8));
             String responseBody = restClient.post()
                     .uri(serverBaseUrl + "/v2/request/token")
-                    .header(HttpHeaders.AUTHORIZATION, "Basic " + basicToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of(
                             "application_id", applicationId,

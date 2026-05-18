@@ -79,6 +79,7 @@ function getPaymentPriceSummary(payment) {
 async function apiRequest(url, options = {}) {
     const response = await fetch(url, {
         method: options.method || "GET",
+        credentials: "same-origin",
         headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
@@ -350,7 +351,6 @@ async function requestBootpayPayment(order, payment) {
         price: summary.totalPrice,
         order_name: orderName,
         order_id: payment.paymentCode,
-        pg: bootpayPg,
         method: "card",
         tax_free: 0,
         user: {

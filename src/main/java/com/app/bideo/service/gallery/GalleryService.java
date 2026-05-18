@@ -10,6 +10,7 @@ import com.app.bideo.dto.gallery.GalleryCreateResponseDTO;
 import com.app.bideo.dto.gallery.GalleryDetailResponseDTO;
 import com.app.bideo.dto.gallery.GalleryListResponseDTO;
 import com.app.bideo.dto.gallery.GallerySearchDTO;
+import com.app.bideo.dto.gallery.GallerySimilarityDocumentDTO;
 import com.app.bideo.dto.gallery.GalleryUpdateRequestDTO;
 import com.app.bideo.dto.gallery.SearchGallerySuggestionDTO;
 import com.app.bideo.dto.interaction.CommentResponseDTO;
@@ -23,15 +24,20 @@ import com.app.bideo.service.common.S3FileService;
 import com.app.bideo.service.member.FollowService;
 import com.app.bideo.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
@@ -50,6 +56,9 @@ public class GalleryService {
     private final NotificationService notificationService;
     private final S3FileService s3FileService;
 
+    @Value("${fastapi.base-url:http://127.0.0.1:8000}")
+    private String fastApiBaseUrl;
+
     // 예술관 등록
     @CacheEvict(value = {"dashboard", "profile"}, allEntries = true)
     public GalleryCreateResponseDTO write(Long memberId, GalleryCreateRequestDTO requestDTO, MultipartFile coverFile) {
@@ -59,7 +68,7 @@ public class GalleryService {
         requestDTO.setAllowComment(requestDTO.getAllowComment() != null ? requestDTO.getAllowComment() : true);
         requestDTO.setShowSimilar(requestDTO.getShowSimilar() != null ? requestDTO.getShowSimilar() : true);
         galleryDAO.save(requestDTO);
-        saveWorkLinks(requestDTO.getId(), requestDTO.getWorkIds());
+        saveWorkLinks(requestDTO.getId(), requestDTO.getWorkIds(), resolvedMemberId);
         saveTags(requestDTO.getId(), requestDTO.getTagIds(), requestDTO.getTagNames());
         galleryDAO.updateWorkCount(requestDTO.getId());
 
@@ -69,7 +78,7 @@ public class GalleryService {
                 .memberNickname(memberRepository.findById(resolvedMemberId)
                         .map(member -> member.getNickname())
                         .orElseThrow(() -> new IllegalStateException("member not found")))
-                .redirectUrl("/profile?galleryId=" + requestDTO.getId())
+                .redirectUrl("/main?relatedGalleryId=" + requestDTO.getId())
                 .build();
     }
 
@@ -80,6 +89,10 @@ public class GalleryService {
         int size = searchDTO.getSize() != null ? searchDTO.getSize() : 10;
         searchDTO.setPage(page);
         searchDTO.setSize(size);
+
+        if (searchDTO.getRelatedGalleryId() != null && searchDTO.getKeyword() == null && searchDTO.getTag() == null) {
+            return getRelatedGalleryList(searchDTO);
+        }
 
         List<GalleryListResponseDTO> list = galleryDAO.findAll(searchDTO);
         list.forEach(g -> g.setCoverImage(s3FileService.getPresignedUrl(g.getCoverImage())));
@@ -93,6 +106,160 @@ public class GalleryService {
                 .totalElements((long) total)
                 .totalPages(totalPages)
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<GalleryListResponseDTO> getSimilarGalleries(Long galleryId, int limit) {
+        List<GallerySimilarityDocumentDTO> documents = galleryDAO.findSimilarityDocuments(galleryId, Math.max(limit + 40, 60));
+        GallerySimilarityDocumentDTO target = documents.stream()
+                .filter(d -> Objects.equals(d.getId(), galleryId))
+                .findFirst()
+                .orElse(null);
+
+        if (target == null || documents.size() <= 1) {
+            return List.of();
+        }
+
+        List<GallerySimilarityDocumentDTO> candidates = documents.stream()
+                .filter(d -> !Objects.equals(d.getId(), galleryId))
+                .toList();
+
+        List<Long> ids = requestSimilarGalleryIds(target, candidates, limit);
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+
+        List<GalleryListResponseDTO> result = galleryDAO.findAllByIds(ids);
+        result.forEach(g -> g.setCoverImage(s3FileService.getPresignedUrl(g.getCoverImage())));
+        return result;
+    }
+
+    private PageResponseDTO<GalleryListResponseDTO> getRelatedGalleryList(GallerySearchDTO searchDTO) {
+        int page = searchDTO.getPage() != null ? searchDTO.getPage() : 1;
+        int size = searchDTO.getSize() != null ? searchDTO.getSize() : 10;
+        int required = Math.max(page * size, size);
+        int candidateLimit = Math.max(required + 60, 120);
+
+        List<GallerySimilarityDocumentDTO> documents = galleryDAO.findSimilarityDocuments(searchDTO.getRelatedGalleryId(), candidateLimit);
+        GallerySimilarityDocumentDTO target = documents.stream()
+                .filter(document -> Objects.equals(document.getId(), searchDTO.getRelatedGalleryId()))
+                .findFirst()
+                .orElse(null);
+
+        if (target == null || documents.size() <= 1) {
+            return getLatestGalleryFallback(page, size);
+        }
+
+        List<GallerySimilarityDocumentDTO> candidates = documents.stream()
+                .filter(document -> !Objects.equals(document.getId(), target.getId()))
+                .toList();
+        List<Long> recommendedIds = requestSimilarGalleryIds(target, candidates, Math.min(candidateLimit, 100));
+        if (recommendedIds.isEmpty()) {
+            return getLatestGalleryFallback(page, size);
+        }
+
+        int fromIndex = Math.min((page - 1) * size, recommendedIds.size());
+        int toIndex = Math.min(fromIndex + size, recommendedIds.size());
+        List<Long> pageIds = recommendedIds.subList(fromIndex, toIndex);
+        List<GalleryListResponseDTO> list = galleryDAO.findAllByIds(pageIds);
+        list.forEach(g -> g.setCoverImage(s3FileService.getPresignedUrl(g.getCoverImage())));
+
+        return PageResponseDTO.<GalleryListResponseDTO>builder()
+                .content(list)
+                .page(page)
+                .size(size)
+                .totalElements((long) recommendedIds.size())
+                .totalPages((int) Math.ceil((double) recommendedIds.size() / size))
+                .build();
+    }
+
+    private PageResponseDTO<GalleryListResponseDTO> getLatestGalleryFallback(int page, int size) {
+        GallerySearchDTO fallback = new GallerySearchDTO();
+        fallback.setPage(page);
+        fallback.setSize(size);
+        List<GalleryListResponseDTO> list = galleryDAO.findAll(fallback);
+        list.forEach(g -> g.setCoverImage(s3FileService.getPresignedUrl(g.getCoverImage())));
+        int total = galleryDAO.findTotal(fallback);
+
+        return PageResponseDTO.<GalleryListResponseDTO>builder()
+                .content(list)
+                .page(page)
+                .size(size)
+                .totalElements((long) total)
+                .totalPages((int) Math.ceil((double) total / size))
+                .build();
+    }
+
+    private List<Long> requestSimilarGalleryIds(
+            GallerySimilarityDocumentDTO target,
+            List<GallerySimilarityDocumentDTO> candidates,
+            int limit
+    ) {
+        try {
+            SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+            requestFactory.setConnectTimeout(Duration.ofSeconds(3));
+            requestFactory.setReadTimeout(Duration.ofSeconds(10));
+
+            GallerySimilarityResponse response = RestClient.builder()
+                    .baseUrl(fastApiBaseUrl)
+                    .requestFactory(requestFactory)
+                    .build()
+                    .post()
+                    .uri("/api/gallery/similarity")
+                    .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                    .accept(org.springframework.http.MediaType.APPLICATION_JSON)
+                    .body(new GallerySimilarityRequest(
+                            toSimilarityItem(target),
+                            candidates.stream().map(this::toSimilarityItem).toList(),
+                            limit
+                    ))
+                    .retrieve()
+                    .body(GallerySimilarityResponse.class);
+
+            if (response == null || response.results() == null) {
+                return List.of();
+            }
+
+            return response.results().stream()
+                    .sorted(Comparator.comparing(GallerySimilarityResult::score).reversed())
+                    .map(GallerySimilarityResult::id)
+                    .filter(Objects::nonNull)
+                    .toList();
+        } catch (RuntimeException e) {
+            return List.of();
+        }
+    }
+
+    private GallerySimilarityItem toSimilarityItem(GallerySimilarityDocumentDTO document) {
+        return new GallerySimilarityItem(
+                document.getId(),
+                document.getTitle(),
+                document.getDescription(),
+                document.getTags(),
+                document.getWorks()
+        );
+    }
+
+    private record GallerySimilarityRequest(
+            GallerySimilarityItem target,
+            List<GallerySimilarityItem> candidates,
+            int limit
+    ) {
+    }
+
+    private record GallerySimilarityItem(
+            Long id,
+            String title,
+            String description,
+            List<String> tags,
+            List<String> works
+    ) {
+    }
+
+    private record GallerySimilarityResponse(List<GallerySimilarityResult> results) {
+    }
+
+    private record GallerySimilarityResult(Long id, Double score) {
     }
 
     // 프로필 하이라이트용 예술관 목록 조회
@@ -194,7 +361,7 @@ public class GalleryService {
 
         galleryDAO.update(id, requestDTO);
         galleryDAO.deleteWorkLinksByGalleryId(id);
-        saveWorkLinks(id, requestDTO.getWorkIds());
+        saveWorkLinks(id, requestDTO.getWorkIds(), resolvedMemberId);
         galleryDAO.updateWorkCount(id);
         galleryDAO.deleteTagsByGalleryId(id);
         saveTags(id, requestDTO.getTagIds(), requestDTO.getTagNames());
@@ -356,12 +523,24 @@ public class GalleryService {
         return s3FileService.upload("galleries", coverFile);
     }
 
-    private void saveWorkLinks(Long galleryId, List<Long> workIds) {
+    private void saveWorkLinks(Long galleryId, List<Long> workIds, Long ownerId) {
         if (workIds == null || workIds.isEmpty()) {
             return;
         }
 
-        new LinkedHashSet<>(workIds).forEach(workId -> galleryDAO.saveWorkLink(galleryId, workId));
+        new LinkedHashSet<>(workIds).forEach(workId -> {
+            validateWorkOwner(workId, ownerId);
+            galleryDAO.saveWorkLink(galleryId, workId);
+        });
+    }
+
+    private void validateWorkOwner(Long workId, Long memberId) {
+        Long ownerId = workDAO.findById(workId)
+                .map(work -> work.getMemberId())
+                .orElseThrow(() -> new IllegalArgumentException("work not found"));
+        if (!ownerId.equals(memberId)) {
+            throw new IllegalStateException("본인 작품만 본인 예술관에 추가할 수 있습니다.");
+        }
     }
 
     private void saveTags(Long galleryId, List<Long> tagIds, List<String> tagNames) {

@@ -9,8 +9,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Map;
 
 @Component
@@ -47,12 +45,8 @@ public class BootpayClient {
             throw new IllegalStateException("부트페이 서버 연동키가 설정되지 않았습니다.");
         }
 
-        String basicToken = Base64.getEncoder()
-                .encodeToString((applicationId + ":" + privateKey).getBytes(StandardCharsets.UTF_8));
-
         String response = restClient.post()
                 .uri(serverBaseUrl + "/v2/request/token")
-                .header(HttpHeaders.AUTHORIZATION, "Basic " + basicToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Map.of(
                         "application_id", applicationId,

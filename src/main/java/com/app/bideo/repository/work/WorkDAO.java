@@ -11,6 +11,7 @@ import com.app.bideo.dto.work.WorkDetailResponseDTO;
 import com.app.bideo.dto.work.WorkFileResponseDTO;
 import com.app.bideo.dto.work.WorkListResponseDTO;
 import com.app.bideo.dto.work.WorkSearchDTO;
+import com.app.bideo.dto.work.WorkSimilarityDocumentDTO;
 import com.app.bideo.mapper.work.WorkMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -182,5 +183,14 @@ public class WorkDAO {
     // 작품 soft delete 처리
     public void delete(Long id) {
         workMapper.softDeleteWork(id);
+    }
+
+    public List<WorkSimilarityDocumentDTO> findSimilarityDocuments(Long galleryId, int limit) {
+        return workMapper.selectWorkSimilarityDocuments(galleryId, limit);
+    }
+
+    public List<WorkListResponseDTO> findAllByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) return List.of();
+        return workMapper.selectWorkListByIds(ids);
     }
 }

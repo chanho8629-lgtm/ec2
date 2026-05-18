@@ -40,17 +40,38 @@ public class S3FileService {
         String extension = extractExtension(file.getOriginalFilename());
         String key = directory + "/" + UUID.randomUUID() + extension;
 
+        return uploadBytes(key, file.getContentType(), readMultipartFileBytes(file));
+    }
+
+    public String uploadBytes(String directory, String originalFilename, String contentType, byte[] bytes) {
+        requireBucket();
+
+        String extension = extractExtension(originalFilename);
+        String key = directory + "/" + UUID.randomUUID() + extension;
+
+        return uploadBytes(key, contentType, bytes);
+    }
+
+    private String uploadBytes(String key, String contentType, byte[] bytes) {
         try {
             PutObjectRequest putRequest = PutObjectRequest.builder()
                     .bucket(bucket)
                     .key(key)
-                    .contentType(file.getContentType())
+                    .contentType(contentType)
                     .build();
 
-            s3Client.putObject(putRequest, RequestBody.fromBytes(file.getBytes()));
+            s3Client.putObject(putRequest, RequestBody.fromBytes(bytes));
             return key;
         } catch (Exception e) {
             throw new IllegalStateException("S3 업로드에 실패했습니다.", e);
+        }
+    }
+
+    private byte[] readMultipartFileBytes(MultipartFile file) {
+        try {
+            return file.getBytes();
+        } catch (Exception e) {
+            throw new IllegalStateException("업로드 파일을 읽지 못했습니다.", e);
         }
     }
 

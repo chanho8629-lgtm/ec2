@@ -109,6 +109,24 @@
                     </div>
                 </div>
 
+                <!-- AI 추천 작품 섹션 -->
+                <div class="ai-rec-section" id="aiRecSection"
+                     th:if="${gallery != null and (gallery.showSimilar == null or gallery.showSimilar)}">
+                    <div class="ai-rec-header">
+                        <span class="ai-rec-badge">AI가 픽업한 회원님을 위한 초정밀 큐레이션</span>
+                        <div class="ai-rec-header-text">
+                        </div>
+                    </div>
+                    <div class="ai-rec-scroll-wrap">
+                        <div class="ai-rec-list" id="aiRecList">
+                            <div class="ai-rec-loading">
+                                <span class="ai-rec-spinner"></span>
+                                추천 작품을 분석 중입니다.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="gallery-results grid grid-disabled">
                     <div id="primary" class="gallery-results-primary">
                         <div class="gallery-rich-grid">
@@ -117,7 +135,7 @@
 
                                 <!-- 동영상 그리드 -->
                                 <div class="content-row-section">
-                                    <h2>인기 급상승</h2>
+                                    <h2>인기 작품</h2>
                                     <div class="video-grid">
                                         <a class="video-item"
                                            th:if="${gallery != null and !#lists.isEmpty(gallery.works)}"
@@ -328,6 +346,49 @@
                     window.location.href = href;
                 });
             });
+        })();
+    </script>
+
+    <!-- AI 추천 작품 JS -->
+    <script th:inline="javascript">
+        (async function loadAiWorkRecommend() {
+            const listEl  = document.getElementById('aiRecList');
+            const section = document.getElementById('aiRecSection');
+            if (!listEl || !section) return;
+
+            const galleryId = /*[[${gallery != null ? gallery.id : null}]]*/ null;
+            if (!galleryId) { section.remove(); return; }
+
+            try {
+                const res = await fetch(`/api/galleries/${galleryId}/similar-works?limit=8`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!res.ok) throw new Error('추천 API 오류: ' + res.status);
+                const items = await res.json();
+
+                if (!items || items.length === 0) {
+                    listEl.innerHTML = '<p class="ai-rec-empty">유사한 작품이 없습니다.</p>';
+                    return;
+                }
+
+                listEl.innerHTML = items.map(item => {
+                    const thumbHtml = item.thumbnailUrl
+                        ? `<img src="${item.thumbnailUrl}" alt="${item.title}" class="ai-work-thumb-img">`
+                        : `<div class="ai-work-thumb-placeholder">${item.title ? item.title[0].toUpperCase() : '?'}</div>`;
+                    return `
+                        <a class="ai-work-card" href="/work/detail/${item.id}">
+                            <div class="ai-work-thumb">${thumbHtml}</div>
+                            <div class="ai-work-info">
+                                <p class="ai-work-title">${item.title}</p>
+                                <p class="ai-work-meta">@${item.memberNickname ?? ''}</p>
+                                <p class="ai-work-stats">조회수 ${(item.viewCount ?? 0).toLocaleString()}</p>
+                            </div>
+                        </a>`;
+                }).join('');
+            } catch (e) {
+                listEl.innerHTML = '<p class="ai-rec-empty">AI 추천 서버에 연결할 수 없습니다.</p>';
+                console.error('[AI 추천]', e);
+            }
         })();
     </script>
 </body>

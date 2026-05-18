@@ -45,7 +45,6 @@ INSERT INTO tbl_tag (tag_name) VALUES
                                    ('인디게임'), ('모바일게임'), ('콘솔게임'), ('스팀게임'), ('e스포츠');
 
 
-INSERT IGNORE INTO tbl_gallery_tag (gallery_id, tag_id)
 SELECT 1, id FROM tbl_tag LIMIT 100;
 
 -- 2. 다시 100개 몰아넣기 (1번 갤러리에 1~100번 태그 연결)

@@ -6,6 +6,7 @@ import com.app.bideo.dto.common.TagResponseDTO;
 import com.app.bideo.dto.gallery.GalleryCreateRequestDTO;
 import com.app.bideo.dto.gallery.SearchGalleryCoverDataDTO;
 import com.app.bideo.dto.gallery.SearchGallerySuggestionDTO;
+import com.app.bideo.dto.gallery.GallerySimilarityDocumentDTO;
 import com.app.bideo.dto.gallery.GalleryDetailResponseDTO;
 import com.app.bideo.dto.gallery.GalleryListResponseDTO;
 import com.app.bideo.dto.gallery.GallerySearchDTO;
@@ -76,6 +77,11 @@ public interface GalleryMapper {
     Integer selectGalleryLikeCount(@Param("galleryId") Long galleryId);
 
     List<GalleryListResponseDTO> selectGalleryList(GallerySearchDTO searchDTO);
+
+    List<GallerySimilarityDocumentDTO> selectGallerySimilarityDocuments(@Param("targetGalleryId") Long targetGalleryId,
+                                                                        @Param("limit") int limit);
+
+    List<GalleryListResponseDTO> selectGalleryListByIds(@Param("ids") List<Long> ids);
 
     List<GalleryListResponseDTO> selectSearchGalleryList(@Param("criteria") Criteria criteria,
                                                           @Param("keyword") String keyword,

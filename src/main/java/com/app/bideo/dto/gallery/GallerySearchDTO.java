@@ -12,4 +12,5 @@ public class GallerySearchDTO extends PageRequestDTO {
     private String tag;
     private Long memberId;
     private String status;
+    private Long relatedGalleryId;
 }

@@ -8,6 +8,86 @@ body.work-register-page *,
     padding: 0;
 }
 
+.work-ai-prediction {
+    width: 100%;
+    margin-top: 18px;
+    padding: 14px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    background: #fafafa;
+    box-sizing: border-box;
+}
+
+.work-ai-prediction__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.work-ai-prediction__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f0f0f;
+}
+
+.work-ai-prediction__status {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #606060;
+}
+
+.work-ai-prediction__button {
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    background: #fff;
+    color: #0f0f0f;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.work-ai-prediction__button:disabled {
+    opacity: 0.55;
+    cursor: default;
+}
+
+.work-ai-prediction__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.work-ai-prediction__item {
+    min-width: 0;
+    padding: 10px;
+    border-radius: 6px;
+    background: #fff;
+    border: 1px solid #eeeeee;
+}
+
+.work-ai-prediction__item span {
+    display: block;
+    font-size: 12px;
+    color: #606060;
+}
+
+.work-ai-prediction__item strong {
+    display: block;
+    margin-top: 5px;
+    font-size: 15px;
+    color: #0f0f0f;
+    overflow-wrap: anywhere;
+}
+
+.work-ai-prediction__item--wide {
+    grid-column: 1 / -1;
+}
+
 body.work-register-page {
     min-height: 100vh;
     font-family: "Roboto", sans-serif;
@@ -460,8 +540,8 @@ body.work-register-page.work-register-edit-mode .dialog-content {
 
 .ai-prompt-modal__dialog {
     position: relative;
-    width: min(880px, calc(100vw - 48px));
-    height: min(680px, calc(100vh - 72px));
+    width: min(879px, calc(100vw - 48px));
+    height: min(740px, calc(100vh - 72px));
     margin: 99px auto;
     border-radius: 28px;
     background: #ffffff;
@@ -571,47 +651,18 @@ body.work-register-page.work-register-edit-mode .dialog-content {
 }
 
 .ai-prompt-preview-card {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    border-radius: 18px;
+    width: min(100%, 420px);
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
     overflow: hidden;
-    background: #e9e5ff;
+    background: #f2f2f2;
 }
 
-.ai-prompt-preview-card__split {
-    position: relative;
-    aspect-ratio: 1 / 1.12;
-    overflow: hidden;
-}
-
-.ai-prompt-preview-card__split img {
+.ai-prompt-preview-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-}
-
-.ai-prompt-preview-card__play {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 82px;
-    height: 58px;
-    border: 2px solid rgba(255, 255, 255, 0.95);
-    border-radius: 18px;
-    background: rgba(0, 0, 0, 0.18);
-    color: #ffffff;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(4px);
-}
-
-.ai-prompt-preview-card__play svg {
-    width: 28px;
-    height: 28px;
-    fill: currentColor;
 }
 
 .ai-prompt-preview-actions {

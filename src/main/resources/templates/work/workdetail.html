@@ -375,8 +375,24 @@
 <div class="Auction-Page-Wrapper">
     <div class="Auction-Content-Layout">
         <main class="Auction-Watch-Main">
-            <!--! 입찰 채팅 패널 -->
-            <aside class="Auction-Bid-Panel">
+            <aside class="Auction-Interaction-Panel">
+                <section class="Auction-AI-SidePanel" id="auctionAiInsight">
+                    <div class="Auction-AI-InsightHeader">
+                        <div>
+                            <div class="Auction-AI-Kicker">
+                                <span class="Auction-AI-Dot"></span>
+                                BIDEO AI RAG
+                            </div>
+                            <div class="Auction-AI-Title">경매 투자 분석</div>
+                        </div>
+                        <button class="Auction-AI-Button" id="auctionAiAnalyzeBtn" type="button">분석</button>
+                    </div>
+                    <div class="Auction-AI-Status" id="auctionAiStatus">경매 작품의 투자 가치와 ROI를 분석합니다.</div>
+                    <div class="Auction-AI-Result" id="auctionAiResult" hidden></div>
+                </section>
+
+                <!--! 입찰 채팅 패널 -->
+                <section class="Auction-Bid-Panel">
 
                 <!-- 채팅 헤더 -->
                 <div class="Auction-Bid-Header">
@@ -491,6 +507,7 @@
                         </svg>
                     </button>
                 </div>
+                </section>
             </aside>
         </main>
 

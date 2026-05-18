@@ -292,6 +292,60 @@
         limit #{size} offset (#{page} - 1) * #{size}
     </select>
 
+    <select id="selectGallerySimilarityDocuments" resultType="GallerySimilarityDocumentDTO">
+        select
+            g.id,
+            g.title,
+            coalesce(g.description, '') as description,
+            coalesce(string_agg(distinct t.tag_name, ' | ') filter (where t.tag_name is not null), '') as tag_text,
+            coalesce(string_agg(distinct concat_ws(' ', w.title, w.category, w.description), ' | ') filter (where w.id is not null), '') as work_text
+        from tbl_gallery g
+        left join tbl_gallery_tag gt on gt.gallery_id = g.id
+        left join tbl_tag t on t.id = gt.tag_id
+        left join tbl_gallery_work gw on gw.gallery_id = g.id
+        left join tbl_work w on w.id = gw.work_id
+            and w.deleted_datetime is null
+            and w.status != 'DELETED'
+        where g.deleted_datetime is null
+          and g.status = 'EXHIBITING'
+        group by g.id, g.title, g.description, g.created_datetime, g.view_count, g.like_count
+        order by
+            case when g.id = #{targetGalleryId} then 0 else 1 end,
+            g.created_datetime desc,
+            g.view_count desc,
+            g.like_count desc,
+            g.id desc
+        limit #{limit}
+    </select>
+
+    <select id="selectGalleryListByIds" resultType="GalleryListResponseDTO">
+        select
+            g.id,
+            g.member_id,
+            g.title,
+            g.description,
+            g.cover_image,
+            m.nickname as member_nickname,
+            g.work_count,
+            g.like_count,
+            g.view_count,
+            false as is_liked,
+            g.created_datetime
+        from tbl_gallery g
+        left join tbl_member m on g.member_id = m.id
+        where g.deleted_datetime is null
+          and g.status != 'DELETED'
+          and g.id in
+          <foreach collection="ids" item="id" open="(" separator="," close=")">
+              #{id}
+          </foreach>
+        order by array_position(array[
+          <foreach collection="ids" item="id" separator=",">
+              #{id}::bigint
+          </foreach>
+        ], g.id)
+    </select>
+
     <select id="selectSearchGalleryList" resultType="GalleryListResponseDTO">
         select
             g.id,

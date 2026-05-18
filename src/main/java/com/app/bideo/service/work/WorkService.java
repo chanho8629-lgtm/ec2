@@ -9,6 +9,7 @@ import com.app.bideo.dto.common.LikeToggleResponseDTO;
 import com.app.bideo.dto.common.PageResponseDTO;
 import com.app.bideo.dto.common.TagResponseDTO;
 import com.app.bideo.dto.interaction.CommentResponseDTO;
+import com.app.bideo.dto.gallery.GalleryDetailResponseDTO;
 import com.app.bideo.dto.work.WorkCreateRequestDTO;
 import com.app.bideo.dto.work.WorkCreateResponseDTO;
 import com.app.bideo.dto.work.WorkDTO;
@@ -16,6 +17,7 @@ import com.app.bideo.dto.work.WorkDetailResponseDTO;
 import com.app.bideo.dto.work.WorkFileRequestDTO;
 import com.app.bideo.dto.work.WorkListResponseDTO;
 import com.app.bideo.dto.work.WorkSearchDTO;
+import com.app.bideo.dto.work.WorkSimilarityDocumentDTO;
 import com.app.bideo.dto.work.WorkUpdateRequestDTO;
 import com.app.bideo.repository.auction.AuctionDAO;
 import com.app.bideo.repository.interaction.BookmarkDAO;
@@ -25,6 +27,7 @@ import com.app.bideo.service.notification.NotificationService;
 import com.app.bideo.repository.gallery.GalleryDAO;
 import com.app.bideo.repository.work.WorkDAO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +41,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 
 @Service
@@ -53,31 +57,51 @@ public class WorkService {
     private final NotificationService notificationService;
     private final S3FileService s3FileService;
 
+    @Value("${fastapi.base-url:http://127.0.0.1:8000}")
+    private String fastApiBaseUrl;
+
     // 작품 등록 후 파일/태그까지 함께 저장한다.
     @CacheEvict(value = {"dashboard", "profile"}, allEntries = true)
     public WorkCreateResponseDTO write(Long memberId, WorkCreateRequestDTO requestDTO, MultipartFile mediaFile, MultipartFile thumbnailFile) {
         Long resolvedMemberId = resolveMemberId(memberId);
         Long galleryId = requireGalleryId(requestDTO.getGalleryId());
+        validateGalleryOwner(galleryId, resolvedMemberId);
+        if ((mediaFile == null || mediaFile.isEmpty()) && !hasExistingFiles(requestDTO.getFiles())) {
+            throw new IllegalArgumentException("업로드할 파일을 선택해주세요.");
+        }
         String category = resolveCategory(requestDTO.getCategory(), mediaFile);
+        boolean hasThumbnail = thumbnailFile != null && !thumbnailFile.isEmpty();
 
         WorkDTO workDTO = WorkDTO.builder()
                 .memberId(resolvedMemberId)
-                .title(requestDTO.getTitle())
+                .title(limitText(requestDTO.getTitle(), 255))
                 .category(category)
                 .description(requestDTO.getDescription())
                 .price(requestDTO.getPrice())
-                .licenseType(requestDTO.getLicenseType())
+                .licenseType(limitText(requestDTO.getLicenseType(), 100))
                 .licenseTerms(requestDTO.getLicenseTerms())
                 .isTradable(requestDTO.getIsTradable())
                 .allowComment(requestDTO.getAllowComment())
                 .showSimilar(requestDTO.getShowSimilar())
-                .linkUrl(requestDTO.getLinkUrl())
+                .linkUrl(limitText(requestDTO.getLinkUrl(), 255))
+                .mediaType(resolveMediaType(category, mediaFile, requestDTO.getFiles()))
+                .titleLength(textLength(requestDTO.getTitle()))
+                .descriptionLength(textLength(requestDTO.getDescription()))
+                .tagCount(countTags(requestDTO))
+                .thumbnailExists(hasThumbnail)
+                .isAiGenerated(resolveAiGenerated(requestDTO, mediaFile))
+                .aiQualityScore(defaultDouble(requestDTO.getAiQualityScore()))
+                .predictedViews(defaultLong(requestDTO.getPredictedViews()))
+                .predictedLikeCount(defaultInteger(requestDTO.getPredictedLikeCount()))
+                .predictedPopular(defaultInteger(requestDTO.getPredictedPopular()))
+                .predictedPopularProbability(defaultDouble(requestDTO.getPredictedPopularProbability()))
                 .status("ACTIVE")
                 .build();
 
         workDAO.save(workDTO);
         saveThumbnailFile(workDTO.getId(), thumbnailFile);
-        saveMediaFile(workDTO.getId(), mediaFile, thumbnailFile != null && !thumbnailFile.isEmpty() ? 1 : 0);
+        saveMediaFile(workDTO.getId(), mediaFile, hasThumbnail ? 1 : 0);
+        saveExistingFiles(workDTO.getId(), requestDTO.getFiles(), hasThumbnail ? 1 : 0);
         saveTags(workDTO.getId(), requestDTO.getTagIds(), requestDTO.getTagNames());
         saveGalleryLink(galleryId, workDTO.getId());
         saveAuctionIfRequested(workDTO.getId(), resolvedMemberId, requestDTO.getPrice(), requestDTO.getAuctionEnabled(), requestDTO.getAuctionStartingPrice(), requestDTO.getAuctionDeadlineHours());
@@ -208,21 +232,22 @@ public class WorkService {
         Long resolvedMemberId = resolveMemberId(memberId);
         validateWorkOwner(id, resolvedMemberId);
         Long galleryId = requireGalleryId(requestDTO.getGalleryId());
+        validateGalleryOwner(galleryId, resolvedMemberId);
         Long previousGalleryId = galleryDAO.findGalleryIdByWorkId(id).orElse(null);
 
         WorkDTO workDTO = WorkDTO.builder()
                 .id(id)
                 .memberId(resolvedMemberId)
-                .title(requestDTO.getTitle())
+                .title(limitText(requestDTO.getTitle(), 255))
                 .category(requestDTO.getCategory())
                 .description(requestDTO.getDescription())
                 .price(requestDTO.getPrice())
-                .licenseType(requestDTO.getLicenseType())
+                .licenseType(limitText(requestDTO.getLicenseType(), 100))
                 .licenseTerms(requestDTO.getLicenseTerms())
                 .isTradable(requestDTO.getIsTradable())
                 .allowComment(requestDTO.getAllowComment())
                 .showSimilar(requestDTO.getShowSimilar())
-                .linkUrl(requestDTO.getLinkUrl())
+                .linkUrl(limitText(requestDTO.getLinkUrl(), 255))
                 .status("ACTIVE")
                 .build();
 
@@ -343,11 +368,71 @@ public class WorkService {
         workDAO.hardDeleteById(id);
     }
 
+    @Transactional(readOnly = true)
+    public List<WorkListResponseDTO> getSimilarWorksByGallery(Long galleryId, int limit) {
+        GalleryDetailResponseDTO gallery = galleryDAO.findById(galleryId)
+                .orElseThrow(() -> new IllegalArgumentException("gallery not found: " + galleryId));
+
+        // gallery title + description + tags 를 쿼리 텍스트로 합성
+        String tagPart = gallery.getTags() == null ? "" :
+                gallery.getTags().stream()
+                        .map(t -> t.getTagName())
+                        .collect(Collectors.joining(" "));
+        String content = String.join(" ",
+                gallery.getTitle() != null ? gallery.getTitle() : "",
+                gallery.getDescription() != null ? gallery.getDescription() : "",
+                tagPart
+        ).trim();
+
+        // FastAPI POST /api/work/recommend 호출
+        List<Long> ids = callWorkRecommend(galleryId, content, limit);
+        if (ids.isEmpty()) return List.of();
+
+        List<WorkListResponseDTO> result = workDAO.findAllByIds(ids);
+        result.forEach(w -> w.setThumbnailUrl(s3FileService.getPresignedUrl(w.getThumbnailUrl())));
+        return result;
+    }
+
+    private List<Long> callWorkRecommend(Long galleryId, String content, int limit) {
+        org.springframework.http.client.SimpleClientHttpRequestFactory factory =
+                new org.springframework.http.client.SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(java.time.Duration.ofSeconds(3));
+        factory.setReadTimeout(java.time.Duration.ofSeconds(15));
+
+        WorkRecResp response = org.springframework.web.client.RestClient.builder()
+                .baseUrl(fastApiBaseUrl)
+                .requestFactory(factory)
+                .build()
+                .post()
+                .uri("/api/work/recommend")
+                .body(new WorkRecReq(galleryId, content, limit))
+                .retrieve()
+                .body(WorkRecResp.class);
+
+        if (response == null || response.recommendations() == null) return List.of();
+        return response.recommendations().stream()
+                .map(WorkRecItem::id)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    private record WorkRecReq(Long gallery_id, String content, int top_n) {}
+    private record WorkRecItem(Long id, String title, Integer viewCount, Integer likeCount, Double similarity) {}
+    private record WorkRecResp(List<WorkRecItem> recommendations) {}
+
     private void validateWorkOwner(Long workId, Long memberId) {
         WorkDTO work = workDAO.findById(workId)
                 .orElseThrow(() -> new IllegalArgumentException("work not found"));
         if (!memberId.equals(work.getMemberId())) {
             throw new IllegalStateException("forbidden");
+        }
+    }
+
+    private void validateGalleryOwner(Long galleryId, Long memberId) {
+        Long ownerId = galleryDAO.findMemberIdById(galleryId)
+                .orElseThrow(() -> new IllegalArgumentException("gallery not found"));
+        if (!ownerId.equals(memberId)) {
+            throw new IllegalStateException("본인 예술관에만 작품을 등록할 수 있습니다.");
         }
     }
 
@@ -558,6 +643,38 @@ public class WorkService {
         );
     }
 
+    private void saveExistingFiles(Long workId, List<WorkFileRequestDTO> files, int defaultSortOrder) {
+        if (files == null || files.isEmpty()) {
+            return;
+        }
+
+        for (int index = 0; index < files.size(); index++) {
+            WorkFileRequestDTO file = files.get(index);
+            if (file == null || file.getFileUrl() == null || file.getFileUrl().isBlank()) {
+                continue;
+            }
+
+            workDAO.saveFile(
+                    WorkFileVO.builder()
+                            .workId(workId)
+                            .fileUrl(file.getFileUrl())
+                            .fileType(file.getFileType() != null ? file.getFileType() : "application/octet-stream")
+                            .fileSize(file.getFileSize() != null ? file.getFileSize() : 0)
+                            .sortOrder(file.getSortOrder() != null ? file.getSortOrder() : defaultSortOrder + index)
+                            .build()
+            );
+        }
+    }
+
+    private boolean hasExistingFiles(List<WorkFileRequestDTO> files) {
+        if (files == null || files.isEmpty()) {
+            return false;
+        }
+
+        return files.stream()
+                .anyMatch(file -> file != null && file.getFileUrl() != null && !file.getFileUrl().isBlank());
+    }
+
     private String resolveCategory(String category, MultipartFile mediaFile) {
         if (mediaFile != null && !mediaFile.isEmpty() && mediaFile.getContentType() != null) {
             if (mediaFile.getContentType().startsWith("image/")) {
@@ -570,6 +687,66 @@ public class WorkService {
         }
 
         return category != null ? category : "VIDEO";
+    }
+
+    private String resolveMediaType(String category, MultipartFile mediaFile, List<WorkFileRequestDTO> files) {
+        if (mediaFile != null && !mediaFile.isEmpty() && mediaFile.getContentType() != null) {
+            return mediaFile.getContentType();
+        }
+
+        if (files != null) {
+            for (WorkFileRequestDTO file : files) {
+                if (file != null && file.getFileType() != null && !file.getFileType().isBlank()) {
+                    return file.getFileType();
+                }
+            }
+        }
+
+        return category != null ? category : "VIDEO";
+    }
+
+    private boolean resolveAiGenerated(WorkCreateRequestDTO requestDTO, MultipartFile mediaFile) {
+        if (Boolean.TRUE.equals(requestDTO.getIsAiGenerated())) {
+            return true;
+        }
+
+        return (mediaFile == null || mediaFile.isEmpty()) && hasExistingFiles(requestDTO.getFiles());
+    }
+
+    private int countTags(WorkCreateRequestDTO requestDTO) {
+        int count = 0;
+        if (requestDTO.getTagIds() != null) {
+            count += requestDTO.getTagIds().size();
+        }
+        if (requestDTO.getTagNames() != null) {
+            count += requestDTO.getTagNames().size();
+        }
+        return count;
+    }
+
+    private int textLength(String text) {
+        return text == null ? 0 : text.trim().length();
+    }
+
+    private String limitText(String text, int maxLength) {
+        if (text == null) {
+            return null;
+        }
+
+        String trimmed = text.trim();
+        return trimmed.length() > maxLength ? trimmed.substring(0, maxLength) : trimmed;
+    }
+
+    private Integer defaultInteger(Integer value) {
+        return value == null ? 0 : value;
+    }
+
+    private Long defaultLong(Long value) {
+        return value == null ? 0L : value;
+    }
+
+    private Double defaultDouble(Double value) {
+        return value == null ? 0D : value;
     }
 
     private void applyFileUrls(WorkDetailResponseDTO detail) {

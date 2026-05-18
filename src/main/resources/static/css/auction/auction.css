@@ -58,6 +58,35 @@ ul, ol {
     max-width: 1440px;
 }
 
+.Auction-Interaction-Panel {
+    width: 400px;
+    height: 599px;
+    min-width: 340px;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(104, 0, 234, 0.18);
+    border-left: 2px solid rgba(104, 0, 234, 0.34);
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 12px 28px rgba(15, 15, 15, 0.08);
+    flex-shrink: 0;
+}
+
+.Auction-AI-SidePanel {
+    width: 100%;
+    max-height: 210px;
+    display: flex;
+    flex-direction: column;
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid rgba(104, 0, 234, 0.16);
+    background: linear-gradient(180deg, rgba(104, 0, 234, 0.07), rgba(104, 0, 234, 0.025) 72%, #ffffff);
+    overflow: hidden;
+    overscroll-behavior: contain;
+    flex-shrink: 0;
+}
+
 /* ───────────────────────────────────────────
    비디오 섹션
 ─────────────────────────────────────────── */
@@ -170,19 +199,15 @@ ul, ol {
    입찰 패널
 ─────────────────────────────────────────── */
 .Auction-Bid-Panel {
-    width: 360px;
-    height: 599px;
-    /*height: auto;*/
-    min-width: 320px;
-    max-width: 400px;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
+    border: 0;
+    border-radius: 0;
     overflow: hidden;
     background: #ffffff;
-    margin-left: 24px;
-    flex-shrink: 0;
 }
 
 /* 입찰 헤더 */
@@ -191,8 +216,8 @@ ul, ol {
     align-items: center;
     justify-content: space-between;
     padding: 12px 16px;
-    border-bottom: 1px solid #e0e0e0;
-    background: #ffffff;
+    border-bottom: 1px solid rgba(224, 224, 224, 0.8);
+    background: rgba(255, 255, 255, 0.92);
     flex-shrink: 0;
 }
 
@@ -238,10 +263,122 @@ ul, ol {
    카운트다운
 ─────────────────────────────────────────── */
 .Auction-Countdown-Wrap {
-    padding: 16px 18px 14px;
+    padding: 14px 18px 12px;
     border-bottom: 1px solid #e0e0e0;
     text-align: center;
     flex-shrink: 0;
+}
+
+.Auction-AI-Insight {
+    margin: 10px 12px;
+    padding: 12px;
+    border: 1px solid rgba(104, 0, 234, 0.18);
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(104, 0, 234, 0.06), #ffffff 72%);
+    flex-shrink: 0;
+    order: 0;
+}
+
+.Auction-AI-InsightHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.Auction-AI-Kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #6800EA;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0;
+}
+
+.Auction-AI-Dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: #6800EA;
+    animation: livePulse 1.4s ease-in-out infinite;
+}
+
+.Auction-AI-Title {
+    margin-top: 3px;
+    font-size: 14px;
+    font-weight: 800;
+    color: #0f0f0f;
+}
+
+.Auction-AI-Button {
+    min-width: 58px;
+    height: 30px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: #6800EA;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.Auction-AI-Button:disabled {
+    cursor: wait;
+    opacity: 0.62;
+}
+
+.Auction-AI-Status {
+    margin-top: 8px;
+    color: #606060;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.Auction-AI-Result {
+    margin-top: 10px;
+    flex: 1;
+    min-height: 0;
+    max-height: 116px;
+    overflow-y: auto;
+    padding-right: 6px;
+    overscroll-behavior: contain;
+}
+
+.Auction-AI-ResultBadge {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: rgba(104, 0, 234, 0.10);
+    color: #6800EA;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.Auction-AI-ResultBlock {
+    margin-top: 10px;
+}
+
+.Auction-AI-ResultBlock strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #0f0f0f;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.Auction-AI-ResultBlock p {
+    color: #303030;
+    font-size: 12px;
+    line-height: 1.58;
+}
+
+.Auction-AI-ResultBlock p {
+    color: #333;
+    font-size: 12px;
+    line-height: 1.48;
 }
 
 .Auction-Countdown-Label {
