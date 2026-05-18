@@ -1,0 +1,24 @@
+#solapi:
+#  api-key: NCS4V4HHHBMCEQ94
+#  api-secret: "BJ247KPS2TLVIWZWLMCBTHBX6HPONR48"
+#  from-number: "01095883420"
+#
+#app:
+#  mail:
+#    from-address: "chanho8629@gmail.com"
+#
+#spring:
+#  mail:
+#    host: smtp.gmail.com
+#    port: 587
+#    username: "chanho8629@gmail.com"
+#    password: "hdzniyhrjhjvoiax"
+#    properties:
+#      mail:
+#        smtp:
+#          auth: true
+#          starttls:
+#            enable: true
+#
+#jwt:
+#  secret: r4jL/gqxy2Gb9oT/BNj0xsHiij2hiWKobnmgD9Hrw+c=
