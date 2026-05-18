@@ -35,7 +35,7 @@ jobs:
 
     - name: Copy project to EC2
       run: |
-        rsync -avz -e "ssh -i ~/.ssd/id_rsa" . ${{ secrets.EC2_USER }}@$HOST:/home/ubuntu/app
+        rsync -avz -e "ssh -i ~/.ssh/id_rsa" . ${{ secrets.EC2_USER }}@$HOST:/home/ubuntu/app
 
     - name: Build & Run Docker on EC2
       run: |
