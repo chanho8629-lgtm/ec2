@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    if: github.repository == 'bideo-ec2/ec2'
+    if: github.repository == '[organization 이름]/[repositor'
     runs-on: ubuntu-24.04
 
     strategy:
