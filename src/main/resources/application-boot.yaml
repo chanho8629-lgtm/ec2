@@ -1,0 +1,24 @@
+spring:
+  config:
+    import:
+      - optional:classpath:application-boot-secret.yaml
+
+bootpay:
+  enabled: true
+  pg: tosspayments
+  js-application-id: 69604c4ab6279cebf60ad178
+  rest-client-key: 69604c4ab6279cebf60ad17b
+  private-key: EmN+sBqpN1hMbhJ5FB3gqSFwWLBvpMggTh48xHevqgA=
+
+boot-pay:
+  enabled: true
+  mode: test
+  api:
+    application-id: 69604c4ab6279cebf60ad17b
+    private-key: EmN+sBqpN1hMbhJ5FB3gqSFwWLBvpMggTh48xHevqgA=
+  billing:
+    pg: tosspayments
+    customer:
+      key-prefix: BIDEO_MEMBER_
+  urls:
+    server-base-url: https://api.bootpay.co.kr

@@ -1,0 +1,71 @@
+server:
+  port: 10000
+  servlet:
+    session:
+      tracking-modes: cookie
+  ssl:
+    enabled: true
+    certificate: classpath:key/bideo+3.pem
+    certificate-private-key: classpath:key/bideo+3-key.pem
+
+
+spring:
+  config:
+    import:
+      - optional:classpath:application-sol.yaml
+      - optional:classpath:application-oauth.yaml
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${EC2_HOST}:${PSQL_PORT}/${PSQL_DATABASE}?serverTimezone=Asia/Seoul
+    username: ${PSQL_USERNAME}
+    password: ${PSQL_PASSWORD}
+  session:
+    redis:
+      repository-type: indexed
+      flush-mode: immediate
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 10MB
+      max-file-size: 20MB
+      max-request-size: 20MB
+  data:
+    redis:
+      host: ${EC2_HOST}
+      port: ${REDIS_PORT}
+
+  profiles:
+    active: sol, oauth
+
+  cache:
+    type: redis
+
+mybatis:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: com.app.bideo.domain; com.app.bideo.dto;
+  type-handlers-package: com.app.bideo.mybatis.handler
+  configuration:
+    map-underscore-to-camel-case: true
+
+# openssl rand -base64 32
+jwt:
+  secret: ${JWT_SECRET}
+
+cloud:
+  aws:
+    access-key: ${AWS_ACCESS_KEY}
+    secret-key: ${AWS_SECRET_KEY}
+    s3:
+      bucket-name: ${AWS_BUCKET_NAME}
+    region: ${AWS_REGION}
+
+bootpay:
+  js-application-id: ${BOOTPAY_JS_APPLICATION_ID}
+  rest-client-key: ${BOOTPAY_REST_CLIENT_KEY}
+  private-key: ${BOOTPAY_PRIVATE_KEY}
+  pg: tosspayments
+
+
+
+fastapi:
+  base-url: ${FASTAPI_BASE_URL}
