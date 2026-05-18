@@ -143,6 +143,7 @@ jobs:
               -e ML_API_BASE_URL=${{ secrets.ML_API_BASE_URL }} \
               bideo
           EOF
+          
           docker stop bideo || true
           docker rm bideo || true
           docker rmi bideo || true
