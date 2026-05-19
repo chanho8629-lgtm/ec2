@@ -26,7 +26,7 @@ public class S3FileService {
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
 
-    @Value("${cloud.aws.s3.bucket:}")
+    @Value("${aws.s3.bucket-name}")
     private String bucket;
 
     private static final Duration PRESIGNED_URL_DURATION = Duration.ofDays(7);
