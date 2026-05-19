@@ -114,7 +114,7 @@ jobs:
               --build-arg ML_API_BASE_URL=${{ secrets.ML_API_BASE_URL }} \
               -t bideo .
             docker run -d -p 80:10000 --name bideo \
-              --add-host=bideo.shop:172.31.44.160 \
+              --add-host=bideo.shop:172.31.37.54 \
               -e EC2_HOST=${{ secrets.EC2_HOST }} \
               -e PSQL_PORT=${{ secrets.PSQL_PORT }} \
               -e PSQL_DATABASE=${{ secrets.PSQL_DATABASE }} \
