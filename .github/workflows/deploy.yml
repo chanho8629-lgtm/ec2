@@ -144,15 +144,7 @@ jobs:
               bideo
           EOF
           
-          docker stop bideo || true
-          docker rm bideo || true
-          docker rmi bideo || true
-          
-          docker system prune -af || true
-          docker builder prune -af || true
-          docker volume prune -f || true
-          
-          sudo rm -rf .gradle build || true
+      
 
 
       - name: Clean up dangling images
