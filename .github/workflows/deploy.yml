@@ -29,6 +29,9 @@ jobs:
       - name: Build application jar
         run: chmod +x ./gradlew && ./gradlew --no-daemon --console=plain --max-workers=1 bootJar -x test
 
+      - name: Prepare deployment jar
+        run: cp build/libs/bideo-*-SNAPSHOT.jar app.jar
+
       - name: Set HOST env var from secrets
         run: echo "HOST=${{ secrets[matrix.name] }}" >> $GITHUB_ENV
 
@@ -88,8 +91,9 @@ jobs:
       - name: Build & Run Docker on EC2
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@$HOST << EOF
+            set -e
             cd /home/ubuntu/bideo
-            test -f build/libs/bideo-*-SNAPSHOT.jar
+            test -f app.jar
             docker build -t bideo .
             docker stop bideo || true
             docker rm bideo || true
