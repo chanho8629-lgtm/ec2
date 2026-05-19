@@ -1,24 +1,21 @@
-#solapi:
-#  api-key: NCS4V4HHHBMCEQ94
-#  api-secret: "BJ247KPS2TLVIWZWLMCBTHBX6HPONR48"
-#  from-number: "01095883420"
-#
-#app:
-#  mail:
-#    from-address: "chanho8629@gmail.com"
-#
-#spring:
-#  mail:
-#    host: smtp.gmail.com
-#    port: 587
-#    username: "chanho8629@gmail.com"
-#    password: "hdzniyhrjhjvoiax"
-#    properties:
-#      mail:
-#        smtp:
-#          auth: true
-#          starttls:
-#            enable: true
-#
-#jwt:
-#  secret: r4jL/gqxy2Gb9oT/BNj0xsHiij2hiWKobnmgD9Hrw+c=
+solapi:
+  api-key: ${SOLAPI_API_KEY:}
+  api-secret: ${SOLAPI_API_SECRET:}
+  from-number: ${SOLAPI_FROM_NUMBER:}
+
+app:
+  mail:
+    from-address: ${APP_MAIL_FROM_ADDRESS:${SPRING_MAIL_USERNAME:no-reply@bideo.local}}
+
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SPRING_MAIL_USERNAME:}
+    password: ${SPRING_MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

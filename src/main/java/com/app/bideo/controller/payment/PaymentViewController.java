@@ -13,7 +13,7 @@ public class PaymentViewController {
     @Value("${bootpay.js-application-id:}")
     private String bootpayJsApplicationId;
 
-    @Value("${bootpay.pg:tosspayments}")
+    @Value("${bootpay.pg:${boot-pay.billing.pg:tosspayments}}")
     private String bootpayPg;
 
     @GetMapping("/pay")

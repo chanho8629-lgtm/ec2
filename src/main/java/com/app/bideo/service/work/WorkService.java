@@ -57,7 +57,7 @@ public class WorkService {
     private final NotificationService notificationService;
     private final S3FileService s3FileService;
 
-    @Value("${fastapi.base-url:}")
+    @Value("")
     private String fastApiBaseUrl;
 
     // 작품 등록 후 파일/태그까지 함께 저장한다.

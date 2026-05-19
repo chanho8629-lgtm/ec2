@@ -54,7 +54,7 @@ jobs:
           echo "AWS_BUCKET_NAME length: ${#A1}"  
           echo "ML_API_BASE_URL length: ${#A2}"
           echo "BOOTPAY_PRIVATE_KEY length: ${#A3}"
-          echo "BOOTPAY_REST_API_KEY length: ${#A4}"
+          echo "BOOTPAY_REST_CLIENT_KEY length: ${#A4}"
           echo "SOLAPI_API_SECRET length: ${#A5}"
           echo "SPRING_MAIL_PASSWORD length: ${#A6}"
           echo "EC2_USER length: ${#A7}"
@@ -71,7 +71,7 @@ jobs:
           A1: ${{ secrets.AWS_BUCKET_NAME }}
           A2: ${{ secrets.ML_API_BASE_URL }}
           A3: ${{ secrets.BOOTPAY_PRIVATE_KEY }}
-          A4: ${{ secrets.BOOTPAY_REST_API_KEY }}
+          A4: ${{ secrets.BOOTPAY_REST_CLIENT_KEY || secrets.BOOTPAY_REST_API_KEY }}
           A5: ${{ secrets.SOLAPI_API_SECRET }}
           A6: ${{ secrets.SPRING_MAIL_PASSWORD }}
           A7: ${{ secrets.EC2_USER }}
@@ -86,10 +86,12 @@ jobs:
             docker rmi bideo || true
             docker build \
               --build-arg EC2_HOST=${{ secrets.EC2_HOST }} \
+              --build-arg DB_HOST=${{ secrets.DB_HOST || secrets.EC2_HOST }} \
               --build-arg PSQL_PORT=${{ secrets.PSQL_PORT }} \
               --build-arg PSQL_DATABASE=${{ secrets.PSQL_DATABASE }} \
               --build-arg PSQL_USERNAME=${{ secrets.PSQL_USERNAME }} \
               --build-arg PSQL_PASSWORD=${{ secrets.PSQL_PASSWORD }} \
+              --build-arg REDIS_HOST=${{ secrets.REDIS_HOST || secrets.EC2_HOST }} \
               --build-arg REDIS_PORT=${{ secrets.REDIS_PORT }} \
               --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} \
               --build-arg AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} \
@@ -102,8 +104,8 @@ jobs:
               --build-arg NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }} \
               --build-arg GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
               --build-arg GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
-              --build-arg BOOTPAY_JS_API_KEY=${{ secrets.BOOTPAY_JS_API_KEY }} \
-              --build-arg BOOTPAY_REST_API_KEY=${{ secrets.BOOTPAY_REST_API_KEY }} \
+              --build-arg BOOTPAY_JS_APPLICATION_ID=${{ secrets.BOOTPAY_JS_APPLICATION_ID || secrets.BOOTPAY_JS_API_KEY }} \
+              --build-arg BOOTPAY_REST_CLIENT_KEY=${{ secrets.BOOTPAY_REST_CLIENT_KEY || secrets.BOOTPAY_REST_API_KEY }} \
               --build-arg BOOTPAY_PRIVATE_KEY=${{ secrets.BOOTPAY_PRIVATE_KEY }} \
               --build-arg SPRING_MAIL_USERNAME=${{ secrets.SPRING_MAIL_USERNAME }} \
               --build-arg SPRING_MAIL_PASSWORD=${{ secrets.SPRING_MAIL_PASSWORD }} \
@@ -114,12 +116,13 @@ jobs:
               --build-arg ML_API_BASE_URL=${{ secrets.ML_API_BASE_URL }} \
               -t bideo .
             docker run -d -p 80:10000 --name bideo \
-              --add-host=bideo.shop:172.31.37.54 \
               -e EC2_HOST=${{ secrets.EC2_HOST }} \
+              -e DB_HOST=${{ secrets.DB_HOST || secrets.EC2_HOST }} \
               -e PSQL_PORT=${{ secrets.PSQL_PORT }} \
               -e PSQL_DATABASE=${{ secrets.PSQL_DATABASE }} \
               -e PSQL_USERNAME=${{ secrets.PSQL_USERNAME }} \
               -e PSQL_PASSWORD=${{ secrets.PSQL_PASSWORD }} \
+              -e REDIS_HOST=${{ secrets.REDIS_HOST || secrets.EC2_HOST }} \
               -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
               -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
               -e AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} \
@@ -132,8 +135,8 @@ jobs:
               -e NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }} \
               -e GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
               -e GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
-              -e BOOTPAY_JS_API_KEY=${{ secrets.BOOTPAY_JS_API_KEY }} \
-              -e BOOTPAY_REST_API_KEY=${{ secrets.BOOTPAY_REST_API_KEY }} \
+              -e BOOTPAY_JS_APPLICATION_ID=${{ secrets.BOOTPAY_JS_APPLICATION_ID || secrets.BOOTPAY_JS_API_KEY }} \
+              -e BOOTPAY_REST_CLIENT_KEY=${{ secrets.BOOTPAY_REST_CLIENT_KEY || secrets.BOOTPAY_REST_API_KEY }} \
               -e BOOTPAY_PRIVATE_KEY=${{ secrets.BOOTPAY_PRIVATE_KEY }} \
               -e SPRING_MAIL_USERNAME=${{ secrets.SPRING_MAIL_USERNAME }} \
               -e SPRING_MAIL_PASSWORD=${{ secrets.SPRING_MAIL_PASSWORD }} \
