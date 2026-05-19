@@ -99,13 +99,10 @@ jobs:
             cd /home/ubuntu/bideo
             test -f app.jar
             docker build -t bideo .
-            NETWORK="$(docker inspect nginx --format '{{range $name, $_ := .NetworkSettings.Networks}}{{$name}}{{end}}' 2>/dev/null || true)"
-            if [ -z "$NETWORK" ]; then
-              NETWORK=bridge
-            fi
+            docker ps -a
             docker rm -f spring spring2 || true
             for CONTAINER_NAME in spring spring2; do
-              docker run -d --restart unless-stopped --name "$CONTAINER_NAME" --network "$NETWORK" \
+              docker run -d --restart unless-stopped --name "$CONTAINER_NAME" \
                 --add-host=bideo.shop:172.31.37.54 \
                 -e EC2_HOST=${{ secrets.EC2_HOST }} \
                 -e PSQL_PORT=${{ secrets.PSQL_PORT }} \
