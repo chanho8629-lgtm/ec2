@@ -102,6 +102,7 @@ jobs:
             docker stop bideo || true
             docker rm bideo || true
             docker run -d --restart unless-stopped -p 80:10000 --name bideo \
+              --add-host=bideo.shop:${{ secrets.DB_HOST_IP || '172.31.37.54' }} \
               -e EC2_HOST=${{ secrets.EC2_HOST }} \
               -e DB_HOST=${{ secrets.DB_HOST || secrets.EC2_HOST }} \
               -e PSQL_PORT=${{ secrets.PSQL_PORT }} \
