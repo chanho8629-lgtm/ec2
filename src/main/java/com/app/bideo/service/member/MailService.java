@@ -2,8 +2,8 @@ package com.app.bideo.service.member;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -11,25 +11,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class MailService {
-
     private final JavaMailSender javaMailSender;
 
     @Value("${app.mail.from-address:no-reply@bideo.local}")
     private String fromAddress;
 
-    public MailService(@Autowired(required = false) JavaMailSender javaMailSender) {
-        this.javaMailSender = javaMailSender;
-        log.info("MailService initialized. mailConfigured={}", javaMailSender != null);
-    }
-
     public void sendVerificationCode(String email, String verificationCode) {
         if (!StringUtils.hasText(email)) {
             throw new IllegalArgumentException("이메일을 입력하세요.");
-        }
-        if (javaMailSender == null) {
-            throw new IllegalStateException("이메일 서비스가 설정되지 않아 인증 메일을 보낼 수 없습니다.");
         }
 
         try {
