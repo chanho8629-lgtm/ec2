@@ -17,13 +17,13 @@ public class BootpayClient {
 
     private final ObjectMapper objectMapper;
 
-    @Value("${bootpay.rest-client-key: }")
+    @Value("${bootpay.rest-client-key:}")
     private String applicationId;
 
     @Value("${bootpay.private-key:}")
     private String privateKey;
 
-    @Value("${boot-pay.urls.server-base-url:https://api.bootpay.co.kr}")
+    @Value("${bootpay.server-base-url:https://api.bootpay.co.kr}")
     private String serverBaseUrl;
 
     private final RestClient restClient = RestClient.builder().build();
