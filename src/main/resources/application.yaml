@@ -46,13 +46,12 @@ mybatis:
 jwt:
   secret: ${JWT_SECRET}
 
-cloud:
-  aws:
-    access-key: ${AWS_ACCESS_KEY}
-    secret-key: ${AWS_SECRET_KEY}
-    s3:
-      bucket-name: ${AWS_BUCKET_NAME}
-    region: ${AWS_REGION}
+aws:
+  access-key: ${AWS_ACCESS_KEY}
+  secret-key: ${AWS_SECRET_KEY}
+  s3:
+    bucket-name: ${AWS_BUCKET_NAME}
+  region: ${AWS_REGION}
 
 bootpay:
   js-application-id: ${BOOTPAY_JS_APPLICATION_ID}
