@@ -32,7 +32,7 @@ public class BootpayService {
     @Value("${boot-pay.enabled:${bootpay.enabled:true}}")
     private boolean enabled;
 
-    @Value("${boot-pay.api.application-id:${bootpay.rest-client-key:}}")
+    @Value("${boot-pay.api.application-id:${bootpay.BOOTPAY_REST_CLIENT_KEY}")
     private String applicationId;
 
     @Value("${boot-pay.api.private-key:${bootpay.private-key:}}")

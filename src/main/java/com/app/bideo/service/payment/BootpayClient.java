@@ -17,10 +17,10 @@ public class BootpayClient {
 
     private final ObjectMapper objectMapper;
 
-    @Value("${boot-pay.api.application-id:${bootpay.rest-client-key:}}")
+    @Value("${bootpay.BOOTPAY_REST_CLIENT_KEY}")
     private String applicationId;
 
-    @Value("${boot-pay.api.private-key:${bootpay.private-key:}}")
+    @Value("${bootpay.bootpay.private-key}")
     private String privateKey;
 
     @Value("${boot-pay.urls.server-base-url:https://api.bootpay.co.kr}")
