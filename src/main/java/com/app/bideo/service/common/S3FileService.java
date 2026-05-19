@@ -178,7 +178,7 @@ public class S3FileService {
 
     private void requireBucket() {
         if (bucket == null || bucket.isBlank()) {
-            throw new IllegalStateException("S3 bucket이 설정되지 않았습니다. cloud.aws.s3.bucket 프로퍼티를 확인하세요.");
+            throw new IllegalStateException("S3 bucket이 설정되지 않았습니다. aws.s3.bucket-name 프로퍼티를 확인하세요.");
         }
     }
 
