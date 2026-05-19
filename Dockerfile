@@ -10,7 +10,7 @@ FROM eclipse-temurin:17-jre
 
 ENV TZ=Asia/Seoul
 
-COPY --from=build /app/build/libs/bideo-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/build/libs/app-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 10000
 
