@@ -20,6 +20,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build application jar
+        run: chmod +x ./gradlew && ./gradlew --no-daemon --console=plain --max-workers=1 bootJar -x test
+
       - name: Set HOST env var from secrets
         run: echo "HOST=${{ secrets[matrix.name] }}" >> $GITHUB_ENV
 
@@ -36,7 +45,6 @@ jobs:
             --exclude='.git' \
             --exclude='.idea' \
             --exclude='.gradle' \
-            --exclude='build' \
             --exclude='out' \
             --exclude='.vscode' \
             --exclude='.claude' \
@@ -52,7 +60,7 @@ jobs:
           echo "EC2_HOST length: ${#X6}"
           echo "JWT_SECRET length: ${#X7}"
           echo "AWS_BUCKET_NAME length: ${#A1}"  
-          echo "ML_API_BASE_URL length: ${#A2}"
+          echo "FASTAPI_BASE_URL length: ${#A2}"
           echo "BOOTPAY_PRIVATE_KEY length: ${#A3}"
           echo "BOOTPAY_REST_CLIENT_KEY length: ${#A4}"
           echo "SOLAPI_API_SECRET length: ${#A5}"
@@ -69,7 +77,7 @@ jobs:
           X6: ${{ secrets.EC2_HOST }}
           X7: ${{ secrets.JWT_SECRET }}
           A1: ${{ secrets.AWS_BUCKET_NAME }}
-          A2: ${{ secrets.ML_API_BASE_URL }}
+          A2: ${{ secrets.FASTAPI_BASE_URL || secrets.ML_API_BASE_URL }}
           A3: ${{ secrets.BOOTPAY_PRIVATE_KEY }}
           A4: ${{ secrets.BOOTPAY_REST_CLIENT_KEY || secrets.BOOTPAY_REST_API_KEY }}
           A5: ${{ secrets.SOLAPI_API_SECRET }}
@@ -81,41 +89,11 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@$HOST << EOF
             cd /home/ubuntu/bideo
+            test -f build/libs/bideo-*-SNAPSHOT.jar
+            docker build -t bideo .
             docker stop bideo || true
             docker rm bideo || true
-            docker rmi bideo || true
-            docker build \
-              --build-arg EC2_HOST=${{ secrets.EC2_HOST }} \
-              --build-arg DB_HOST=${{ secrets.DB_HOST || secrets.EC2_HOST }} \
-              --build-arg PSQL_PORT=${{ secrets.PSQL_PORT }} \
-              --build-arg PSQL_DATABASE=${{ secrets.PSQL_DATABASE }} \
-              --build-arg PSQL_USERNAME=${{ secrets.PSQL_USERNAME }} \
-              --build-arg PSQL_PASSWORD=${{ secrets.PSQL_PASSWORD }} \
-              --build-arg REDIS_HOST=${{ secrets.REDIS_HOST || secrets.EC2_HOST }} \
-              --build-arg REDIS_PORT=${{ secrets.REDIS_PORT }} \
-              --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} \
-              --build-arg AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} \
-              --build-arg AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} \
-              --build-arg AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }} \
-              --build-arg AWS_REGION=${{ secrets.AWS_REGION }} \
-              --build-arg KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
-              --build-arg KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} \
-              --build-arg NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }} \
-              --build-arg NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }} \
-              --build-arg GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
-              --build-arg GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
-              --build-arg BOOTPAY_JS_APPLICATION_ID=${{ secrets.BOOTPAY_JS_APPLICATION_ID || secrets.BOOTPAY_JS_API_KEY }} \
-              --build-arg BOOTPAY_REST_CLIENT_KEY=${{ secrets.BOOTPAY_REST_CLIENT_KEY || secrets.BOOTPAY_REST_API_KEY }} \
-              --build-arg BOOTPAY_PRIVATE_KEY=${{ secrets.BOOTPAY_PRIVATE_KEY }} \
-              --build-arg SPRING_MAIL_USERNAME=${{ secrets.SPRING_MAIL_USERNAME }} \
-              --build-arg SPRING_MAIL_PASSWORD=${{ secrets.SPRING_MAIL_PASSWORD }} \
-              --build-arg APP_MAIL_FROM_ADDRESS=${{ secrets.APP_MAIL_FROM_ADDRESS }} \
-              --build-arg SOLAPI_API_KEY=${{ secrets.SOLAPI_API_KEY }} \
-              --build-arg SOLAPI_API_SECRET=${{ secrets.SOLAPI_API_SECRET }} \
-              --build-arg SOLAPI_FROM_NUMBER=${{ secrets.SOLAPI_FROM_NUMBER }} \
-              --build-arg ML_API_BASE_URL=${{ secrets.ML_API_BASE_URL }} \
-              -t bideo .
-            docker run -d -p 80:10000 --name bideo \
+            docker run -d --restart unless-stopped -p 80:10000 --name bideo \
               -e EC2_HOST=${{ secrets.EC2_HOST }} \
               -e DB_HOST=${{ secrets.DB_HOST || secrets.EC2_HOST }} \
               -e PSQL_PORT=${{ secrets.PSQL_PORT }} \
@@ -144,8 +122,11 @@ jobs:
               -e SOLAPI_API_KEY=${{ secrets.SOLAPI_API_KEY }} \
               -e SOLAPI_API_SECRET=${{ secrets.SOLAPI_API_SECRET }} \
               -e SOLAPI_FROM_NUMBER=${{ secrets.SOLAPI_FROM_NUMBER }} \
-              -e ML_API_BASE_URL=${{ secrets.ML_API_BASE_URL }} \
+              -e FASTAPI_BASE_URL=${{ secrets.FASTAPI_BASE_URL || secrets.ML_API_BASE_URL }} \
               bideo
+            sleep 5
+            docker ps -a --filter name=bideo
+            docker logs --tail 200 bideo
           EOF
           
       
