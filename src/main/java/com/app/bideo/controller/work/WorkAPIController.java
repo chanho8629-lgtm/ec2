@@ -44,7 +44,7 @@ public class WorkAPIController {
     private final WorkService workService;
     private final S3FileService s3FileService;
 
-    @Value("${fastapi.base-url:http://127.0.0.1:8000}")
+    @Value("${fastapi.base-url}")
     private String fastApiBaseUrl;
 
     // 작품 등록
