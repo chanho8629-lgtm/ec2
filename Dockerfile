@@ -4,7 +4,7 @@ ENV TZ=Asia/Seoul
 
 WORKDIR /app
 
-COPY build/libs/bideo-*-SNAPSHOT.jar app.jar
+COPY app.jar app.jar
 
 EXPOSE 10000
 
