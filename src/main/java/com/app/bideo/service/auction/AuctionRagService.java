@@ -25,7 +25,7 @@ public class AuctionRagService {
     private final WorkDAO workDAO;
     private final S3FileService s3FileService;
 
-    @Value("${fastapi.base-url:http://127.0.0.1:8000}")
+    @Value("${FASTAPI_BASE_URL}")
     private String fastApiBaseUrl;
 
     public AuctionRagAnalyzeResponseDTO analyzeAuction(Long auctionId) {
