@@ -30,7 +30,11 @@ jobs:
         run: chmod +x ./gradlew && ./gradlew --no-daemon --console=plain --max-workers=1 bootJar -x test
 
       - name: Prepare deployment jar
-        run: cp build/libs/bideo-*-SNAPSHOT.jar app.jar
+        run: |
+          ls -al build/libs
+          JAR_FILE="$(find build/libs -maxdepth 1 -type f -name '*.jar' ! -name '*-plain.jar' | head -n 1)"
+          test -n "$JAR_FILE"
+          cp "$JAR_FILE" app.jar
 
       - name: Set HOST env var from secrets
         run: echo "HOST=${{ secrets[matrix.name] }}" >> $GITHUB_ENV
