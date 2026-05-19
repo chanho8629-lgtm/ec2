@@ -29,7 +29,7 @@ public class BootpayService {
     private final ObjectMapper objectMapper;
     private final RestClient restClient = RestClient.create();
 
-    @Value("${boot-pay.enabled:${bootpay.enabled:true}}")
+    @Value("${bootpay.enabled:true}")
     private boolean enabled;
 
     @Value("${bootpay.rest-client-key:}")
@@ -38,16 +38,16 @@ public class BootpayService {
     @Value("${bootpay.private-key:}")
     private String privateKey;
 
-    @Value("${boot-pay.mode:test}")
+    @Value("${bootpay.mode:test}")
     private String mode;
 
-    @Value("${boot-pay.billing.pg:${bootpay.pg:tosspayments}}")
+    @Value("${bootpay.pg:tosspayments}")
     private String billingPg;
 
-    @Value("${boot-pay.billing.customer.key-prefix:BIDEO_MEMBER_}")
+    @Value("${bootpay.customer-key-prefix:BIDEO_MEMBER_}")
     private String customerKeyPrefix;
 
-    @Value("${boot-pay.urls.server-base-url:https://api.bootpay.co.kr}")
+    @Value("${bootpay.server-base-url:https://api.bootpay.co.kr}")
     private String serverBaseUrl;
 
     // 민감 카드정보는 저장하지 않고, 부트페이 빌링키로 즉시 치환한다.

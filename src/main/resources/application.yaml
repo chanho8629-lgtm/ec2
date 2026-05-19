@@ -54,10 +54,14 @@ aws:
   region: ${AWS_REGION}
 
 bootpay:
-  js-application-id: ${BOOTPAY_JS_APPLICATION_ID}
-  rest-client-key: ${BOOTPAY_REST_CLIENT_KEY}
-  private-key: ${BOOTPAY_PRIVATE_KEY}
+  js-application-id: ${BOOTPAY_JS_APPLICATION_ID:}
+  rest-client-key: ${BOOTPAY_REST_CLIENT_KEY:}
+  private-key: ${BOOTPAY_PRIVATE_KEY:}
   pg: tosspayments
+  mode: test
+  server-base-url: https://api.bootpay.co.kr
+  customer-key-prefix: BIDEO_MEMBER_
+  enabled: true
 
 #
 #
