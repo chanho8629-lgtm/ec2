@@ -63,7 +63,5 @@ bootpay:
   customer-key-prefix: BIDEO_MEMBER_
   enabled: true
 
-#
-#
-#fastapi:
-#  base-url: ${FASTAPI_BASE_URL}
+fastapi:
+  base-url: ${FASTAPI_BASE_URL:}
