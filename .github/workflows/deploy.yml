@@ -99,43 +99,47 @@ jobs:
             cd /home/ubuntu/bideo
             test -f app.jar
             docker build -t bideo .
-            docker stop bideo || true
-            docker rm bideo || true
-            docker run -d --restart unless-stopped -p 80:10000 --name bideo \
-              --add-host=bideo.shop:${{ secrets.DB_HOST_IP || '172.31.37.54' }} \
-              -e EC2_HOST=${{ secrets.EC2_HOST }} \
-              -e DB_HOST=${{ secrets.DB_HOST || secrets.EC2_HOST }} \
-              -e PSQL_PORT=${{ secrets.PSQL_PORT }} \
-              -e PSQL_DATABASE=${{ secrets.PSQL_DATABASE }} \
-              -e PSQL_USERNAME=${{ secrets.PSQL_USERNAME }} \
-              -e PSQL_PASSWORD=${{ secrets.PSQL_PASSWORD }} \
-              -e REDIS_HOST=${{ secrets.REDIS_HOST || secrets.EC2_HOST }} \
-              -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
-              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-              -e AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} \
-              -e AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} \
-              -e AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }} \
-              -e AWS_REGION=${{ secrets.AWS_REGION }} \
-              -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
-              -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} \
-              -e NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }} \
-              -e NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }} \
-              -e GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
-              -e GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
-              -e BOOTPAY_JS_APPLICATION_ID=${{ secrets.BOOTPAY_JS_APPLICATION_ID || secrets.BOOTPAY_JS_API_KEY }} \
-              -e BOOTPAY_REST_CLIENT_KEY=${{ secrets.BOOTPAY_REST_CLIENT_KEY || secrets.BOOTPAY_REST_API_KEY }} \
-              -e BOOTPAY_PRIVATE_KEY=${{ secrets.BOOTPAY_PRIVATE_KEY }} \
-              -e SPRING_MAIL_USERNAME=${{ secrets.SPRING_MAIL_USERNAME }} \
-              -e SPRING_MAIL_PASSWORD=${{ secrets.SPRING_MAIL_PASSWORD }} \
-              -e APP_MAIL_FROM_ADDRESS=${{ secrets.APP_MAIL_FROM_ADDRESS }} \
-              -e SOLAPI_API_KEY=${{ secrets.SOLAPI_API_KEY }} \
-              -e SOLAPI_API_SECRET=${{ secrets.SOLAPI_API_SECRET }} \
-              -e SOLAPI_FROM_NUMBER=${{ secrets.SOLAPI_FROM_NUMBER }} \
-              -e FASTAPI_BASE_URL=${{ secrets.FASTAPI_BASE_URL || secrets.ML_API_BASE_URL }} \
-              bideo
+            NETWORK="$(docker inspect nginx --format '{{range $name, $_ := .NetworkSettings.Networks}}{{$name}}{{end}}' 2>/dev/null || true)"
+            if [ -z "$NETWORK" ]; then
+              NETWORK=bridge
+            fi
+            docker rm -f spring spring2 || true
+            for CONTAINER_NAME in spring spring2; do
+              docker run -d --restart unless-stopped --name "$CONTAINER_NAME" --network "$NETWORK" \
+                --add-host=bideo.shop:172.31.37.54 \
+                -e EC2_HOST=${{ secrets.EC2_HOST }} \
+                -e PSQL_PORT=${{ secrets.PSQL_PORT }} \
+                -e PSQL_DATABASE=${{ secrets.PSQL_DATABASE }} \
+                -e PSQL_USERNAME=${{ secrets.PSQL_USERNAME }} \
+                -e PSQL_PASSWORD=${{ secrets.PSQL_PASSWORD }} \
+                -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
+                -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+                -e AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} \
+                -e AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} \
+                -e AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }} \
+                -e AWS_REGION=${{ secrets.AWS_REGION }} \
+                -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
+                -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} \
+                -e NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }} \
+                -e NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }} \
+                -e GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
+                -e GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
+                -e BOOTPAY_JS_APPLICATION_ID=${{ secrets.BOOTPAY_JS_APPLICATION_ID || secrets.BOOTPAY_JS_API_KEY }} \
+                -e BOOTPAY_REST_CLIENT_KEY=${{ secrets.BOOTPAY_REST_CLIENT_KEY || secrets.BOOTPAY_REST_API_KEY }} \
+                -e BOOTPAY_PRIVATE_KEY=${{ secrets.BOOTPAY_PRIVATE_KEY }} \
+                -e SPRING_MAIL_USERNAME=${{ secrets.SPRING_MAIL_USERNAME }} \
+                -e SPRING_MAIL_PASSWORD=${{ secrets.SPRING_MAIL_PASSWORD }} \
+                -e APP_MAIL_FROM_ADDRESS=${{ secrets.APP_MAIL_FROM_ADDRESS }} \
+                -e SOLAPI_API_KEY=${{ secrets.SOLAPI_API_KEY }} \
+                -e SOLAPI_API_SECRET=${{ secrets.SOLAPI_API_SECRET }} \
+                -e SOLAPI_FROM_NUMBER=${{ secrets.SOLAPI_FROM_NUMBER }} \
+                -e FASTAPI_BASE_URL=${{ secrets.FASTAPI_BASE_URL || secrets.ML_API_BASE_URL }} \
+                bideo
+            done
             sleep 5
-            docker ps -a --filter name=bideo
-            docker logs --tail 200 bideo
+            docker ps -a --filter name=spring
+            docker logs --tail 100 spring
+            docker logs --tail 100 spring2
           EOF
           
       
