@@ -25,7 +25,7 @@ public class AuctionRagService {
     private final WorkDAO workDAO;
     private final S3FileService s3FileService;
 
-    @Value("${}")
+    @Value("")
     private String fastApiBaseUrl;
 
     public AuctionRagAnalyzeResponseDTO analyzeAuction(Long auctionId) {
