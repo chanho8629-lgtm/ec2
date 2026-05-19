@@ -59,7 +59,7 @@ bootpay:
   private-key: ${BOOTPAY_PRIVATE_KEY}
   pg: tosspayments
 
-
-
-fastapi:
-  base-url: ${FASTAPI_BASE_URL}
+#
+#
+#fastapi:
+#  base-url: ${FASTAPI_BASE_URL}
