@@ -24,6 +24,7 @@ jobs:
         run: |
           echo "HOST=${{ secrets[matrix.name] }}" >> $GITHUB_ENV
           echo "FASTAPI_BASE_URL=${{ secrets.FASTAPI_BASE_URL || secrets.ML_API_BASE_URL }}" >> $GITHUB_ENV
+          echo "BOOTPAY_JS_APPLICATION_ID=${{ secrets.BOOTPAY_JS_APPLICATION_ID || secrets.BOOTPAY_JS_API_KEY }}" >> $GITHUB_ENV
 
       - name: Normalize FastAPI base URL
         run: |
@@ -43,6 +44,13 @@ jobs:
           NORMALIZED_FASTAPI_BASE_URL="${NORMALIZED_FASTAPI_BASE_URL%/}"
           echo "FASTAPI_BASE_URL=$NORMALIZED_FASTAPI_BASE_URL" >> $GITHUB_ENV
           echo "FASTAPI_HOST=$(printf '%s' "$NORMALIZED_FASTAPI_BASE_URL" | sed -E 's#^https?://([^/]+).*#\1#')" >> $GITHUB_ENV
+
+      - name: Validate Bootpay JS key
+        run: |
+          if [ -z "$BOOTPAY_JS_APPLICATION_ID" ]; then
+            echo "BOOTPAY_JS_APPLICATION_ID or BOOTPAY_JS_API_KEY secret is required" >&2
+            exit 1
+          fi
 
       - name: Set up SSH
         run: |
@@ -75,6 +83,7 @@ jobs:
           echo "AWS_BUCKET_NAME length: ${#A1}"  
           echo "ML_API_BASE_URL length: ${#A2}"
           echo "FASTAPI_BASE_URL length: ${#FASTAPI_BASE_URL}"
+          echo "BOOTPAY_JS_APPLICATION_ID length: ${#BOOTPAY_JS_APPLICATION_ID}"
           echo "BOOTPAY_PRIVATE_KEY length: ${#A3}"
           echo "BOOTPAY_REST_API_KEY length: ${#A4}"
           echo "SOLAPI_API_SECRET length: ${#A5}"
@@ -134,6 +143,7 @@ jobs:
               --build-arg GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
               --build-arg GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
               --build-arg BOOTPAY_JS_API_KEY=${{ secrets.BOOTPAY_JS_API_KEY }} \
+              --build-arg BOOTPAY_JS_APPLICATION_ID="$BOOTPAY_JS_APPLICATION_ID" \
               --build-arg BOOTPAY_REST_API_KEY=${{ secrets.BOOTPAY_REST_API_KEY }} \
               --build-arg BOOTPAY_PRIVATE_KEY=${{ secrets.BOOTPAY_PRIVATE_KEY }} \
               --build-arg SPRING_MAIL_USERNAME=${{ secrets.SPRING_MAIL_USERNAME }} \
@@ -168,6 +178,7 @@ jobs:
               -e GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
               -e GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
               -e BOOTPAY_JS_API_KEY=${{ secrets.BOOTPAY_JS_API_KEY }} \
+              -e BOOTPAY_JS_APPLICATION_ID="$BOOTPAY_JS_APPLICATION_ID" \
               -e BOOTPAY_REST_API_KEY=${{ secrets.BOOTPAY_REST_API_KEY }} \
               -e BOOTPAY_PRIVATE_KEY=${{ secrets.BOOTPAY_PRIVATE_KEY }} \
               -e SPRING_MAIL_USERNAME=${{ secrets.SPRING_MAIL_USERNAME }} \
@@ -184,6 +195,7 @@ jobs:
               -e RABBITMQ_PASS=${{ secrets.RABBITMQ_PASS }} \
               bideo:latest
             docker exec bideo sh -c 'echo "FASTAPI_BASE_URL=$FASTAPI_BASE_URL"'
+            docker exec bideo sh -c 'echo "BOOTPAY_JS_APPLICATION_ID length=${#BOOTPAY_JS_APPLICATION_ID}"'
             docker exec bideo sh -c 'curl -fsS "$FASTAPI_BASE_URL/" >/dev/null && echo "FastAPI root OK"'
             docker exec bideo sh -c 'curl -fsS "$FASTAPI_BASE_URL/docs" >/dev/null && echo "FastAPI docs OK"'
             if command -v nginx >/dev/null 2>&1; then
