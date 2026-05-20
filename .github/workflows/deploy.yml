@@ -128,37 +128,37 @@ jobs:
           ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@$HOST << EOF
             set -e
             cd /home/ubuntu/bideo
-            docker builder prune -f
-            docker build \
-              --build-arg EC2_HOST=${{ secrets.EC2_HOST }} \
-              --build-arg PSQL_PORT=${{ secrets.PSQL_PORT }} \
-              --build-arg PSQL_DATABASE=${{ secrets.PSQL_DATABASE }} \
-              --build-arg PSQL_USERNAME=${{ secrets.PSQL_USERNAME }} \
-              --build-arg PSQL_PASSWORD=${{ secrets.PSQL_PASSWORD }} \
-              --build-arg REDIS_PORT=${{ secrets.REDIS_PORT }} \
-              --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} \
-              --build-arg AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} \
-              --build-arg AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} \
-              --build-arg AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }} \
-              --build-arg AWS_REGION=${{ secrets.AWS_REGION }} \
-              --build-arg KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
-              --build-arg KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} \
-              --build-arg NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }} \
-              --build-arg NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }} \
-              --build-arg GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
-              --build-arg GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
-              --build-arg BOOTPAY_JS_API_KEY=${{ secrets.BOOTPAY_JS_API_KEY }} \
-              --build-arg BOOTPAY_JS_APPLICATION_ID="$BOOTPAY_JS_APPLICATION_ID" \
-              --build-arg BOOTPAY_REST_API_KEY=${{ secrets.BOOTPAY_REST_API_KEY }} \
-              --build-arg BOOTPAY_PRIVATE_KEY=${{ secrets.BOOTPAY_PRIVATE_KEY }} \
-              --build-arg SPRING_MAIL_USERNAME=${{ secrets.SPRING_MAIL_USERNAME }} \
-              --build-arg SPRING_MAIL_PASSWORD=${{ secrets.SPRING_MAIL_PASSWORD }} \
-              --build-arg APP_MAIL_FROM_ADDRESS=${{ secrets.APP_MAIL_FROM_ADDRESS }} \
-              --build-arg SOLAPI_API_KEY=${{ secrets.SOLAPI_API_KEY }} \
-              --build-arg SOLAPI_API_SECRET=${{ secrets.SOLAPI_API_SECRET }} \
-              --build-arg SOLAPI_FROM_NUMBER=${{ secrets.SOLAPI_FROM_NUMBER }} \
-              --build-arg ML_API_BASE_URL=${{ secrets.ML_API_BASE_URL }} \
-              --build-arg FASTAPI_BASE_URL="$FASTAPI_BASE_URL" \
+            docker system prune -a -f
+            docker build --no-cache \
+              --build-arg "EC2_HOST=${{ secrets.EC2_HOST }}" \
+              --build-arg "PSQL_PORT=${{ secrets.PSQL_PORT }}" \
+              --build-arg "PSQL_DATABASE=${{ secrets.PSQL_DATABASE }}" \
+              --build-arg "PSQL_USERNAME=${{ secrets.PSQL_USERNAME }}" \
+              --build-arg "PSQL_PASSWORD=${{ secrets.PSQL_PASSWORD }}" \
+              --build-arg "REDIS_PORT=${{ secrets.REDIS_PORT }}" \
+              --build-arg "JWT_SECRET=${{ secrets.JWT_SECRET }}" \
+              --build-arg "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" \
+              --build-arg "AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}" \
+              --build-arg "AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}" \
+              --build-arg "AWS_REGION=${{ secrets.AWS_REGION }}" \
+              --build-arg "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" \
+              --build-arg "KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}" \
+              --build-arg "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" \
+              --build-arg "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" \
+              --build-arg "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" \
+              --build-arg "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+              --build-arg "BOOTPAY_JS_API_KEY=${{ secrets.BOOTPAY_JS_API_KEY }}" \
+              --build-arg "BOOTPAY_JS_APPLICATION_ID=$BOOTPAY_JS_APPLICATION_ID" \
+              --build-arg "BOOTPAY_REST_API_KEY=${{ secrets.BOOTPAY_REST_API_KEY }}" \
+              --build-arg "BOOTPAY_PRIVATE_KEY=${{ secrets.BOOTPAY_PRIVATE_KEY }}" \
+              --build-arg "SPRING_MAIL_USERNAME=${{ secrets.SPRING_MAIL_USERNAME }}" \
+              --build-arg "SPRING_MAIL_PASSWORD=${{ secrets.SPRING_MAIL_PASSWORD }}" \
+              --build-arg "APP_MAIL_FROM_ADDRESS=${{ secrets.APP_MAIL_FROM_ADDRESS }}" \
+              --build-arg "SOLAPI_API_KEY=${{ secrets.SOLAPI_API_KEY }}" \
+              --build-arg "SOLAPI_API_SECRET=${{ secrets.SOLAPI_API_SECRET }}" \
+              --build-arg "SOLAPI_FROM_NUMBER=${{ secrets.SOLAPI_FROM_NUMBER }}" \
+              --build-arg "ML_API_BASE_URL=${{ secrets.ML_API_BASE_URL }}" \
+              --build-arg "FASTAPI_BASE_URL=$FASTAPI_BASE_URL" \
               -t bideo:next .
             if docker ps --format '{{.Names}}' | grep -qx bideo; then
               docker stop bideo
@@ -204,7 +204,7 @@ jobs:
             RABBITMQ_PORT=${{ secrets.RABBITMQ_PORT }}
             RABBITMQ_USER=${{ secrets.RABBITMQ_USER }}
             RABBITMQ_PASS=${{ secrets.RABBITMQ_PASS }}
-            ENVVARS
+          ENVVARS
             sed -i 's/^[[:space:]]*//' /tmp/bideo.env
             chmod 600 /tmp/bideo.env
             docker run -d -p 80:10000 --name bideo --add-host=host.docker.internal:host-gateway --env-file /tmp/bideo.env bideo:latest
