@@ -1,6 +1,7 @@
 package com.app.bideo.service.gallery;
 
 import com.app.bideo.auth.member.CustomUserDetails;
+import com.app.bideo.config.FastApiUrlSupport;
 import com.app.bideo.domain.gallery.GalleryTagVO;
 import com.app.bideo.domain.interaction.CommentVO;
 import com.app.bideo.dto.common.LikeToggleResponseDTO;
@@ -196,12 +197,16 @@ public class GalleryService {
             int limit
     ) {
         try {
+            String resolvedBaseUrl = FastApiUrlSupport.normalize(fastApiBaseUrl);
+            if (resolvedBaseUrl.isBlank()) {
+                return List.of();
+            }
             SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
             requestFactory.setConnectTimeout(Duration.ofSeconds(3));
             requestFactory.setReadTimeout(Duration.ofSeconds(10));
 
             GallerySimilarityResponse response = RestClient.builder()
-                    .baseUrl(fastApiBaseUrl)
+                    .baseUrl(resolvedBaseUrl)
                     .requestFactory(requestFactory)
                     .build()
                     .post()

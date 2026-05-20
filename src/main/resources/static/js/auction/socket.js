@@ -21,7 +21,9 @@ const AuctionSocket = (() => {
             return;
         }
 
-        const socket = new SockJS('/ws');
+        const socket = new SockJS('/ws', null, {
+            transports: ['websocket', 'xhr-streaming', 'xhr-polling']
+        });
         stompClient = Stomp.over(socket);
         stompClient.debug = null;
 

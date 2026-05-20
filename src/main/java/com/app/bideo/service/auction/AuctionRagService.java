@@ -1,5 +1,6 @@
 package com.app.bideo.service.auction;
 
+import com.app.bideo.config.FastApiUrlSupport;
 import com.app.bideo.dto.auction.AuctionDetailResponseDTO;
 import com.app.bideo.dto.auction.AuctionRagAnalyzeResponseDTO;
 import com.app.bideo.dto.common.TagResponseDTO;
@@ -54,9 +55,13 @@ public class AuctionRagService {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(Duration.ofSeconds(10));
         requestFactory.setReadTimeout(Duration.ofMinutes(5));
+        String resolvedBaseUrl = FastApiUrlSupport.normalize(fastApiBaseUrl);
+        if (resolvedBaseUrl.isBlank()) {
+            throw new IllegalStateException("FastAPI 경매 RAG 서버 주소가 설정되지 않았습니다.");
+        }
 
         AuctionRagAnalyzeResponseDTO response = RestClient.builder()
-                .baseUrl(fastApiBaseUrl)
+                .baseUrl(resolvedBaseUrl)
                 .requestFactory(requestFactory)
                 .build()
                 .post()

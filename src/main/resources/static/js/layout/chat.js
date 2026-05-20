@@ -190,7 +190,9 @@ window.addEventListener("load", function () {
 
   function connectWebSocket() {
     if (typeof SockJS === "undefined" || typeof Stomp === "undefined") return;
-    let socket = new SockJS('/ws');
+    let socket = new SockJS('/ws', null, {
+      transports: ['websocket', 'xhr-streaming', 'xhr-polling']
+    });
     stompClient = Stomp.over(socket);
     stompClient.debug = null;
     stompClient.connect({}, function () {

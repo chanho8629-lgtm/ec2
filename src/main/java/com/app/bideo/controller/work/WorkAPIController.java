@@ -11,6 +11,7 @@ import com.app.bideo.dto.work.WorkListResponseDTO;
 import com.app.bideo.dto.work.WorkSearchDTO;
 import com.app.bideo.dto.work.WorkUpdateRequestDTO;
 import com.app.bideo.auth.member.CustomUserDetails;
+import com.app.bideo.config.FastApiUrlSupport;
 import com.app.bideo.service.common.S3FileService;
 import com.app.bideo.service.work.WorkService;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -150,7 +151,7 @@ public class WorkAPIController {
         FastApiImagePipelineResponse fastApiResponse;
         try {
             fastApiResponse = RestClient.builder()
-                    .baseUrl(fastApiBaseUrl)
+                    .baseUrl(resolvedFastApiBaseUrl())
                     .requestFactory(requestFactory)
                     .build()
                     .post()
@@ -159,7 +160,7 @@ public class WorkAPIController {
                     .retrieve()
                     .body(FastApiImagePipelineResponse.class);
         } catch (RuntimeException exception) {
-            log.warn("FastAPI image pipeline failed. baseUrl={}, message={}", fastApiBaseUrl, exception.getMessage());
+            log.warn("FastAPI image pipeline failed. baseUrl={}, message={}", resolvedFastApiBaseUrl(), exception.getMessage());
             throw new IllegalStateException("FastAPI 이미지 생성 서버에 연결할 수 없습니다.");
         }
 
@@ -203,7 +204,7 @@ public class WorkAPIController {
         FastApiImageAnalyzeResponse fastApiResponse;
         try {
             fastApiResponse = RestClient.builder()
-                    .baseUrl(fastApiBaseUrl)
+                    .baseUrl(resolvedFastApiBaseUrl())
                     .requestFactory(requestFactory)
                     .build()
                     .post()
@@ -212,7 +213,7 @@ public class WorkAPIController {
                     .retrieve()
                     .body(FastApiImageAnalyzeResponse.class);
         } catch (RuntimeException exception) {
-            log.warn("FastAPI image analyze failed. baseUrl={}, message={}", fastApiBaseUrl, exception.getMessage());
+            log.warn("FastAPI image analyze failed. baseUrl={}, message={}", resolvedFastApiBaseUrl(), exception.getMessage());
             throw new IllegalStateException("FastAPI 이미지 설명 서버에 연결할 수 없습니다.");
         }
 
@@ -236,13 +237,13 @@ public class WorkAPIController {
         requestFactory.setConnectTimeout(Duration.ofSeconds(10));
         requestFactory.setReadTimeout(Duration.ofMinutes(5));
 
-        if (fastApiBaseUrl == null || fastApiBaseUrl.isBlank()) {
+        if (resolvedFastApiBaseUrl().isBlank()) {
             return buildLocalPredictionResponse(regressionInput, "FastAPI 미설정");
         }
 
         try {
             RestClient fastApiClient = RestClient.builder()
-                    .baseUrl(fastApiBaseUrl)
+                    .baseUrl(resolvedFastApiBaseUrl())
                     .requestFactory(requestFactory)
                     .build();
 
@@ -270,7 +271,7 @@ public class WorkAPIController {
             Double resolvedThreshold = classification.threshold() == null ? 0.5D : classification.threshold();
             return buildPredictionResponse(predictedViews, rawPopularProbability, resolvedThreshold, regressionInput, null);
         } catch (RuntimeException exception) {
-            log.warn("FastAPI work prediction failed. baseUrl={}, message={}", fastApiBaseUrl, exception.getMessage());
+            log.warn("FastAPI work prediction failed. baseUrl={}, message={}", resolvedFastApiBaseUrl(), exception.getMessage());
             return buildLocalPredictionResponse(regressionInput, "FastAPI 연결 실패");
         }
     }
@@ -317,24 +318,28 @@ public class WorkAPIController {
         double shortVideoBoost = videoLengthSec <= 60 ? 1.08D : 1D;
         double inputQualityGate = Math.min(1D, Math.max(0.05D, normalizedQuality * 0.55D + completionRate * 0.35D + Math.min(1D, engagementScore / 400D) * 0.10D));
         int predictedViews = (int) Math.round(
-                (80D + engagementScore * 1.15D + Math.pow(normalizedQuality, 1.8D) * 2400D + Math.pow(completionRate, 1.4D) * 900D)
+                (180D + engagementScore * 1.4D + Math.pow(normalizedQuality, 1.4D) * 5200D + Math.pow(completionRate, 1.2D) * 1800D)
                         * shortVideoBoost
                         * inputQualityGate
                         / Math.max(1D, Math.log1p(ageDays + 2D) / 1.8D)
         );
-        double rawProbability = Math.min(0.72D, Math.max(0.03D,
-                Math.pow(normalizedQuality, 1.7D) * 0.30D
-                        + Math.pow(completionRate, 1.25D) * 0.18D
-                        + Math.min(1D, engagementScore / 1500D) * 0.16D
+        double rawProbability = Math.min(0.78D, Math.max(0.03D,
+                Math.pow(normalizedQuality, 1.4D) * 0.38D
+                        + Math.pow(completionRate, 1.15D) * 0.22D
+                        + Math.min(1D, engagementScore / 1500D) * 0.14D
                         + (videoLengthSec <= 60 ? 0.03D : 0.01D)
         ));
         return buildPredictionResponse(Math.max(predictedViews, 0), rawProbability, 0.5D, regression, reason);
     }
 
     private void requireFastApiBaseUrl(String featureName) {
-        if (fastApiBaseUrl == null || fastApiBaseUrl.isBlank()) {
+        if (resolvedFastApiBaseUrl().isBlank()) {
             throw new IllegalStateException(featureName + "을 위한 FastAPI 주소가 설정되지 않았습니다.");
         }
+    }
+
+    private String resolvedFastApiBaseUrl() {
+        return FastApiUrlSupport.normalize(fastApiBaseUrl);
     }
 
     // 작품 삭제
@@ -426,8 +431,8 @@ public class WorkAPIController {
         double viewSignal = Math.min(1D, Math.log1p(Math.max(predictedViews, 0)) / Math.log1p(30000D));
         double likeSignal = Math.min(1D, Math.log1p(Math.max(estimatedLikes, 0)) / Math.log1p(1800D));
         double engagementSignal = Math.min(1D, Math.log1p(Math.max(engagementScore, 0)) / Math.log1p(2500D));
-        double adjustedProbability = safeModelProbability * 0.38D
-                + viewSignal * 0.18D
+        double adjustedProbability = safeModelProbability * 0.50D
+                + viewSignal * 0.22D
                 + likeSignal * 0.10D
                 + engagementSignal * 0.06D
                 + normalizedQuality * 0.02D;

@@ -1,6 +1,7 @@
 package com.app.bideo.service.work;
 
 import com.app.bideo.auth.member.CustomUserDetails;
+import com.app.bideo.config.FastApiUrlSupport;
 import com.app.bideo.domain.auction.AuctionVO;
 import com.app.bideo.domain.interaction.CommentVO;
 import com.app.bideo.domain.work.WorkFileVO;
@@ -396,7 +397,8 @@ public class WorkService {
     }
 
     private List<Long> callWorkRecommend(Long galleryId, String content, int limit) {
-        if (fastApiBaseUrl == null || fastApiBaseUrl.isBlank()) {
+        String resolvedBaseUrl = FastApiUrlSupport.normalize(fastApiBaseUrl);
+        if (resolvedBaseUrl.isBlank()) {
             log.warn("FastAPI base URL is empty. Skip work recommendation for galleryId={}", galleryId);
             return List.of();
         }
@@ -408,7 +410,7 @@ public class WorkService {
 
         try {
             WorkRecResp response = org.springframework.web.client.RestClient.builder()
-                    .baseUrl(fastApiBaseUrl)
+                    .baseUrl(resolvedBaseUrl)
                     .requestFactory(factory)
                     .build()
                     .post()
@@ -424,7 +426,7 @@ public class WorkService {
                     .toList();
         } catch (RuntimeException exception) {
             log.warn("FastAPI work recommendation failed. galleryId={}, baseUrl={}, message={}",
-                    galleryId, fastApiBaseUrl, exception.getMessage());
+                    galleryId, resolvedBaseUrl, exception.getMessage());
             return List.of();
         }
     }

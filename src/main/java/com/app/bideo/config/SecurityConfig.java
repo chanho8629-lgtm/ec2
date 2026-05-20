@@ -58,6 +58,7 @@ public class SecurityConfig {
                                 "/api/search/**",
                                 "/api/auth/**",
                                 "/ws/**",
+                                "/ws-native/**",
                                 "/oauth2/**",
                                 "/login/oauth2/**",
                                 "/css/**",
