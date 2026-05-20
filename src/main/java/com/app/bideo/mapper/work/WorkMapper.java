@@ -107,6 +107,4 @@ public interface WorkMapper {
     List<WorkSimilarityDocumentDTO> selectWorkSimilarityDocuments(@Param("galleryId") Long galleryId, @Param("limit") int limit);
 
     List<WorkListResponseDTO> selectWorkListByIds(@Param("ids") List<Long> ids);
-
-    List<WorkListResponseDTO> selectFallbackRecommendationsByGallery(@Param("galleryId") Long galleryId, @Param("limit") int limit);
 }

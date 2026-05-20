@@ -1017,8 +1017,8 @@ function initializeWorkRegister() {
         var descriptionQuality = clampNumber(description.length / 320, 0, 1);
         var titleCompleteness = clampNumber(title.length / 12, 0, 1);
         var descriptionCompleteness = clampNumber(description.length / 80, 0, 1);
-        var contentCompleteness = clampNumber(0.18 + titleCompleteness * 0.32 + descriptionCompleteness * 0.50, 0.18, 1);
         var tagQuality = clampNumber(tagCount / 5, 0, 1);
+        var contentCompleteness = clampNumber(0.03 + titleCompleteness * 0.27 + descriptionCompleteness * 0.55 + tagQuality * 0.15, 0.03, 1);
         var mediaQuality = file || currentAiGeneratedImageKey || currentExistingMediaUrl ? 1 : 0;
         var qualityRatio = clampNumber(
             0.03 + titleQuality * 0.24 + descriptionQuality * 0.35 + tagQuality * 0.18 + mediaQuality * 0.20,
@@ -1027,18 +1027,18 @@ function initializeWorkRegister() {
         );
         var aiQualityScore = Math.round(clampNumber(10 + qualityRatio * 89, 10, 99) * 10) / 10;
         var estimatedViewsForRatio = Math.round(clampNumber(
-            (350 + Math.pow(qualityRatio, 1.75) * 38000 + tagQuality * 4200 + descriptionQuality * 5200 + mediaQuality * 2600) * contentCompleteness,
-            300,
-            75000
+            (120 + Math.pow(qualityRatio, 1.9) * 12000 + tagQuality * 900 + descriptionQuality * 1600 + mediaQuality * 700) * contentCompleteness,
+            20,
+            18000
         ));
-        var likeRatio = clampNumber((0.014 + qualityRatio * 0.075 + tagQuality * 0.010) * contentCompleteness, 0.006, 0.12);
-        var commentRatio = clampNumber((0.0008 + descriptionQuality * 0.008 + tagQuality * 0.003) * contentCompleteness, 0.0002, 0.020);
-        var shareRatio = clampNumber((0.0006 + titleQuality * 0.0045 + tagQuality * 0.003 + (currentAiGeneratedImageKey ? 0.0015 : 0)) * contentCompleteness, 0, 0.016);
+        var likeRatio = clampNumber((0.006 + qualityRatio * 0.035 + tagQuality * 0.006) * contentCompleteness, 0.001, 0.06);
+        var commentRatio = clampNumber((0.0003 + descriptionQuality * 0.003 + tagQuality * 0.0015) * contentCompleteness, 0, 0.008);
+        var shareRatio = clampNumber((0.0002 + titleQuality * 0.0018 + tagQuality * 0.0012 + (currentAiGeneratedImageKey ? 0.0008 : 0)) * contentCompleteness, 0, 0.006);
         var likes = Math.round(estimatedViewsForRatio * likeRatio);
-        var comments = Math.round(Math.max(2, estimatedViewsForRatio * commentRatio));
-        var shares = Math.round(Math.max(1, estimatedViewsForRatio * shareRatio));
+        var comments = Math.round(estimatedViewsForRatio * commentRatio);
+        var shares = Math.round(estimatedViewsForRatio * shareRatio);
         var engagementScore = likes + comments + shares;
-        var watchCompletionRate = clampNumber(0.2 + qualityRatio * 0.78, 0.2, 0.98);
+        var watchCompletionRate = clampNumber(0.08 + qualityRatio * 0.62 * contentCompleteness, 0.08, 0.82);
         var now = new Date();
         var bidderCount = auctionEnabled ? Math.round(clampNumber(tagCount + 2 + qualityRatio * 6, 1, 30)) : 0;
         var bidCount = auctionEnabled ? bidderCount * 2 : 0;

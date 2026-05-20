@@ -314,17 +314,19 @@ public class WorkAPIController {
         double completionRate = Math.max(0.05D, Math.min(1D, toDouble(regression.get("watch_completion_rate"))));
         int ageDays = Math.max(0, toInteger(regression.get("age_days")));
         int videoLengthSec = Math.max(1, toInteger(regression.get("video_length_sec")));
-        double shortVideoBoost = videoLengthSec <= 60 ? 1.18D : 1D;
+        double shortVideoBoost = videoLengthSec <= 60 ? 1.08D : 1D;
+        double inputQualityGate = Math.min(1D, Math.max(0.05D, normalizedQuality * 0.55D + completionRate * 0.35D + Math.min(1D, engagementScore / 400D) * 0.10D));
         int predictedViews = (int) Math.round(
-                (750D + engagementScore * 3.8D + normalizedQuality * 8500D + completionRate * 4200D)
+                (80D + engagementScore * 1.15D + Math.pow(normalizedQuality, 1.8D) * 2400D + Math.pow(completionRate, 1.4D) * 900D)
                         * shortVideoBoost
-                        / Math.max(1D, Math.log1p(ageDays + 1D) / 2.0D)
+                        * inputQualityGate
+                        / Math.max(1D, Math.log1p(ageDays + 2D) / 1.8D)
         );
-        double rawProbability = Math.min(0.95D, Math.max(0.05D,
-                normalizedQuality * 0.38D
-                        + completionRate * 0.25D
-                        + Math.min(1D, engagementScore / 3500D) * 0.25D
-                        + (videoLengthSec <= 60 ? 0.08D : 0.02D)
+        double rawProbability = Math.min(0.72D, Math.max(0.03D,
+                Math.pow(normalizedQuality, 1.7D) * 0.30D
+                        + Math.pow(completionRate, 1.25D) * 0.18D
+                        + Math.min(1D, engagementScore / 1500D) * 0.16D
+                        + (videoLengthSec <= 60 ? 0.03D : 0.01D)
         ));
         return buildPredictionResponse(Math.max(predictedViews, 0), rawProbability, 0.5D, regression, reason);
     }
@@ -403,7 +405,7 @@ public class WorkAPIController {
 
         double aiQualityScore = toDouble(regression.get("ai_quality_score"));
         double normalizedQuality = aiQualityScore > 1D ? aiQualityScore / 100D : aiQualityScore;
-        double likeRate = Math.min(0.12D, Math.max(0.018D, 0.025D + normalizedQuality * 0.045D));
+        double likeRate = Math.min(0.055D, Math.max(0.004D, 0.006D + normalizedQuality * 0.026D));
         return Math.max(currentLikes, (int) Math.round(predictedViews * likeRate));
     }
 
@@ -421,22 +423,24 @@ public class WorkAPIController {
         double aiQualityScore = toDouble(regression.get("ai_quality_score"));
         double normalizedQuality = aiQualityScore > 1D ? aiQualityScore / 100D : aiQualityScore;
         double safeModelProbability = modelProbability == null ? 0D : modelProbability;
-        double viewSignal = Math.min(1D, Math.log1p(Math.max(predictedViews, 0)) / Math.log1p(50000D));
-        double likeSignal = Math.min(1D, Math.log1p(Math.max(estimatedLikes, 0)) / Math.log1p(3000D));
-        double engagementSignal = Math.min(1D, Math.log1p(Math.max(engagementScore, 0)) / Math.log1p(5000D));
-        double adjustedProbability = safeModelProbability * 0.45D
-                + viewSignal * 0.22D
-                + likeSignal * 0.14D
-                + engagementSignal * 0.08D
-                + normalizedQuality * 0.03D;
+        double viewSignal = Math.min(1D, Math.log1p(Math.max(predictedViews, 0)) / Math.log1p(30000D));
+        double likeSignal = Math.min(1D, Math.log1p(Math.max(estimatedLikes, 0)) / Math.log1p(1800D));
+        double engagementSignal = Math.min(1D, Math.log1p(Math.max(engagementScore, 0)) / Math.log1p(2500D));
+        double adjustedProbability = safeModelProbability * 0.38D
+                + viewSignal * 0.18D
+                + likeSignal * 0.10D
+                + engagementSignal * 0.06D
+                + normalizedQuality * 0.02D;
 
-        if (predictedViews >= 20000 || estimatedLikes >= 1500) {
-            adjustedProbability = Math.max(adjustedProbability, 0.65D);
-        } else if (predictedViews >= 10000 || estimatedLikes >= 700 || engagementScore >= 1200) {
-            adjustedProbability = Math.max(adjustedProbability, 0.48D);
+        if (predictedViews >= 20000 || estimatedLikes >= 1200) {
+            adjustedProbability = Math.max(adjustedProbability, 0.58D);
+        } else if (predictedViews >= 10000 || estimatedLikes >= 600 || engagementScore >= 1000) {
+            adjustedProbability = Math.max(adjustedProbability, 0.42D);
+        } else if (predictedViews < 1000 && engagementScore < 60) {
+            adjustedProbability = Math.min(adjustedProbability, 0.28D);
         }
 
-        return Math.round(Math.min(0.98D, Math.max(0.02D, adjustedProbability)) * 1000D) / 1000D;
+        return Math.round(Math.min(0.88D, Math.max(0.02D, adjustedProbability)) * 1000D) / 1000D;
     }
 
     private Double calculatePredictionConfidence(Integer predictedViews, Double popularProbability, Map<String, Object> regression) {
@@ -444,18 +448,18 @@ public class WorkAPIController {
         double normalizedQuality = aiQualityScore > 1D ? aiQualityScore / 100D : aiQualityScore;
         double probabilityDistance = Math.abs(popularProbability - 0.5D) * 2D;
         double volumeSignal = Math.min(1D, Math.log1p(Math.max(predictedViews, 0)) / Math.log1p(50000D));
-        double confidence = 0.32D + probabilityDistance * 0.34D + volumeSignal * 0.18D + normalizedQuality * 0.16D;
-        return Math.round(Math.min(0.98D, Math.max(0.2D, confidence)) * 1000D) / 1000D;
+        double confidence = 0.18D + probabilityDistance * 0.28D + volumeSignal * 0.14D + normalizedQuality * 0.12D;
+        return Math.round(Math.min(0.82D, Math.max(0.12D, confidence)) * 1000D) / 1000D;
     }
 
     private String resolvePredictionGrade(Integer predictedViews, Double popularProbability) {
-        if (predictedViews >= 50000 || popularProbability >= 0.75D) {
+        if (predictedViews >= 50000 || popularProbability >= 0.78D) {
             return "상위 노출 기대";
         }
-        if (predictedViews >= 10000 || popularProbability >= 0.6D) {
+        if (predictedViews >= 10000 || popularProbability >= 0.62D) {
             return "성장 가능";
         }
-        if (predictedViews >= 3000 || popularProbability >= 0.4D) {
+        if (predictedViews >= 3000 || popularProbability >= 0.42D) {
             return "보통";
         }
         return "초기 반응 낮음";

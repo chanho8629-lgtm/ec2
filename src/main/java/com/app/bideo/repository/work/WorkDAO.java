@@ -193,8 +193,4 @@ public class WorkDAO {
         if (ids == null || ids.isEmpty()) return List.of();
         return workMapper.selectWorkListByIds(ids);
     }
-
-    public List<WorkListResponseDTO> findFallbackRecommendationsByGallery(Long galleryId, int limit) {
-        return workMapper.selectFallbackRecommendationsByGallery(galleryId, limit);
-    }
 }
