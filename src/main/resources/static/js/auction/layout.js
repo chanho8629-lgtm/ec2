@@ -193,7 +193,7 @@ const AuctionLayout = (() => {
             elements.auctionAiAnalyzeBtn.textContent = loading ? "분석 중" : "분석";
         }
         if (elements.auctionAiStatus) {
-            elements.auctionAiStatus.textContent = loading ? "FastAPI 빠른 경매 분석 중입니다." : "경매 작품의 투자 가치와 ROI를 분석합니다.";
+            elements.auctionAiStatus.textContent = loading ? "FastAPI 경매 분석을 불러오는 중입니다." : "입찰 흐름과 예상 낙찰가를 분석합니다.";
         }
     }
 
@@ -218,7 +218,7 @@ const AuctionLayout = (() => {
         }
         elements.auctionAiResult.hidden = false;
         elements.auctionAiResult.innerHTML = [
-            `<div class="Auction-AI-ResultBadge">${usedRag === false ? "Fast analysis" : "Tinuiti RAG"}</div>`,
+            `<div class="Auction-AI-ResultBadge">${usedRag === false ? "FastAPI 분석" : "RAG 분석"}</div>`,
             `<div class="Auction-AI-ResultGrid">
                 <div class="Auction-AI-Metric Auction-AI-Metric--primary"><span>성공 가능성</span><strong>${escapeHtml(successLevel)}</strong></div>
                 <div class="Auction-AI-Metric Auction-AI-Metric--primary"><span>입찰 추천</span><strong>${escapeHtml(recommendation)}</strong></div>
@@ -230,7 +230,7 @@ const AuctionLayout = (() => {
         ].join("");
 
         if (elements.auctionAiStatus) {
-            elements.auctionAiStatus.textContent = "AI 경매 분석 완료";
+            elements.auctionAiStatus.textContent = "분석 결과가 업데이트되었습니다.";
         }
     }
 
@@ -241,7 +241,7 @@ const AuctionLayout = (() => {
             elements.auctionAiAnalyzeBtn.textContent = "분석";
         }
         if (elements.auctionAiStatus) {
-            elements.auctionAiStatus.textContent = "경매 작품의 투자 가치와 ROI를 분석합니다.";
+            elements.auctionAiStatus.textContent = "입찰 흐름과 예상 낙찰가를 분석합니다.";
         }
         if (elements.auctionAiResult) {
             elements.auctionAiResult.hidden = true;

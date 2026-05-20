@@ -1,0 +1,10 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.idea/
+images/
+rag_output/
+trend_pulse_storage/
+llm_workspace/
+*.log

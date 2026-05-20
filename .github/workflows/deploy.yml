@@ -23,7 +23,7 @@ jobs:
       - name: Set HOST env var from secrets
         run: |
           echo "HOST=${{ secrets[matrix.name] }}" >> $GITHUB_ENV
-          echo "FASTAPI_BASE_URL=${{ secrets.FASTAPI_BASE_URL || secrets.ML_API_BASE_URL }}" >> $GITHUB_ENV
+          echo "FASTAPI_BASE_URL=http://127.0.0.1:8000" >> $GITHUB_ENV
           echo "BOOTPAY_JS_APPLICATION_ID=${{ secrets.BOOTPAY_JS_APPLICATION_ID || secrets.BOOTPAY_JS_API_KEY }}" >> $GITHUB_ENV
 
       - name: Normalize FastAPI base URL
@@ -36,6 +36,9 @@ jobs:
           case "$RAW_FASTAPI_BASE_URL" in
             http://*|https://*)
               NORMALIZED_FASTAPI_BASE_URL="$RAW_FASTAPI_BASE_URL"
+              ;;
+            host.docker.internal:*|localhost:*|127.*|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*)
+              NORMALIZED_FASTAPI_BASE_URL="http://$RAW_FASTAPI_BASE_URL"
               ;;
             *)
               NORMALIZED_FASTAPI_BASE_URL="https://$RAW_FASTAPI_BASE_URL"
@@ -189,6 +192,9 @@ jobs:
               -e SOLAPI_FROM_NUMBER=${{ secrets.SOLAPI_FROM_NUMBER }} \
               -e ML_API_BASE_URL=${{ secrets.ML_API_BASE_URL }} \
               -e FASTAPI_BASE_URL="$FASTAPI_BASE_URL" \
+              -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+              -e OPENAI_TEXT_MODEL=${{ secrets.OPENAI_TEXT_MODEL || 'gpt-4o-mini' }} \
+              -e OPENAI_IMAGE_MODEL=${{ secrets.OPENAI_IMAGE_MODEL || 'gpt-image-1' }} \
               -e RABBITMQ_HOST=${{ secrets.RABBITMQ_HOST }} \
               -e RABBITMQ_PORT=${{ secrets.RABBITMQ_PORT }} \
               -e RABBITMQ_USER=${{ secrets.RABBITMQ_USER }} \
@@ -196,7 +202,17 @@ jobs:
               bideo:latest
             docker exec bideo sh -c 'echo "FASTAPI_BASE_URL=$FASTAPI_BASE_URL"'
             docker exec bideo sh -c 'echo "BOOTPAY_JS_APPLICATION_ID length=${#BOOTPAY_JS_APPLICATION_ID}"'
-            docker exec bideo sh -c 'curl -fsS "$FASTAPI_BASE_URL/" >/dev/null && echo "FastAPI root OK"'
+            for i in \$(seq 1 30); do
+              if docker exec bideo sh -c 'curl -fsS "$FASTAPI_BASE_URL/api/health" >/dev/null'; then
+                echo "FastAPI health OK"
+                break
+              fi
+              if [ "\$i" = "30" ]; then
+                docker logs bideo --tail 250
+                exit 1
+              fi
+              sleep 2
+            done
             docker exec bideo sh -c 'curl -fsS "$FASTAPI_BASE_URL/docs" >/dev/null && echo "FastAPI docs OK"'
             if command -v nginx >/dev/null 2>&1; then
               sudo mkdir -p /etc/nginx/conf.d

@@ -1,0 +1,17 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+asyncpg==0.31.0
+python-dotenv==1.0.1
+pydantic==2.10.6
+numpy==1.26.4
+scikit-learn==1.6.1
+kiwipiepy==0.20.4
+kiwipiepy_model==0.20.0
+boto3==1.35.99
+botocore==1.35.99
+openai==1.67.0
+langchain-openai==0.3.9
+langchain-core==0.3.46
+langchain-community==0.3.20
+redis==5.2.1
+requests==2.32.5

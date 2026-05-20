@@ -100,12 +100,27 @@ RUN chmod +x ./gradlew && \
 FROM eclipse-temurin:17-jre
 
 ENV TZ=Asia/Seoul
+ENV FASTAPI_BASE_URL=http://127.0.0.1:8000
+
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends python3 python3-venv curl && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY --from=build /app/fastapi/basic/requirements-container.txt /app/fastapi/basic/requirements-container.txt
+RUN python3 -m venv /opt/bideo-ai && \
+    /opt/bideo-ai/bin/pip install --no-cache-dir --upgrade pip && \
+    /opt/bideo-ai/bin/pip install --no-cache-dir -r /app/fastapi/basic/requirements-container.txt
 
 # JAR 파일 복사
-COPY --from=build /app/build/libs/bideo-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/build/libs/bideo-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY --from=build /app/fastapi/basic /app/fastapi/basic
+COPY scripts/docker/start-bideo.sh /app/start-bideo.sh
+RUN chmod +x /app/start-bideo.sh
 
 # 포트 오픈
 EXPOSE 10000
 
 # 실행 명령어
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["/app/start-bideo.sh"]

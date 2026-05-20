@@ -81,9 +81,7 @@ ul, ol {
     flex-direction: column;
     padding: 16px;
     border-bottom: 1px solid #dfe3ea;
-    background:
-        linear-gradient(180deg, #f8fafc 0%, #ffffff 78%),
-        #ffffff;
+    background: #ffffff;
     overflow: hidden;
     overscroll-behavior: contain;
     flex-shrink: 0;
@@ -287,6 +285,18 @@ ul, ol {
     align-items: center;
     justify-content: space-between;
     gap: 10px;
+    position: relative;
+}
+
+.Auction-AI-InsightHeader::before {
+    content: "";
+    position: absolute;
+    left: -16px;
+    top: 2px;
+    bottom: 2px;
+    width: 3px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #2563eb, #6800ea);
 }
 
 .Auction-AI-Kicker {
@@ -318,17 +328,18 @@ ul, ol {
     min-width: 64px;
     height: 32px;
     padding: 0 14px;
-    border: 1px solid #1d4ed8;
+    border: 1px solid #111827;
     border-radius: 6px;
-    background: #2563eb;
+    background: #111827;
     color: #fff;
     font-size: 12px;
     font-weight: 800;
     white-space: nowrap;
+    box-shadow: 0 8px 16px rgba(17, 24, 39, 0.14);
 }
 
 .Auction-AI-Button:hover {
-    background: #1d4ed8;
+    background: #000000;
 }
 
 .Auction-AI-Button:disabled {
@@ -362,8 +373,8 @@ ul, ol {
     height: 24px;
     padding: 0 9px;
     border-radius: 6px;
-    background: #eff6ff;
-    color: #1d4ed8;
+    background: #111827;
+    color: #ffffff;
     font-size: 11px;
     font-weight: 800;
 }
