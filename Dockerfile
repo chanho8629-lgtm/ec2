@@ -96,8 +96,8 @@ RUN chmod +x ./gradlew && \
     ./gradlew bootJar -x test --no-daemon && \
     rm -rf /root/.gradle /app/.gradle
 
-# 실행만 담당하는 jre 환경으로 설정한다.
-FROM eclipse-temurin:17-jre
+# 실행 이미지에는 Python 3.11과 JRE를 같이 둔다.
+FROM python:3.11-slim
 
 ENV TZ=Asia/Seoul
 ENV FASTAPI_BASE_URL=http://127.0.0.1:8000
@@ -105,11 +105,11 @@ ENV FASTAPI_BASE_URL=http://127.0.0.1:8000
 WORKDIR /app
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends python3 python3-venv curl && \
+    apt-get install -y --no-install-recommends openjdk-17-jre-headless build-essential curl && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /app/fastapi/basic/requirements-container.txt /app/fastapi/basic/requirements-container.txt
-RUN python3 -m venv /opt/bideo-ai && \
+RUN python -m venv /opt/bideo-ai && \
     /opt/bideo-ai/bin/pip install --no-cache-dir --upgrade pip && \
     /opt/bideo-ai/bin/pip install --no-cache-dir -r /app/fastapi/basic/requirements-container.txt
 
