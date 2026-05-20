@@ -2694,7 +2694,7 @@ body.workdetail-page:has(.work-share-modal-overlay:not([hidden]))::after {
 .work-auction-modal .Auction-AI-SidePanel {
     width: 100%;
     min-width: 0;
-    max-height: 210px;
+    max-height: 280px;
     border-top: 0;
     border-left: 0;
     border-radius: 0;

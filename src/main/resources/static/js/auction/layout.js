@@ -206,6 +206,11 @@ const AuctionLayout = (() => {
         const imageAnalysis = data?.imageAnalysis || data?.image_analysis || "";
         const auctionReport = data?.auctionReport || data?.auction_report || "";
         const usedRag = data?.usedRag ?? data?.used_rag;
+        const reportText = String(auctionReport || "");
+        const successLevel = extractReportValue(reportText, "경매 성공 가능성") || "-";
+        const recommendation = extractReportValue(reportText, "입찰 추천") || "-";
+        const bidderRange = extractReportValue(reportText, "예상 입찰자 수 범위") || "-";
+        const finalPriceRange = extractReportValue(reportText, "예상 최종 낙찰가 범위") || "-";
 
         if (elements.auctionAiAnalyzeBtn) {
             elements.auctionAiAnalyzeBtn.disabled = false;
@@ -214,6 +219,12 @@ const AuctionLayout = (() => {
         elements.auctionAiResult.hidden = false;
         elements.auctionAiResult.innerHTML = [
             `<div class="Auction-AI-ResultBadge">${usedRag === false ? "Fast analysis" : "Tinuiti RAG"}</div>`,
+            `<div class="Auction-AI-ResultGrid">
+                <div class="Auction-AI-Metric Auction-AI-Metric--primary"><span>성공 가능성</span><strong>${escapeHtml(successLevel)}</strong></div>
+                <div class="Auction-AI-Metric Auction-AI-Metric--primary"><span>입찰 추천</span><strong>${escapeHtml(recommendation)}</strong></div>
+                <div class="Auction-AI-Metric"><span>예상 입찰자</span><strong>${escapeHtml(bidderRange)}</strong></div>
+                <div class="Auction-AI-Metric"><span>예상 낙찰가</span><strong>${escapeHtml(finalPriceRange)}</strong></div>
+            </div>`,
             imageAnalysis ? `<div class="Auction-AI-ResultBlock"><strong>작품 분석</strong><p>${escapeHtml(imageAnalysis)}</p></div>` : "",
             auctionReport ? `<div class="Auction-AI-ResultBlock"><strong>투자 분석</strong><p>${escapeHtml(auctionReport)}</p></div>` : ""
         ].join("");
@@ -246,6 +257,16 @@ const AuctionLayout = (() => {
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#39;")
             .replace(/\n/g, "<br>");
+    }
+
+    function extractReportValue(text, label) {
+        const normalized = String(text || "");
+        const pattern = new RegExp(label + "\\s*[:：]\\s*([^\\n]+)");
+        const match = normalized.match(pattern);
+        if (!match) {
+            return "";
+        }
+        return match[1].replace(/^[\\s-]+/, "").trim();
     }
 
     return {
