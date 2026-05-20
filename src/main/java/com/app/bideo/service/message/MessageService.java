@@ -13,8 +13,10 @@ import com.app.bideo.repository.message.MessageDAO;
 import com.app.bideo.repository.message.MessageRoomDAO;
 import com.app.bideo.service.common.S3FileService;
 import com.app.bideo.service.notification.NotificationService;
+import com.app.bideo.config.RabbitConfig;
+import com.app.bideo.dto.message.ChatRelayMessage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +35,7 @@ public class MessageService {
     private final MessageDAO messageDAO;
     private final MessageRoomDAO messageRoomDAO;
     private final MemberRepository memberRepository;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final RabbitTemplate rabbitTemplate;
     private final NotificationService notificationService;
     private final S3FileService s3FileService;
 
@@ -238,25 +240,31 @@ public class MessageService {
     }
 
     private void broadcast(Long roomId, String type, MessageResponseDTO message) {
-        messagingTemplate.convertAndSend(
-                "/topic/room." + roomId,
+        publishRelay("/topic/room." + roomId,
                 MessageRealtimeEventDTO.builder()
                         .roomId(roomId)
                         .type(type)
                         .message(message)
-                        .build()
-        );
+                        .build());
         broadcastRoomTouch(roomId);
     }
 
     private void broadcastRoomTouch(Long roomId) {
         List<Long> memberIds = messageRoomDAO.findRoomMemberIds(roomId);
         for (Long memberId : memberIds) {
-            messagingTemplate.convertAndSend(
-                    "/topic/user." + memberId,
-                    java.util.Map.of("type", "ROOM_TOUCH", "roomId", roomId)
-            );
+            publishRelay("/topic/user." + memberId,
+                    java.util.Map.of("type", "ROOM_TOUCH", "roomId", roomId));
         }
+    }
+
+    private void publishRelay(String destination, Object payload) {
+        rabbitTemplate.convertAndSend(
+                RabbitConfig.CHAT_EXCHANGE, "",
+                ChatRelayMessage.builder()
+                        .destination(destination)
+                        .payload(payload)
+                        .build()
+        );
     }
 
     private MessageRoomResponseDTO buildRoomResponse(Long roomId, Long currentMemberId) {

@@ -29,6 +29,11 @@ spring:
     redis:
       host: ${EC2_HOST}
       port: ${REDIS_PORT}
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASS:guest}
 
   profiles:
     active: sol, oauth
