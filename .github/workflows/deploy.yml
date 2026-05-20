@@ -128,6 +128,7 @@ jobs:
           ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@$HOST << EOF
             set -e
             cd /home/ubuntu/bideo
+            docker builder prune -f
             docker build \
               --build-arg EC2_HOST=${{ secrets.EC2_HOST }} \
               --build-arg PSQL_PORT=${{ secrets.PSQL_PORT }} \
