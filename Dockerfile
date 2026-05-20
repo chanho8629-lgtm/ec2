@@ -96,8 +96,21 @@ RUN chmod +x ./gradlew && \
     ./gradlew bootJar -x test --no-daemon && \
     rm -rf /root/.gradle /app/.gradle
 
-# 실행 이미지에는 Python 3.11과 JRE를 같이 둔다.
-FROM python:3.11-slim
+FROM python:3.11-slim AS fastapi-runtime
+
+WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY --from=build /app/fastapi/basic/requirements-container.txt /app/fastapi/basic/requirements-container.txt
+RUN python -m venv /opt/bideo-ai && \
+    /opt/bideo-ai/bin/pip install --no-cache-dir --upgrade pip && \
+    /opt/bideo-ai/bin/pip install --no-cache-dir -r /app/fastapi/basic/requirements-container.txt
+
+# 실행은 기존 Java 17 JRE 이미지에서 한다.
+FROM eclipse-temurin:17-jre
 
 ENV TZ=Asia/Seoul
 ENV FASTAPI_BASE_URL=http://127.0.0.1:8000
@@ -105,13 +118,11 @@ ENV FASTAPI_BASE_URL=http://127.0.0.1:8000
 WORKDIR /app
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends openjdk-17-jre-headless build-essential curl && \
+    apt-get install -y --no-install-recommends curl libgomp1 && \
     rm -rf /var/lib/apt/lists/*
 
-COPY --from=build /app/fastapi/basic/requirements-container.txt /app/fastapi/basic/requirements-container.txt
-RUN python -m venv /opt/bideo-ai && \
-    /opt/bideo-ai/bin/pip install --no-cache-dir --upgrade pip && \
-    /opt/bideo-ai/bin/pip install --no-cache-dir -r /app/fastapi/basic/requirements-container.txt
+COPY --from=fastapi-runtime /usr/local /usr/local
+COPY --from=fastapi-runtime /opt/bideo-ai /opt/bideo-ai
 
 # JAR 파일 복사
 COPY --from=build /app/build/libs/bideo-0.0.1-SNAPSHOT.jar /app/app.jar
