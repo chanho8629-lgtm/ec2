@@ -92,6 +92,24 @@ jobs:
           A7: ${{ secrets.EC2_USER }}
           A8: ${{ secrets.EC2_KEY }}
 
+      - name: Ensure auction database tables
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@$HOST << EOF
+            set -e
+            cd /home/ubuntu/bideo
+            docker run --rm \
+              --add-host=bideo.shop:172.31.37.54 \
+              -v /home/ubuntu/bideo/src/main/resources/sql:/sql \
+              -e PGPASSWORD=${{ secrets.PSQL_PASSWORD }} \
+              postgres:16 \
+              psql -v ON_ERROR_STOP=1 \
+                -h bideo.shop \
+                -p ${{ secrets.PSQL_PORT }} \
+                -U ${{ secrets.PSQL_USERNAME }} \
+                -d ${{ secrets.PSQL_DATABASE }} \
+                -f /sql/2026-05-20_create_missing_auction_tables.sql
+          EOF
+
       - name: Build & Run Docker on EC2
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@$HOST << EOF
