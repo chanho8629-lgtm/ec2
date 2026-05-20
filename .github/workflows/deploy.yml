@@ -159,48 +159,54 @@ jobs:
               --build-arg ML_API_BASE_URL=${{ secrets.ML_API_BASE_URL }} \
               --build-arg FASTAPI_BASE_URL="$FASTAPI_BASE_URL" \
               -t bideo:next .
-            docker stop bideo || true
-            docker rm bideo || true
+            if docker ps --format '{{.Names}}' | grep -qx bideo; then
+              docker stop bideo
+            fi
+            if docker ps -a --format '{{.Names}}' | grep -qx bideo; then
+              docker rm bideo
+            fi
             docker tag bideo:next bideo:latest
-            docker run -d -p 80:10000 --name bideo \
-              --add-host=host.docker.internal:host-gateway \
-              -e EC2_HOST=${{ secrets.EC2_HOST }} \
-              -e PSQL_PORT=${{ secrets.PSQL_PORT }} \
-              -e PSQL_DATABASE=${{ secrets.PSQL_DATABASE }} \
-              -e PSQL_USERNAME=${{ secrets.PSQL_USERNAME }} \
-              -e PSQL_PASSWORD=${{ secrets.PSQL_PASSWORD }} \
-              -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
-              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-              -e AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} \
-              -e AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} \
-              -e AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }} \
-              -e AWS_REGION=${{ secrets.AWS_REGION }} \
-              -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
-              -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} \
-              -e NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }} \
-              -e NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }} \
-              -e GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
-              -e GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
-              -e BOOTPAY_JS_API_KEY=${{ secrets.BOOTPAY_JS_API_KEY }} \
-              -e BOOTPAY_JS_APPLICATION_ID="$BOOTPAY_JS_APPLICATION_ID" \
-              -e BOOTPAY_REST_API_KEY=${{ secrets.BOOTPAY_REST_API_KEY }} \
-              -e BOOTPAY_PRIVATE_KEY=${{ secrets.BOOTPAY_PRIVATE_KEY }} \
-              -e SPRING_MAIL_USERNAME=${{ secrets.SPRING_MAIL_USERNAME }} \
-              -e SPRING_MAIL_PASSWORD=${{ secrets.SPRING_MAIL_PASSWORD }} \
-              -e APP_MAIL_FROM_ADDRESS=${{ secrets.APP_MAIL_FROM_ADDRESS }} \
-              -e SOLAPI_API_KEY=${{ secrets.SOLAPI_API_KEY }} \
-              -e SOLAPI_API_SECRET=${{ secrets.SOLAPI_API_SECRET }} \
-              -e SOLAPI_FROM_NUMBER=${{ secrets.SOLAPI_FROM_NUMBER }} \
-              -e ML_API_BASE_URL=${{ secrets.ML_API_BASE_URL }} \
-              -e FASTAPI_BASE_URL="$FASTAPI_BASE_URL" \
-              -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
-              -e OPENAI_TEXT_MODEL=${{ secrets.OPENAI_TEXT_MODEL || 'gpt-4o-mini' }} \
-              -e OPENAI_IMAGE_MODEL=${{ secrets.OPENAI_IMAGE_MODEL || 'gpt-image-1' }} \
-              -e RABBITMQ_HOST=${{ secrets.RABBITMQ_HOST }} \
-              -e RABBITMQ_PORT=${{ secrets.RABBITMQ_PORT }} \
-              -e RABBITMQ_USER=${{ secrets.RABBITMQ_USER }} \
-              -e RABBITMQ_PASS=${{ secrets.RABBITMQ_PASS }} \
-              bideo:latest
+            cat > /tmp/bideo.env << 'ENVVARS'
+            EC2_HOST=${{ secrets.EC2_HOST }}
+            PSQL_PORT=${{ secrets.PSQL_PORT }}
+            PSQL_DATABASE=${{ secrets.PSQL_DATABASE }}
+            PSQL_USERNAME=${{ secrets.PSQL_USERNAME }}
+            PSQL_PASSWORD=${{ secrets.PSQL_PASSWORD }}
+            REDIS_PORT=${{ secrets.REDIS_PORT }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
+            AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
+            AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME }}
+            AWS_REGION=${{ secrets.AWS_REGION }}
+            KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
+            KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}
+            NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}
+            NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            BOOTPAY_JS_API_KEY=${{ secrets.BOOTPAY_JS_API_KEY }}
+            BOOTPAY_JS_APPLICATION_ID=$BOOTPAY_JS_APPLICATION_ID
+            BOOTPAY_REST_API_KEY=${{ secrets.BOOTPAY_REST_API_KEY }}
+            BOOTPAY_PRIVATE_KEY=${{ secrets.BOOTPAY_PRIVATE_KEY }}
+            SPRING_MAIL_USERNAME=${{ secrets.SPRING_MAIL_USERNAME }}
+            SPRING_MAIL_PASSWORD=${{ secrets.SPRING_MAIL_PASSWORD }}
+            APP_MAIL_FROM_ADDRESS=${{ secrets.APP_MAIL_FROM_ADDRESS }}
+            SOLAPI_API_KEY=${{ secrets.SOLAPI_API_KEY }}
+            SOLAPI_API_SECRET=${{ secrets.SOLAPI_API_SECRET }}
+            SOLAPI_FROM_NUMBER=${{ secrets.SOLAPI_FROM_NUMBER }}
+            ML_API_BASE_URL=${{ secrets.ML_API_BASE_URL }}
+            FASTAPI_BASE_URL=$FASTAPI_BASE_URL
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            OPENAI_TEXT_MODEL=${{ secrets.OPENAI_TEXT_MODEL || 'gpt-4o-mini' }}
+            OPENAI_IMAGE_MODEL=${{ secrets.OPENAI_IMAGE_MODEL || 'gpt-image-1' }}
+            RABBITMQ_HOST=${{ secrets.RABBITMQ_HOST }}
+            RABBITMQ_PORT=${{ secrets.RABBITMQ_PORT }}
+            RABBITMQ_USER=${{ secrets.RABBITMQ_USER }}
+            RABBITMQ_PASS=${{ secrets.RABBITMQ_PASS }}
+            ENVVARS
+            sed -i 's/^[[:space:]]*//' /tmp/bideo.env
+            chmod 600 /tmp/bideo.env
+            docker run -d -p 80:10000 --name bideo --add-host=host.docker.internal:host-gateway --env-file /tmp/bideo.env bideo:latest
             docker exec bideo sh -c 'echo "FASTAPI_BASE_URL=$FASTAPI_BASE_URL"'
             docker exec bideo sh -c 'echo "BOOTPAY_JS_APPLICATION_ID length=${#BOOTPAY_JS_APPLICATION_ID}"'
             for i in \$(seq 1 30); do
