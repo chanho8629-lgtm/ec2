@@ -25,6 +25,25 @@ jobs:
           echo "HOST=${{ secrets[matrix.name] }}" >> $GITHUB_ENV
           echo "FASTAPI_BASE_URL=${{ secrets.FASTAPI_BASE_URL || secrets.ML_API_BASE_URL }}" >> $GITHUB_ENV
 
+      - name: Normalize FastAPI base URL
+        run: |
+          RAW_FASTAPI_BASE_URL="${FASTAPI_BASE_URL}"
+          if [ -z "$RAW_FASTAPI_BASE_URL" ]; then
+            echo "FASTAPI_BASE_URL or ML_API_BASE_URL secret is required" >&2
+            exit 1
+          fi
+          case "$RAW_FASTAPI_BASE_URL" in
+            http://*|https://*)
+              NORMALIZED_FASTAPI_BASE_URL="$RAW_FASTAPI_BASE_URL"
+              ;;
+            *)
+              NORMALIZED_FASTAPI_BASE_URL="https://$RAW_FASTAPI_BASE_URL"
+              ;;
+          esac
+          NORMALIZED_FASTAPI_BASE_URL="${NORMALIZED_FASTAPI_BASE_URL%/}"
+          echo "FASTAPI_BASE_URL=$NORMALIZED_FASTAPI_BASE_URL" >> $GITHUB_ENV
+          echo "FASTAPI_HOST=$(printf '%s' "$NORMALIZED_FASTAPI_BASE_URL" | sed -E 's#^https?://([^/]+).*#\1#')" >> $GITHUB_ENV
+
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
@@ -164,6 +183,9 @@ jobs:
               -e RABBITMQ_USER=${{ secrets.RABBITMQ_USER }} \
               -e RABBITMQ_PASS=${{ secrets.RABBITMQ_PASS }} \
               bideo:latest
+            docker exec bideo sh -c 'echo "FASTAPI_BASE_URL=$FASTAPI_BASE_URL"'
+            docker exec bideo sh -c 'curl -fsS "$FASTAPI_BASE_URL/" >/dev/null && echo "FastAPI root OK"'
+            docker exec bideo sh -c 'curl -fsS "$FASTAPI_BASE_URL/docs" >/dev/null && echo "FastAPI docs OK"'
             if command -v nginx >/dev/null 2>&1; then
               sudo mkdir -p /etc/nginx/conf.d
               printf 'client_max_body_size 100m;\n' | sudo tee /etc/nginx/conf.d/bideo-upload.conf >/dev/null
