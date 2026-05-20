@@ -30,6 +30,18 @@ with raw_features as (
         coalesce(w.like_count, 0) as like_count,
         coalesce(w.comment_count, 0) as comment_count,
         coalesce(w.save_count, 0) as save_count,
+        greatest(0, (current_date - coalesce(w.created_datetime::date, current_date))::int) as age_days,
+        case
+            when coalesce(w.category, '') = 'VIDEO'
+              or exists (
+                  select 1
+                  from tbl_work_file wf
+                  where wf.work_id = w.id
+                    and coalesce(wf.file_type, '') like 'video/%'
+              )
+            then 45
+            else 0
+        end as video_length_sec,
         greatest(
             0,
             round(
@@ -121,6 +133,14 @@ set media_type = scored.media_type,
     thumbnail_exists = scored.thumbnail_exists,
     is_ai_generated = scored.is_ai_generated,
     ai_quality_score = scored.ai_quality_score,
+    age_days = scored.age_days,
+    video_length_sec = scored.video_length_sec,
+    watch_completion_rate = least(0.98, greatest(0.12, scored.quality_ratio * 0.78 + case when scored.video_length_sec > 0 then 0.08 else 0.03 end)),
+    engagement_score = greatest(0, scored.like_count + scored.comment_count * 4 + scored.save_count * 3),
+    reaction_score = greatest(0, scored.like_count + scored.comment_count + scored.save_count),
+    quality_completion_score = scored.ai_quality_score * least(0.98, greatest(0.12, scored.quality_ratio * 0.78 + case when scored.video_length_sec > 0 then 0.08 else 0.03 end)),
+    short_video_score = case when scored.video_length_sec > 0 and scored.video_length_sec <= 60 then 1.0 else 0.0 end,
+    training_feature_version = 'v1',
     predicted_views = scored.predicted_views,
     predicted_like_count = scored.predicted_like_count,
     predicted_popular = case

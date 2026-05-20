@@ -865,4 +865,50 @@
         ], w.id)
     </select>
 
+    <select id="selectFallbackRecommendationsByGallery" resultType="WorkListResponseDTO">
+        select
+            w.id,
+            w.member_id,
+            w.title,
+            w.category,
+            w.is_tradable,
+            w.price,
+            w.status,
+            m.nickname      as member_nickname,
+            m.profile_image as member_profile_image,
+            t_file.file_url     as thumbnail_url,
+            t_file.file_type    as thumbnail_file_type,
+            t_file.width        as thumbnail_width,
+            t_file.height       as thumbnail_height,
+            w.view_count,
+            w.like_count,
+            w.save_count,
+            w.comment_count,
+            w.created_datetime
+        from tbl_work w
+        left join tbl_member m on m.id = w.member_id
+        left join lateral (
+            select wf.file_url, wf.file_type, wf.width, wf.height
+            from tbl_work_file wf
+            where wf.work_id = w.id
+            order by case when wf.file_type like 'image/%' then 0 else 1 end, wf.sort_order asc, wf.id asc
+            limit 1
+        ) t_file on true
+        where w.deleted_datetime is null
+          and w.status = 'ACTIVE'
+          and not exists (
+              select 1
+              from tbl_gallery_work gw
+              where gw.gallery_id = #{galleryId}
+                and gw.work_id = w.id
+          )
+        order by
+            w.predicted_popular_probability desc,
+            w.predicted_views desc,
+            w.view_count desc,
+            w.like_count desc,
+            w.created_datetime desc
+        limit #{limit}
+    </select>
+
 </mapper>

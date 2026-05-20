@@ -388,7 +388,11 @@ public class WorkService {
 
         // FastAPI POST /api/work/recommend 호출
         List<Long> ids = callWorkRecommend(galleryId, content, limit);
-        if (ids.isEmpty()) return List.of();
+        if (ids.isEmpty()) {
+            List<WorkListResponseDTO> fallback = workDAO.findFallbackRecommendationsByGallery(galleryId, limit);
+            applyThumbnailUrls(fallback);
+            return fallback;
+        }
 
         List<WorkListResponseDTO> result = workDAO.findAllByIds(ids);
         result.forEach(w -> w.setThumbnailUrl(s3FileService.getPresignedUrl(w.getThumbnailUrl())));

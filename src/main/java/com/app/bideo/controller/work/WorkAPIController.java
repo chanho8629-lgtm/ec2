@@ -15,6 +15,7 @@ import com.app.bideo.service.common.S3FileService;
 import com.app.bideo.service.work.WorkService;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,6 +40,7 @@ import java.util.concurrent.CompletableFuture;
 @RestController
 @RequestMapping("/api/works")
 @RequiredArgsConstructor
+@Slf4j
 public class WorkAPIController {
 
     private final WorkService workService;
@@ -135,6 +137,7 @@ public class WorkAPIController {
     // 기존 작품 API 안에서 FastAPI 이미지 파이프라인을 호출한다.
     @PostMapping("/ai/image/pipeline")
     public ImagePipelineResponse runImagePipeline(@RequestBody ImagePipelineRequest requestDTO) {
+        requireFastApiBaseUrl("AI 이미지 생성");
         ImagePipelineRequest request = new ImagePipelineRequest(
                 requestDTO.prompt(),
                 requestDTO.size() == null || requestDTO.size().isBlank() ? "1024x1024" : requestDTO.size()
@@ -144,15 +147,21 @@ public class WorkAPIController {
         requestFactory.setConnectTimeout(Duration.ofSeconds(10));
         requestFactory.setReadTimeout(Duration.ofMinutes(5));
 
-        FastApiImagePipelineResponse fastApiResponse = RestClient.builder()
-                .baseUrl(fastApiBaseUrl)
-                .requestFactory(requestFactory)
-                .build()
-                .post()
-                .uri("/api/ai/image/pipeline")
-                .body(request)
-                .retrieve()
-                .body(FastApiImagePipelineResponse.class);
+        FastApiImagePipelineResponse fastApiResponse;
+        try {
+            fastApiResponse = RestClient.builder()
+                    .baseUrl(fastApiBaseUrl)
+                    .requestFactory(requestFactory)
+                    .build()
+                    .post()
+                    .uri("/api/ai/image/pipeline")
+                    .body(request)
+                    .retrieve()
+                    .body(FastApiImagePipelineResponse.class);
+        } catch (RuntimeException exception) {
+            log.warn("FastAPI image pipeline failed. baseUrl={}, message={}", fastApiBaseUrl, exception.getMessage());
+            throw new IllegalStateException("FastAPI 이미지 생성 서버에 연결할 수 없습니다.");
+        }
 
         if (fastApiResponse == null) {
             throw new IllegalStateException("FastAPI 이미지 파이프라인 응답이 비어 있습니다.");
@@ -178,6 +187,7 @@ public class WorkAPIController {
     // 현재 이미지에 대한 제목/설명만 생성한다. 새 이미지는 만들지 않는다.
     @PostMapping("/ai/image/describe")
     public ImageDescriptionResponse describeImage(@RequestBody ImageDescriptionRequest requestDTO) {
+        requireFastApiBaseUrl("AI 이미지 설명");
         String imageUrl = requestDTO.imageUrl();
         if ((imageUrl == null || imageUrl.isBlank()) && requestDTO.imageKey() != null && !requestDTO.imageKey().isBlank()) {
             imageUrl = s3FileService.getPresignedUrl(requestDTO.imageKey());
@@ -190,15 +200,21 @@ public class WorkAPIController {
         requestFactory.setConnectTimeout(Duration.ofSeconds(10));
         requestFactory.setReadTimeout(Duration.ofMinutes(5));
 
-        FastApiImageAnalyzeResponse fastApiResponse = RestClient.builder()
-                .baseUrl(fastApiBaseUrl)
-                .requestFactory(requestFactory)
-                .build()
-                .post()
-                .uri("/api/ai/image/analyze")
-                .body(new FastApiImageAnalyzeRequest(imageUrl))
-                .retrieve()
-                .body(FastApiImageAnalyzeResponse.class);
+        FastApiImageAnalyzeResponse fastApiResponse;
+        try {
+            fastApiResponse = RestClient.builder()
+                    .baseUrl(fastApiBaseUrl)
+                    .requestFactory(requestFactory)
+                    .build()
+                    .post()
+                    .uri("/api/ai/image/analyze")
+                    .body(new FastApiImageAnalyzeRequest(imageUrl))
+                    .retrieve()
+                    .body(FastApiImageAnalyzeResponse.class);
+        } catch (RuntimeException exception) {
+            log.warn("FastAPI image analyze failed. baseUrl={}, message={}", fastApiBaseUrl, exception.getMessage());
+            throw new IllegalStateException("FastAPI 이미지 설명 서버에 연결할 수 없습니다.");
+        }
 
         if (fastApiResponse == null) {
             throw new IllegalStateException("FastAPI 이미지 설명 응답이 비어 있습니다.");
@@ -215,62 +231,108 @@ public class WorkAPIController {
     // 작성폼 입력값을 FastAPI 회귀/분류 모델에 전달해 조회수와 고조회수 여부를 예측한다.
     @PostMapping("/ai/prediction")
     public WorkPredictionResponse predictWork(@RequestBody WorkPredictionRequest requestDTO) {
+        Map<String, Object> regressionInput = requestDTO.regression() == null ? Map.of() : requestDTO.regression();
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(Duration.ofSeconds(10));
         requestFactory.setReadTimeout(Duration.ofMinutes(5));
 
-        RestClient fastApiClient = RestClient.builder()
-                .baseUrl(fastApiBaseUrl)
-                .requestFactory(requestFactory)
-                .build();
-
-        CompletableFuture<FastApiRegressionResponse> regressionFuture = CompletableFuture.supplyAsync(() -> fastApiClient.post()
-                .uri("/api/work/regression")
-                .body(requestDTO.regression())
-                .retrieve()
-                .body(FastApiRegressionResponse.class));
-
-        CompletableFuture<FastApiClassificationResponse> classificationFuture = CompletableFuture.supplyAsync(() -> fastApiClient.post()
-                .uri("/api/work/classification")
-                .body(requestDTO.classification())
-                .retrieve()
-                .body(FastApiClassificationResponse.class));
-
-        FastApiRegressionResponse regression = regressionFuture.join();
-        FastApiClassificationResponse classification = classificationFuture.join();
-
-        if (regression == null || classification == null) {
-            throw new IllegalStateException("FastAPI 회귀/분류 응답이 비어 있습니다.");
+        if (fastApiBaseUrl == null || fastApiBaseUrl.isBlank()) {
+            return buildLocalPredictionResponse(regressionInput, "FastAPI 미설정");
         }
 
-        Integer predictedViews = regression.predictedViews() != null ? regression.predictedViews() : 0;
-        Double rawPopularProbability = classification.popularProbability() != null ? classification.popularProbability() : 0D;
-        Integer estimatedLikes = estimateLikes(predictedViews, requestDTO.regression());
+        try {
+            RestClient fastApiClient = RestClient.builder()
+                    .baseUrl(fastApiBaseUrl)
+                    .requestFactory(requestFactory)
+                    .build();
+
+            CompletableFuture<FastApiRegressionResponse> regressionFuture = CompletableFuture.supplyAsync(() -> fastApiClient.post()
+                    .uri("/api/work/regression")
+                    .body(regressionInput)
+                    .retrieve()
+                    .body(FastApiRegressionResponse.class));
+
+            CompletableFuture<FastApiClassificationResponse> classificationFuture = CompletableFuture.supplyAsync(() -> fastApiClient.post()
+                    .uri("/api/work/classification")
+                    .body(requestDTO.classification() == null ? Map.of() : requestDTO.classification())
+                    .retrieve()
+                    .body(FastApiClassificationResponse.class));
+
+            FastApiRegressionResponse regression = regressionFuture.join();
+            FastApiClassificationResponse classification = classificationFuture.join();
+
+            if (regression == null || classification == null) {
+                return buildLocalPredictionResponse(regressionInput, "FastAPI 응답 없음");
+            }
+
+            Integer predictedViews = regression.predictedViews() != null ? regression.predictedViews() : 0;
+            Double rawPopularProbability = classification.popularProbability() != null ? classification.popularProbability() : 0D;
+            Double resolvedThreshold = classification.threshold() == null ? 0.5D : classification.threshold();
+            return buildPredictionResponse(predictedViews, rawPopularProbability, resolvedThreshold, regressionInput, null);
+        } catch (RuntimeException exception) {
+            log.warn("FastAPI work prediction failed. baseUrl={}, message={}", fastApiBaseUrl, exception.getMessage());
+            return buildLocalPredictionResponse(regressionInput, "FastAPI 연결 실패");
+        }
+    }
+
+    private WorkPredictionResponse buildPredictionResponse(Integer predictedViews, Double rawPopularProbability, Double resolvedThreshold, Map<String, Object> regression, String fallbackReason) {
+        Integer estimatedLikes = estimateLikes(predictedViews, regression);
         Double adjustedPopularProbability = calculateAdjustedPopularProbability(
                 predictedViews,
                 estimatedLikes,
                 rawPopularProbability,
-                requestDTO.regression()
+                regression
         );
-        Double resolvedThreshold = classification.threshold() == null ? 0.5D : classification.threshold();
         Integer finalPredictedPopular = adjustedPopularProbability >= resolvedThreshold ? 1 : 0;
         String finalPredictedLabel = finalPredictedPopular == 1 ? "고조회수" : "저조회수";
+        String modelSignal = resolveModelSignal(predictedViews, rawPopularProbability, adjustedPopularProbability, regression);
+        if (fallbackReason != null && !fallbackReason.isBlank()) {
+            modelSignal = fallbackReason + " - " + modelSignal;
+        }
 
         return new WorkPredictionResponse(
                 predictedViews,
                 estimatedLikes,
-                estimateCount(predictedViews, requestDTO.regression(), "comments", 0.009D, 1),
-                estimateCount(predictedViews, requestDTO.regression(), "shares", 0.006D, 1),
+                estimateCount(predictedViews, regression, "comments", 0.009D, 1),
+                estimateCount(predictedViews, regression, "shares", 0.006D, 1),
                 finalPredictedPopular,
                 finalPredictedLabel,
                 adjustedPopularProbability,
                 Math.round(adjustedPopularProbability * 1000D) / 10D,
                 resolvedThreshold,
-                calculatePredictionConfidence(predictedViews, adjustedPopularProbability, requestDTO.regression()),
+                calculatePredictionConfidence(predictedViews, adjustedPopularProbability, regression),
                 resolvePredictionGrade(predictedViews, adjustedPopularProbability),
                 resolveViewBand(predictedViews),
-                resolveModelSignal(predictedViews, rawPopularProbability, adjustedPopularProbability, requestDTO.regression())
+                modelSignal
         );
+    }
+
+    private WorkPredictionResponse buildLocalPredictionResponse(Map<String, Object> regression, String reason) {
+        int engagementScore = toInteger(regression.get("engagement_score"));
+        double aiQualityScore = toDouble(regression.get("ai_quality_score"));
+        double normalizedQuality = aiQualityScore > 1D ? aiQualityScore / 100D : aiQualityScore;
+        double completionRate = Math.max(0.05D, Math.min(1D, toDouble(regression.get("watch_completion_rate"))));
+        int ageDays = Math.max(0, toInteger(regression.get("age_days")));
+        int videoLengthSec = Math.max(1, toInteger(regression.get("video_length_sec")));
+        double shortVideoBoost = videoLengthSec <= 60 ? 1.18D : 1D;
+        int predictedViews = (int) Math.round(
+                (750D + engagementScore * 3.8D + normalizedQuality * 8500D + completionRate * 4200D)
+                        * shortVideoBoost
+                        / Math.max(1D, Math.log1p(ageDays + 1D) / 2.0D)
+        );
+        double rawProbability = Math.min(0.95D, Math.max(0.05D,
+                normalizedQuality * 0.38D
+                        + completionRate * 0.25D
+                        + Math.min(1D, engagementScore / 3500D) * 0.25D
+                        + (videoLengthSec <= 60 ? 0.08D : 0.02D)
+        ));
+        return buildPredictionResponse(Math.max(predictedViews, 0), rawProbability, 0.5D, regression, reason);
+    }
+
+    private void requireFastApiBaseUrl(String featureName) {
+        if (fastApiBaseUrl == null || fastApiBaseUrl.isBlank()) {
+            throw new IllegalStateException(featureName + "을 위한 FastAPI 주소가 설정되지 않았습니다.");
+        }
     }
 
     // 작품 삭제

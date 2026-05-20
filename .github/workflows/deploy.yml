@@ -80,6 +80,18 @@ jobs:
           A7: ${{ secrets.EC2_USER }}
           A8: ${{ secrets.EC2_KEY }}
 
+      - name: Ensure DB schema and seed data
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@$HOST << EOF
+            cd /home/ubuntu/bideo
+            PSQL_PORT=${{ secrets.PSQL_PORT }} \
+            PSQL_DATABASE=${{ secrets.PSQL_DATABASE }} \
+            PSQL_USERNAME=${{ secrets.PSQL_USERNAME }} \
+            PSQL_PASSWORD=${{ secrets.PSQL_PASSWORD }} \
+            SQL_DIR=/home/ubuntu/bideo/src/main/resources/sql \
+            bash scripts/deploy/ensure-db-schema.sh
+          EOF
+
       - name: Build & Run Docker on EC2
         run: |
           ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@$HOST << EOF
