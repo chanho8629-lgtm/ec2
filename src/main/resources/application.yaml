@@ -66,4 +66,4 @@ bootpay:
   pg: tosspayments
 
 fastapi:
-  base-url: ${FASTAPI_BASE_URL:}
+  base-url: ${FASTAPI_BASE_URL:${ML_API_BASE_URL:}}

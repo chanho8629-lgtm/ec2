@@ -648,6 +648,7 @@
         ) values (
                      #{tagName}
                  )
+        on conflict (tag_name) do nothing
     </insert>
 
     <select id="selectTagSuggestions" resultType="TagResponseDTO">

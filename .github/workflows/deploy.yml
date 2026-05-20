@@ -53,6 +53,7 @@ jobs:
           echo "JWT_SECRET length: ${#X7}"
           echo "AWS_BUCKET_NAME length: ${#A1}"  
           echo "ML_API_BASE_URL length: ${#A2}"
+          echo "FASTAPI_BASE_URL length: ${#A9}"
           echo "BOOTPAY_PRIVATE_KEY length: ${#A3}"
           echo "BOOTPAY_REST_API_KEY length: ${#A4}"
           echo "SOLAPI_API_SECRET length: ${#A5}"
@@ -70,6 +71,7 @@ jobs:
           X7: ${{ secrets.JWT_SECRET }}
           A1: ${{ secrets.AWS_BUCKET_NAME }}
           A2: ${{ secrets.ML_API_BASE_URL }}
+          A9: ${{ secrets.ML_API_BASE_URL }}
           A3: ${{ secrets.BOOTPAY_PRIVATE_KEY }}
           A4: ${{ secrets.BOOTPAY_REST_API_KEY }}
           A5: ${{ secrets.SOLAPI_API_SECRET }}
@@ -112,6 +114,7 @@ jobs:
               --build-arg SOLAPI_API_SECRET=${{ secrets.SOLAPI_API_SECRET }} \
               --build-arg SOLAPI_FROM_NUMBER=${{ secrets.SOLAPI_FROM_NUMBER }} \
               --build-arg ML_API_BASE_URL=${{ secrets.ML_API_BASE_URL }} \
+              --build-arg FASTAPI_BASE_URL=${{ secrets.ML_API_BASE_URL }} \
               -t bideo .
             docker run -d -p 80:10000 --name bideo \
               -e EC2_HOST=${{ secrets.EC2_HOST }} \
@@ -141,6 +144,7 @@ jobs:
               -e SOLAPI_API_SECRET=${{ secrets.SOLAPI_API_SECRET }} \
               -e SOLAPI_FROM_NUMBER=${{ secrets.SOLAPI_FROM_NUMBER }} \
               -e ML_API_BASE_URL=${{ secrets.ML_API_BASE_URL }} \
+              -e FASTAPI_BASE_URL=${{ secrets.ML_API_BASE_URL }} \
               -e RABBITMQ_HOST=${{ secrets.RABBITMQ_HOST }} \
               -e RABBITMQ_PORT=${{ secrets.RABBITMQ_PORT }} \
               -e RABBITMQ_USER=${{ secrets.RABBITMQ_USER }} \

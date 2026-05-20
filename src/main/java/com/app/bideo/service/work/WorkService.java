@@ -57,7 +57,7 @@ public class WorkService {
     private final NotificationService notificationService;
     private final S3FileService s3FileService;
 
-    @Value("")
+    @Value("${fastapi.base-url}")
     private String fastApiBaseUrl;
 
     // 작품 등록 후 파일/태그까지 함께 저장한다.
@@ -469,7 +469,7 @@ public class WorkService {
         ));
     }
 
-    // 입력된 태그명은 기존 태그만 연결한다.
+    // 입력된 태그명은 없으면 생성한 뒤 연결한다.
     private List<Long> resolveTagIds(List<String> tagNames) {
         List<String> safeTagNames = tagNames == null ? Collections.emptyList() : tagNames;
 
@@ -477,7 +477,7 @@ public class WorkService {
                 .map(this::normalizeTagName)
                 .filter(Objects::nonNull)
                 .distinct()
-                .map(this::requireExistingTagId)
+                .map(this::findOrCreateTagId)
                 .toList();
     }
 
@@ -501,9 +501,13 @@ public class WorkService {
         return galleryId;
     }
 
-    private Long requireExistingTagId(String tagName) {
+    private Long findOrCreateTagId(String tagName) {
         return workDAO.findTagIdByName(tagName)
-                .orElseThrow(() -> new IllegalArgumentException("등록된 태그만 선택할 수 있습니다: " + tagName));
+                .orElseGet(() -> {
+                    workDAO.saveTagName(tagName);
+                    return workDAO.findTagIdByName(tagName)
+                            .orElseThrow(() -> new IllegalStateException("태그 저장에 실패했습니다: " + tagName));
+                });
     }
 
     private String normalizeTagKeyword(String keyword) {

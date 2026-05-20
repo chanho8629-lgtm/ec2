@@ -56,7 +56,7 @@ public class GalleryService {
     private final NotificationService notificationService;
     private final S3FileService s3FileService;
 
-    @Value("")
+    @Value("${fastapi.base-url}")
     private String fastApiBaseUrl;
 
     // 예술관 등록
