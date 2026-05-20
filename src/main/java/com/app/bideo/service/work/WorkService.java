@@ -27,6 +27,7 @@ import com.app.bideo.service.notification.NotificationService;
 import com.app.bideo.repository.gallery.GalleryDAO;
 import com.app.bideo.repository.work.WorkDAO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,7 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Transactional(rollbackFor = Exception.class)
+@Slf4j
 public class WorkService {
 
     private final WorkDAO workDAO;
@@ -394,26 +396,37 @@ public class WorkService {
     }
 
     private List<Long> callWorkRecommend(Long galleryId, String content, int limit) {
+        if (fastApiBaseUrl == null || fastApiBaseUrl.isBlank()) {
+            log.warn("FastAPI base URL is empty. Skip work recommendation for galleryId={}", galleryId);
+            return List.of();
+        }
+
         org.springframework.http.client.SimpleClientHttpRequestFactory factory =
                 new org.springframework.http.client.SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(java.time.Duration.ofSeconds(3));
         factory.setReadTimeout(java.time.Duration.ofSeconds(15));
 
-        WorkRecResp response = org.springframework.web.client.RestClient.builder()
-                .baseUrl(fastApiBaseUrl)
-                .requestFactory(factory)
-                .build()
-                .post()
-                .uri("/api/work/recommend")
-                .body(new WorkRecReq(galleryId, content, limit))
-                .retrieve()
-                .body(WorkRecResp.class);
+        try {
+            WorkRecResp response = org.springframework.web.client.RestClient.builder()
+                    .baseUrl(fastApiBaseUrl)
+                    .requestFactory(factory)
+                    .build()
+                    .post()
+                    .uri("/api/work/recommend")
+                    .body(new WorkRecReq(galleryId, content, limit))
+                    .retrieve()
+                    .body(WorkRecResp.class);
 
-        if (response == null || response.recommendations() == null) return List.of();
-        return response.recommendations().stream()
-                .map(WorkRecItem::id)
-                .filter(Objects::nonNull)
-                .toList();
+            if (response == null || response.recommendations() == null) return List.of();
+            return response.recommendations().stream()
+                    .map(WorkRecItem::id)
+                    .filter(Objects::nonNull)
+                    .toList();
+        } catch (RuntimeException exception) {
+            log.warn("FastAPI work recommendation failed. galleryId={}, baseUrl={}, message={}",
+                    galleryId, fastApiBaseUrl, exception.getMessage());
+            return List.of();
+        }
     }
 
     private record WorkRecReq(Long gallery_id, String content, int top_n) {}

@@ -57,6 +57,7 @@ public class SecurityConfig {
                                 "/error-page",
                                 "/api/search/**",
                                 "/api/auth/**",
+                                "/ws/**",
                                 "/oauth2/**",
                                 "/login/oauth2/**",
                                 "/css/**",
