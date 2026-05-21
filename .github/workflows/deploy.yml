@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    if: github.repository == 'bideo-ec2/ec2'
+    if: github.repository == 'chanho8629-lgtm/ec2'
     runs-on: ubuntu-24.04
 
     strategy:
@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          lfs: true
 
       - name: Set HOST env var from secrets
         run: |
