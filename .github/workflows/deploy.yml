@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: EC2_HOST1
@@ -19,6 +20,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          lfs: true
 
       - name: Set HOST env var from secrets
         run: |
@@ -61,10 +64,16 @@ jobs:
           echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H $HOST >> ~/.ssh/known_hosts
+          cat >> ~/.ssh/config << 'SSHCFG'
+          Host *
+            ServerAliveInterval 60
+            ServerAliveCountMax 20
+            ConnectTimeout 30
+          SSHCFG
 
       - name: Copy project to EC2
         run: |
-          rsync -avz --delete --delete-excluded \
+          rsync -az --delete --delete-excluded \
             --exclude='.git' \
             --exclude='.idea' \
             --exclude='.gradle' \
@@ -74,46 +83,9 @@ jobs:
             --exclude='.claude' \
             -e "ssh -i ~/.ssh/id_rsa" . ${{ secrets.EC2_USER }}@$HOST:/home/ubuntu/bideo
 
-      - name: Debug secret presence
-        run: |
-          echo "PSQL_PORT length: ${#X1}"
-          echo "PSQL_DATABASE length: ${#X2}"
-          echo "PSQL_USERNAME length: ${#X3}"
-          echo "PSQL_PASSWORD length: ${#X4}"
-          echo "REDIS_PORT length: ${#X5}"
-          echo "EC2_HOST length: ${#X6}"
-          echo "JWT_SECRET length: ${#X7}"
-          echo "AWS_BUCKET_NAME length: ${#A1}"  
-          echo "ML_API_BASE_URL length: ${#A2}"
-          echo "FASTAPI_BASE_URL length: ${#FASTAPI_BASE_URL}"
-          echo "BOOTPAY_JS_APPLICATION_ID length: ${#BOOTPAY_JS_APPLICATION_ID}"
-          echo "BOOTPAY_PRIVATE_KEY length: ${#A3}"
-          echo "BOOTPAY_REST_API_KEY length: ${#A4}"
-          echo "SOLAPI_API_SECRET length: ${#A5}"
-          echo "SPRING_MAIL_PASSWORD length: ${#A6}"
-          echo "EC2_USER length: ${#A7}"
-          echo "EC2_KEY length: ${#A8}"
-        
-        env:
-          X1: ${{ secrets.PSQL_PORT }}
-          X2: ${{ secrets.PSQL_DATABASE }}
-          X3: ${{ secrets.PSQL_USERNAME }}
-          X4: ${{ secrets.PSQL_PASSWORD }}
-          X5: ${{ secrets.REDIS_PORT }}
-          X6: ${{ secrets.EC2_HOST }}
-          X7: ${{ secrets.JWT_SECRET }}
-          A1: ${{ secrets.AWS_BUCKET_NAME }}
-          A2: ${{ secrets.ML_API_BASE_URL }}
-          A3: ${{ secrets.BOOTPAY_PRIVATE_KEY }}
-          A4: ${{ secrets.BOOTPAY_REST_API_KEY }}
-          A5: ${{ secrets.SOLAPI_API_SECRET }}
-          A6: ${{ secrets.SPRING_MAIL_PASSWORD }}
-          A7: ${{ secrets.EC2_USER }}
-          A8: ${{ secrets.EC2_KEY }}
-
       - name: Ensure DB schema and seed data
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@$HOST << EOF
+          ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=10 -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@$HOST << EOF
             cd /home/ubuntu/bideo
             PSQL_PORT=${{ secrets.PSQL_PORT }} \
             PSQL_DATABASE=${{ secrets.PSQL_DATABASE }} \
@@ -125,7 +97,7 @@ jobs:
 
       - name: Build & Run Docker on EC2
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@$HOST << EOF
+          ssh -o ServerAliveInterval=60 -o ServerAliveCountMax=20 -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@$HOST << EOF
             set -e
             cd /home/ubuntu/bideo
             docker system prune -a -f --volumes
@@ -245,7 +217,7 @@ jobs:
       - name: Clean up dangling images
         if: success()
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@$HOST << 'EOF'
+          ssh -o ServerAliveInterval=60 -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@$HOST << 'EOF'
             docker image prune -f
             docker container prune -f
           EOF
