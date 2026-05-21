@@ -22,17 +22,15 @@ if load_dotenv:
     load_dotenv()
 
 
-# 회귀 모델 파일 위치
-# 현재 모델은 ai/workspace/data-analysis/models에 있는 기존 pkl 파일을 그대로 사용한다.
-WORK_REGRESSOR_PATH = Path(r"C:\Users\chanh\Desktop\gb_jch\ai\workspace\data-analysis\models\bideo_regressor.pkl")
-WORK_REGRESSOR_FEATURES_PATH = Path(r"C:\Users\chanh\Desktop\gb_jch\ai\workspace\data-analysis\models\bideo_regressor_features.pkl")
+_MODELS_DIR = Path(__file__).resolve().parents[1] / "models"
 
-# 분류 모델 파일 위치
-# bideo-분류.ipynb에서 저장한 RandomForestClassifier, threshold, LabelEncoder를 그대로 사용한다.
-WORK_CLASSIFIER_PATH = Path(r"C:\Users\chanh\Desktop\gb_jch\ai\workspace\data-analysis\models\bideo_classifier.pkl")
-WORK_CLASSIFIER_FEATURES_PATH = Path(r"C:\Users\chanh\Desktop\gb_jch\ai\workspace\data-analysis\models\bideo_classifier_features.pkl")
-WORK_CLASSIFIER_THRESHOLD_PATH = Path(r"C:\Users\chanh\Desktop\gb_jch\ai\workspace\data-analysis\models\bideo_threshold.pkl")
-WORK_LABEL_ENCODERS_PATH = Path(r"C:\Users\chanh\Desktop\gb_jch\ai\workspace\data-analysis\models\bideo_label_encoders.pkl")
+WORK_REGRESSOR_PATH = _MODELS_DIR / "bideo_regressor.pkl"
+WORK_REGRESSOR_FEATURES_PATH = _MODELS_DIR / "bideo_regressor_features.pkl"
+
+WORK_CLASSIFIER_PATH = _MODELS_DIR / "bideo_classifier.pkl"
+WORK_CLASSIFIER_FEATURES_PATH = _MODELS_DIR / "bideo_classifier_features.pkl"
+WORK_CLASSIFIER_THRESHOLD_PATH = _MODELS_DIR / "bideo_threshold.pkl"
+WORK_LABEL_ENCODERS_PATH = _MODELS_DIR / "bideo_label_encoders.pkl"
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://bideo:1234@localhost:5432/bideo").strip()
 
 

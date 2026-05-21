@@ -1,6 +1,5 @@
 # 기본: 모든 텍스트 파일은 저장소에 LF로 저장, 체크아웃 시 OS 자동 변환
 * text=auto eol=lf
-
 # ===== 텍스트 파일 명시 =====
 *.java       text
 *.kt         text
@@ -27,16 +26,13 @@
 .gitignore     text
 .gitattributes text
 .editorconfig  text
-
 # ===== Unix 스크립트(LF 강제) =====
 *.sh    text eol=lf
 gradlew text eol=lf
-
 # ===== Windows 스크립트(CRLF 강제) =====
 *.bat text eol=crlf
 *.cmd text eol=crlf
 *.ps1 text eol=crlf
-
 # ===== 바이너리(변환 금지) =====
 *.jar   binary
 *.war   binary
@@ -50,7 +46,6 @@ gradlew text eol=lf
 *.gz    binary
 *.7z    binary
 *.rar   binary
-
 *.png  binary
 *.jpg  binary
 *.jpeg binary
@@ -58,7 +53,6 @@ gradlew text eol=lf
 *.bmp  binary
 *.ico  binary
 *.webp binary
-
 *.pdf  binary
 *.xls  binary
 *.xlsx binary
@@ -66,16 +60,14 @@ gradlew text eol=lf
 *.docx binary
 *.ppt  binary
 *.pptx binary
-
 *.mp3 binary
 *.mp4 binary
 *.mov binary
 *.wav binary
-
 *.woff  binary
 *.woff2 binary
 *.ttf   binary
 *.otf   binary
 *.eot   binary
-
 gradle/wrapper/gradle-wrapper.jar binary
+fastapi/basic/models/bideo_regressor.pkl filter=lfs diff=lfs merge=lfs -text
