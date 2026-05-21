@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    if: github.repository == 'chanho8629-lgtm/ec2'
+    if: github.repository == 'bideo-ec2/ec2'
     runs-on: ubuntu-24.04
 
     strategy:
