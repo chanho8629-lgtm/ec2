@@ -125,7 +125,7 @@ RUN apt-get update && \
 COPY --from=fastapi-runtime /usr/local /usr/local
 COPY --from=fastapi-runtime /opt/bideo-ai /opt/bideo-ai
 
-# JAR 및 FastAPI 코드 복사 (models/ 포함)
+# JAR 및 FastAPI 코드 복사 (models/는 .dockerignore 제외 → 볼륨 마운트로 주입)
 COPY --from=build /app/build/libs/bideo-0.0.1-SNAPSHOT.jar /app/app.jar
 COPY fastapi/basic/ /app/fastapi/basic/
 COPY scripts/docker/start-bideo.sh /app/start-bideo.sh

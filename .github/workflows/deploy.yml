@@ -211,7 +211,9 @@ jobs:
           ENVVARS
             sed -i 's/^[[:space:]]*//' /tmp/bideo.env
             chmod 600 /tmp/bideo.env
-            docker run -d -p 80:10000 --name bideo --add-host=host.docker.internal:host-gateway --env-file /tmp/bideo.env bideo:latest
+            docker run -d -p 80:10000 --name bideo --add-host=host.docker.internal:host-gateway --env-file /tmp/bideo.env \
+              -v /home/ubuntu/bideo/fastapi/basic/models:/app/fastapi/basic/models:ro \
+              bideo:latest
             docker exec bideo sh -c 'echo "FASTAPI_BASE_URL=$FASTAPI_BASE_URL"'
             docker exec bideo sh -c 'echo "BOOTPAY_JS_APPLICATION_ID length=${#BOOTPAY_JS_APPLICATION_ID}"'
             for i in \$(seq 1 30); do

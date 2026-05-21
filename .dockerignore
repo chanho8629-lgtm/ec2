@@ -17,3 +17,6 @@ docs
 src/main/resources/key
 src/main/resources/application*-secret.yaml
 src/main/resources/application*-local.yaml
+fastapi/basic/models/
+fastapi/basic/images/
+fastapi/basic/llm_workspace/
