@@ -148,23 +148,40 @@ function initializeWorkRegister() {
             panel.id = "work-ai-prediction";
             panel.innerHTML = [
                 '<div class="work-ai-prediction__header">',
-                '<div>',
-                '<div class="work-ai-prediction__eyebrow">Regression / Classification</div>',
-                '<div class="work-ai-prediction__title">작품 반응 예측</div>',
-                '<div class="work-ai-prediction__status" id="work-prediction-status">작성값 기준 예측 대기</div>',
+                '  <div>',
+                '    <div class="work-ai-prediction__eyebrow">AI · Regression / Classification</div>',
+                '    <div class="work-ai-prediction__status" id="work-prediction-status">작성값 기준 예측 대기</div>',
+                '  </div>',
+                '  <button type="button" class="work-ai-prediction__button" id="work-prediction-button">예측하기</button>',
                 '</div>',
-                '<button type="button" class="work-ai-prediction__button" id="work-prediction-button">예측하기</button>',
+                '<div class="work-ai-prediction__hero">',
+                '  <div>',
+                '    <span class="work-ai-prediction__views-label">예상 조회수</span>',
+                '    <strong id="work-regression-views" class="work-ai-prediction__views-value">-</strong>',
+                '  </div>',
+                '  <div class="work-ai-prediction__badges">',
+                '    <span id="work-prediction-grade" class="work-ai-prediction__grade-badge">-</span>',
+                '    <span id="work-classification-label" class="work-ai-prediction__class-badge">-</span>',
+                '  </div>',
+                '</div>',
+                '<div class="work-ai-prediction__prob">',
+                '  <div class="work-ai-prediction__prob-header">',
+                '    <span>고조회수 가능성</span>',
+                '    <strong id="work-classification-probability">-</strong>',
+                '  </div>',
+                '  <div class="work-ai-prediction__prob-track">',
+                '    <div class="work-ai-prediction__prob-fill" id="work-prob-fill"></div>',
+                '  </div>',
                 '</div>',
                 '<div class="work-ai-prediction__grid">',
-                '<div class="work-ai-prediction__item work-ai-prediction__item--primary"><span>예상 조회수</span><strong id="work-regression-views">-</strong></div>',
-                '<div class="work-ai-prediction__item work-ai-prediction__item--primary"><span>분류 결과</span><strong id="work-classification-label">-</strong></div>',
-                '<div class="work-ai-prediction__item"><span>고조회수 확률</span><strong id="work-classification-probability">-</strong></div>',
-                '<div class="work-ai-prediction__item"><span>예상 좋아요</span><strong id="work-prediction-likes">-</strong></div>',
-                '<div class="work-ai-prediction__item"><span>예상 댓글</span><strong id="work-prediction-comments">-</strong></div>',
-                '<div class="work-ai-prediction__item"><span>예상 공유</span><strong id="work-prediction-shares">-</strong></div>',
-                '<div class="work-ai-prediction__item"><span>예측 등급</span><strong id="work-prediction-grade">-</strong></div>',
-                '<div class="work-ai-prediction__item"><span>신뢰도</span><strong id="work-prediction-confidence">-</strong></div>',
-                '<div class="work-ai-prediction__item work-ai-prediction__item--wide"><span>모델 근거</span><strong id="work-prediction-signal">-</strong></div>',
+                '  <div class="work-ai-prediction__item"><span>예상 좋아요</span><strong id="work-prediction-likes">-</strong></div>',
+                '  <div class="work-ai-prediction__item"><span>예상 댓글</span><strong id="work-prediction-comments">-</strong></div>',
+                '  <div class="work-ai-prediction__item"><span>예상 공유</span><strong id="work-prediction-shares">-</strong></div>',
+                '  <div class="work-ai-prediction__item"><span>신뢰도</span><strong id="work-prediction-confidence">-</strong></div>',
+                '</div>',
+                '<div class="work-ai-prediction__signal" id="work-prediction-signal-wrap">',
+                '  <span>모델 근거</span>',
+                '  <p id="work-prediction-signal">-</p>',
                 '</div>'
             ].join("");
         }
@@ -1114,31 +1131,58 @@ function initializeWorkRegister() {
         lastPredictedPopular = Number(data.predictedPopular || 0);
         lastPredictedPopularProbability = Number(data.popularProbability || 0);
 
+        var probabilityPct = Math.round(lastPredictedPopularProbability * 1000) / 10;
+        var grade = data.predictionGrade || "-";
+        var label = data.predictedLabel || "-";
+
+        // 조회수
         if (workRegressionViews) {
             workRegressionViews.textContent = lastPredictedViews.toLocaleString("ko-KR") + "회";
         }
 
+        // 좋아요
         if (workPredictionLikes) {
             workPredictionLikes.textContent = lastPredictedLikes.toLocaleString("ko-KR") + "개";
         }
 
-        if (workClassificationLabel) {
-            workClassificationLabel.textContent = data.predictedLabel || "-";
-        }
-
+        // 확률 텍스트
         if (workClassificationProbability) {
-            workClassificationProbability.textContent = Math.round(lastPredictedPopularProbability * 1000) / 10 + "%";
+            workClassificationProbability.textContent = probabilityPct + "%";
         }
 
+        // 확률 바
+        var probFill = document.getElementById("work-prob-fill");
+        if (probFill) {
+            probFill.style.width = Math.min(probabilityPct, 100) + "%";
+        }
+
+        // 등급 뱃지
+        var gradeBadge = document.getElementById("work-prediction-grade");
+        if (gradeBadge) {
+            gradeBadge.textContent = grade;
+            var gradeKey = grade === "상위 노출 기대" ? "top"
+                : grade === "성장 가능" ? "good"
+                : grade === "보통" ? "mid" : "low";
+            gradeBadge.setAttribute("data-grade", gradeKey);
+        }
+
+        // 분류 뱃지
+        if (workClassificationLabel) {
+            workClassificationLabel.textContent = label;
+            workClassificationLabel.setAttribute("data-class", label === "고조회수" ? "high" : "low");
+        }
+
+        // 상태
         if (workPredictionStatus) {
             workPredictionStatus.textContent = "최근 작성값으로 계산됨";
         }
 
         setPredictionText("work-prediction-comments", Number(data.estimatedComments || 0).toLocaleString("ko-KR") + "개");
         setPredictionText("work-prediction-shares", Number(data.estimatedShares || 0).toLocaleString("ko-KR") + "회");
-        setPredictionText("work-prediction-grade", data.predictionGrade || "-");
         setPredictionText("work-prediction-confidence", Math.round(Number(data.confidence || 0) * 1000) / 10 + "%");
-        setPredictionText("work-prediction-signal", data.modelSignal || "-");
+
+        var signalEl = document.getElementById("work-prediction-signal");
+        if (signalEl) { signalEl.textContent = data.modelSignal || "-"; }
     }
 
     function setPredictionText(id, value) {
