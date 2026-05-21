@@ -128,7 +128,11 @@ jobs:
           ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USER }}@$HOST << EOF
             set -e
             cd /home/ubuntu/bideo
-            docker system prune -a -f
+            docker system prune -a -f --volumes
+            sudo journalctl --vacuum-size=50M 2>/dev/null || true
+            sudo apt-get clean 2>/dev/null || true
+            rm -rf /tmp/bideo.env 2>/dev/null || true
+            df -h /
             docker build --no-cache \
               --build-arg "EC2_HOST=${{ secrets.EC2_HOST }}" \
               --build-arg "PSQL_PORT=${{ secrets.PSQL_PORT }}" \

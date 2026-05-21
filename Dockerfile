@@ -85,11 +85,12 @@ ENV ML_API_BASE_URL=${ML_API_BASE_URL}
 ARG FASTAPI_BASE_URL
 ENV FASTAPI_BASE_URL=${FASTAPI_BASE_URL}
 
-# 작업 디렉토리 설정
 WORKDIR /app
 
-# 프로젝트 루트에 있는 파일을 컨테이너 안으로 복사해서 넣기
-COPY . .
+# Gradle 빌드에 필요한 파일만 복사 (pkl 등 불필요한 대용량 파일 제외)
+COPY build.gradle settings.gradle gradlew ./
+COPY gradle/ ./gradle/
+COPY src/ ./src/
 
 # 배포 이미지는 실행 JAR만 필요하므로 테스트는 CI/로컬 검증에서 수행한다.
 RUN chmod +x ./gradlew && \
@@ -104,10 +105,10 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends build-essential && \
     rm -rf /var/lib/apt/lists/*
 
-COPY --from=build /app/fastapi/basic/requirements-container.txt /app/fastapi/basic/requirements-container.txt
+COPY fastapi/basic/requirements-container.txt ./requirements-container.txt
 RUN python -m venv /opt/bideo-ai && \
     /opt/bideo-ai/bin/pip install --no-cache-dir --upgrade pip && \
-    /opt/bideo-ai/bin/pip install --no-cache-dir -r /app/fastapi/basic/requirements-container.txt
+    /opt/bideo-ai/bin/pip install --no-cache-dir -r ./requirements-container.txt
 
 # 실행은 기존 Java 17 JRE 이미지에서 한다.
 FROM eclipse-temurin:17-jre
@@ -124,9 +125,9 @@ RUN apt-get update && \
 COPY --from=fastapi-runtime /usr/local /usr/local
 COPY --from=fastapi-runtime /opt/bideo-ai /opt/bideo-ai
 
-# JAR 파일 복사
+# JAR 및 FastAPI 코드 복사 (models/ 포함)
 COPY --from=build /app/build/libs/bideo-0.0.1-SNAPSHOT.jar /app/app.jar
-COPY --from=build /app/fastapi/basic /app/fastapi/basic
+COPY fastapi/basic/ /app/fastapi/basic/
 COPY scripts/docker/start-bideo.sh /app/start-bideo.sh
 RUN chmod +x /app/start-bideo.sh
 
