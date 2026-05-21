@@ -853,7 +853,7 @@
             limit 1
         ) t_file on true
         where w.deleted_datetime is null
-          and w.status != 'DELETED'
+          and w.status = 'ACTIVE'
           and w.id in
           <foreach collection="ids" item="id" open="(" separator="," close=")">
               #{id}

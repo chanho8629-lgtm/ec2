@@ -1,3 +1,4 @@
+import random
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from fastapi import HTTPException
@@ -85,19 +86,31 @@ class WorkRecommendService:
 
         sim_scores  = cosine_similarity(query_mat, tfidf_mat)[0]
         top_n       = max(1, min(request.top_n, len(rows)))
-        top_indices = sim_scores.argsort()[::-1][:top_n]
 
-        recommendations = [
-            WorkRecommendItem(
-                id=int(rows[i]["id"]),
-                title=str(rows[i]["title"]),
-                viewCount=int(rows[i]["view_count"]),
-                likeCount=int(rows[i]["like_count"]),
-                similarity=float(sim_scores[i]),
-                memberNickname=rows[i]["member_nickname"] or "",
-                thumbnailUrl=rows[i]["thumbnail_url"] or "",
+        # 상위 pool(top_n × 3)에서 랜덤 섞어 추천 다양성 확보
+        pool_size   = min(top_n * 3, len(rows))
+        pool_indices = sim_scores.argsort()[::-1][:pool_size].tolist()
+        random.shuffle(pool_indices)
+        top_indices = pool_indices[:top_n]
+
+        # 중복 제거 (ID 기준)
+        seen_ids: set[int] = set()
+        recommendations = []
+        for i in top_indices:
+            work_id = int(rows[i]["id"])
+            if work_id in seen_ids:
+                continue
+            seen_ids.add(work_id)
+            recommendations.append(
+                WorkRecommendItem(
+                    id=work_id,
+                    title=str(rows[i]["title"]),
+                    viewCount=int(rows[i]["view_count"]),
+                    likeCount=int(rows[i]["like_count"]),
+                    similarity=float(sim_scores[i]),
+                    memberNickname=rows[i]["member_nickname"] or "",
+                    thumbnailUrl=rows[i]["thumbnail_url"] or "",
+                )
             )
-            for i in top_indices
-        ]
 
         return WorkRecommendResponse(recommendations=recommendations)

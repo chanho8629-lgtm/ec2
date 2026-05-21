@@ -388,7 +388,9 @@ public class WorkService {
         ).trim();
 
         // FastAPI POST /api/work/recommend 호출
-        List<Long> ids = callWorkRecommend(galleryId, content, limit);
+        List<Long> ids = callWorkRecommend(galleryId, content, limit).stream()
+                .distinct()
+                .toList();
         if (ids.isEmpty()) return List.of();
 
         List<WorkListResponseDTO> result = workDAO.findAllByIds(ids);
