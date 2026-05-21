@@ -14,9 +14,12 @@ out
 front
 ex
 docs
-src/main/resources/key
-src/main/resources/application*-secret.yaml
-src/main/resources/application*-local.yaml
+src/
+build.gradle
+settings.gradle
+gradlew
+gradlew.bat
+gradle/
 fastapi/basic/models/
 fastapi/basic/images/
 fastapi/basic/llm_workspace/
