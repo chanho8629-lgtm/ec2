@@ -25,11 +25,13 @@ select
 \i /sql/2026-05-13_work_ai_features.sql
 \i /sql/2026-05-13_fill_work_ai_features.sql
 \i /sql/2026-05-15_seed_tags_500.sql
+\i /sql/2026-05-15_seed_random_work_gallery_tags.sql
 
 create index if not exists idx_tag_lower_name on tbl_tag (lower(tag_name));
 
 select
     count(*) as tag_count,
+    count(*) filter (where tag_name like 'AI_%') as ai_tag_count,
     count(*) filter (where tag_name like '영상_%') as video_tag_count
 from tbl_tag;
 
