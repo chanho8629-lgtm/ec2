@@ -17,13 +17,18 @@
     <img src="https://img.shields.io/badge/PostgreSQL-Database-4169E1?logo=postgresql&logoColor=white" />
     <img src="https://img.shields.io/badge/AWS-EC2%20%7C%20S3-FF9900?logo=amazonaws&logoColor=white" />
   </p>
+
+  <img src="docs/images/bideo-main-page.png" width="100%" alt="BIDEO 메인 페이지" />
 </div>
 
 ---
 
 ## 🎯 기획 의도
 
-<img src="docs/images/gallery_cover_01.jpg" width="100%" alt="BIDEO Gallery Preview" />
+<div align="center">
+  <img src="docs/images/bideo-creator-problem-summary.png" width="49%" alt="BIDEO 창작자 문제 분석" />
+  <img src="docs/images/bideo-market-growth.png" width="49%" alt="BIDEO 시장 성장 분석" />
+</div>
 
 디지털 창작자는 작품을 공개하고 수익화할 수 있는 채널이 필요하지만, 일반적인 SNS는 전시·거래·정산 흐름이 분리되어 있습니다.<br>
 BIDEO는 창작자가 작품을 올리고, 사용자는 작품을 탐색·소장·입찰할 수 있도록 **콘텐츠 플랫폼과 커머스 기능을 하나로 연결**하는 것을 목표로 기획되었습니다.
@@ -47,8 +52,7 @@ BIDEO는 창작자가 작품을 올리고, 사용자는 작품을 탐색·소장
 ## ✨ 기대 효과
 
 <div align="center">
-  <img src="docs/images/gallery_cover_02.jpg" width="48%" alt="Gallery Cover 2" />
-  <img src="docs/images/gallery_cover_03.jpg" width="48%" alt="Gallery Cover 3" />
+  <img src="docs/images/bideo-intro-main.png" width="100%" alt="BIDEO 소개 메인 페이지" />
 </div>
 
 1. **🎨 창작자 성장 지원**
@@ -102,6 +106,17 @@ BIDEO는 창작자가 작품을 올리고, 사용자는 작품을 탐색·소장
 
 ## 🖼️ 화면 및 자료
 
+### 메인 페이지
+
+<img src="docs/images/bideo-main-page.png" width="100%" alt="BIDEO 메인 페이지 캡처" />
+
+### 작품 AI 분석 / 경매 인사이트
+
+<div align="center">
+  <img src="docs/images/bideo-ai-analysis-modal.png" width="49%" alt="BIDEO AI 작품 분석 모달" />
+  <img src="docs/images/bideo-auction-insight.png" width="49%" alt="BIDEO 경매 인사이트" />
+</div>
+
 ### 작품 샘플
 
 <div align="center">
@@ -127,6 +142,11 @@ BIDEO는 창작자가 작품을 올리고, 사용자는 작품을 탐색·소장
 ## 📊 데이터 분석 / AI 근거 자료
 
 본 프로젝트는 단순 CRUD가 아니라 작품 데이터를 분석하여 **예측·추천·경매 분석**에 활용합니다.
+
+<div align="center">
+  <img src="docs/images/bideo-usage-rate.png" width="49%" alt="BIDEO 사용률 분석" />
+  <img src="docs/images/bideo-mobile-content-core.png" width="49%" alt="BIDEO 모바일 콘텐츠 분석" />
+</div>
 
 | 자료 | 위치 | 활용 |
 |---|---|---|
