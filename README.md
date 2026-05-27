@@ -173,20 +173,46 @@ BIDEO는 창작자가 작품을 올리고, 사용자는 작품을 탐색·소장
 - `reaction_score`: 사용자 반응 합계
 - `short_video_score`: 숏폼 가중치
 
-### AI 처리 흐름
+### AI 예측 처리 순서
 
 ```mermaid
-flowchart LR
-    A[Spring Boot 작품 API] --> B[작품 메타데이터 수집]
-    B --> C[FastAPI /api/work/regression]
-    B --> D[FastAPI /api/work/classification]
-    B --> E[FastAPI /api/work/recommend]
-    C --> F[예상 조회수]
-    D --> G[인기 작품 가능성]
-    E --> H[유사 작품 추천]
-    F --> I[DB 예측 결과 저장]
-    G --> I
-    H --> J[작품/갤러리 추천 노출]
+sequenceDiagram
+    actor User as 사용자
+    participant WorkAPI as Spring Boot 작품 API
+    participant S3 as AWS S3
+    participant DB as PostgreSQL
+    participant FastAPI as FastAPI AI 서버
+    participant Model as ML/RAG 모델
+
+    User->>WorkAPI: 작품 등록 요청
+    WorkAPI->>S3: 이미지/영상 파일 업로드
+    S3-->>WorkAPI: 파일 URL 반환
+    WorkAPI->>DB: 작품 기본 정보 저장
+    WorkAPI->>WorkAPI: 제목/설명/태그/썸네일 피처 생성
+    WorkAPI->>FastAPI: /api/work/regression 조회수 예측 요청
+    FastAPI->>Model: 회귀 모델 실행
+    Model-->>FastAPI: 예상 조회수 반환
+    WorkAPI->>FastAPI: /api/work/classification 인기 분류 요청
+    FastAPI->>Model: 분류 모델 실행
+    Model-->>FastAPI: 인기 가능성 반환
+    FastAPI-->>WorkAPI: AI 분석 결과 반환
+    WorkAPI->>DB: 예측 조회수/인기 확률/품질 점수 저장
+    WorkAPI-->>User: 작품 등록 완료 및 분석 결과 표시
+```
+
+### 추천 처리 순서
+
+```mermaid
+flowchart TD
+    A[사용자 작품/갤러리 조회] --> B[Spring Boot 추천 요청]
+    B --> C[후보 작품 데이터 조회]
+    C --> D[FastAPI 추천 API 호출]
+    D --> E[제목 + 설명 + 태그 텍스트 벡터화]
+    E --> F[TF-IDF / Cosine Similarity 계산]
+    F --> G[유사도 높은 후보 정렬]
+    G --> H[이미 포함된 작품 제외]
+    H --> I[추천 작품/갤러리 반환]
+    I --> J[메인/상세/갤러리 화면 노출]
 ```
 
 ---
@@ -209,17 +235,198 @@ flowchart LR
 
 ```mermaid
 erDiagram
-    MEMBER ||--o{ WORK : creates
+    MEMBER {
+        bigint id PK
+        varchar email
+        varchar nickname
+        varchar role
+        datetime created_datetime
+    }
+
+    WORK {
+        bigint id PK
+        bigint member_id FK
+        varchar title
+        text description
+        bigint predicted_views
+        double predicted_popular_probability
+        datetime created_datetime
+    }
+
+    WORK_FILE {
+        bigint id PK
+        bigint work_id FK
+        text file_path
+        varchar file_type
+        int sort_order
+    }
+
+    TAG {
+        bigint id PK
+        varchar name
+        varchar type
+    }
+
+    WORK_TAG {
+        bigint work_id FK
+        bigint tag_id FK
+    }
+
+    GALLERY {
+        bigint id PK
+        bigint member_id FK
+        varchar title
+        text description
+    }
+
+    GALLERY_WORK {
+        bigint gallery_id FK
+        bigint work_id FK
+        int sort_order
+    }
+
+    CONTEST {
+        bigint id PK
+        bigint member_id FK
+        varchar title
+        datetime start_datetime
+        datetime end_datetime
+    }
+
+    CONTEST_ENTRY {
+        bigint id PK
+        bigint contest_id FK
+        bigint work_id FK
+        bigint member_id FK
+    }
+
+    AUCTION {
+        bigint id PK
+        bigint work_id FK
+        bigint seller_id FK
+        numeric start_price
+        numeric current_price
+        varchar status
+    }
+
+    BID {
+        bigint id PK
+        bigint auction_id FK
+        bigint bidder_id FK
+        numeric bid_price
+        datetime created_datetime
+    }
+
+    ORDERS {
+        bigint id PK
+        bigint member_id FK
+        bigint auction_id FK
+        numeric total_price
+        varchar status
+    }
+
+    PAYMENT {
+        bigint id PK
+        bigint order_id FK
+        varchar receipt_id
+        numeric paid_amount
+        varchar status
+    }
+
+    SETTLEMENT {
+        bigint id PK
+        bigint seller_id FK
+        bigint order_id FK
+        numeric settlement_amount
+        varchar status
+    }
+
+    COMMENT {
+        bigint id PK
+        bigint member_id FK
+        bigint target_id
+        varchar target_type
+        text content
+    }
+
+    BOOKMARK {
+        bigint id PK
+        bigint member_id FK
+        bigint work_id FK
+    }
+
+    MESSAGE_ROOM {
+        bigint id PK
+        datetime created_datetime
+    }
+
+    MESSAGE {
+        bigint id PK
+        bigint room_id FK
+        bigint sender_id FK
+        text content
+    }
+
+    REPORT {
+        bigint id PK
+        bigint reporter_id FK
+        bigint target_id
+        varchar target_type
+        varchar status
+    }
+
+    MEMBER ||--o{ WORK : registers
     MEMBER ||--o{ GALLERY : owns
-    MEMBER ||--o{ BID : places
+    MEMBER ||--o{ CONTEST : creates
+    MEMBER ||--o{ BID : bids
+    MEMBER ||--o{ ORDERS : orders
+    MEMBER ||--o{ COMMENT : writes
+    MEMBER ||--o{ BOOKMARK : saves
+    MEMBER ||--o{ REPORT : reports
+
     WORK ||--o{ WORK_FILE : has
     WORK ||--o{ WORK_TAG : tagged
+    TAG ||--o{ WORK_TAG : maps
     GALLERY ||--o{ GALLERY_WORK : contains
-    WORK ||--o{ AUCTION : listed
+    WORK ||--o{ GALLERY_WORK : displayed_in
+    CONTEST ||--o{ CONTEST_ENTRY : receives
+    WORK ||--o{ CONTEST_ENTRY : submitted
+
+    WORK ||--o| AUCTION : listed_as
     AUCTION ||--o{ BID : receives
-    ORDER ||--o{ PAYMENT : paid_by
+    AUCTION ||--o| ORDERS : closes_to
+    ORDERS ||--o| PAYMENT : paid_by
+    ORDERS ||--o| SETTLEMENT : settled_by
+
+    MESSAGE_ROOM ||--o{ MESSAGE : contains
     MEMBER ||--o{ MESSAGE : sends
-    MEMBER ||--o{ REPORT : reports
+```
+
+### 경매/결제 순서
+
+```mermaid
+sequenceDiagram
+    actor Seller as 판매자
+    actor Buyer as 입찰자
+    participant AuctionAPI as 경매 API
+    participant FastAPI as AI 경매 분석
+    participant DB as PostgreSQL
+    participant Payment as Bootpay
+    participant Admin as 관리자
+
+    Seller->>AuctionAPI: 작품 경매 등록
+    AuctionAPI->>FastAPI: 작품 기반 경매 분석 요청
+    FastAPI-->>AuctionAPI: 예상 낙찰가/입찰 추천/성공 가능성
+    AuctionAPI->>DB: 경매 정보와 AI 분석 결과 저장
+    Buyer->>AuctionAPI: 입찰 요청
+    AuctionAPI->>DB: 현재 최고가 검증
+    AuctionAPI->>DB: 입찰 내역 저장 및 최고가 갱신
+    AuctionAPI-->>Buyer: 입찰 결과 반환
+    AuctionAPI->>DB: 경매 마감 및 낙찰자 확정
+    Buyer->>Payment: 결제 요청
+    Payment-->>AuctionAPI: 결제 검증 결과
+    AuctionAPI->>DB: 주문/결제/정산 데이터 생성
+    Admin->>DB: 결제·정산·출금 상태 확인
 ```
 
 ---
@@ -230,17 +437,32 @@ BIDEO는 EC2에서 Docker 컨테이너로 실행되며, 하나의 이미지 안�
 
 ```mermaid
 flowchart TB
-    A[GitHub Actions] --> B[Gradle Build]
-    B --> C[Docker Image Build]
-    C --> D[AWS EC2 Deploy]
-    D --> E[Spring Boot :10000]
-    D --> F[FastAPI :8000]
-    E --> G[PostgreSQL]
-    E --> H[Redis]
-    E --> I[RabbitMQ]
-    E --> J[AWS S3]
-    E --> K[Bootpay / OAuth / SMTP]
+    A[GitHub Push] --> B[GitHub Actions]
+    B --> C[Gradle Test / Build]
+    C --> D[app.jar 생성]
+    B --> E[FastAPI requirements 설치]
+    D --> F[Docker Image Build]
     E --> F
+    F --> G[EC2로 이미지 배포]
+    G --> H[DB 스키마 보정 스크립트 실행]
+    H --> I[bideo 컨테이너 재시작]
+
+    subgraph EC2[bideo Docker Container]
+        J[Spring Boot :10000]
+        K[FastAPI Uvicorn :8000]
+        L[start-bideo.sh]
+        L --> J
+        L --> K
+        J --> K
+    end
+
+    I --> L
+    J --> M[(PostgreSQL)]
+    J --> N[(Redis Session/Cache)]
+    J --> O[(RabbitMQ)]
+    J --> P[AWS S3]
+    J --> Q[Bootpay]
+    J --> R[OAuth / SMTP / Solapi]
 ```
 
 ### 배포 핵심
