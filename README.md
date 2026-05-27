@@ -1,1 +1,430 @@
+# BIDEO
 
+<div align="center">
+  <img src="docs/images/logo.png" width="220" alt="BIDEO Logo" />
+
+  <h3>AI 기반 디지털 아트 전시·거래 플랫폼</h3>
+
+  <p>
+    <b>BIDEO</b>는 영상·이미지 작품을 등록하고, 갤러리로 전시하며,<br>
+    경매·결제·정산까지 연결하는 창작자 중심 디지털 아트 플랫폼입니다.
+  </p>
+
+  <p>
+    <img src="https://img.shields.io/badge/Spring%20Boot-3.5.10-6DB33F?logo=springboot&logoColor=white" />
+    <img src="https://img.shields.io/badge/Java-17-007396?logo=openjdk&logoColor=white" />
+    <img src="https://img.shields.io/badge/FastAPI-AI%20Server-009688?logo=fastapi&logoColor=white" />
+    <img src="https://img.shields.io/badge/PostgreSQL-Database-4169E1?logo=postgresql&logoColor=white" />
+    <img src="https://img.shields.io/badge/AWS-EC2%20%7C%20S3-FF9900?logo=amazonaws&logoColor=white" />
+  </p>
+</div>
+
+---
+
+## 🎯 기획 의도
+
+<img src="docs/images/gallery_cover_01.jpg" width="100%" alt="BIDEO Gallery Preview" />
+
+디지털 창작자는 작품을 공개하고 수익화할 수 있는 채널이 필요하지만, 일반적인 SNS는 전시·거래·정산 흐름이 분리되어 있습니다.<br>
+BIDEO는 창작자가 작품을 올리고, 사용자는 작품을 탐색·소장·입찰할 수 있도록 **콘텐츠 플랫폼과 커머스 기능을 하나로 연결**하는 것을 목표로 기획되었습니다.
+
+### 주요 기획 배경
+
+1. **창작자 수익화 채널 부족**
+   - 영상·이미지 작품은 노출은 가능하지만 실제 판매, 경매, 정산까지 이어지는 구조가 부족합니다.
+
+2. **작품 탐색 품질 개선 필요**
+   - 사용자가 원하는 작품을 찾기 위해 태그, 검색, 추천, 유사도 분석이 함께 동작해야 했습니다.
+
+3. **AI 기반 운영 자동화 필요**
+   - 작품 품질 점수, 예상 조회수, 인기 가능성, 경매 분석처럼 운영자가 수동으로 판단하기 어려운 영역을 AI로 보조했습니다.
+
+4. **안전한 거래와 관리자 기능 필요**
+   - 신고, 제재, 결제 검증, 출금 요청, 관리자 페이지를 통해 플랫폼 운영 안정성을 확보했습니다.
+
+---
+
+## ✨ 기대 효과
+
+<div align="center">
+  <img src="docs/images/gallery_cover_02.jpg" width="48%" alt="Gallery Cover 2" />
+  <img src="docs/images/gallery_cover_03.jpg" width="48%" alt="Gallery Cover 3" />
+</div>
+
+1. **🎨 창작자 성장 지원**
+   - 작품 등록, 갤러리 구성, 콘테스트 참여, 경매 판매를 통해 창작자가 포트폴리오와 수익화를 함께 관리할 수 있습니다.
+
+2. **📈 AI 기반 작품 분석**
+   - 조회수 예측, 인기 분류, 유사 작품 추천, 경매 RAG 분석으로 작품 운영과 거래 판단을 보조합니다.
+
+3. **💳 거래 신뢰성 확보**
+   - Bootpay 결제, 주문 관리, 정산·출금 요청, 관리자 검수 흐름을 통해 거래 이후까지 관리합니다.
+
+4. **🛡️ 운영 리스크 감소**
+   - 신고, 숨김, 차단, 회원 제재, 관리자 대시보드로 서비스 운영 중 발생할 수 있는 문제를 추적합니다.
+
+---
+
+## 🧩 주요 기능
+
+| 구분 | 기능 |
+|---|---|
+| **회원/인증** | 일반 로그인, OAuth2 로그인, JWT 인증, 이메일·휴대폰 인증, 비밀번호 재설정 |
+| **작품** | 작품 등록, 수정, 삭제, 상세 조회, 피드, 조회수, 좋아요, 댓글, 북마크 |
+| **갤러리** | 갤러리 생성, 작품 연결, 유사 갤러리 추천, 좋아요, 댓글 |
+| **콘테스트** | 콘테스트 목록, 상세, 작품 출품, 수상작 관리, 공유 |
+| **경매** | 작품 경매 등록, 입찰, 낙찰, 관심 경매, AI 경매 분석 |
+| **결제/정산** | Bootpay 결제, 주문 조회, 판매 내역, 정산, 출금 요청 |
+| **메시지** | 채팅방, 메시지 전송, 읽지 않은 메시지 수, 메시지 좋아요 |
+| **알림** | 알림 목록, 읽음 처리, 알림 설정 |
+| **관리자** | 회원, 작품, 경매, 결제, 신고, 제재, 문의, 출금 관리 |
+| **AI/분석** | 이미지 생성·분석, 조회수 회귀 예측, 인기 분류, 유사도 추천, 경매 RAG 분석 |
+
+---
+
+## 🛠️ 프로젝트 사용 기술
+
+| 구분 | 기술/도구 |
+|---|---|
+| **Backend** | Java 17, Spring Boot 3.5.10, Spring Security, JWT, MyBatis |
+| **Frontend** | Thymeleaf, HTML, CSS, JavaScript |
+| **AI Server** | FastAPI, Python 3.11, scikit-learn, pandas, numpy, TF-IDF, cosine similarity |
+| **RAG/LLM** | OpenAI API, RAGAnything, LightRAG |
+| **Database** | PostgreSQL, Redis |
+| **Message** | RabbitMQ, WebSocket |
+| **Storage** | AWS S3 |
+| **Infra** | AWS EC2, Docker, GitHub Actions |
+| **Payment** | Bootpay |
+| **API/Library** | Swagger UI, OAuth2 Client, Solapi, Gmail SMTP, Lombok |
+| **Test** | JUnit5, Spring Boot Test, MyBatis Test, Spring Security Test |
+
+---
+
+## 🖼️ 화면 및 자료
+
+### 작품 샘플
+
+<div align="center">
+  <img src="docs/images/work_001.png" width="15%" alt="work 001" />
+  <img src="docs/images/work_024.png" width="15%" alt="work 024" />
+  <img src="docs/images/work_066.png" width="15%" alt="work 066" />
+  <img src="docs/images/work_100.png" width="15%" alt="work 100" />
+  <img src="docs/images/work_150.png" width="15%" alt="work 150" />
+  <img src="docs/images/work_200.png" width="15%" alt="work 200" />
+</div>
+
+### 배지 시스템
+
+<div align="center">
+  <img src="docs/images/first_video_badge.png" width="120" alt="첫 영상 배지" />
+  <img src="docs/images/first_sell_badge.png" width="120" alt="첫 판매 배지" />
+  <img src="docs/images/contest_award_badge.png" width="120" alt="콘테스트 수상 배지" />
+  <img src="docs/images/auction_price_of_1_million_won_badge.png" width="120" alt="경매 100만원 배지" />
+</div>
+
+---
+
+## 📊 데이터 분석 / AI 근거 자료
+
+본 프로젝트는 단순 CRUD가 아니라 작품 데이터를 분석하여 **예측·추천·경매 분석**에 활용합니다.
+
+| 자료 | 위치 | 활용 |
+|---|---|---|
+| DB 전체 스키마 | `src/main/resources/sql/create_all_tables.sql` | 회원, 작품, 갤러리, 경매, 결제, 메시지, 관리자 테이블 설계 |
+| AI 피처 컬럼 추가 | `src/main/resources/sql/2026-05-13_work_ai_features.sql` | 작품 예측에 필요한 피처 저장 컬럼 추가 |
+| AI 피처 산출 SQL | `src/main/resources/sql/2026-05-13_fill_work_ai_features.sql` | 제목 길이, 설명 길이, 태그 수, 썸네일 여부, 반응 점수 계산 |
+| 태그/더미 데이터 | `src/main/resources/sql/2026-05-15_seed_tags_500.sql`, `seed_presentation_v3.sql` | 추천·검색·시연용 데이터 구성 |
+| 회귀/분류 모델 | `fastapi/basic/models/*.pkl` | 예상 조회수, 인기 가능성 예측 |
+| 추천 로직 | `fastapi/basic/service/work_recommend_service.py` | TF-IDF와 cosine similarity 기반 유사 작품 추천 |
+| 경매 RAG | `fastapi/basic/service/auction_rag_service.py` | 작품·경매 자료 기반 분석 리포트 생성 |
+
+### AI 분석 피처
+
+작품 등록 및 운영 데이터에서 다음 피처를 생성해 예측에 사용했습니다.
+
+- `title_length`: 제목 길이
+- `description_length`: 설명 길이
+- `tag_count`: 태그 수
+- `thumbnail_exists`: 썸네일 존재 여부
+- `is_ai_generated`: AI 생성 작품 여부
+- `ai_quality_score`: 품질 점수
+- `watch_completion_rate`: 추정 완주율
+- `engagement_score`: 좋아요·댓글·저장 기반 참여 점수
+- `reaction_score`: 사용자 반응 합계
+- `short_video_score`: 숏폼 가중치
+
+### AI 처리 흐름
+
+```mermaid
+flowchart LR
+    A[Spring Boot 작품 API] --> B[작품 메타데이터 수집]
+    B --> C[FastAPI /api/work/regression]
+    B --> D[FastAPI /api/work/classification]
+    B --> E[FastAPI /api/work/recommend]
+    C --> F[예상 조회수]
+    D --> G[인기 작품 가능성]
+    E --> H[유사 작품 추천]
+    F --> I[DB 예측 결과 저장]
+    G --> I
+    H --> J[작품/갤러리 추천 노출]
+```
+
+---
+
+## 🗂️ ERD / 데이터 모델
+
+전체 테이블은 `src/main/resources/sql/create_all_tables.sql` 기준으로 설계했습니다.
+
+| 도메인 | 주요 테이블 |
+|---|---|
+| **회원** | `tbl_member`, `tbl_oauth`, `tbl_follow`, `tbl_block`, `tbl_badge`, `tbl_member_badge` |
+| **작품** | `tbl_work`, `tbl_work_file`, `tbl_work_tag`, `tbl_work_view`, `tbl_work_like` |
+| **갤러리** | `tbl_gallery`, `tbl_gallery_tag`, `tbl_gallery_work`, `tbl_gallery_like` |
+| **콘테스트** | `tbl_contest`, `tbl_contest_tag`, `tbl_contest_entry` |
+| **상호작용** | `tbl_comment`, `tbl_comment_like`, `tbl_bookmark`, `tbl_like`, `tbl_hide` |
+| **경매** | `tbl_auction`, `tbl_bid`, `tbl_auction_wishlist` |
+| **결제/정산** | `tbl_order`, `tbl_payment`, `tbl_settlement`, `tbl_withdrawal_request` |
+| **메시지/알림** | `tbl_message_room`, `tbl_message`, `tbl_notification`, `tbl_notification_setting` |
+| **관리자** | `tbl_report`, `tbl_member_restriction`, `tbl_display_control`, `tbl_inquiry`, `tbl_faq` |
+
+```mermaid
+erDiagram
+    MEMBER ||--o{ WORK : creates
+    MEMBER ||--o{ GALLERY : owns
+    MEMBER ||--o{ BID : places
+    WORK ||--o{ WORK_FILE : has
+    WORK ||--o{ WORK_TAG : tagged
+    GALLERY ||--o{ GALLERY_WORK : contains
+    WORK ||--o{ AUCTION : listed
+    AUCTION ||--o{ BID : receives
+    ORDER ||--o{ PAYMENT : paid_by
+    MEMBER ||--o{ MESSAGE : sends
+    MEMBER ||--o{ REPORT : reports
+```
+
+---
+
+## 🚀 배포 구조
+
+BIDEO는 EC2에서 Docker 컨테이너로 실행되며, 하나의 이미지 안에서 Spring Boot와 FastAPI가 함께 동작합니다.
+
+```mermaid
+flowchart TB
+    A[GitHub Actions] --> B[Gradle Build]
+    B --> C[Docker Image Build]
+    C --> D[AWS EC2 Deploy]
+    D --> E[Spring Boot :10000]
+    D --> F[FastAPI :8000]
+    E --> G[PostgreSQL]
+    E --> H[Redis]
+    E --> I[RabbitMQ]
+    E --> J[AWS S3]
+    E --> K[Bootpay / OAuth / SMTP]
+    E --> F
+```
+
+### 배포 핵심
+
+- `Dockerfile`: Spring Boot JAR와 FastAPI 런타임을 하나의 이미지에 포함
+- `scripts/docker/start-bideo.sh`: Uvicorn과 Spring Boot를 같이 실행
+- `FASTAPI_BASE_URL`: 컨테이너 내부 기본값 `http://127.0.0.1:8000`
+- `.github/workflows/deploy.yml`: GitHub Actions 기반 EC2 배포
+- `scripts/deploy/ensure-db-schema.sh`: 배포 전 DB 스키마 보정
+
+---
+
+## ⚙️ 실행 방법
+
+### 1. 환경 변수
+
+`application.yml`은 민감 정보를 직접 저장하지 않고 환경 변수로 주입합니다.
+
+```bash
+EC2_HOST=
+PSQL_PORT=
+PSQL_DATABASE=
+PSQL_USERNAME=
+PSQL_PASSWORD=
+REDIS_PORT=
+RABBITMQ_HOST=
+RABBITMQ_PORT=
+RABBITMQ_USERNAME=
+RABBITMQ_PASSWORD=
+JWT_SECRET=
+AWS_ACCESS_KEY=
+AWS_SECRET_KEY=
+AWS_BUCKET_NAME=
+AWS_REGION=
+BOOTPAY_APPLICATION_ID=
+BOOTPAY_PRIVATE_KEY=
+FASTAPI_BASE_URL=
+```
+
+### 2. Spring Boot 실행
+
+```bash
+./gradlew bootRun
+```
+
+### 3. FastAPI 실행
+
+```bash
+cd fastapi/basic
+pip install -r requirements-container.txt
+uvicorn main:app --host 127.0.0.1 --port 8000
+```
+
+### 4. 접속
+
+- Spring Boot: `http://localhost:10000`
+- Swagger UI: `http://localhost:10000/swagger-ui/index.html`
+- FastAPI Health: `http://127.0.0.1:8000/api/health`
+
+---
+
+## 👨‍💻 담당 업무
+
+### 작품 / 갤러리
+
+- 작품 목록, 상세, 등록, 수정, 삭제
+- 작품 파일 업로드 및 S3 연동
+- 작품 좋아요, 댓글, 북마크, 조회수 처리
+- 갤러리 생성, 작품 연결, 유사 갤러리 추천
+
+### AI / 데이터 분석
+
+- 작품 조회수 회귀 예측 API 연동
+- 인기 작품 분류 API 연동
+- 작품·갤러리 유사도 추천
+- AI 분석용 피처 SQL 설계 및 데이터 보정
+- 경매 RAG 분석 흐름 구성
+
+### 거래 / 운영
+
+- 경매 등록, 입찰, 낙찰 흐름
+- Bootpay 결제 연동
+- 주문, 판매 내역, 정산, 출금 요청
+- 신고, 제재, 관리자 조회 기능
+
+### 인프라
+
+- AWS EC2 배포
+- AWS S3 파일 저장
+- Docker 기반 Spring Boot + FastAPI 통합 실행
+- GitHub Actions 배포 자동화
+
+---
+
+## 🔥 트러블슈팅
+
+### 1. Spring Boot와 FastAPI 호출 주소 문제
+
+#### 문제 상황
+
+Spring Boot에서 AI 예측 API를 호출할 때 로컬 개발 환경과 EC2 Docker 환경의 FastAPI 주소가 달라 호출 실패가 발생할 수 있었습니다.
+
+#### 원인
+
+EC2 배포에서는 Spring Boot와 FastAPI가 같은 컨테이너 안에서 실행되기 때문에 외부 도메인이 아니라 컨테이너 내부 주소로 호출해야 했습니다.
+
+#### 해결 방안
+
+- `FASTAPI_BASE_URL` 환경 변수를 도입했습니다.
+- Docker 실행 시 기본값을 `http://127.0.0.1:8000`으로 설정했습니다.
+- `scripts/docker/start-bideo.sh`에서 Uvicorn과 Spring Boot를 함께 실행하도록 구성했습니다.
+
+---
+
+### 2. AI 모델 입력 피처 불일치 문제
+
+#### 문제 상황
+
+작품 예측 모델은 학습 당시 사용한 피처 순서와 실제 API 입력 순서가 다르면 예측값이 불안정해질 수 있었습니다.
+
+#### 원인
+
+제목 길이, 설명 길이, 태그 수, 썸네일 여부, 품질 점수 등 여러 피처가 Java와 Python 사이에서 전달되기 때문에 필드 누락이나 순서 불일치 위험이 있었습니다.
+
+#### 해결 방안
+
+- `fastapi/basic/models/*features.pkl`에 학습 피처 목록을 저장했습니다.
+- FastAPI `WorkService`에서 모델과 피처 목록을 함께 로드해 입력 순서를 맞췄습니다.
+- `2026-05-13_work_ai_features.sql`로 DB에 예측 결과와 피처 컬럼을 명확히 분리했습니다.
+
+---
+
+### 3. EC2 DB 스키마 누락 문제
+
+#### 문제 상황
+
+로컬 개발 DB와 EC2 PostgreSQL의 스키마가 다르면 경매, 결제, 관리자 기능에서 컬럼 또는 테이블 누락 오류가 발생할 수 있었습니다.
+
+#### 원인
+
+프로젝트 후반에 경매, AI 피처, 관리자 컬럼이 추가되면서 기존 EC2 DB에 모든 변경사항이 반영되지 않을 가능성이 있었습니다.
+
+#### 해결 방안
+
+- `ensure_database_schema.sql`로 필수 스키마를 보정했습니다.
+- `2026-05-20_create_missing_auction_tables.sql`로 경매 관련 누락 테이블을 보완했습니다.
+- `scripts/deploy/ensure-db-schema.sh`를 통해 배포 과정에서 스키마 확인 흐름을 추가했습니다.
+
+---
+
+### 4. 파일 업로드와 S3 저장 안정성 문제
+
+#### 문제 상황
+
+작품 이미지·영상 파일과 프로필/배너 이미지가 함께 사용되면서 파일 URL 길이, 업로드 경로, 저장소 분리 문제가 발생할 수 있었습니다.
+
+#### 원인
+
+로컬 정적 파일과 S3 URL이 혼재되어 있고, 영상 파일은 이미지보다 크기 때문에 업로드 제한과 URL 컬럼 길이를 함께 고려해야 했습니다.
+
+#### 해결 방안
+
+- `S3FileService`로 파일 저장 책임을 분리했습니다.
+- `spring.servlet.multipart.max-file-size=100MB`로 대용량 업로드를 허용했습니다.
+- `alter_upload_columns_to_text.sql`로 업로드 URL 컬럼을 `text` 타입으로 보정했습니다.
+
+---
+
+## ✅ QA 테스트
+
+| 구분 | 테스트 내용 |
+|---|---|
+| 회원 | 회원가입, 로그인, OAuth 로그인, JWT 인증, 로그아웃 |
+| 작품 | 등록, 상세, 수정, 삭제, 파일 업로드, 좋아요, 댓글 |
+| 갤러리 | 갤러리 생성, 작품 연결, 상세 조회, 유사 추천 |
+| 경매 | 경매 등록, 입찰, 낙찰, 관심 경매 |
+| 결제 | Bootpay 결제 요청, 결제 검증, 주문 조회 |
+| AI | 조회수 예측, 인기 분류, 유사 작품 추천, 경매 분석 |
+| 관리자 | 회원 조회, 신고 처리, 작품 관리, 결제/출금 관리 |
+| 배포 | EC2 Docker 실행, FastAPI health check, DB 연결, S3 업로드 |
+
+---
+
+## 📌 총평
+
+### 좋았던 점
+
+- Spring Boot 기반 서비스에 FastAPI AI 서버를 결합하면서 백엔드와 데이터 분석 흐름을 함께 경험할 수 있었습니다.
+- 단순 게시판 구조가 아니라 작품, 갤러리, 콘테스트, 경매, 결제, 정산, 관리자까지 이어지는 서비스 흐름을 설계했습니다.
+- AWS EC2, S3, Docker, GitHub Actions를 사용해 실제 배포 환경에 가까운 구조를 구성했습니다.
+
+### 아쉬웠던 점
+
+- AI 모델과 DB 피처가 함께 변경되기 때문에 초기에 피처 버전 관리 기준을 더 명확히 잡았으면 유지보수가 쉬웠을 것 같습니다.
+- 경매와 결제는 예외 상황이 많아 테스트 케이스를 더 세분화할 필요가 있었습니다.
+- 관리자 기능은 운영 흐름과 직접 연결되므로 화면 단위 QA 기록을 더 체계적으로 남기는 것이 필요했습니다.
+
+### 배운 점
+
+- AI 모델은 예측 정확도뿐 아니라 서비스 DB 구조, API 입력값, 배포 환경까지 함께 맞아야 안정적으로 운영된다는 점을 배웠습니다.
+- 결제·정산·신고·제재처럼 운영 리스크가 있는 기능은 개발 초기부터 예외 흐름을 구체적으로 설계해야 한다는 점을 체감했습니다.
+- EC2 배포에서는 애플리케이션 실행뿐 아니라 DB 스키마, 환경 변수, 내부 API 주소, 파일 저장소까지 함께 검증해야 한다는 점을 확인했습니다.
+
+---
+
+**작성자:** 정찬호 &nbsp;&nbsp;&nbsp;&nbsp; **TEAM:** BIDEO<br>
+**기간:** 2026.04 ~ 2026.05
