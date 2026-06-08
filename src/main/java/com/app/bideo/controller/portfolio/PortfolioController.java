@@ -1,0 +1,144 @@
+package com.app.bideo.controller.portfolio;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
+
+@Controller
+@RequestMapping("/portfolio")
+public class PortfolioController {
+
+    @GetMapping("/flowchart")
+    public String flowchart(@RequestParam(defaultValue = "overview") String view,
+                            @RequestParam(defaultValue = "fixed") String capture,
+                            Model model) {
+        model.addAttribute("initialView", view);
+        model.addAttribute("captureMode", capture);
+        return "portfolio/flowchart";
+    }
+
+    @ResponseBody
+    @GetMapping("/api/flowchart")
+    public PortfolioFlowResponse flowchartData() {
+        return new PortfolioFlowResponse(
+                List.of(
+                        new PortfolioModule(
+                                "work",
+                                "Artwork CRUD + S3 Delivery",
+                                "A full artwork lifecycle from registration to public feed rendering.",
+                                "Backend",
+                                List.of(
+                                        new FlowStep("01", "Thymeleaf Form", "work-register.html collects metadata, media, tags, gallery, and auction options."),
+                                        new FlowStep("02", "Controller", "WorkAPIController.write binds multipart files and authenticated member id."),
+                                        new FlowStep("03", "Service Transaction", "WorkService validates ownership, saves WorkVO, and orchestrates files, tags, and auction setup."),
+                                        new FlowStep("04", "AWS S3", "S3FileService.upload(\"works\", file) stores media and keeps only the object key in PostgreSQL."),
+                                        new FlowStep("05", "MyBatis", "WorkMapper writes tbl_work, tbl_work_file, tbl_work_tag, tbl_gallery_work, and optional tbl_auction."),
+                                        new FlowStep("06", "Read Model", "WorkService.applyFileUrls converts S3 keys into presigned URLs for feed/detail responses.")
+                                )
+                        ),
+                        new PortfolioModule(
+                                "gallery",
+                                "Gallery CRUD + Curated Works",
+                                "Gallery cover upload, ownership validation, linked artwork curation, and presigned image delivery.",
+                                "UI/UX",
+                                List.of(
+                                        new FlowStep("01", "Gallery Form", "gallery-register.html handles cover file, selected works, and tags."),
+                                        new FlowStep("02", "Controller", "GalleryAPIController.write/update delegates authenticated member context."),
+                                        new FlowStep("03", "S3 Cover", "S3FileService.upload(\"galleries\", coverFile) returns a persistent coverImage key."),
+                                        new FlowStep("04", "Transactional Save", "GalleryService saves gallery metadata, work links, tag rows, and work count."),
+                                        new FlowStep("05", "Detail View", "GalleryService joins gallery, tags, and work thumbnails."),
+                                        new FlowStep("06", "Public Render", "The page receives presigned cover and thumbnail URLs without exposing bucket internals.")
+                                )
+                        ),
+                        new PortfolioModule(
+                                "payment",
+                                "Bootpay Payment Verification",
+                                "Server-side receipt verification before finalizing order, payment, and artwork status.",
+                                "Backend",
+                                List.of(
+                                        new FlowStep("01", "Client Payment", "pay.js starts Bootpay.requestPayment and receives receiptId."),
+                                        new FlowStep("02", "Confirm API", "PaymentAPIController.confirmBootpayPayment receives paymentId and receiptId."),
+                                        new FlowStep("03", "Receipt Lookup", "BootpayClient.getReceipt validates the PG receipt server-to-server."),
+                                        new FlowStep("04", "Guard Rails", "PaymentService checks price, status, order_id, buyer, and work consistency."),
+                                        new FlowStep("05", "Finalize", "paymentDAO.completePayment and orderDAO.updateStatus(\"PAID\") close the transaction."),
+                                        new FlowStep("06", "Inventory Update", "workDAO.updateStatus(\"SOLD\") and galleryDAO.deleteWorkLinkByWorkId remove sold work from galleries.")
+                                )
+                        ),
+                        new PortfolioModule(
+                                "auction",
+                                "Auction Bid + Scheduled Close",
+                                "Bid validation, winning-bid replacement, notification, and pending payment generation.",
+                                "Realtime",
+                                List.of(
+                                        new FlowStep("01", "Bid Request", "AuctionController.placeBid receives auctionId and bidPrice."),
+                                        new FlowStep("02", "Validation", "BidCommandService rejects inactive, expired, seller-owned, or below-minimum bids."),
+                                        new FlowStep("03", "Winning Bid", "bidDAO.clearPreviousWinning and bidDAO.save mark the current winner atomically."),
+                                        new FlowStep("04", "Current Price", "auctionDAO.updateCurrentPrice stores price and unique bidder count."),
+                                        new FlowStep("05", "Scheduler", "AuctionClosureService.closeExpiredAuctions closes expired auctions."),
+                                        new FlowStep("06", "Pending Payment", "The winner receives a generated order/payment and a WebSocket close event.")
+                                )
+                        )
+                ),
+                List.of(
+                        new AiUseCase("Price Regression", "FastAPI /api/work/regression predicts expected artwork price from metadata and visual quality features."),
+                        new AiUseCase("Style Classification", "FastAPI /api/work/classification classifies category/style to support registration and discovery."),
+                        new AiUseCase("Image Pipeline", "FastAPI /api/ai/image/pipeline generates or transforms a prompt image and uploads the result to S3."),
+                        new AiUseCase("Auction RAG", "AuctionRagService summarizes bid history and risk signals for auction decision support.")
+                ),
+                List.of(
+                        new TroubleshootingCase(
+                                "s3-url",
+                                "S3 object key was saved correctly, but the UI rendered the raw key instead of a presigned URL.",
+                                "Image preview broken on artwork detail. Network tab showed 404 because the browser requested works/demo.png from the app host.",
+                                "Moved URL conversion into WorkService.applyFileUrls and GalleryService list/detail responses.",
+                                "Verified feed, detail, gallery cover, and thumbnail rendering with presigned URLs."
+                        ),
+                        new TroubleshootingCase(
+                                "bootpay-receipt",
+                                "Client success callback was trusted before receipt validation.",
+                                "Payment looked complete in the browser while server state stayed PENDING after order_id mismatch.",
+                                "Changed confirm flow to call BootpayClient.getReceipt and compare amount, status, order_id, buyer, and work.",
+                                "Confirmed invalid receipt stays PENDING and valid receipt updates payment/order/work atomically."
+                        ),
+                        new TroubleshootingCase(
+                                "auction-race",
+                                "Multiple bidders could race around the current winning bid update.",
+                                "Two winning bids appeared during rapid manual bid testing.",
+                                "Wrapped BidCommandService.placeBid in a transaction and clears previous winning bid before saving the new one.",
+                                "Repeated parallel bid tests keep exactly one winning bid per auction."
+                        )
+                )
+        );
+    }
+
+    public record PortfolioFlowResponse(
+            List<PortfolioModule> modules,
+            List<AiUseCase> aiUseCases,
+            List<TroubleshootingCase> troubleshooting
+    ) {}
+
+    public record PortfolioModule(
+            String key,
+            String title,
+            String summary,
+            String lane,
+            List<FlowStep> steps
+    ) {}
+
+    public record FlowStep(String number, String title, String detail) {}
+
+    public record AiUseCase(String title, String detail) {}
+
+    public record TroubleshootingCase(
+            String key,
+            String title,
+            String before,
+            String fix,
+            String after
+    ) {}
+}

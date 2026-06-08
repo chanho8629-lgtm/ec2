@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{layout/layout :: ytShellHead('BIDEO | Portfolio Flowchart')}"></th:block>
+    <link rel="stylesheet" href="/css/common/reset.css" th:href="@{/css/common/reset.css}" />
+    <link rel="stylesheet" href="/css/common/global.css" th:href="@{/css/common/global.css}" />
+    <link rel="stylesheet" href="/css/common/util.css" th:href="@{/css/common/util.css}" />
+    <link rel="stylesheet" href="/css/common/common.css" th:href="@{/css/common/common.css}" />
+    <link rel="stylesheet" href="/css/portfolio/flowchart.css" th:href="@{/css/portfolio/flowchart.css}" />
+    <script defer src="/js/portfolio/flowchart.js" th:src="@{/js/portfolio/flowchart.js}"></script>
+</head>
+<body th:attr="data-initial-view=${initialView},data-capture-mode=${captureMode}">
+<div th:replace="~{layout/layout :: ytShellChrome('portfolio-flow')}"></div>
+<main class="bd-shell__page-content PortfolioFlow" id="main-content">
+    <section class="PortfolioFlow-Hero" aria-labelledby="portfolioTitle">
+        <div>
+            <p class="PortfolioFlow-Eyebrow">Portfolio System Flow</p>
+            <h1 id="portfolioTitle">BIDEO architecture, UI flow, AI usage, and troubleshooting evidence</h1>
+            <p class="PortfolioFlow-Lead">
+                A capture-ready project page for explaining Spring Boot, MyBatis, AWS S3, Bootpay, auctions, and FastAPI AI integration.
+            </p>
+        </div>
+        <aside class="PortfolioFlow-CapturePanel" aria-label="Capture mode">
+            <span class="PortfolioFlow-CaptureLabel">Capture Mode</span>
+            <div class="PortfolioFlow-CaptureControls" role="group" aria-label="Capture mode controls">
+                <a href="/portfolio/flowchart?capture=error" data-capture-link="error">Failure</a>
+                <a href="/portfolio/flowchart?capture=fixed" data-capture-link="fixed">Fixed</a>
+                <a href="/portfolio/flowchart?capture=overview" data-capture-link="overview">Overview</a>
+            </div>
+        </aside>
+    </section>
+
+    <nav class="PortfolioFlow-Tabs" aria-label="Portfolio flow sections">
+        <button type="button" class="is-active" data-flow-tab="overview">Overview</button>
+        <button type="button" data-flow-tab="backend">Backend</button>
+        <button type="button" data-flow-tab="ai">AI Usage</button>
+        <button type="button" data-flow-tab="troubleshooting">Troubleshooting</button>
+    </nav>
+
+    <section class="PortfolioFlow-Panel is-active" data-flow-panel="overview">
+        <div class="PortfolioFlow-Board" data-flow-board></div>
+    </section>
+
+    <section class="PortfolioFlow-Panel" data-flow-panel="backend" hidden>
+        <div class="PortfolioFlow-BackendGrid" data-backend-grid></div>
+    </section>
+
+    <section class="PortfolioFlow-Panel" data-flow-panel="ai" hidden>
+        <div class="PortfolioFlow-AI">
+            <div class="PortfolioFlow-AIHeader">
+                <h2>AI-assisted implementation notes</h2>
+                <p>These items show where AI was used as product functionality and where it helped development documentation.</p>
+            </div>
+            <div class="PortfolioFlow-AIGrid" data-ai-grid></div>
+            <div class="PortfolioFlow-PromptLog">
+                <h3>Prompt-to-implementation trace</h3>
+                <ol>
+                    <li>Mapped user-facing flows into backend service boundaries.</li>
+                    <li>Checked S3, Bootpay, auction, and FastAPI integration risks.</li>
+                    <li>Converted implementation details into capture-ready portfolio explanations.</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <section class="PortfolioFlow-Panel" data-flow-panel="troubleshooting" hidden>
+        <div class="PortfolioFlow-TroubleShell">
+            <div class="PortfolioFlow-TroubleList" data-trouble-list></div>
+            <article class="PortfolioFlow-TroubleCapture" data-trouble-capture>
+                <header>
+                    <span data-capture-status>Fixed Evidence</span>
+                    <h2 data-capture-title>Portfolio troubleshooting capture</h2>
+                </header>
+                <div class="PortfolioFlow-Terminal" data-capture-terminal></div>
+                <dl class="PortfolioFlow-FixGrid">
+                    <div>
+                        <dt>Before</dt>
+                        <dd data-capture-before></dd>
+                    </div>
+                    <div>
+                        <dt>Fix</dt>
+                        <dd data-capture-fix></dd>
+                    </div>
+                    <div>
+                        <dt>After</dt>
+                        <dd data-capture-after></dd>
+                    </div>
+                </dl>
+            </article>
+        </div>
+    </section>
+</main>
+<th:block th:replace="~{layout/layout :: ytShellScripts()}"></th:block>
+</body>
+</html>

@@ -1,0 +1,494 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.PortfolioFlow {
+  min-width: 0;
+  padding-top: 80px;
+  padding-right: clamp(16px, 3vw, 36px);
+  padding-bottom: 56px;
+  padding-left: calc(240px + clamp(16px, 3vw, 36px));
+  background: #ffffff;
+  color: #111111;
+}
+
+.PortfolioFlow-Hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 28px;
+  align-items: end;
+  max-width: 1320px;
+  margin: 0 auto 22px;
+  padding: 22px 0 18px;
+  border-bottom: 1px solid #d8d8d8;
+}
+
+.PortfolioFlow-Eyebrow,
+.PortfolioFlow-CaptureLabel {
+  display: block;
+  margin: 0 0 8px;
+  color: #606060;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.PortfolioFlow-Hero h1 {
+  max-width: 920px;
+  margin: 0;
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.08;
+  font-weight: 750;
+  letter-spacing: 0;
+}
+
+.PortfolioFlow-Lead {
+  max-width: 820px;
+  margin: 14px 0 0;
+  color: #4d4d4d;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.PortfolioFlow-CapturePanel {
+  border: 1px solid #d6d6d6;
+  background: #fafafa;
+  padding: 16px;
+}
+
+.PortfolioFlow-CaptureControls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.PortfolioFlow-CaptureControls a,
+.PortfolioFlow-Tabs button {
+  min-height: 38px;
+  border: 1px solid #d0d0d0;
+  background: #ffffff;
+  color: #111111;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.PortfolioFlow-CaptureControls a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.PortfolioFlow-CaptureControls a.is-active,
+.PortfolioFlow-Tabs button.is-active {
+  border-color: #111111;
+  background: #111111;
+  color: #ffffff;
+}
+
+.PortfolioFlow-Tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-width: 1320px;
+  margin: 0 auto 22px;
+}
+
+.PortfolioFlow-Tabs button {
+  padding: 0 16px;
+}
+
+.PortfolioFlow-Panel {
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.PortfolioFlow-Board {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.PortfolioFlow-Module {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 520px;
+  border: 1px solid #cfcfcf;
+  background: #ffffff;
+}
+
+.PortfolioFlow-ModuleHeader {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  min-height: 82px;
+  border-bottom: 1px solid #cfcfcf;
+}
+
+.PortfolioFlow-Lane {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  border-right: 1px solid #cfcfcf;
+  background: #f2f2f2;
+  color: #111111;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.PortfolioFlow-ModuleTitle {
+  padding: 14px 18px;
+}
+
+.PortfolioFlow-ModuleTitle h2,
+.PortfolioFlow-AIHeader h2,
+.PortfolioFlow-TroubleCapture h2 {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 750;
+  letter-spacing: 0;
+}
+
+.PortfolioFlow-ModuleTitle p,
+.PortfolioFlow-AIHeader p {
+  margin: 6px 0 0;
+  color: #5f6368;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.PortfolioFlow-Steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  padding: 18px;
+}
+
+.PortfolioFlow-Step {
+  position: relative;
+  min-height: 132px;
+  padding: 0 12px 16px;
+}
+
+.PortfolioFlow-StepBox {
+  min-height: 104px;
+  border: 2px solid #3f3f3f;
+  background: #ffffff;
+  padding: 12px;
+}
+
+.PortfolioFlow-StepNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 26px;
+  margin-bottom: 8px;
+  background: #d9d9d9;
+  border: 1px solid #3f3f3f;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.PortfolioFlow-StepTitle {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.PortfolioFlow-StepDetail {
+  margin: 0;
+  color: #4b4b4b;
+  font-size: 12px;
+  line-height: 1.42;
+}
+
+.PortfolioFlow-Step::after {
+  content: "";
+  position: absolute;
+  top: 52px;
+  right: -9px;
+  width: 18px;
+  height: 2px;
+  background: #3f3f3f;
+}
+
+.PortfolioFlow-Step::before {
+  content: "";
+  position: absolute;
+  top: 47px;
+  right: -13px;
+  width: 0;
+  height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 8px solid #3f3f3f;
+}
+
+.PortfolioFlow-Step:nth-child(3n)::after,
+.PortfolioFlow-Step:nth-child(3n)::before,
+.PortfolioFlow-Step:last-child::after,
+.PortfolioFlow-Step:last-child::before {
+  display: none;
+}
+
+.PortfolioFlow-BackendGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid #cfcfcf;
+}
+
+.PortfolioFlow-BackendColumn {
+  min-height: 520px;
+  border-right: 1px solid #cfcfcf;
+  background: #ffffff;
+}
+
+.PortfolioFlow-BackendColumn:last-child {
+  border-right: 0;
+}
+
+.PortfolioFlow-BackendColumn h2 {
+  margin: 0;
+  min-height: 58px;
+  padding: 16px;
+  background: #d9d9d9;
+  border-bottom: 1px solid #bdbdbd;
+  font-size: 16px;
+}
+
+.PortfolioFlow-BackendColumn ol {
+  list-style: none;
+  margin: 0;
+  padding: 18px;
+}
+
+.PortfolioFlow-BackendColumn li {
+  position: relative;
+  margin-bottom: 26px;
+  border: 2px solid #3f3f3f;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.PortfolioFlow-BackendColumn li::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -22px;
+  width: 2px;
+  height: 20px;
+  background: #3f3f3f;
+}
+
+.PortfolioFlow-BackendColumn li:last-child::after {
+  display: none;
+}
+
+.PortfolioFlow-AI {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 18px;
+}
+
+.PortfolioFlow-AIHeader,
+.PortfolioFlow-PromptLog {
+  border: 1px solid #cfcfcf;
+  padding: 18px;
+  background: #ffffff;
+}
+
+.PortfolioFlow-AIHeader {
+  grid-column: 1 / -1;
+}
+
+.PortfolioFlow-AIGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.PortfolioFlow-AICard {
+  min-height: 150px;
+  border: 1px solid #cfcfcf;
+  padding: 18px;
+  background: #ffffff;
+}
+
+.PortfolioFlow-AICard h3,
+.PortfolioFlow-PromptLog h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+
+.PortfolioFlow-AICard p,
+.PortfolioFlow-PromptLog li {
+  margin: 0;
+  color: #4d4d4d;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.PortfolioFlow-PromptLog ol {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.PortfolioFlow-TroubleShell {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 18px;
+}
+
+.PortfolioFlow-TroubleList {
+  display: grid;
+  gap: 12px;
+  align-self: start;
+}
+
+.PortfolioFlow-TroubleButton {
+  min-height: 92px;
+  border: 1px solid #cfcfcf;
+  background: #ffffff;
+  padding: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.PortfolioFlow-TroubleButton.is-active {
+  border-color: #111111;
+  box-shadow: inset 4px 0 0 #111111;
+}
+
+.PortfolioFlow-TroubleButton strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.PortfolioFlow-TroubleButton span {
+  color: #5f6368;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.PortfolioFlow-TroubleCapture {
+  min-height: 560px;
+  border: 1px solid #cfcfcf;
+  background: #ffffff;
+  padding: 18px;
+}
+
+.PortfolioFlow-TroubleCapture header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.PortfolioFlow-TroubleCapture header span {
+  flex: 0 0 auto;
+  border: 1px solid #111111;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.PortfolioFlow-Terminal {
+  min-height: 180px;
+  border: 1px solid #2b2b2b;
+  background: #111111;
+  color: #f4f4f4;
+  padding: 16px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.PortfolioFlow-Terminal.is-error {
+  border-color: #b3261e;
+  background: #2a0c0c;
+}
+
+.PortfolioFlow-Terminal.is-fixed {
+  border-color: #146c2e;
+  background: #0d2415;
+}
+
+.PortfolioFlow-FixGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0 0;
+}
+
+.PortfolioFlow-FixGrid div {
+  border: 1px solid #cfcfcf;
+  padding: 14px;
+}
+
+.PortfolioFlow-FixGrid dt {
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.PortfolioFlow-FixGrid dd {
+  margin: 0;
+  color: #4d4d4d;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+@media (max-width: 1100px) {
+  .PortfolioFlow-Hero,
+  .PortfolioFlow-AI,
+  .PortfolioFlow-TroubleShell {
+    grid-template-columns: 1fr;
+  }
+
+  .PortfolioFlow-Board,
+  .PortfolioFlow-AIGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .PortfolioFlow-BackendGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .PortfolioFlow {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .PortfolioFlow-Hero h1 {
+    font-size: 30px;
+  }
+
+  .PortfolioFlow-Steps,
+  .PortfolioFlow-BackendGrid,
+  .PortfolioFlow-FixGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .PortfolioFlow-Step::after,
+  .PortfolioFlow-Step::before {
+    display: none;
+  }
+}

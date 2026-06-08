@@ -27,12 +27,20 @@ public class LayoutDataAdvice {
         if (memberId == null) {
             return Collections.emptyList();
         }
-        return followService.getFollowings(memberId, memberId, 0);
+        try {
+            return followService.getFollowings(memberId, memberId, 0);
+        } catch (Exception ignored) {
+            return Collections.emptyList();
+        }
     }
 
     @ModelAttribute("popularTags")
     public List<TagResponseDTO> popularTags() {
-        return galleryDAO.findPopularTags(10);
+        try {
+            return galleryDAO.findPopularTags(10);
+        } catch (Exception ignored) {
+            return Collections.emptyList();
+        }
     }
 
     private Long getCurrentMemberId() {
