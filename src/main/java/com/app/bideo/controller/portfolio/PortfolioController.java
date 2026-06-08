@@ -27,6 +27,50 @@ public class PortfolioController {
     public PortfolioFlowResponse flowchartData() {
         return new PortfolioFlowResponse(
                 List.of(
+                        new PlanningInsight(
+                                "Creator-first artwork commerce",
+                                "The service was planned around creators who need one place to upload a work, present it in a gallery, sell it immediately, or open an auction without moving between separate tools.",
+                                "A single registration flow had to connect metadata, media upload, tags, gallery exposure, sale status, and optional auction creation."
+                        ),
+                        new PlanningInsight(
+                                "Trust before payment completion",
+                                "Because art purchases and auction wins affect ownership state, the payment flow cannot rely on a browser success callback alone.",
+                                "Bootpay receipt verification, order validation, work status updates, and gallery link cleanup were placed in the backend transaction boundary."
+                        ),
+                        new PlanningInsight(
+                                "Portfolio evidence over feature listing",
+                                "The portfolio page was designed to show implementation decisions, failure reproduction, fix evidence, and final verification instead of only listing screens.",
+                                "The capture modes separate failure screenshots from fixed screenshots so troubleshooting can be explained step by step."
+                        ),
+                        new PlanningInsight(
+                                "AI as a workflow assistant",
+                                "AI was positioned as support for registration quality, classification, image generation, auction analysis, and documentation rather than as a standalone gimmick.",
+                                "FastAPI integrations are shown next to the Spring Boot flow so evaluators can see where model output enters the product."
+                        )
+                ),
+                List.of(
+                        new ImageEvidence(
+                                "/images/portfolio/planning-curation.png",
+                                "Curated gallery commerce",
+                                "Explains the main planning idea: one uploaded work should become a curated gallery item and a commercial artwork without duplicate registration."
+                        ),
+                        new ImageEvidence(
+                                "/images/portfolio/planning-upload.png",
+                                "Artwork upload to gallery",
+                                "Shows why upload, artwork metadata, gallery selection, and image presentation were planned as one creator workflow."
+                        ),
+                        new ImageEvidence(
+                                "/images/portfolio/planning-discovery.png",
+                                "Discovery and recommendation",
+                                "Supports the requirement that works need tags, search surfaces, similar works, and AI-backed discovery after registration."
+                        ),
+                        new ImageEvidence(
+                                "/images/portfolio/planning-commerce-s3.png",
+                                "Auction, payment, and S3 state",
+                                "Combines the transaction-heavy part of the plan: winning bid, receipt verification, database update, and secure image delivery."
+                        )
+                ),
+                List.of(
                         new PortfolioModule(
                                 "work",
                                 "Artwork CRUD + S3 Delivery",
@@ -117,10 +161,16 @@ public class PortfolioController {
     }
 
     public record PortfolioFlowResponse(
+            List<PlanningInsight> planningInsights,
+            List<ImageEvidence> imageEvidence,
             List<PortfolioModule> modules,
             List<AiUseCase> aiUseCases,
             List<TroubleshootingCase> troubleshooting
     ) {}
+
+    public record PlanningInsight(String title, String analysis, String implementationDecision) {}
+
+    public record ImageEvidence(String imageUrl, String title, String analysis) {}
 
     public record PortfolioModule(
             String key,

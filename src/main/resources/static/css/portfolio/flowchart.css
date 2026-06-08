@@ -14,6 +14,11 @@
   color: #111111;
 }
 
+body:has(.PortfolioFlow) .bd-chat-fab,
+body:has(.PortfolioFlow) .bd-chat-layer {
+  display: none !important;
+}
+
 .PortfolioFlow-Hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
@@ -106,6 +111,127 @@
 .PortfolioFlow-Panel {
   max-width: 1320px;
   margin: 0 auto;
+}
+
+.PortfolioFlow-Planning {
+  display: grid;
+  gap: 18px;
+}
+
+.PortfolioFlow-PlanningIntro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 480px);
+  gap: 24px;
+  align-items: end;
+  border: 1px solid #cfcfcf;
+  background: #ffffff;
+  padding: 22px;
+}
+
+.PortfolioFlow-PlanningIntro h2 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.18;
+  font-weight: 760;
+  letter-spacing: 0;
+}
+
+.PortfolioFlow-PlanningIntro p:last-child {
+  margin: 0;
+  color: #444444;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.PortfolioFlow-PlanningGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.PortfolioFlow-PlanningCard {
+  min-height: 228px;
+  border: 1px solid #cfcfcf;
+  background: #ffffff;
+  padding: 16px 18px;
+}
+
+.PortfolioFlow-PlanningNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 30px;
+  margin-bottom: 12px;
+  border: 1px solid #111111;
+  background: #f2f2f2;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.PortfolioFlow-PlanningCard h3 {
+  margin: 0 0 10px;
+  font-size: 17px;
+  line-height: 1.24;
+  font-weight: 750;
+}
+
+.PortfolioFlow-PlanningCard p {
+  margin: 0;
+  color: #4d4d4d;
+  font-size: 13px;
+  line-height: 1.48;
+}
+
+.PortfolioFlow-Decision {
+  display: block;
+  margin: 12px 0 6px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.PortfolioFlow-DecisionText {
+  color: #2f2f2f;
+}
+
+.PortfolioFlow-ImageEvidence {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.PortfolioFlow-ImageCard {
+  margin: 0;
+  border: 1px solid #cfcfcf;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.PortfolioFlow-ImageCard img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  background: #eeeeee;
+}
+
+.PortfolioFlow-ImageCard figcaption {
+  display: grid;
+  gap: 7px;
+  min-height: 104px;
+  padding: 14px;
+}
+
+.PortfolioFlow-ImageCard strong {
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.PortfolioFlow-ImageCard span {
+  color: #4d4d4d;
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .PortfolioFlow-Board {
@@ -456,12 +582,15 @@
 
 @media (max-width: 1100px) {
   .PortfolioFlow-Hero,
+  .PortfolioFlow-PlanningIntro,
   .PortfolioFlow-AI,
   .PortfolioFlow-TroubleShell {
     grid-template-columns: 1fr;
   }
 
   .PortfolioFlow-Board,
+  .PortfolioFlow-PlanningGrid,
+  .PortfolioFlow-ImageEvidence,
   .PortfolioFlow-AIGrid {
     grid-template-columns: 1fr;
   }
