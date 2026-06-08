@@ -23,6 +23,24 @@
 
 ---
 
+## 목차
+
+- [기획 의도](#-기획-의도)
+- [기대 효과](#-기대-효과)
+- [주요 기능](#-주요-기능)
+- [기능 구현 상세](#-기능-구현-상세)
+- [프로젝트 사용 기술](#️-프로젝트-사용-기술)
+- [화면 및 자료](#️-화면-및-자료)
+- [데이터 분석 / AI 근거 자료](#-데이터-분석--ai-근거-자료)
+- [ERD / 데이터 모델](#️-erd--데이터-모델)
+- [배포 구조](#-배포-구조)
+- [실행 방법](#️-실행-방법)
+- [담당 업무](#-담당-업무)
+- [트러블슈팅](#-트러블슈팅)
+- [QA 테스트](#-qa-테스트)
+
+---
+
 ## 🎯 기획 의도
 
 <div align="center">
@@ -73,16 +91,73 @@ BIDEO는 창작자가 작품을 올리고, 사용자는 작품을 탐색·소장
 
 | 구분 | 기능 |
 |---|---|
-| **회원/인증** | 일반 로그인, OAuth2 로그인, JWT 인증, 이메일·휴대폰 인증, 비밀번호 재설정 |
-| **작품** | 작품 등록, 수정, 삭제, 상세 조회, 피드, 조회수, 좋아요, 댓글, 북마크 |
-| **갤러리** | 갤러리 생성, 작품 연결, 유사 갤러리 추천, 좋아요, 댓글 |
-| **콘테스트** | 콘테스트 목록, 상세, 작품 출품, 수상작 관리, 공유 |
-| **경매** | 작품 경매 등록, 입찰, 낙찰, 관심 경매, AI 경매 분석 |
-| **결제/정산** | Bootpay 결제, 주문 조회, 판매 내역, 정산, 출금 요청 |
-| **메시지** | 채팅방, 메시지 전송, 읽지 않은 메시지 수, 메시지 좋아요 |
-| **알림** | 알림 목록, 읽음 처리, 알림 설정 |
-| **관리자** | 회원, 작품, 경매, 결제, 신고, 제재, 문의, 출금 관리 |
-| **AI/분석** | 이미지 생성·분석, 조회수 회귀 예측, 인기 분류, 유사도 추천, 경매 RAG 분석 |
+| **회원/인증** | 일반 회원가입/로그인, OAuth2 로그인, JWT 인증, Redis Refresh Token 검증, 이메일/휴대폰 인증, 비밀번호 재설정, 관리자 로그인 |
+| **프로필/소셜** | 프로필/배너 이미지 S3 업로드, 닉네임 수정, 팔로우/팔로워/팔로잉, 차단/차단 해제, 뱃지 조회 |
+| **작품** | 작품 등록, 수정, 삭제, 상세 조회, 피드 조회, 파일 업로드, S3 URL 변환, 태그, 조회수, 좋아요, 댓글, 북마크, 다운로드 |
+| **갤러리** | 갤러리 생성, 수정, 삭제, 목록/상세 조회, 커버 이미지 업로드, 작품 연결, 태그, 좋아요, 댓글, 유사 갤러리/작품 추천 |
+| **콘테스트** | 콘테스트 목록, 상세, 등록/수정, 작품 출품, 수상작 선정, 내 공모전/내 출품작 조회, 공유 |
+| **검색/탐색** | 통합 검색, 최근 검색어 저장, 인기 검색어, 추천 검색어, 작품/갤러리/태그 기반 탐색 |
+| **경매** | 작품 경매 등록, 경매 조회, 입찰, 최고가 갱신, 관심 경매, 경매 마감 스케줄러, 낙찰자 주문/결제 생성, AI 경매 분석 |
+| **결제/주문/정산** | Bootpay 결제 요청, 서버 영수증 검증, 주문 조회, 구매/판매 내역, 카드 등록, 정산, 출금 요청 |
+| **메시지/알림** | WebSocket/STOMP 채팅, RabbitMQ 메시지 중계, 채팅방, 메시지 전송, 읽지 않은 메시지 수, 메시지 좋아요, 알림 목록/설정 |
+| **신고/운영** | 신고 접수, 숨김/차단, 회원 제재, 문의/FAQ, 관리자 검수 |
+| **관리자** | 회원, 작품, 경매, 결제, 신고, 제재, 문의, 출금 관리, 관리자 대시보드 |
+| **AI/분석** | 이미지 생성/분석, 조회수 회귀 예측, 인기 분류, 유사도 추천, 갤러리 추천, 경매 RAG 분석 |
+
+---
+
+## 🔎 기능 구현 상세
+
+### 사용자/인증
+
+| 기능 | 구현 내용 | 주요 파일 |
+|---|---|---|
+| 회원가입/로그인 | 이메일 기반 가입, 로그인, 로그아웃, JWT 발급/검증 | `AuthController`, `AuthService`, `JwtTokenProvider` |
+| OAuth2 로그인 | Google, Kakao, Naver OAuth2 사용자 정보 매핑 및 회원 upsert | `CustomOAuth2UserService`, `OAuth2SuccessHandler`, `OAuth2Attribute` |
+| 인증 유지 | Refresh Token을 Redis에 저장하고 쿠키 토큰과 비교 | `JwtTokenProvider`, `RedisConfig` |
+| 이메일/휴대폰 인증 | 인증번호 발송, 확인, 비밀번호 재설정 | `VerificationService`, `MailService`, `SmsService` |
+| 관리자 로그인 | 일반 사용자 로그인과 분리된 관리자 로그인 모달 및 권한 진입 | `admin-auth-modal.js`, `AdminPageController` |
+
+### 작품/갤러리
+
+| 기능 | 구현 내용 | 주요 파일 |
+|---|---|---|
+| 작품 CRUD | 작품 등록/수정/삭제/상세/피드 API, 파일/태그/갤러리 연결 저장 | `WorkAPIController`, `WorkService`, `WorkMapper.xml` |
+| 작품 파일 업로드 | 이미지/영상 파일을 AWS S3에 저장하고 DB에는 object key 저장 | `S3FileService`, `WorkFileVO` |
+| 작품 URL 변환 | 상세/피드 응답 시 S3 key를 presigned URL로 변환 | `WorkService.applyFileUrls` |
+| 작품 반응 | 조회수 증가, 좋아요, 댓글, 북마크, 다운로드 | `CommentService`, `BookmarkService`, `DownloadsController` |
+| 갤러리 CRUD | 갤러리 생성/수정/삭제/상세/목록, 커버 이미지, 작품 연결, 태그 저장 | `GalleryAPIController`, `GalleryService`, `GalleryMapper.xml` |
+| 갤러리 추천 | 갤러리와 작품 텍스트/태그 기반 유사 작품 추천 | `GalleryService`, `WorkService`, `FastAPI gallery/work router` |
+
+### 경매/결제/정산
+
+| 기능 | 구현 내용 | 주요 파일 |
+|---|---|---|
+| 경매 등록/조회 | 작품 기반 경매 생성, 시작가/현재가/상태/마감 시간 관리 | `AuctionCommandService`, `AuctionQueryService` |
+| 입찰 | 입찰 유효성 검증, 최고가 갱신, 이전 winning bid 해제, 새 winning bid 저장 | `BidCommandService`, `BidQueryService` |
+| 경매 마감 | 스케줄러가 만료 경매를 닫고 낙찰 주문/결제 대기 데이터 생성 | `AuctionClosureService` |
+| AI 경매 분석 | 경매/작품 정보를 FastAPI RAG 분석으로 전달하고 요약 리포트 반환 | `AuctionRagService`, `auction_rag_service.py` |
+| Bootpay 결제 | 클라이언트 결제 성공 후 서버에서 receiptId 조회 및 금액/주문/구매자 검증 | `PaymentService`, `BootpayClient`, `pay.js` |
+| 주문/정산/출금 | 주문 조회, 판매 내역, 정산 상태, 출금 요청과 관리자 승인 조회 | `OrderService`, `PaymentService`, `AdminWithdrawalService` |
+
+### 커뮤니케이션/운영
+
+| 기능 | 구현 내용 | 주요 파일 |
+|---|---|---|
+| 실시간 채팅 | WebSocket/STOMP 연결, RabbitMQ fanout 중계, 채팅방/메시지 저장 | `WebSocketConfig`, `RabbitConfig`, `MessageService`, `ChatRelayListener` |
+| 알림 | 알림 목록, 읽지 않은 알림, 알림 설정 관리 | `NotificationAPIController`, `NotificationService`, `NotificationSettingService` |
+| 신고/제재 | 신고 접수, 관리자 신고 조회, 회원 제재 생성/수정/만료 복구 | `ReportAPIController`, `AdminReportService`, `AdminRestrictionService` |
+| 관리자 | 회원/작품/경매/결제/신고/제재/문의/출금 관리 화면과 API | `controller/admin`, `service/admin`, `templates/admin` |
+
+### AI/데이터
+
+| 기능 | 구현 내용 | 주요 파일 |
+|---|---|---|
+| 작품 조회수 예측 | 작품 등록 입력값을 회귀 모델에 전달해 예상 조회수 산출 | `WorkAPIController`, `work_service.py`, `bideo_regressor.pkl` |
+| 인기 분류 | 작품 피처 기반 인기 가능성/분류 결과 산출 | `work_service.py`, `bideo_classifier.pkl` |
+| 이미지 생성/분석 | FastAPI 이미지 파이프라인 호출, 결과 이미지를 S3에 업로드 | `WorkAPIController`, `ai_service.py` |
+| 유사도 추천 | TF-IDF와 cosine similarity 기반 작품/갤러리 추천 | `work_recommend_service.py`, `gallery_service.py` |
+| 경매 RAG | 작품 이미지/경매 데이터 기반 입찰 리스크와 낙찰 가능성 분석 | `AuctionRagService`, `auction_rag_service.py` |
 
 ---
 
@@ -158,6 +233,25 @@ BIDEO는 창작자가 작품을 올리고, 사용자는 작품을 탐색·소장
   <img src="docs/images/bideo-ai-analysis-modal.png" width="49%" alt="BIDEO AI 작품 분석 모달" />
   <img src="docs/images/bideo-auction-insight.png" width="49%" alt="BIDEO 경매 인사이트" />
 </div>
+
+### 포트폴리오 UI/UX 캡처
+
+구현 기능을 면접/포트폴리오에서 설명하기 쉽도록 별도 `/portfolio/flowchart` 화면을 만들고, 기획 배경·백엔드 흐름·AI 활용·트러블슈팅 전후 상태를 캡처했습니다.
+
+<div align="center">
+  <img src="docs/portfolio/screenshots/00-planning-background.png" width="100%" alt="BIDEO 기획 배경 포트폴리오 캡처" />
+  <img src="docs/portfolio/screenshots/01-overview.png" width="100%" alt="BIDEO 아키텍처 플로우 캡처" />
+  <img src="docs/portfolio/screenshots/02-backend.png" width="100%" alt="BIDEO 백엔드 플로우 캡처" />
+  <img src="docs/portfolio/screenshots/03-ai-usage.png" width="100%" alt="BIDEO AI 활용 캡처" />
+</div>
+
+<details>
+<summary>트러블슈팅 실패/수정 캡처 보기</summary>
+
+<img src="docs/portfolio/screenshots/04-troubleshooting-failure.png" width="100%" alt="BIDEO 트러블슈팅 실패 캡처" />
+<img src="docs/portfolio/screenshots/05-troubleshooting-fixed.png" width="100%" alt="BIDEO 트러블슈팅 수정 완료 캡처" />
+
+</details>
 
 ### 작품 샘플
 
@@ -532,14 +626,15 @@ PSQL_PASSWORD=
 REDIS_PORT=
 RABBITMQ_HOST=
 RABBITMQ_PORT=
-RABBITMQ_USERNAME=
-RABBITMQ_PASSWORD=
+RABBITMQ_USER=
+RABBITMQ_PASS=
 JWT_SECRET=
 AWS_ACCESS_KEY=
 AWS_SECRET_KEY=
 AWS_BUCKET_NAME=
 AWS_REGION=
-BOOTPAY_APPLICATION_ID=
+BOOTPAY_JS_APPLICATION_ID=
+BOOTPAY_REST_CLIENT_KEY=
 BOOTPAY_PRIVATE_KEY=
 FASTAPI_BASE_URL=
 ```
@@ -568,34 +663,35 @@ uvicorn main:app --host 127.0.0.1 --port 8000
 
 ## 👨‍💻 담당 업무
 
-### 작품 / 갤러리
+| 영역 | 구현 내용 |
+|---|---|
+| **작품** | 작품 등록/수정/삭제/상세/피드, 파일 업로드, 태그, 갤러리 연결, 조회수, 좋아요, 댓글, 북마크, S3 presigned URL 변환 |
+| **갤러리** | 갤러리 생성/수정/삭제/목록/상세, 커버 이미지 업로드, 작품 연결, 태그 저장, 좋아요/댓글, 유사 갤러리/작품 추천 |
+| **AI** | FastAPI 회귀/분류 모델 연동, 작품 예측 결과 저장, 이미지 생성/분석 파이프라인, 작품/갤러리 추천, 경매 RAG 분석 |
+| **경매** | 경매 등록/조회, 입찰 검증, 최고가 갱신, winning bid 관리, 경매 마감 스케줄러, 낙찰 주문/결제 대기 생성 |
+| **결제/정산** | Bootpay 결제 요청, 서버 영수증 검증, 주문/결제 상태 변경, 판매 내역, 정산/출금 요청, 관리자 승인 조회 |
+| **회원/프로필** | JWT 인증, OAuth2 연동 구조, 이메일/휴대폰 인증, 프로필/배너 S3 업로드, 팔로우/차단/뱃지 |
+| **커뮤니케이션** | WebSocket/STOMP 채팅, RabbitMQ 메시지 중계, 채팅방/메시지 API, 알림 목록/설정 |
+| **관리자** | 회원/작품/경매/결제/신고/제재/문의/출금 관리 API와 화면 연결 |
+| **인프라** | EC2 Docker 배포, Spring Boot + FastAPI 통합 실행, GitHub Actions 배포, DB 스키마 보정 스크립트 |
+| **문서/포트폴리오** | README 구조화, BIDEO 플로우차트 27장 캡처, 포트폴리오용 Flowchart UI/UX 화면과 트러블슈팅 캡처 구성 |
 
-- 작품 목록, 상세, 등록, 수정, 삭제
-- 작품 파일 업로드 및 S3 연동
-- 작품 좋아요, 댓글, 북마크, 조회수 처리
-- 갤러리 생성, 작품 연결, 유사 갤러리 추천
+### 구현 흐름 요약
 
-### AI / 데이터 분석
-
-- 작품 조회수 회귀 예측 API 연동
-- 인기 작품 분류 API 연동
-- 작품·갤러리 유사도 추천
-- AI 분석용 피처 SQL 설계 및 데이터 보정
-- 경매 RAG 분석 흐름 구성
-
-### 거래 / 운영
-
-- 경매 등록, 입찰, 낙찰 흐름
-- Bootpay 결제 연동
-- 주문, 판매 내역, 정산, 출금 요청
-- 신고, 제재, 관리자 조회 기능
-
-### 인프라
-
-- AWS EC2 배포
-- AWS S3 파일 저장
-- Docker 기반 Spring Boot + FastAPI 통합 실행
-- GitHub Actions 배포 자동화
+```mermaid
+flowchart LR
+    A[사용자 로그인/JWT] --> B[작품 등록]
+    B --> C[AWS S3 파일 업로드]
+    B --> D[FastAPI AI 예측/분류]
+    B --> E[갤러리 연결]
+    E --> F[검색/추천/피드 노출]
+    B --> G[경매 등록]
+    G --> H[입찰/마감/낙찰]
+    H --> I[Bootpay 결제 검증]
+    I --> J[주문/정산/출금]
+    F --> K[댓글/좋아요/북마크/채팅/알림]
+    K --> L[신고/관리자 운영]
+```
 
 ---
 
