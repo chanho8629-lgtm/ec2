@@ -53,6 +53,40 @@
     });
   }
 
+  function renderPlanning(insights) {
+    const grid = $("[data-planning-grid]");
+    grid.replaceChildren();
+
+    insights.forEach((insight, index) => {
+      const card = create("article", "PortfolioFlow-PlanningCard");
+      card.append(create("span", "PortfolioFlow-PlanningNumber", String(index + 1).padStart(2, "0")));
+      card.append(create("h3", "", insight.title));
+      card.append(create("p", "", insight.analysis));
+      const decision = create("strong", "PortfolioFlow-Decision", "Implementation decision");
+      const detail = create("p", "PortfolioFlow-DecisionText", insight.implementationDecision);
+      card.append(decision, detail);
+      grid.append(card);
+    });
+  }
+
+  function renderImageEvidence(images) {
+    const grid = $("[data-image-evidence]");
+    grid.replaceChildren();
+
+    images.forEach((item) => {
+      const card = create("figure", "PortfolioFlow-ImageCard");
+      const image = create("img");
+      image.src = item.imageUrl;
+      image.alt = item.title;
+      image.loading = "lazy";
+      const caption = create("figcaption");
+      caption.append(create("strong", "", item.title));
+      caption.append(create("span", "", item.analysis));
+      card.append(image, caption);
+      grid.append(card);
+    });
+  }
+
   function renderBackend(modules) {
     const grid = $("[data-backend-grid]");
     grid.replaceChildren();
@@ -177,6 +211,8 @@
         throw new Error(`Portfolio API failed: ${response.status}`);
       }
       state.data = await response.json();
+      renderPlanning(state.data.planningInsights || []);
+      renderImageEvidence(state.data.imageEvidence || []);
       renderBoard(state.data.modules);
       renderBackend(state.data.modules);
       renderAi(state.data.aiUseCases);

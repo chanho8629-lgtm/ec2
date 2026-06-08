@@ -15,9 +15,9 @@
     <section class="PortfolioFlow-Hero" aria-labelledby="portfolioTitle">
         <div>
             <p class="PortfolioFlow-Eyebrow">Portfolio System Flow</p>
-            <h1 id="portfolioTitle">BIDEO architecture, UI flow, AI usage, and troubleshooting evidence</h1>
+            <h1 id="portfolioTitle">BIDEO planning background, architecture flow, and troubleshooting evidence</h1>
             <p class="PortfolioFlow-Lead">
-                A capture-ready project page for explaining Spring Boot, MyBatis, AWS S3, Bootpay, auctions, and FastAPI AI integration.
+                A capture-ready project page that connects product planning, gallery imagery, Spring Boot, MyBatis, AWS S3, Bootpay, auctions, and FastAPI AI integration.
             </p>
         </div>
         <aside class="PortfolioFlow-CapturePanel" aria-label="Capture mode">
@@ -31,13 +31,30 @@
     </section>
 
     <nav class="PortfolioFlow-Tabs" aria-label="Portfolio flow sections">
-        <button type="button" class="is-active" data-flow-tab="overview">Overview</button>
+        <button type="button" class="is-active" data-flow-tab="planning">Planning</button>
+        <button type="button" data-flow-tab="overview">Overview</button>
         <button type="button" data-flow-tab="backend">Backend</button>
         <button type="button" data-flow-tab="ai">AI Usage</button>
         <button type="button" data-flow-tab="troubleshooting">Troubleshooting</button>
     </nav>
 
-    <section class="PortfolioFlow-Panel is-active" data-flow-panel="overview">
+    <section class="PortfolioFlow-Panel is-active" data-flow-panel="planning">
+        <div class="PortfolioFlow-Planning">
+            <section class="PortfolioFlow-PlanningIntro">
+                <p class="PortfolioFlow-Eyebrow">Main Planning Background</p>
+                <h2>One flow from artwork upload to gallery exposure, sale, auction, payment, and S3 delivery</h2>
+                <p>
+                    BIDEO was planned as a portfolio-grade art commerce service. The core problem is that an artwork is not only content:
+                    it becomes gallery material, commercial inventory, auction subject, payment target, and AI analysis input.
+                    The flowchart therefore separates creator actions, backend transaction boundaries, external services, and capture evidence.
+                </p>
+            </section>
+            <div class="PortfolioFlow-PlanningGrid" data-planning-grid></div>
+            <div class="PortfolioFlow-ImageEvidence" data-image-evidence></div>
+        </div>
+    </section>
+
+    <section class="PortfolioFlow-Panel" data-flow-panel="overview" hidden>
         <div class="PortfolioFlow-Board" data-flow-board></div>
     </section>
 
