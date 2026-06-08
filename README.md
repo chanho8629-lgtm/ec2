@@ -338,6 +338,12 @@ flowchart TD
 
 전체 테이블은 `src/main/resources/sql/create_all_tables.sql` 기준으로 설계했습니다.
 
+GGSHOP 플로우차트처럼 각진 박스와 연결선 중심으로 도메인별 테이블 관계를 요약했습니다. 실제 구현은 아래 표와 Mermaid ERD의 테이블 기준을 따릅니다.
+
+<div align="center">
+  <img src="docs/portfolio/erd/bideo-erd-ggshop-style.png" width="100%" alt="BIDEO GGSHOP 스타일 ERD 요약" />
+</div>
+
 | 도메인 | 주요 테이블 |
 |---|---|
 | **회원** | `tbl_member`, `tbl_oauth`, `tbl_follow`, `tbl_block`, `tbl_badge`, `tbl_member_badge` |
@@ -634,12 +640,6 @@ pip install -r requirements-container.txt
 uvicorn main:app --host 127.0.0.1 --port 8000
 ```
 
-### 4. 접속
-
-- Spring Boot: `http://localhost:10000`
-- Swagger UI: `http://localhost:10000/swagger-ui/index.html`
-- FastAPI Health: `http://127.0.0.1:8000/api/health`
-
 ---
 
 ## 👨‍💻 담당 업무
@@ -655,7 +655,7 @@ uvicorn main:app --host 127.0.0.1 --port 8000
 | **커뮤니케이션** | WebSocket/STOMP 채팅, RabbitMQ 메시지 중계, 채팅방/메시지 API, 알림 목록/설정 |
 | **관리자** | 회원/작품/경매/결제/신고/제재/문의/출금 관리 API와 화면 연결 |
 | **인프라** | EC2 Docker 배포, Spring Boot + FastAPI 통합 실행, GitHub Actions 배포, DB 스키마 보정 스크립트 |
-| **문서/포트폴리오** | README 구조화, BIDEO 플로우차트 27장 캡처, 포트폴리오용 Flowchart UI/UX 화면과 트러블슈팅 캡처 구성 |
+| **문서/포트폴리오** | README 구조화, BIDEO 플로우차트 27장 캡처, 실제 서비스 UI/UX 화면 정리, GGSHOP 스타일 ERD 이미지, 트러블슈팅 코드 캡처 구성 |
 
 ### 구현 흐름 요약
 
@@ -696,7 +696,15 @@ DB에는 `works/demo.png` 같은 S3 object key만 저장되어 있는데, 응답
 
 `WorkService` 응답 조립 단계에서 작품 파일, 작성자 프로필, 댓글 프로필 이미지를 모두 presigned URL로 변환하도록 수정했습니다.
 
+<div align="center">
+  <img src="docs/portfolio/troubleshooting/01-workservice-apply-file-urls.png" width="100%" alt="WorkService S3 URL 변환 코드 캡처" />
+</div>
+
 `S3FileService`에서는 이미 완성된 URL과 로컬 정적 경로는 그대로 반환하고, S3 object key일 때만 presigned URL을 생성하도록 분기했습니다.
+
+<div align="center">
+  <img src="docs/portfolio/troubleshooting/02-s3file-presigned-url.png" width="100%" alt="S3FileService presigned URL 코드 캡처" />
+</div>
 
 #### 수정 결과
 
