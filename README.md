@@ -21,26 +21,6 @@
   <img src="docs/images/bideo-main-page.png" width="100%" alt="BIDEO 메인 페이지" />
 </div>
 
----
-
-## 목차
-
-- [기획 의도](#-기획-의도)
-- [기대 효과](#-기대-효과)
-- [주요 기능](#-주요-기능)
-- [기능 구현 상세](#-기능-구현-상세)
-- [프로젝트 사용 기술](#️-프로젝트-사용-기술)
-- [화면 및 자료](#️-화면-및-자료)
-- [데이터 분석 / AI 근거 자료](#-데이터-분석--ai-근거-자료)
-- [ERD / 데이터 모델](#️-erd--데이터-모델)
-- [배포 구조](#-배포-구조)
-- [실행 방법](#️-실행-방법)
-- [담당 업무](#-담당-업무)
-- [트러블슈팅](#-트러블슈팅)
-- [QA 테스트](#-qa-테스트)
-
----
-
 ## 🎯 기획 의도
 
 <div align="center">
@@ -697,7 +677,47 @@ flowchart LR
 
 ## 🔥 트러블슈팅
 
-### 1. Spring Boot와 FastAPI 호출 주소 문제
+### 1. S3 이미지 URL 렌더링 문제
+
+#### 문제 상황
+
+작품 등록 시 이미지와 영상 파일은 S3에 정상 업로드되고 DB에는 object key가 저장됐지만, 상세 화면에서는 브라우저가 이 key를 그대로 이미지 주소로 요청하면서 404가 발생했습니다.
+
+<div align="center">
+  <img src="docs/portfolio/troubleshooting/01-s3-before-code.png" width="100%" alt="S3 raw key 문제 코드 캡처" />
+</div>
+
+#### 원인
+
+DB에는 `works/demo.png` 같은 S3 object key만 저장되어 있는데, 응답 변환 없이 화면에 전달되면 `<img src="works/demo.png">` 형태로 렌더링됩니다. 이 경우 브라우저는 S3가 아니라 현재 애플리케이션 호스트에서 파일을 찾기 때문에 이미지 미리보기와 상세 이미지가 깨졌습니다.
+
+#### 수정 코드
+
+`WorkService` 응답 조립 단계에서 작품 파일, 작성자 프로필, 댓글 프로필 이미지를 모두 presigned URL로 변환하도록 수정했습니다.
+
+<div align="center">
+  <img src="docs/portfolio/troubleshooting/02-s3-after-code.png" width="100%" alt="WorkService S3 URL 변환 수정 코드 캡처" />
+</div>
+
+`S3FileService`에서는 이미 완성된 URL과 로컬 정적 경로는 그대로 반환하고, S3 object key일 때만 presigned URL을 생성하도록 분기했습니다.
+
+<div align="center">
+  <img src="docs/portfolio/troubleshooting/03-s3-presigned-helper.png" width="100%" alt="S3FileService presigned URL 생성 코드 캡처" />
+</div>
+
+#### 수정 결과
+
+<div align="center">
+  <img src="docs/portfolio/troubleshooting/04-s3-result-flow.png" width="100%" alt="S3 URL 수정 결과 흐름 캡처" />
+</div>
+
+- DB에는 안정적인 object key만 저장합니다.
+- API 응답 직전에 브라우저가 접근 가능한 presigned URL로 변환합니다.
+- 작품 상세, 피드 썸네일, 갤러리 커버, 댓글 프로필 이미지가 동일한 방식으로 렌더링됩니다.
+
+---
+
+### 2. Spring Boot와 FastAPI 호출 주소 문제
 
 #### 문제 상황
 
@@ -715,7 +735,7 @@ EC2 배포에서는 Spring Boot와 FastAPI가 같은 컨테이너 안에서 실�
 
 ---
 
-### 2. AI 모델 입력 피처 불일치 문제
+### 3. AI 모델 입력 피처 불일치 문제
 
 #### 문제 상황
 
@@ -733,7 +753,7 @@ EC2 배포에서는 Spring Boot와 FastAPI가 같은 컨테이너 안에서 실�
 
 ---
 
-### 3. EC2 DB 스키마 누락 문제
+### 4. EC2 DB 스키마 누락 문제
 
 #### 문제 상황
 
@@ -748,24 +768,6 @@ EC2 배포에서는 Spring Boot와 FastAPI가 같은 컨테이너 안에서 실�
 - `ensure_database_schema.sql`로 필수 스키마를 보정했습니다.
 - `2026-05-20_create_missing_auction_tables.sql`로 경매 관련 누락 테이블을 보완했습니다.
 - `scripts/deploy/ensure-db-schema.sh`를 통해 배포 과정에서 스키마 확인 흐름을 추가했습니다.
-
----
-
-### 4. 파일 업로드와 S3 저장 안정성 문제
-
-#### 문제 상황
-
-작품 이미지·영상 파일과 프로필/배너 이미지가 함께 사용되면서 파일 URL 길이, 업로드 경로, 저장소 분리 문제가 발생할 수 있었습니다.
-
-#### 원인
-
-로컬 정적 파일과 S3 URL이 혼재되어 있고, 영상 파일은 이미지보다 크기 때문에 업로드 제한과 URL 컬럼 길이를 함께 고려해야 했습니다.
-
-#### 해결 방안
-
-- `S3FileService`로 파일 저장 책임을 분리했습니다.
-- `spring.servlet.multipart.max-file-size=100MB`로 대용량 업로드를 허용했습니다.
-- `alter_upload_columns_to_text.sql`로 업로드 URL 컬럼을 `text` 타입으로 보정했습니다.
 
 ---
 
