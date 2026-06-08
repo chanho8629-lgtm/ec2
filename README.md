@@ -214,15 +214,16 @@ BIDEO는 창작자가 작품을 올리고, 사용자는 작품을 탐색·소장
   <img src="docs/images/bideo-auction-insight.png" width="49%" alt="BIDEO 경매 인사이트" />
 </div>
 
-### 포트폴리오 UI/UX 캡처
+### 서비스 UI/UX 화면
 
-구현 기능을 면접/포트폴리오에서 설명하기 쉽도록 별도 `/portfolio/flowchart` 화면을 만들고, 기획 배경·백엔드 흐름·AI 활용·트러블슈팅 전후 상태를 캡처했습니다.
+실제 구현 화면 캡처를 기준으로 메인 진입, 서비스 소개, 모바일 핵심 콘텐츠, AI 분석, 경매 인사이트 흐름을 정리했습니다.
 
 <div align="center">
-  <img src="docs/portfolio/screenshots/00-planning-background.png" width="100%" alt="BIDEO 기획 배경 포트폴리오 캡처" />
-  <img src="docs/portfolio/screenshots/01-overview.png" width="100%" alt="BIDEO 아키텍처 플로우 캡처" />
-  <img src="docs/portfolio/screenshots/02-backend.png" width="100%" alt="BIDEO 백엔드 플로우 캡처" />
-  <img src="docs/portfolio/screenshots/03-ai-usage.png" width="100%" alt="BIDEO AI 활용 캡처" />
+  <img src="docs/images/bideo-main-page.png" width="100%" alt="BIDEO 메인 화면" />
+  <img src="docs/images/bideo-intro-main.png" width="100%" alt="BIDEO 소개 화면" />
+  <img src="docs/images/bideo-mobile-content-core.png" width="49%" alt="BIDEO 모바일 콘텐츠 화면" />
+  <img src="docs/images/bideo-ai-analysis-modal.png" width="49%" alt="BIDEO AI 분석 모달" />
+  <img src="docs/images/bideo-auction-insight.png" width="100%" alt="BIDEO 경매 인사이트 화면" />
 </div>
 
 <details>
@@ -684,31 +685,23 @@ flowchart LR
 작품 등록 시 이미지와 영상 파일은 S3에 정상 업로드되고 DB에는 object key가 저장됐지만, 상세 화면에서는 브라우저가 이 key를 그대로 이미지 주소로 요청하면서 404가 발생했습니다.
 
 <div align="center">
-  <img src="docs/portfolio/troubleshooting/01-s3-before-code.png" width="100%" alt="S3 raw key 문제 코드 캡처" />
+  <img src="docs/portfolio/screenshots/04-troubleshooting-failure.png" width="100%" alt="BIDEO 트러블슈팅 실패 캡처" />
 </div>
 
 #### 원인
 
-DB에는 `works/demo.png` 같은 S3 object key만 저장되어 있는데, 응답 변환 없이 화면에 전달되면 `<img src="works/demo.png">` 형태로 렌더링됩니다. 이 경우 브라우저는 S3가 아니라 현재 애플리케이션 호스트에서 파일을 찾기 때문에 이미지 미리보기와 상세 이미지가 깨졌습니다.
+DB에는 `works/demo.png` 같은 S3 object key만 저장되어 있는데, 응답 변환 없이 화면에 전달되면 `&lt;img src="works/demo.png"&gt;` 형태로 렌더링됩니다. 이 경우 브라우저는 S3가 아니라 현재 애플리케이션 호스트에서 파일을 찾기 때문에 이미지 미리보기와 상세 이미지가 깨졌습니다.
 
 #### 수정 코드
 
 `WorkService` 응답 조립 단계에서 작품 파일, 작성자 프로필, 댓글 프로필 이미지를 모두 presigned URL로 변환하도록 수정했습니다.
 
-<div align="center">
-  <img src="docs/portfolio/troubleshooting/02-s3-after-code.png" width="100%" alt="WorkService S3 URL 변환 수정 코드 캡처" />
-</div>
-
 `S3FileService`에서는 이미 완성된 URL과 로컬 정적 경로는 그대로 반환하고, S3 object key일 때만 presigned URL을 생성하도록 분기했습니다.
-
-<div align="center">
-  <img src="docs/portfolio/troubleshooting/03-s3-presigned-helper.png" width="100%" alt="S3FileService presigned URL 생성 코드 캡처" />
-</div>
 
 #### 수정 결과
 
 <div align="center">
-  <img src="docs/portfolio/troubleshooting/04-s3-result-flow.png" width="100%" alt="S3 URL 수정 결과 흐름 캡처" />
+  <img src="docs/portfolio/screenshots/05-troubleshooting-fixed.png" width="100%" alt="BIDEO 트러블슈팅 수정 완료 캡처" />
 </div>
 
 - DB에는 안정적인 object key만 저장합니다.
