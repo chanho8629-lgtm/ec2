@@ -167,7 +167,7 @@ BIDEO는 창작자가 작품을 올리고, 사용자는 작품을 탐색·소장
 
 ### BIDEO 시스템 플로우차트
 
-표지 슬라이드를 제외하고 갤러리·작품 CRUD, S3 업로드, AI 분석, Bootpay 결제 검증, 경매 입찰·자동 마감의 핵심 처리 흐름 26장을 정리했습니다. 각 슬라이드는 Backend와 Frontend의 실행 순서, DB·S3·외부 API 연동 지점을 동일한 간격과 정렬 기준으로 표현합니다.
+갤러리·작품 CRUD, AI 분석, Bootpay 결제, 경매의 핵심 처리 흐름을 기능당 한 페이지로 정리했습니다. 각 슬라이드는 Backend와 Frontend의 전체 실행 순서, DB·S3·외부 API 연동 지점을 한 화면에서 확인할 수 있습니다.
 
 [BIDEO 전체 플로우차트 PPTX 다운로드](docs/portfolio/bideo-flowchart/bideo-flowchart.pptx)
 
@@ -178,55 +178,44 @@ BIDEO는 창작자가 작품을 올리고, 사용자는 작품을 탐색·소장
 <details open>
 <summary><b>갤러리 핵심 플로우 — 생성·조회·수정·삭제</b></summary>
 
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-02.png" width="100%" alt="BIDEO flowchart slide 02" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-03.png" width="100%" alt="BIDEO flowchart slide 03" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-04.png" width="100%" alt="BIDEO flowchart slide 04" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-05.png" width="100%" alt="BIDEO flowchart slide 05" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-06.png" width="100%" alt="BIDEO flowchart slide 06" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-07.png" width="100%" alt="BIDEO flowchart slide 07" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-08.png" width="100%" alt="BIDEO flowchart slide 08" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-09.png" width="100%" alt="BIDEO flowchart slide 09" />
+<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-02.png" width="100%" alt="BIDEO 갤러리 목록 플로우차트" />
+<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-03.png" width="100%" alt="BIDEO 갤러리 상세 플로우차트" />
+<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-04.png" width="100%" alt="BIDEO 갤러리 수정 플로우차트" />
+<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-05.png" width="100%" alt="BIDEO 갤러리 삭제 플로우차트" />
 
 </details>
 
 <details open>
 <summary><b>작품 핵심 플로우 — 생성·피드/상세·수정·삭제</b></summary>
 
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-10.png" width="100%" alt="BIDEO flowchart slide 10" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-11.png" width="100%" alt="BIDEO flowchart slide 11" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-12.png" width="100%" alt="BIDEO flowchart slide 12" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-13.png" width="100%" alt="BIDEO flowchart slide 13" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-14.png" width="100%" alt="BIDEO flowchart slide 14" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-15.png" width="100%" alt="BIDEO flowchart slide 15" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-16.png" width="100%" alt="BIDEO flowchart slide 16" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-17.png" width="100%" alt="BIDEO flowchart slide 17" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-18.png" width="100%" alt="BIDEO flowchart slide 18" />
+<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-06.png" width="100%" alt="BIDEO 작품 생성 플로우차트" />
+<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-07.png" width="100%" alt="BIDEO 작품 피드 및 상세 플로우차트" />
+<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-08.png" width="100%" alt="BIDEO 작품 수정 플로우차트" />
+<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-09.png" width="100%" alt="BIDEO 작품 삭제 플로우차트" />
 
 </details>
 
 <details open>
 <summary><b>AI 핵심 플로우 — 이미지 생성·예측</b></summary>
 
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-19.png" width="100%" alt="BIDEO flowchart slide 19" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-20.png" width="100%" alt="BIDEO flowchart slide 20" />
+<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-10.png" width="100%" alt="BIDEO AI 이미지 생성 플로우차트" />
+<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-11.png" width="100%" alt="BIDEO AI 작품 예측 플로우차트" />
 
 </details>
 
 <details open>
 <summary><b>결제 핵심 플로우 — Bootpay 검증·DB 완료</b></summary>
 
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-21.png" width="100%" alt="BIDEO flowchart slide 21" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-22.png" width="100%" alt="BIDEO flowchart slide 22" />
+<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-12.png" width="100%" alt="BIDEO Bootpay 결제 플로우차트" />
 
 </details>
 
 <details open>
 <summary><b>경매 핵심 플로우 — 조회·입찰·자동 마감</b></summary>
 
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-23.png" width="100%" alt="BIDEO flowchart slide 23" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-24.png" width="100%" alt="BIDEO flowchart slide 24" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-25.png" width="100%" alt="BIDEO flowchart slide 25" />
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-26.png" width="100%" alt="BIDEO flowchart slide 26" />
+<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-13.png" width="100%" alt="BIDEO 경매 조회 플로우차트" />
+<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-14.png" width="100%" alt="BIDEO 경매 입찰 플로우차트" />
+<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-15.png" width="100%" alt="BIDEO 경매 자동 마감 플로우차트" />
 
 </details>
 
