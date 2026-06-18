@@ -170,14 +170,12 @@ BIDEO는 창작자가 작품을 올리고, 사용자는 작품을 탐색·소장
 `C:\Users\chanh\Desktop\포토폴리오\저찬호\정찬호_BIDEO_플로우차트.pptx`의 슬라이드를 PNG로 캡처해 정리했습니다. 갤러리 CRUD, 작품 CRUD, S3 업로드, Bootpay 결제 검증, 경매 입찰/낙찰, AI 분석 흐름을 백엔드와 프론트엔드 기준으로 나누어 표현했습니다.
 
 <div align="center">
-  <img src="docs/portfolio/bideo-flowchart/bideo-flowchart-01.png" width="100%" alt="BIDEO 플로우차트 표지" />
-  <img src="docs/portfolio/bideo-flowchart/bideo-flowchart-02.png" width="100%" alt="BIDEO 갤러리 생성 플로우차트" />
+  <img src="docs/portfolio/bideo-flowchart/bideo-flowchart-02.png" width="100%" alt="BIDEO 메인 플로우차트 - 갤러리 생성" />
 </div>
 
 <details>
-<summary>전체 BIDEO 플로우차트 캡처 27장 보기</summary>
+<summary>전체 BIDEO 플로우차트 캡처 26장 보기</summary>
 
-<img src="docs/portfolio/bideo-flowchart/bideo-flowchart-01.png" width="100%" alt="BIDEO flowchart slide 01" />
 <img src="docs/portfolio/bideo-flowchart/bideo-flowchart-02.png" width="100%" alt="BIDEO flowchart slide 02" />
 <img src="docs/portfolio/bideo-flowchart/bideo-flowchart-03.png" width="100%" alt="BIDEO flowchart slide 03" />
 <img src="docs/portfolio/bideo-flowchart/bideo-flowchart-04.png" width="100%" alt="BIDEO flowchart slide 04" />
