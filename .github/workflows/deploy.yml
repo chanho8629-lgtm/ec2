@@ -4,10 +4,32 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Build and test
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean test bootJar --no-daemon
+
   deploy:
-    if: github.repository == 'bideo-ec2/ec2'
+    needs: verify
+    if: github.repository == 'chanho8629-lgtm/ec2' && vars.ENABLE_EC2_DEPLOY == 'true'
     runs-on: ubuntu-24.04
 
     strategy:

@@ -46,6 +46,10 @@ public class AuctionDAO {
         return auctionMapper.selectById(auctionId);
     }
 
+    public AuctionVO findRawByIdForUpdate(Long auctionId) {
+        return auctionMapper.selectByIdForUpdate(auctionId);
+    }
+
     public Optional<AuctionVO> findLatestByWorkId(Long workId) {
         return Optional.ofNullable(auctionMapper.selectLatestByWorkId(workId));
     }

@@ -142,6 +142,15 @@
         WHERE id = #{paymentId}
     </update>
 
+    <select id="existsPgReceiptIdForOtherPayment" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM tbl_payment
+            WHERE pg_receipt_id = #{pgReceiptId}
+              AND id != #{paymentId}
+        )
+    </select>
+
     <update id="updateOtherOpenByBuyerAndWork">
         UPDATE tbl_payment
         SET status = #{status}

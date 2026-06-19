@@ -27,3 +27,6 @@ comment on column tbl_bid.is_winning is '최고가 여부';
 
 create index idx_bid_auction on tbl_bid (auction_id, bid_price desc);
 create index idx_bid_member  on tbl_bid (member_id);
+create unique index ux_bid_one_winner_per_auction
+    on tbl_bid (auction_id)
+    where is_winning = true;

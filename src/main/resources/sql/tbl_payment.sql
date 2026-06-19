@@ -63,3 +63,6 @@ create index idx_payment_buyer   on tbl_payment (buyer_id);
 create index idx_payment_seller  on tbl_payment (seller_id);
 create index idx_payment_work    on tbl_payment (work_id);
 create index idx_payment_auction on tbl_payment (auction_id);
+create unique index ux_payment_pg_receipt
+    on tbl_payment (pg_receipt_id)
+    where pg_receipt_id is not null;

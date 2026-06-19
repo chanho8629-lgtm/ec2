@@ -6,9 +6,11 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+    @Builder
 public class PageRequestDTO {
+    @Builder.Default
     private Integer page = 1;
+    @Builder.Default
     private Integer size = 20;
     private String sort;
     private String order;

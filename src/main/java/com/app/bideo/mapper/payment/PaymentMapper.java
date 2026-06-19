@@ -35,6 +35,9 @@ public interface PaymentMapper {
 
     void updatePgReceiptId(@Param("paymentId") Long paymentId, @Param("pgReceiptId") String pgReceiptId);
 
+    boolean existsPgReceiptIdForOtherPayment(@Param("pgReceiptId") String pgReceiptId,
+                                             @Param("paymentId") Long paymentId);
+
     void updateOtherOpenByBuyerAndWork(@Param("buyerId") Long buyerId,
                                        @Param("workId") Long workId,
                                        @Param("excludePaymentId") Long excludePaymentId,

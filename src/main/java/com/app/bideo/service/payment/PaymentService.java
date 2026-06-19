@@ -215,6 +215,11 @@ public class PaymentService {
             throw new IllegalStateException("부트페이 결제 상태가 완료가 아닙니다.");
         }
 
+        if (paymentDAO.existsPgReceiptIdForOtherPayment(requestDTO.getReceiptId(), payment.getId())) {
+            throw new IllegalStateException("이미 사용된 부트페이 영수증입니다.");
+        }
+
+        paymentDAO.updatePgReceiptId(payment.getId(), requestDTO.getReceiptId());
         return completePayment(payment.getId(), buyerId);
     }
 

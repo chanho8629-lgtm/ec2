@@ -27,6 +27,7 @@ select
 \i /sql/2026-05-15_seed_tags_500.sql
 \i /sql/2026-05-15_seed_random_work_gallery_tags.sql
 \i /sql/seed_work_interactions.sql
+\i /sql/2026-06-19_payment_auction_integrity.sql
 
 create index if not exists idx_tag_lower_name on tbl_tag (lower(tag_name));
 
