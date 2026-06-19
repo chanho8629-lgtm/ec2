@@ -107,6 +107,13 @@
         SELECT * FROM tbl_auction WHERE id = #{auctionId}
     </select>
 
+    <select id="selectByIdForUpdate" resultType="AuctionVO">
+        SELECT *
+        FROM tbl_auction
+        WHERE id = #{auctionId}
+        FOR UPDATE
+    </select>
+
     <select id="selectLatestByWorkId" resultType="AuctionVO">
         SELECT *
         FROM tbl_auction

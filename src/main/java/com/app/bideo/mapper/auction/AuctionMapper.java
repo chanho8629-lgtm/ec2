@@ -28,6 +28,8 @@ public interface AuctionMapper {
 
     AuctionVO selectById(@Param("auctionId") Long auctionId);
 
+    AuctionVO selectByIdForUpdate(@Param("auctionId") Long auctionId);
+
     AuctionVO selectLatestByWorkId(@Param("workId") Long workId);
 
     List<AuctionVO> selectExpiredActiveAuctions();

@@ -153,8 +153,8 @@ public class PortfolioController {
                                 "auction-race",
                                 "Multiple bidders could race around the current winning bid update.",
                                 "Two winning bids appeared during rapid manual bid testing.",
-                                "Wrapped BidCommandService.placeBid in a transaction and clears previous winning bid before saving the new one.",
-                                "Repeated parallel bid tests keep exactly one winning bid per auction."
+                                "Locks the auction row with SELECT FOR UPDATE, clears the previous winner, and saves the new winning bid in one transaction.",
+                                "A partial unique index also prevents more than one winning bid per auction."
                         )
                 )
         );
