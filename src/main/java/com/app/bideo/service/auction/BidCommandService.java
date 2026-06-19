@@ -23,7 +23,8 @@ public class BidCommandService {
     private final NotificationService notificationService;
 
     public BidResponseDTO placeBid(Long memberId, BidRequestDTO requestDTO) {
-        AuctionVO auction = auctionDAO.findRawById(requestDTO.getAuctionId());
+        // 같은 경매의 입찰 요청을 DB 행 잠금으로 직렬화한다.
+        AuctionVO auction = auctionDAO.findRawByIdForUpdate(requestDTO.getAuctionId());
         if (auction == null) {
             throw new IllegalArgumentException("경매를 찾을 수 없습니다.");
         }
