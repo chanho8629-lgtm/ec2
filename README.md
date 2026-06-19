@@ -16,9 +16,8 @@
     <img src="https://img.shields.io/badge/FastAPI-AI%20Server-009688?logo=fastapi&logoColor=white" />
     <img src="https://img.shields.io/badge/PostgreSQL-Database-4169E1?logo=postgresql&logoColor=white" />
     <img src="https://img.shields.io/badge/AWS-EC2%20%7C%20S3-FF9900?logo=amazonaws&logoColor=white" />
+    <img src="https://github.com/chanho8629-lgtm/ec2/actions/workflows/deploy.yml/badge.svg" alt="Build and test" />
   </p>
-
-  <img src="docs/images/bideo-main-page.png" width="100%" alt="BIDEO 메인 페이지" />
 </div>
 
 ## 👨‍💻 포트폴리오 핵심 요약
@@ -40,6 +39,10 @@
 - **AI 기능 개발**: 이미지 생성·분석, 작품 조회수 예측과 인기 분류, TF-IDF 기반 유사 작품·갤러리 추천, 경매 RAG 분석을 서비스 API에 연동했습니다.
 
 > 팀 프로젝트의 전체 기능은 아래에 정리되어 있으며, 위 CRUD·경매·결제·S3·AI 항목은 정찬호가 직접 구현한 핵심 영역입니다.
+
+### 빠른 탐색
+
+[주요 기능](#-주요-기능) · [플로우차트](#bideo-시스템-플로우차트) · [AI 근거](#-데이터-분석--ai-근거-자료) · [ERD](#️-erd--데이터-모델) · [트러블슈팅](#-트러블슈팅) · [검증 현황](#-검증-현황)
 
 ---
 
@@ -595,10 +598,11 @@ EC2 배포에서는 Spring Boot와 FastAPI가 같은 컨테이너 안에서 실�
 
 ### 자동화 테스트
 
-- `./gradlew test` 실행 결과: **20개 테스트 통과**
+- `./gradlew test` 실행 결과: **22개 테스트 통과**
 - 관리자 화면 계약 검증: 12개
 - 회원 제재 서비스 생성·중복 방지·해제 검증: 6개
 - 경매 잠금·결제 영수증 무결성 계약 검증: 2개
+- 경매 행 잠금 호출·결제 영수증 재사용 차단 단위 테스트: 2개
 - 현재 테스트는 핵심 도메인 전체를 보장하는 수준이 아니며, 경매 동시 입찰과 결제 중복 요청 테스트는 추가 과제로 관리합니다.
 
 ### 기능 QA
@@ -621,7 +625,7 @@ EC2 배포에서는 Spring Boot와 FastAPI가 같은 컨테이너 안에서 실�
 - **경매 동시성**: 경매 행에 `SELECT ... FOR UPDATE` 잠금을 적용하고 경매별 최고 입찰을 하나만 허용하는 부분 유일 인덱스로 동시 입찰을 보호합니다.
 - **결제 멱등성**: Bootpay 영수증 ID의 중복 사용 여부를 애플리케이션과 DB 부분 유일 인덱스에서 함께 검증합니다.
 - **테스트 격리**: 외부 인프라 없이 실행되는 단위 테스트와 Testcontainers 기반 통합 테스트를 분리할 계획입니다.
-- **AI 모델 관리**: 대용량 모델 파일은 Git LFS 또는 별도 모델 저장소로 분리하고 버전·평가 지표를 함께 관리할 계획입니다.
+- **AI 모델 관리**: 현재 `.pkl` 모델은 Git LFS로 관리합니다. 이후 모델 버전과 평가 지표를 자동으로 연결하는 모델 레지스트리 도입이 필요합니다.
 - **서비스 분리**: 현재는 Spring Boot와 FastAPI를 하나의 컨테이너에서 실행하지만, 트래픽 증가 시 독립 배포와 확장이 가능하도록 분리할 계획입니다.
 
 ---
