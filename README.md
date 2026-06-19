@@ -21,6 +21,28 @@
   <img src="docs/images/bideo-main-page.png" width="100%" alt="BIDEO 메인 페이지" />
 </div>
 
+## 👨‍💻 포트폴리오 핵심 요약
+
+| 항목 | 내용 |
+|---|---|
+| **프로젝트** | AI 기반 디지털 아트 전시·거래 플랫폼 |
+| **핵심 기여** | 작품 CRUD, 갤러리(예술관) CRUD, 경매, Bootpay 결제, AWS S3 파일 저장, AI 기능 개발 |
+| **담당 범위** | API·서비스·MyBatis 데이터 처리, 화면 연동, 외부 결제 검증, S3 업로드 및 URL 변환, Spring Boot–FastAPI 연동 |
+| **배포 환경** | Spring Boot와 FastAPI를 Docker 이미지로 구성하고 AWS EC2에 배포 |
+| **개발 기간** | 2026.04 ~ 2026.05 |
+
+### 핵심 구현
+
+- **작품·갤러리 CRUD**: 작품 파일, 태그, 갤러리 연결 관계를 함께 저장하고 수정·삭제 시 연관 데이터를 처리했습니다.
+- **경매 흐름**: 경매 등록, 입찰 검증, 최고가 갱신, 자동 마감, 낙찰 주문 생성까지 연결했습니다.
+- **결제 검증**: 클라이언트 결제 결과를 그대로 신뢰하지 않고 Bootpay 서버 API로 영수증과 주문 금액을 다시 검증했습니다.
+- **S3 파일 처리**: DB에는 S3 object key를 저장하고 API 응답 시 presigned URL로 변환해 파일 접근과 저장 책임을 분리했습니다.
+- **AI 기능 개발**: 이미지 생성·분석, 작품 조회수 예측과 인기 분류, TF-IDF 기반 유사 작품·갤러리 추천, 경매 RAG 분석을 서비스 API에 연동했습니다.
+
+> 팀 프로젝트의 전체 기능은 아래에 정리되어 있으며, 위 CRUD·경매·결제·S3·AI 항목은 정찬호가 직접 구현한 핵심 영역입니다.
+
+---
+
 ## 🎯 기획 의도
 
 <div align="center">
@@ -175,7 +197,7 @@ BIDEO는 창작자가 작품을 올리고, 사용자는 작품을 탐색·소장
   <img src="docs/portfolio/bideo-flowchart/bideo-flowchart-01.png" width="100%" alt="BIDEO 메인 플로우차트 - 갤러리 생성" />
 </div>
 
-<details open>
+<details>
 <summary><b>갤러리 핵심 플로우 — 생성·조회·수정·삭제</b></summary>
 
 <img src="docs/portfolio/bideo-flowchart/bideo-flowchart-02.png" width="100%" alt="BIDEO 갤러리 목록 플로우차트" />
@@ -185,7 +207,7 @@ BIDEO는 창작자가 작품을 올리고, 사용자는 작품을 탐색·소장
 
 </details>
 
-<details open>
+<details>
 <summary><b>작품 핵심 플로우 — 생성·피드/상세·수정·삭제</b></summary>
 
 <img src="docs/portfolio/bideo-flowchart/bideo-flowchart-06.png" width="100%" alt="BIDEO 작품 생성 플로우차트" />
@@ -195,7 +217,7 @@ BIDEO는 창작자가 작품을 올리고, 사용자는 작품을 탐색·소장
 
 </details>
 
-<details open>
+<details>
 <summary><b>AI 핵심 플로우 — 이미지 생성·예측</b></summary>
 
 <img src="docs/portfolio/bideo-flowchart/bideo-flowchart-10.png" width="100%" alt="BIDEO AI 이미지 생성 플로우차트" />
@@ -203,14 +225,14 @@ BIDEO는 창작자가 작품을 올리고, 사용자는 작품을 탐색·소장
 
 </details>
 
-<details open>
+<details>
 <summary><b>결제 핵심 플로우 — Bootpay 검증·DB 완료</b></summary>
 
 <img src="docs/portfolio/bideo-flowchart/bideo-flowchart-12.png" width="100%" alt="BIDEO Bootpay 결제 플로우차트" />
 
 </details>
 
-<details open>
+<details>
 <summary><b>경매 핵심 플로우 — 조회·입찰·자동 마감</b></summary>
 
 <img src="docs/portfolio/bideo-flowchart/bideo-flowchart-13.png" width="100%" alt="BIDEO 경매 조회 플로우차트" />
@@ -567,9 +589,20 @@ EC2 배포에서는 Spring Boot와 FastAPI가 같은 컨테이너 안에서 실�
 
 ---
 
-## ✅ QA 테스트
+## ✅ 검증 현황
 
-| 구분 | 테스트 내용 |
+배포 서버는 PostgreSQL, Redis, RabbitMQ, S3 및 외부 인증·결제 키에 의존하므로 배포용 JAR 생성과 자동화 테스트를 분리했습니다. GitHub Actions 배포에서는 `bootJar -x test`로 패키징하며, 테스트 코드를 삭제하지 않고 로컬 또는 별도 테스트 환경에서 실행할 수 있도록 유지합니다.
+
+### 자동화 테스트
+
+- `./gradlew test` 실행 결과: **18개 테스트 통과**
+- 관리자 화면 계약 검증: 12개
+- 회원 제재 서비스 생성·중복 방지·해제 검증: 6개
+- 현재 테스트는 핵심 도메인 전체를 보장하는 수준이 아니며, 경매 동시 입찰과 결제 중복 요청 테스트는 추가 과제로 관리합니다.
+
+### 기능 QA
+
+| 구분 | 수동 검증 내용 |
 |---|---|
 | 회원 | 회원가입, 로그인, OAuth 로그인, JWT 인증, 로그아웃 |
 | 작품 | 등록, 상세, 수정, 삭제, 파일 업로드, 좋아요, 댓글 |
@@ -579,6 +612,16 @@ EC2 배포에서는 Spring Boot와 FastAPI가 같은 컨테이너 안에서 실�
 | AI | 조회수 예측, 인기 분류, 유사 작품 추천, 경매 분석 |
 | 관리자 | 회원 조회, 신고 처리, 작품 관리, 결제/출금 관리 |
 | 배포 | EC2 Docker 실행, FastAPI health check, DB 연결, S3 업로드 |
+
+---
+
+## 🚧 기술적 한계와 개선 계획
+
+- **경매 동시성**: 동일 경매에 입찰 요청이 동시에 들어오는 상황을 재현하고 DB 잠금 또는 낙관적 잠금을 적용할 계획입니다.
+- **결제 멱등성**: 동일 영수증의 중복 처리 방지를 DB 제약조건과 요청 식별자로 강화할 계획입니다.
+- **테스트 격리**: 외부 인프라 없이 실행되는 단위 테스트와 Testcontainers 기반 통합 테스트를 분리할 계획입니다.
+- **AI 모델 관리**: 대용량 모델 파일은 Git LFS 또는 별도 모델 저장소로 분리하고 버전·평가 지표를 함께 관리할 계획입니다.
+- **서비스 분리**: 현재는 Spring Boot와 FastAPI를 하나의 컨테이너에서 실행하지만, 트래픽 증가 시 독립 배포와 확장이 가능하도록 분리할 계획입니다.
 
 ---
 
