@@ -164,6 +164,8 @@ BIDEO는 창작자가 작품을 올리고, 사용자는 작품을 탐색·소장
 | 유사도 추천 | TF-IDF와 cosine similarity 기반 작품/갤러리 추천 | `work_recommend_service.py`, `gallery_service.py` |
 | 경매 RAG | 작품 이미지/경매 데이터 기반 입찰 리스크와 낙찰 가능성 분석 | `AuctionRagService`, `auction_rag_service.py` |
 
+[AI 모델 카드 및 검증 한계 보기](docs/portfolio/AI_MODEL_CARD.md)
+
 ---
 
 ## 🛠️ 프로젝트 사용 기술
@@ -598,11 +600,13 @@ EC2 배포에서는 Spring Boot와 FastAPI가 같은 컨테이너 안에서 실�
 
 ### 자동화 테스트
 
-- `./gradlew test` 실행 결과: **22개 테스트 통과**
+- `./gradlew test` 실행 결과: **25개 테스트 통과**
 - 관리자 화면 계약 검증: 12개
 - 회원 제재 서비스 생성·중복 방지·해제 검증: 6개
 - 경매 잠금·결제 영수증 무결성 계약 검증: 2개
 - 경매 행 잠금 호출·결제 영수증 재사용 차단 단위 테스트: 2개
+- 갤러리 수정·삭제·소유권 단위 테스트: 3개
+- FastAPI 갤러리 유사도 테스트: 3개
 - 현재 테스트는 핵심 도메인 전체를 보장하는 수준이 아니며, 경매 동시 입찰과 결제 중복 요청 테스트는 추가 과제로 관리합니다.
 
 ### 기능 QA
