@@ -88,6 +88,10 @@ src/main/resources/certs/
 certs
 key/
 *.zip
+.env
+.env.*
+!.env.example
+src/main/resources/application-*-secret.y*ml
 
 # =====================================================
 # 프로젝트 전용
