@@ -1,54 +1,65 @@
-# BIDEO
-
 <div align="center">
-  <img src="docs/images/logo.png" width="220" alt="BIDEO Logo" />
+  <img src="docs/images/logo.png" width="190" alt="BIDEO Logo" />
 
-  <h3>AI 기반 디지털 아트 전시·거래 플랫폼</h3>
+  <h1>BIDEO</h1>
+  <h3>작품 전시부터 AI 분석·경매·결제까지 연결한 디지털 아트 플랫폼</h3>
 
   <p>
-    <b>BIDEO</b>는 영상·이미지 작품을 등록하고, 갤러리로 전시하며,<br>
-    경매·결제·정산까지 연결하는 창작자 중심 디지털 아트 플랫폼입니다.
+    창작자는 작품을 등록하고 예술관을 구성하며,<br>
+    사용자는 작품을 탐색하고 경매·결제를 통해 소장할 수 있습니다.
   </p>
 
   <p>
-    <img src="https://img.shields.io/badge/Spring%20Boot-3.5.10-6DB33F?logo=springboot&logoColor=white" />
-    <img src="https://img.shields.io/badge/Java-17-007396?logo=openjdk&logoColor=white" />
-    <img src="https://img.shields.io/badge/FastAPI-AI%20Server-009688?logo=fastapi&logoColor=white" />
-    <img src="https://img.shields.io/badge/PostgreSQL-Database-4169E1?logo=postgresql&logoColor=white" />
-    <img src="https://img.shields.io/badge/AWS-EC2%20%7C%20S3-FF9900?logo=amazonaws&logoColor=white" />
+    <img src="https://img.shields.io/badge/Java_17-007396?style=flat-square&logo=openjdk&logoColor=white" />
+    <img src="https://img.shields.io/badge/Spring_Boot_3.5-6DB33F?style=flat-square&logo=springboot&logoColor=white" />
+    <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" />
+    <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" />
+    <img src="https://img.shields.io/badge/AWS_S3-FF9900?style=flat-square&logo=amazons3&logoColor=white" />
+    <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" />
     <img src="https://github.com/chanho8629-lgtm/ec2/actions/workflows/deploy.yml/badge.svg" alt="Build and test" />
   </p>
+
+  <p>
+    <a href="docs/portfolio/demo/bideo-demo.mp4"><b>▶ 3분 40초 시연 영상</b></a>
+    &nbsp;·&nbsp;
+    <a href="docs/portfolio/bideo-flowchart/bideo-flowchart.pptx"><b>전체 플로우차트</b></a>
+    &nbsp;·&nbsp;
+    <a href="docs/portfolio/AI_MODEL_CARD.md"><b>AI 모델 카드</b></a>
+  </p>
+
+  <img src="docs/images/bideo-main-page.png" width="100%" alt="BIDEO 메인 화면" />
 </div>
 
-## 👨‍💻 포트폴리오 핵심 요약
+## 🚀 한눈에 보는 프로젝트
+
+| **직접 구현** | **거래 안정성** | **AI 연동** | **검증** |
+|:---:|:---:|:---:|:---:|
+| 작품·예술관 CRUD<br>S3 파일 처리 | 경매 DB 잠금<br>결제 영수증 검증 | 예측·분류·추천<br>경매 RAG | Java 28개<br>FastAPI 3개 |
 
 | 항목 | 내용 |
 |---|---|
-| **프로젝트** | AI 기반 디지털 아트 전시·거래 플랫폼 |
-| **핵심 기여** | 작품 CRUD, 갤러리(예술관) CRUD, 경매, Bootpay 결제, AWS S3 파일 저장, AI 기능 개발 |
-| **담당 범위** | API·서비스·MyBatis 데이터 처리, 화면 연동, 외부 결제 검증, S3 업로드 및 URL 변환, Spring Boot–FastAPI 연동 |
-| **배포 환경** | Spring Boot와 FastAPI를 Docker 이미지로 구성하고 AWS EC2에 배포 |
 | **개발 기간** | 2026.04 ~ 2026.05 |
+| **개인 핵심 기여** | 작품 CRUD, 예술관 CRUD, 경매, Bootpay 결제, AWS S3 저장, AI 기능 연동 |
+| **Backend** | Java 17, Spring Boot 3.5, Spring Security, JWT, MyBatis |
+| **Data / Infra** | PostgreSQL, Redis, RabbitMQ, AWS S3·EC2, Docker, GitHub Actions |
+| **AI** | FastAPI, RandomForest, TF-IDF, RAGAnything, LightRAG, OpenAI API |
 
-### 핵심 구현
+## 🔥 핵심 기술 문제와 해결
 
-- **작품·갤러리 CRUD**: 작품 파일, 태그, 갤러리 연결 관계를 함께 저장하고 수정·삭제 시 연관 데이터를 처리했습니다.
-- **경매 흐름**: 경매 등록, 입찰 검증, 최고가 갱신, 자동 마감, 낙찰 주문 생성까지 연결했습니다.
-- **결제 검증**: 클라이언트 결제 결과를 그대로 신뢰하지 않고 Bootpay 서버 API로 영수증과 주문 금액을 다시 검증했습니다.
-- **S3 파일 처리**: DB에는 S3 object key를 저장하고 API 응답 시 presigned URL로 변환해 파일 접근과 저장 책임을 분리했습니다.
-- **AI 기능 개발**: 이미지 생성·분석, 작품 조회수 예측과 인기 분류, TF-IDF 기반 유사 작품·갤러리 추천, 경매 RAG 분석을 서비스 API에 연동했습니다.
+| 문제 | 해결 |
+|---|---|
+| 동시 입찰 시 최고 입찰 상태 충돌 가능성 | `SELECT FOR UPDATE`와 부분 유일 인덱스로 경매별 최고 입찰을 하나로 보장 |
+| 클라이언트 결제 결과 위·변조 가능성 | Bootpay 서버 API로 영수증·금액·주문번호를 검증하고 영수증 재사용 차단 |
+| S3 object key를 브라우저가 직접 열 수 없는 문제 | DB에는 object key만 저장하고 응답 시 presigned URL로 변환 |
+| Java와 Python 간 AI 입력 피처 불일치 | 학습 피처 목록을 모델과 함께 저장하고 FastAPI에서 동일 순서로 입력 구성 |
 
-> 팀 프로젝트의 전체 기능은 아래에 정리되어 있으며, 위 CRUD·경매·결제·S3·AI 항목은 정찬호가 직접 구현한 핵심 영역입니다.
+> 위 CRUD·경매·결제·S3·AI 영역은 정찬호가 직접 구현한 핵심 범위입니다.
 
-## 🎬 3분 40초 시연 영상
+## 🎬 실제 서비스 시연
 
-### [▶ BIDEO 실제 시연 영상 보기](docs/portfolio/demo/bideo-demo.mp4)
-
-> GitHub에서 바로 재생되지 않는 경우 링크를 눌러 원본 영상을 다운로드해 확인할 수 있습니다.
+### [▶ BIDEO 3분 40초 시연 영상 보기](docs/portfolio/demo/bideo-demo.mp4)
 
 작품·예술관 관리, 경매·결제, AI 기능 등 실제 서비스 화면을 확인할 수 있습니다.
-
-### [▶ 상세 시연 가이드 바로 보기](docs/portfolio/DEMO_GUIDE.md)
 
 ### 빠른 탐색
 
@@ -197,10 +208,6 @@ BIDEO는 창작자가 작품을 올리고, 사용자는 작품을 탐색·소장
 ---
 
 ## 🖼️ 화면 및 자료
-
-### 메인 페이지
-
-<img src="docs/images/bideo-main-page.png" width="100%" alt="BIDEO 메인 페이지 캡처" />
 
 ### BIDEO 시스템 플로우차트
 
